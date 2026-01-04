@@ -208,7 +208,7 @@ function MobileMenu() {
         </div>
       </DrawerTrigger>
       <DrawerContent className="bg-background border-border text-foreground max-h-[90vh]">
-        <DrawerHeader className="border-b border-border px-6 py-5 flex items-center justify-between">
+        <DrawerHeader className="px-6 py-5 flex flex-row items-center justify-between border-none">
           <DrawerTitle className="text-left font-black text-xl uppercase tracking-tighter">
             Design History
           </DrawerTitle>
@@ -218,7 +218,7 @@ function MobileMenu() {
         </DrawerHeader>
 
         {/* Search Bar matching Sidebar style */}
-        <div className="p-6 pb-2 border-b border-border/50">
+        <div className="p-6 pb-2">
           <div className="relative group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-foreground transition-colors" />
             <input
