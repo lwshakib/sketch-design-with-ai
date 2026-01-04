@@ -14,16 +14,15 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { title, type } = body;
+    const { title } = body;
 
-    if (!title || !type) {
+    if (!title) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
     const project = await prisma.project.create({
       data: {
         title,
-        type,
         userId: session.user.id,
       }
     });

@@ -107,7 +107,6 @@ export default function Home() {
         method: "POST",
         body: JSON.stringify({
           title: inputValue.slice(0, 30) || "Untitled Design",
-          type: activeTab,
         })
       });
 

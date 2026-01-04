@@ -26,6 +26,12 @@ import {
   SearchIcon,
   Layout,
   MessageSquareIcon,
+  Menu,
+  Pencil,
+  Hand,
+  Image as ImageIcon,
+  User,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,6 +40,7 @@ import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DefaultChatTransport } from "ai";
+import { extractArtifact, stripArtifact } from "@/lib/artifact-renderer";
 import {
   Conversation,
   ConversationContent,
@@ -51,19 +58,30 @@ import {
 interface Project {
   id: string;
   title: string;
-  type: "app" | "web";
   messages: any[];
 }
+
+
 
 export default function ProjectPage() {
   const params = useParams();
   const projectId = params.projectId as string;
+  const previewRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [attachments, setAttachments] = useState<{ url: string; isUploading: boolean }[]>([]);
   const [input, setInput] = useState("");
+  const [currentArtifact, setCurrentArtifact] = useState<{ content: string, type: 'web' | 'app' | 'general' } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [activeTool, setActiveTool] = useState<'select' | 'hand'>('select');
+  const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 });
+  const [framePos, setFramePos] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [isPanning, setIsPanning] = useState(false);
+  const [isDraggingFrame, setIsDraggingFrame] = useState(false);
+  const dragStart = useRef({ x: 0, y: 0 });
+  const [dynamicFrameHeight, setDynamicFrameHeight] = useState<number>(800);
 
   const {
     messages,
@@ -82,8 +100,14 @@ export default function ProjectPage() {
       console.error(error);
       toast.error("Failed to connect to design engine");
     },
-    onFinish: () => {
-      // Logic after AI finishes
+    onFinish: (message) => {
+      const textContent = (message.parts?.find((p: any) => p.type === 'text') as any)?.text || message.content;
+      if (typeof textContent === 'string') {
+        const artifactData = extractArtifact(textContent);
+        if (artifactData) {
+          setCurrentArtifact(artifactData);
+        }
+      }
     },
   });
 
@@ -95,18 +119,15 @@ export default function ProjectPage() {
         const data = await res.json();
         setProject(data);
         
-        // Load initial messages from DB
         if (data.messages && data.messages.length > 0) {
           setMessages(data.messages);
         }
 
-        // Check if there's a pending prompt from the home page
         const pendingPromptRaw = sessionStorage.getItem(`pending_prompt_${projectId}`);
         if (pendingPromptRaw) {
           const { content, attachments: initialAttachments } = JSON.parse(pendingPromptRaw);
           sessionStorage.removeItem(`pending_prompt_${projectId}`);
           
-          // Trigger the initial AI response
           sendMessage({
             text: content,
             files: initialAttachments.map((url: string) => ({ type: "file" as const, url, mediaType: "image/*" })),
@@ -123,6 +144,93 @@ export default function ProjectPage() {
 
     if (projectId) fetchProjectAndInitialize();
   }, [projectId, sendMessage, setMessages, router]);
+
+  useEffect(() => {
+    const lastAssistantMessage = (messages as any[]).filter(m => m.role === 'assistant').at(-1);
+    if (lastAssistantMessage) {
+      const textContent = lastAssistantMessage.parts?.find((p: any) => p.type === 'text')?.text || lastAssistantMessage.content;
+      if (typeof textContent === 'string') {
+        const artifactData = extractArtifact(textContent);
+        if (artifactData) {
+          setCurrentArtifact(artifactData);
+        }
+      }
+    }
+  }, [messages]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (activeTool === 'hand') {
+      setIsPanning(true);
+      dragStart.current = { x: e.clientX - canvasOffset.x, y: e.clientY - canvasOffset.y };
+    }
+  };
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'HEIGHT_UPDATE' && typeof event.data.height === 'number') {
+        setDynamicFrameHeight(event.data.height);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  const getInjectedHTML = (html: string) => {
+    const script = `
+      <script>
+        const sendHeight = () => {
+          window.parent.postMessage({ type: 'HEIGHT_UPDATE', height: document.documentElement.scrollHeight }, '*');
+        };
+        window.onload = sendHeight;
+        new ResizeObserver(sendHeight).observe(document.body);
+      </script>
+      <style>
+        ::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; overflow-x: hidden; }
+      </style>
+    `;
+    return html.replace('</body>', `${script}</body>`);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isPanning && activeTool === 'hand') {
+      setCanvasOffset({
+        x: e.clientX - dragStart.current.x,
+        y: e.clientY - dragStart.current.y
+      });
+    } else if (isDraggingFrame && activeTool === 'select') {
+      setFramePos({
+        x: (e.clientX - dragStart.current.x) / zoom,
+        y: (e.clientY - dragStart.current.y) / zoom
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsPanning(false);
+    setIsDraggingFrame(false);
+  };
+
+  const startDraggingFrame = (e: React.MouseEvent) => {
+    if (activeTool === 'select') {
+      e.stopPropagation();
+      setIsDraggingFrame(true);
+      dragStart.current = { x: e.clientX - framePos.x * zoom, y: e.clientY - framePos.y * zoom };
+    }
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 0.9 : 1.1;
+      setZoom(prev => Math.min(Math.max(prev * delta, 0.1), 5));
+    } else {
+      setCanvasOffset(prev => ({
+        x: prev.x - e.deltaX,
+        y: prev.y - e.deltaY
+      }));
+    }
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -188,7 +296,7 @@ export default function ProjectPage() {
 
   if (loading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-[#09090b]">
+      <div className="h-screen w-full flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
            <Loader2 className="h-8 w-8 animate-spin text-primary" />
            <span className="text-zinc-500 text-sm font-medium">Entering Workspace...</span>
@@ -200,33 +308,28 @@ export default function ProjectPage() {
   if (!project) return null;
 
   return (
-    <div className="flex h-screen w-full bg-[#09090b] text-foreground overflow-hidden font-sans">
+    <div className="flex h-screen w-full bg-background text-foreground overflow-hidden font-sans">
       
       {/* Left Sidebar - Chat History */}
-      <aside className="w-[450px] flex flex-col border-r border-[#1a1a1e] bg-[#09090b] z-20">
-        <header className="flex items-center justify-between p-4 border-b border-[#1a1a1e] h-14 bg-[#09090b]">
-           <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => router.push('/')} className="h-8 w-8 rounded-lg hover:bg-[#1a1a1e]">
-                <RotateCcw className="h-4 w-4 text-zinc-500" />
+      <aside className="w-[380px] flex flex-col border-r bg-sidebar z-20">
+        <header className="flex items-center justify-between px-4 py-2 h-14 border-b bg-sidebar">
+           <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-white">
+                <Menu className="h-5 w-5" />
               </Button>
-              <div className="flex flex-col">
-                 <span className="font-bold text-sm truncate max-w-[220px] tracking-tight">{project.title}</span>
-                 <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{project.type} Prototype</span>
-              </div>
-           </div>
-           <div className="flex items-center gap-1">
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-zinc-500 hover:text-white hover:bg-[#1a1a1e]">
-                 <Edit2 className="h-3.5 w-3.5" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-zinc-500 hover:text-white hover:bg-[#1a1a1e]">
-                 <MoreVertical className="h-4 w-4" />
+              <span className="font-semibold text-[15px] text-foreground tracking-tight">{project.title}</span>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-500 hover:text-white ml-2">
+                <Pencil className="h-3.5 w-3.5" />
               </Button>
            </div>
+           <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-500 hover:text-white">
+              <Columns className="h-4 w-4" />
+           </Button>
         </header>
 
-        <div className="flex-1 relative overflow-hidden">
+        <div className="flex-1 relative overflow-hidden bg-sidebar">
           <Conversation className="relative h-full">
-            <ConversationContent className="p-6 gap-10 scrollbar-hide">
+            <ConversationContent className="p-4 gap-8 scrollbar-hide">
               {messages.length === 0 ? (
                 <ConversationEmptyState
                   title="Initialize Workspace"
@@ -235,101 +338,81 @@ export default function ProjectPage() {
                 />
               ) : (
                 messages.map((message) => (
-                  <Message from={message.role} key={message.id} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-                    <div className="flex items-center gap-3 mb-4">
+                  <div key={message.id} className="flex flex-col gap-4">
+                    <div className="flex items-start gap-3">
                        {message.role === 'user' ? (
-                         <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-[#4f46e5] to-[#9333ea] flex items-center justify-center text-xs font-black shadow-lg shadow-purple-500/20">
-                            U
+                         <div className="h-8 w-8 rounded-full bg-zinc-800 flex items-center justify-center">
+                            <User className="h-4 w-4 text-zinc-400" />
                          </div>
                        ) : (
-                         <div className="h-8 w-8 rounded-xl bg-[#1a1a1e] flex items-center justify-center border border-[#2a2a2e] shadow-xl">
-                            <Logo iconSize={16} showText={false} showBadge={false} />
+                         <div className="h-8 w-8 rounded-full bg-indigo-600/20 flex items-center justify-center border border-indigo-500/20">
+                            <Logo iconSize={14} showText={false} showBadge={false} />
                          </div>
                        )}
                        <div className="flex flex-col">
-                          <span className="text-[11px] font-black text-zinc-500 uppercase tracking-widest leading-none mb-1">
-                             {message.role === 'user' ? 'Designer' : 'Sketch AI'}
-                          </span>
-                          <span className="text-xs font-bold text-zinc-200">
-                             {message.role === 'user' ? 'You' : 'Vision Engine'}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[13px] font-bold text-zinc-100 uppercase tracking-wide">
+                               {message.role === 'user' ? 'Professor' : 'Stitch'}
+                            </span>
+                            {message.role === 'assistant' && (
+                              <div className="flex items-center gap-1.5 bg-muted px-2 py-0.5 rounded-full border shadow-sm">
+                                <span className="text-[10px] font-medium text-muted-foreground">Thinking with 3 Pro</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="mt-2 pl-0">
+                            <MessageContent className="p-0 bg-transparent text-foreground leading-relaxed text-[14px]">
+                              {message.parts?.map((part: any, i: number) => {
+                                if (part.type === 'text') {
+                                  const textContent = typeof part.text === 'string' ? part.text : part.text?.text;
+                                  if (!textContent) return null;
+                                  return (
+                                    <div key={i} className="whitespace-pre-wrap">
+                                       {message.role === 'assistant' ? (
+                                         <MessageResponse>{stripArtifact(textContent)}</MessageResponse>
+                                       ) : (
+                                         textContent
+                                       )}
+                                    </div>
+                                  );
+                                }
+                                if (part.type === 'file') {
+                                  const fileUrl = typeof part.file === 'string' ? part.file : part.file?.url;
+                                  if (!fileUrl) return null;
+                                  return (
+                                    <div key={i} className="mt-3 rounded-xl overflow-hidden border border-zinc-800 shadow-xl max-w-[200px]">
+                                       <img src={fileUrl} alt="Design Reference" className="w-full h-auto object-cover" />
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })}
+                              
+                              {!message.parts && (
+                                <div className="whitespace-pre-wrap">
+                                   {message.role === 'assistant' ? (
+                                     <MessageResponse>{stripArtifact((message as any).content)}</MessageResponse>
+                                   ) : (
+                                     (message as any).content
+                                   )}
+                                </div>
+                              )}
+                            </MessageContent>
+                          </div>
                        </div>
-                       {message.role === 'assistant' && status === 'streaming' && (
-                         <div className="ml-auto flex items-center gap-1.5 bg-[#1a1a1e] px-2.5 py-1 rounded-full border border-[#2a2a2e]">
-                            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[10px] font-bold text-zinc-400">Streaming</span>
-                         </div>
-                       )}
                     </div>
-
-                    <MessageContent className="pl-[44px] space-y-4">
-                      {message.parts?.map((part: any, i: number) => {
-                        if (part.type === 'text') {
-                          const textContent = typeof part.text === 'string' ? part.text : part.text?.text;
-                          if (!textContent) return null;
-                          return (
-                            <div key={i} className="text-[14px] text-zinc-300 leading-relaxed font-medium whitespace-pre-wrap">
-                               {message.role === 'assistant' ? (
-                                 <MessageResponse>{textContent}</MessageResponse>
-                               ) : (
-                                 textContent
-                               )}
-                            </div>
-                          );
-                        }
-                        if (part.type === 'file') {
-                          const fileUrl = typeof part.file === 'string' ? part.file : part.file?.url;
-                          if (!fileUrl) return null;
-                          return (
-                            <MessageAttachments key={i} className="mb-2">
-                               <MessageAttachment data={{ type: "file", url: fileUrl, mediaType: "image/png" }} />
-                            </MessageAttachments>
-                          );
-                        }
-                        return null;
-                      })}
-                      
-                      {/* Fallback for messages without parts */}
-                      {!message.parts && (
-                        <div className="text-[14px] text-zinc-300 leading-relaxed font-medium whitespace-pre-wrap">
-                           {message.role === 'assistant' ? (
-                             <MessageResponse>{(message as any).content}</MessageResponse>
-                           ) : (
-                             (message as any).content
-                           )}
-                        </div>
-                      )}
-                    </MessageContent>
-                  </Message>
+                  </div>
                 ))
               )}
             </ConversationContent>
-            <ConversationScrollButton />
           </Conversation>
         </div>
 
         {/* Bottom Chat Input */}
-        <div className="p-6 border-t border-[#1a1a1e] bg-[#09090b]">
-           <div className="relative group">
-              {/* Image Previews */}
-              <AnimatePresence>
-                {attachments.length > 0 && (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} className="flex flex-wrap gap-2 mb-4">
-                    {attachments.map((attr, i) => (
-                      <div key={i} className="relative group/img h-16 w-16 rounded-xl overflow-hidden border border-[#2a2a2e] bg-[#0d0d0f]">
-                        <img src={attr.url} alt="Upload" className={cn("h-full w-full object-cover", attr.isUploading && "opacity-40 blur-sm")} />
-                        {attr.isUploading && <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="h-4 w-4 text-white animate-spin" /></div>}
-                        <button onClick={() => removeAttachment(i)} className="absolute top-1 right-1 h-4 w-4 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover/img:opacity-100 transition-opacity"><X className="h-2 w-2" /></button>
-                      </div>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <div className={cn(
-                "relative bg-[#0d0d0f] rounded-[24px] p-5 space-y-4 border transition-all duration-300 shadow-2xl",
-                project.type === 'app' ? "focus-within:border-purple-500/30" : "focus-within:border-blue-500/30"
-              )}>
+        <div className="p-4 bg-sidebar">
+           <div className="relative">
+              <div className="bg-muted/50 rounded-2xl p-4 border border-border shadow-2xl transition-all focus-within:border-primary/50">
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -339,128 +422,175 @@ export default function ProjectPage() {
                       handleCustomSubmit(e);
                     }
                   }}
-                  placeholder="Ask Sketch to iterate..."
-                  className="w-full h-24 bg-transparent outline-none resize-none text-sm text-foreground placeholder:text-zinc-600 font-medium hide-scrollbar"
+                  placeholder="Describe your design"
+                  className="w-full bg-transparent outline-none resize-none text-[14px] text-foreground placeholder:text-muted-foreground min-h-[40px] max-h-[200px]"
                 />
 
-                <div className="flex items-center justify-between pt-2 border-t border-[#1a1a1e]">
-                  <div className="flex items-center gap-3">
-                    <input type="file" multiple accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
-                    <Button onClick={() => fileInputRef.current?.click()} variant="ghost" size="icon" className="h-9 w-9 rounded-xl bg-[#1a1a1e] text-zinc-500 hover:text-white border border-[#2a2a2e]">
-                      <Plus className="h-4.5 w-4.5" />
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-800/50">
+                  <div className="flex items-center gap-1.5">
+                    <Button onClick={() => fileInputRef.current?.click()} variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800">
+                      <Plus className="h-5 w-5" />
                     </Button>
-                    <div className="hidden sm:flex items-center gap-2 bg-[#1a1a1e] px-3 py-1.5 rounded-xl border border-[#2a2a2e]">
-                       <Sparkles className="h-3 w-3 text-purple-400" />
-                       <span className="text-[10px] font-black text-zinc-500 uppercase tracking-tight">Vision Pro</span>
-                    </div>
+                    <input type="file" multiple accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
+                    
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800">
+                      <div className="flex items-center justify-center font-bold text-[10px] bg-zinc-800 rounded px-1 min-w-[20px] h-5 border border-zinc-700">3x</div>
+                    </Button>
                   </div>
                   
                   <div className="flex items-center gap-2">
+                    <Button variant="ghost" className="h-8 px-2 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 flex items-center gap-1.5 text-[11px] font-bold">
+                      3.0 Pro <ChevronDown className="h-3.5 w-3.5" />
+                    </Button>
                     <Button 
                        onClick={handleCustomSubmit}
-                       disabled={(!input.trim() && attachments.length === 0) || status === 'streaming' || attachments.some(a => a.isUploading)}
-                       className={cn(
-                         "h-9 w-9 rounded-xl p-0 shadow-lg transition-all",
-                         project.type === 'app' ? "bg-purple-600 hover:bg-purple-500" : "bg-blue-600 hover:bg-blue-500"
-                       )}
+                       disabled={(!input.trim() && attachments.length === 0) || status === 'streaming'}
+                       className="h-8 w-8 rounded-lg p-0 bg-white hover:bg-zinc-200 text-black shadow-lg"
                     >
-                      {status === 'streaming' ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4.5 w-4.5" />}
+                      <ArrowRight className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
               </div>
            </div>
-           <p className="text-[10px] text-center mt-4 text-zinc-600 font-bold uppercase tracking-tighter opacity-50">
-              Generated design powered by Gemini 2.0 Flash
+           <p className="text-[10px] text-center mt-3 text-zinc-600 font-medium">
+              Stitch can make mistakes. Please check its work.
            </p>
         </div>
       </aside>
 
       {/* Main Preview Area */}
-      <main className="flex-1 flex flex-col bg-[#0d0d0f] relative overflow-hidden">
-         {/* Grid Background Effect */}
-         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+      <main 
+        ref={previewRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onWheel={handleWheel}
+        className={cn(
+          "flex-1 flex flex-col bg-muted relative overflow-hidden",
+          activeTool === 'hand' ? "cursor-grab active:cursor-grabbing" : "cursor-default"
+        )}
+      >
+         {/* Grid Background */}
+         <div 
+           className="absolute inset-0 pointer-events-none opacity-[0.03]"
+           style={{
+             backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
+             backgroundSize: `${20 * zoom}px ${20 * zoom}px`,
+             transform: `translate(${canvasOffset.x % (20 * zoom)}px, ${canvasOffset.y % (20 * zoom)}px)`
+           }}
+         />
 
          {/* Preview Header */}
-         <header className="absolute top-0 left-0 right-0 h-16 flex items-center justify-between px-8 z-10 pointer-events-none">
-            <div className="flex items-center gap-4 pointer-events-auto">
-               <div className="bg-[#1a1a1e]/80 backdrop-blur-xl border border-[#2a2a2e] rounded-2xl px-4 py-2 flex items-center gap-3 shadow-2xl">
-                  {project.type === 'app' ? <Smartphone className="h-4 w-4 text-purple-400" /> : <Monitor className="h-4 w-4 text-blue-400" />}
-                  <span className="text-xs font-black uppercase tracking-widest text-zinc-400">Live Preview</span>
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+         <header className="absolute top-0 left-0 right-0 h-16 flex items-center justify-between px-6 z-30 pointer-events-none">
+            <div className="flex items-center gap-2 pointer-events-auto">
+               <div className="bg-background/80 backdrop-blur-md px-3 py-1.5 rounded-full border shadow-sm flex items-center gap-2 text-[11px] font-bold text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    {Math.round(zoom * 100)}%
+                  </span>
                </div>
             </div>
             
             <div className="flex items-center gap-4 pointer-events-auto">
-               <div className="flex items-center bg-[#1a1a1e]/80 backdrop-blur-xl rounded-2xl border border-[#2a2a2e] p-1.5 pr-4 gap-3 shadow-2xl">
-                  <div className="h-8 w-8 rounded-xl bg-[#2a2a2e] flex items-center justify-center">
-                     <Logo iconSize={16} showText={false} showBadge={false} />
-                  </div>
-                  <Button variant="ghost" size="sm" className="h-8 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[11px] font-black uppercase tracking-widest flex items-center gap-2 shadow-xl hover:opacity-90 active:scale-95 transition-all">
-                    <Share2 className="h-3.5 w-3.5" />
-                    Share Design
-                  </Button>
-               </div>
+               <button className="flex items-center h-9 px-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[13px] font-bold shadow-lg hover:opacity-90 active:scale-95 transition-all gap-2">
+                 <Share2 className="h-4 w-4" />
+                 Share
+               </button>
                <UserMenu />
             </div>
          </header>
 
-         {/* Canvas area (mockup) */}
-         <div className="flex-1 p-12 pt-24 flex items-center justify-center relative">
-            <motion.div 
-               initial={{ opacity: 0, scale: 0.95 }}
-               animate={{ opacity: 1, scale: 1 }}
-               className="w-full max-w-5xl h-full rounded-[32px] bg-[#f4f4f5] shadow-[0_60px_150px_-30px_rgba(0,0,0,0.7)] border border-white/5 overflow-hidden flex flex-col relative"
-            >
-               {/* Design Frame Header */}
-               <div className="h-10 bg-white border-b border-zinc-100 flex items-center px-4 justify-between">
-                  <div className="flex gap-1.5">
-                     <div className="h-3 w-3 rounded-full bg-zinc-200" />
-                     <div className="h-3 w-3 rounded-full bg-zinc-200" />
-                     <div className="h-3 w-3 rounded-full bg-zinc-200" />
-                  </div>
-                  <div className="bg-zinc-100 px-3 py-1 rounded-md text-[10px] font-medium text-zinc-400">
-                     design-preview-v1.sketch
-                  </div>
-                  <div className="w-12" />
+         {/* Content Layer */}
+         <div 
+           className="absolute inset-0 flex items-center justify-center transition-transform duration-75 ease-out select-none"
+           style={{
+             transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom})`
+           }}
+         >
+            {currentArtifact ? (
+               <div 
+                 onMouseDown={startDraggingFrame}
+                 className={cn(
+                   "transition-shadow duration-300 ease-in-out shadow-[0_40px_100px_rgba(0,0,0,0.4)] overflow-hidden border border-border/50 relative bg-white select-none",
+                   activeTool === 'select' ? "cursor-move hover:border-primary/50" : "pointer-events-auto",
+                   isDraggingFrame && "shadow-[0_60px_120px_rgba(0,0,0,0.5)] border-primary",
+                   currentArtifact.type === 'app' 
+                     ? "w-[375px] aspect-[9/19.5] rounded-[3rem] border-[12px] border-zinc-900" 
+                     : currentArtifact.type === 'web'
+                       ? "w-[1200px] rounded-sm"
+                       : "w-[800px] aspect-square rounded-sm"
+                 )}
+                 style={{
+                   transform: `translate(${framePos.x}px, ${framePos.y}px)`,
+                   height: currentArtifact.type === 'web' ? `${dynamicFrameHeight}px` : undefined
+                 }}
+               >
+                  {/* Phone Notch for App Design */}
+                  {currentArtifact.type === 'app' && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-zinc-900 rounded-b-[1.5rem] z-50 flex items-center justify-center">
+                      <div className="w-10 h-1 bg-zinc-800 rounded-full" />
+                    </div>
+                  )}
+                  
+                  <iframe 
+                    srcDoc={getInjectedHTML(currentArtifact.content)}
+                    className={cn(
+                      "w-full h-full border-none bg-white",
+                      isDraggingFrame || activeTool === 'hand' ? "pointer-events-none" : "pointer-events-auto"
+                    )}
+                    title="Design Preview"
+                    sandbox="allow-scripts"
+                  />
                </div>
-
-               <div className="flex-1 flex items-center justify-center bg-zinc-50">
-                  <div className="flex flex-col items-center gap-6 opacity-20">
-                     <Layout className="h-20 w-20 text-zinc-900" />
-                     <p className="text-sm font-bold text-zinc-900 uppercase tracking-widest">Rendering Workspace</p>
-                  </div>
+            ) : (
+               <div className="flex flex-col items-center gap-6 opacity-20 pointer-events-none">
+                  <Logo iconSize={80} showText={false} />
+                  <p className="text-xl font-medium tracking-tight">Generate your first design to see it here</p>
                </div>
-            </motion.div>
+            )}
          </div>
 
          {/* Bottom Floating Toolbar */}
-         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 p-2 bg-[#1a1a1e]/90 backdrop-blur-2xl rounded-[24px] border border-[#2a2a2e] shadow-[0_40px_100px_rgba(0,0,0,0.8)] z-50">
-            <div className="flex items-center px-4 gap-2 border-r border-[#2a2a2e] mr-2 text-xs font-black text-zinc-400">
-               100%
-            </div>
-            <div className="flex gap-1">
-               {[
-                 { icon: MousePointer2, color: 'text-purple-400' },
-                 { icon: SearchIcon, color: 'text-zinc-500' },
-                 { icon: Layout, color: 'text-zinc-500' },
-                 { icon: Download, color: 'text-zinc-500' },
-                 { icon: RotateCcw, color: 'text-zinc-500' }
-               ].map((tool, i) => (
-                  <Button key={i} variant="ghost" size="icon" className={cn("h-11 w-11 rounded-2xl hover:bg-[#2a2a2e] transition-all", tool.color)}>
-                     <tool.icon className="h-5 w-5" />
-                  </Button>
-               ))}
-            </div>
-         </div>
-
-         {/* Utility buttons corner */}
-         <div className="absolute bottom-10 left-10 flex flex-col gap-3">
-            <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl bg-[#1a1a1e] border border-[#2a2a2e] shadow-2xl text-zinc-500 hover:text-white">
-               <Globe className="h-5 w-5" />
+         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 p-1.5 bg-card/90 backdrop-blur-xl rounded-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-1 z-30">
+            <Button 
+              onClick={() => setActiveTool('select')}
+              variant="ghost" 
+              size="icon" 
+              className={cn(
+                "h-10 w-10 rounded-xl transition-all",
+                activeTool === 'select' ? "bg-primary text-background shadow-lg shadow-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+               <MousePointer2 className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl bg-[#1a1a1e] border border-[#2a2a2e] shadow-2xl text-zinc-500 hover:text-white">
-               <Maximize2 className="h-5 w-5" />
+            <Button 
+              onClick={() => setActiveTool('hand')}
+              variant="ghost" 
+              size="icon" 
+              className={cn(
+                "h-10 w-10 rounded-xl transition-all",
+                activeTool === 'hand' ? "bg-primary text-background shadow-lg shadow-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+               <Hand className="h-5 w-5" />
+            </Button>
+            <div className="w-[1px] h-6 bg-border mx-1" />
+            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted">
+               <Search className="h-5 w-5" />
+            </Button>
+            <Button 
+              onClick={() => {
+                setCanvasOffset({ x: 0, y: 0 });
+                setFramePos({ x: 0, y: 0 });
+                setZoom(1);
+              }}
+              variant="ghost" 
+              size="icon" 
+              className="h-10 w-10 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted"
+              title="Reset View"
+            >
+               <RotateCcw className="h-5 w-5" />
             </Button>
          </div>
       </main>
