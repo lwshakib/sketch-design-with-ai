@@ -50,9 +50,10 @@ const themes: Theme[] = (THEME_NAME_LIST as unknown as string[]).map((key) => {
 type Props = {
   activeThemeId: string | null;
   onApplyTheme: (theme: Theme) => void;
+  appliedTheme?: Theme | null;
 };
 
-export function ThemeSettings({ activeThemeId, onApplyTheme }: Props) {
+export function ThemeSettings({ activeThemeId, onApplyTheme, appliedTheme }: Props) {
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [themePrompt, setThemePrompt] = React.useState("");
   const [showInput, setShowInput] = React.useState(false);
@@ -116,7 +117,7 @@ export function ThemeSettings({ activeThemeId, onApplyTheme }: Props) {
 
       <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-8">
         {/* Active Theme Display */}
-        {activeTheme && (
+        {appliedTheme && (
             <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
                     <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Currently Applied</span>
@@ -124,9 +125,9 @@ export function ThemeSettings({ activeThemeId, onApplyTheme }: Props) {
                 </div>
                 <div className="p-4 bg-indigo-600/10 border border-indigo-500/30 rounded-2xl relative overflow-hidden group">
                     <div className="flex items-center justify-between mb-3 relative z-10">
-                        <span className="text-sm font-bold text-white tracking-tight">{activeTheme.name}</span>
+                        <span className="text-sm font-bold text-white tracking-tight">{appliedTheme.name}</span>
                         <div className="flex gap-1.5">
-                            {activeTheme.colors.map((color, i) => (
+                            {(appliedTheme.colors || []).map((color, i) => (
                                 <div 
                                     key={i} 
                                     className="size-3.5 rounded-full border border-white/20 shadow-sm" 
@@ -136,7 +137,7 @@ export function ThemeSettings({ activeThemeId, onApplyTheme }: Props) {
                         </div>
                     </div>
                     <p className="text-xs text-indigo-200/70 leading-relaxed relative z-10">
-                        {activeTheme.description}
+                        {appliedTheme.description}
                     </p>
                     <div className="absolute top-0 right-0 p-2 opacity-20 pointer-events-none">
                         <Check className="size-16 -mr-4 -mt-4" />

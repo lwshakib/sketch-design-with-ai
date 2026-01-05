@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>GourmetGo | Home</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        border: "var(--border)", input: "var(--input)", ring: "var(--ring)", background: "var(--background)", foreground: "var(--foreground)",
+                        primary: { DEFAULT: "var(--primary)", foreground: "var(--primary-foreground)" },
+                        secondary: { DEFAULT: "var(--secondary)", foreground: "var(--secondary-foreground)" },
+                        muted: { DEFAULT: "var(--muted)", foreground: "var(--muted-foreground)" },
+                        accent: { DEFAULT: "var(--accent)", foreground: "var(--accent-foreground)" },
+                        card: { DEFAULT: "var(--card)", foreground: "var(--card-foreground)" },
+                    },
+                    borderRadius: { lg: "var(--radius)", md: "calc(var(--radius) - 2px)", sm: "calc(var(--radius) - 4px)" },
+                    fontFamily: { sans: ['var(--font-sans)', 'Outfit', 'sans-serif'] },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { background-color: var(--background); color: var(--foreground); -webkit-tap-highlight-color: transparent; font-family: var(--font-sans); }
+        .glass-card { background: var(--card); border: 1px solid var(--border); backdrop-filter: blur(16px); }
+        /* Hide scrollbar for category scroll, but allow scrolling */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="p-6 space-y-10 pb-32">
+    <!-- Header Section -->
+    <header class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <i data-lucide="map-pin" class="size-5 text-primary"></i>
+            <div class="space-y-0.5">
+                <p class="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/80">Delivering to</p>
+                <h1 class="text-base font-extrabold tracking-tight">123 Main St, Anytown <i data-lucide="chevron-down" class="size-4 inline-block text-muted-foreground/80"></i></h1>
+            </div>
+        </div>
+        <div class="size-12 rounded-2xl border border-border bg-muted/30 p-1 flex items-center justify-center">
+            <img src="https://i.pravatar.cc/128?u=gourmet" class="w-full h-full object-cover rounded-xl" alt="User Avatar" />
+        </div>
+    </header>
+
+    <!-- Search Input -->
+    <div class="relative">
+        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground/70"></i>
+        <input type="text" placeholder="Search for restaurants or dishes..." class="w-full h-14 pl-12 pr-6 rounded-2xl bg-muted/20 border border-border focus:border-primary focus:ring-1 focus:ring-primary text-foreground text-sm font-medium placeholder:text-muted-foreground/60 transition-colors" />
+    </div>
+
+    <!-- Deals & Offers Section -->
+    <section class="space-y-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-xl font-extrabold tracking-tight">Exclusive Offers</h2>
+            <span class="text-[10px] font-bold text-primary uppercase tracking-widest">View All</span>
+        </div>
+        <div class="glass-card rounded-[2.5rem] p-6 space-y-4 relative overflow-hidden">
+            <img src="https://loremflickr.com/800/800/food,pizza" class="absolute inset-0 w-full h-full object-cover opacity-[0.03] rounded-[2.5rem]" alt="Food background pattern" />
+            <div class="relative z-10 flex items-center gap-4">
+                <div class="size-16 rounded-2xl bg-accent/10 flex items-center justify-center border border-accent/20">
+                    <i data-lucide="percent" class="size-8 text-accent"></i>
+                </div>
+                <div class="space-y-1">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-accent/80">Limited Time!</p>
+                    <h3 class="text-2xl font-black tracking-tight text-white/90">25% Off Your First Order</h3>
+                </div>
+            </div>
+            <button class="w-full h-12 bg-primary text-primary-foreground font-black text-xs uppercase tracking-widest rounded-xl hover:scale-105 transition-transform relative z-10">Claim Offer</button>
+        </div>
+    </section>
+
+    <!-- Food Categories Section -->
+    <section class="space-y-6">
+        <h2 class="text-xl font-extrabold tracking-tight">Explore Categories</h2>
+        <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+            <!-- Category Item -->
+            <button class="flex-none w-28 h-28 glass-card rounded-3xl flex flex-col items-center justify-center gap-2">
+                <div class="size-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <i data-lucide="pizza" class="size-6 text-primary"></i>
+                </div>
+                <span class="text-xs font-bold text-foreground/90">Pizza</span>
+            </button>
+            <button class="flex-none w-28 h-28 glass-card rounded-3xl flex flex-col items-center justify-center gap-2">
+                <div class="size-12 rounded-xl bg-accent/10 flex items-center justify-center">
+                    <i data-lucide="sandwich" class="size-6 text-accent"></i>
+                </div>
+                <span class="text-xs font-bold text-foreground/90">Burgers</span>
+            </button>
+            <button class="flex-none w-28 h-28 glass-card rounded-3xl flex flex-col items-center justify-center gap-2">
+                <div class="size-12 rounded-xl bg-purple-400/10 flex items-center justify-center">
+                    <i data-lucide="sushi" class="size-6 text-purple-400"></i>
+                </div>
+                <span class="text-xs font-bold text-foreground/90">Sushi</span>
+            </button>
+            <button class="flex-none w-28 h-28 glass-card rounded-3xl flex flex-col items-center justify-center gap-2">
+                <div class="size-12 rounded-xl bg-green-400/10 flex items-center justify-center">
+                    <i data-lucide="salad" class="size-6 text-green-400"></i>
+                </div>
+                <span class="text-xs font-bold text-foreground/90">Healthy</span>
+            </button>
+            <button class="flex-none w-28 h-28 glass-card rounded-3xl flex flex-col items-center justify-center gap-2">
+                <div class="size-12 rounded-xl bg-yellow-400/10 flex items-center justify-center">
+                    <i data-lucide="coffee" class="size-6 text-yellow-400"></i>
+                </div>
+                <span class="text-xs font-bold text-foreground/90">Drinks</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Popular Restaurants Section -->
+    <section class="space-y-6">
+        <h2 class="text-xl font-extrabold tracking-tight">Popular Restaurants</h2>
+        <div class="space-y-6">
+            <!-- Restaurant Card 1 -->
+            <div class="glass-card rounded-[2.5rem] p-4 space-y-4">
+                <div class="relative">
+                    <img src="https://loremflickr.com/800/800/restaurant,pasta" class="w-full h-48 object-cover rounded-2xl" alt="Restaurant Image" />
+                    <span class="absolute top-4 right-4 bg-background/70 backdrop-blur-md text-foreground text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-border">30-40 min</span>
+                </div>
+                <div class="px-2 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold tracking-tight">The Italian Bistro</h3>
+                        <div class="flex items-center gap-1">
+                            <i data-lucide="star" class="size-4 text-yellow-400 fill-yellow-400"></i>
+                            <span class="text-sm font-semibold">4.8</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-muted-foreground/80 font-medium tracking-wide">Italian, Pasta, Pizza • $</p>
+                    <button class="w-full h-12 mt-4 bg-primary text-primary-foreground font-black text-xs uppercase tracking-widest rounded-xl hover:scale-105 transition-transform">Order Now</button>
+                </div>
+            </div>
+
+            <!-- Restaurant Card 2 -->
+            <div class="glass-card rounded-[2.5rem] p-4 space-y-4">
+                <div class="relative">
+                    <img src="https://loremflickr.com/800/800/restaurant,sushi" class="w-full h-48 object-cover rounded-2xl" alt="Restaurant Image" />
+                    <span class="absolute top-4 right-4 bg-background/70 backdrop-blur-md text-foreground text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-border">20-30 min</span>
+                </div>
+                <div class="px-2 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold tracking-tight">Sakura Sushi Bar</h3>
+                        <div class="flex items-center gap-1">
+                            <i data-lucide="star" class="size-4 text-yellow-400 fill-yellow-400"></i>
+                            <span class="text-sm font-semibold">4.9</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-muted-foreground/80 font-medium tracking-wide">Japanese, Sushi, Ramen • $$</p>
+                    <button class="w-full h-12 mt-4 bg-primary text-primary-foreground font-black text-xs uppercase tracking-widest rounded-xl hover:scale-105 transition-transform">Order Now</button>
+                </div>
+            </div>
+
+            <!-- Restaurant Card 3 -->
+            <div class="glass-card rounded-[2.5rem] p-4 space-y-4">
+                <div class="relative">
+                    <img src="https://loremflickr.com/800/800/restaurant,burger" class="w-full h-48 object-cover rounded-2xl" alt="Restaurant Image" />
+                    <span class="absolute top-4 right-4 bg-background/70 backdrop-blur-md text-foreground text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-border">15-25 min</span>
+                </div>
+                <div class="px-2 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold tracking-tight">Burger Haven</h3>
+                        <div class="flex items-center gap-1">
+                            <i data-lucide="star" class="size-4 text-yellow-400 fill-yellow-400"></i>
+                            <span class="text-sm font-semibold">4.7</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-muted-foreground/80 font-medium tracking-wide">American, Burgers, Fries • $</p>
+                    <button class="w-full h-12 mt-4 bg-primary text-primary-foreground font-black text-xs uppercase tracking-widest rounded-xl hover:scale-105 transition-transform">Order Now</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-48px)] h-20 bg-card/90 backdrop-blur-3xl rounded-[2.5rem] border border-border flex items-center justify-around px-4 z-50">
+        <button class="size-12 flex flex-col items-center justify-center text-primary gap-0.5">
+            <i data-lucide="home" class="size-6"></i>
+            <span class="text-[9px] font-bold">Home</span>
+        </button>
+        <button class="size-12 flex flex-col items-center justify-center text-muted-foreground/70 gap-0.5">
+            <i data-lucide="compass" class="size-6"></i>
+            <span class="text-[9px] font-medium">Explore</span>
+        </button>
+        <button class="size-14 bg-foreground text-background rounded-full flex items-center justify-center shadow-2xl active:scale-90 transition-transform -translate-y-2">
+            <i data-lucide="plus" class="size-6"></i>
+        </button>
+        <button class="size-12 flex flex-col items-center justify-center text-muted-foreground/70 gap-0.5">
+            <i data-lucide="receipt-text" class="size-6"></i>
+            <span class="text-[9px] font-medium">Orders</span>
+        </button>
+        <button class="size-12 flex flex-col items-center justify-center text-muted-foreground/70 gap-0.5">
+            <i data-lucide="user" class="size-6"></i>
+            <span class="text-[9px] font-medium">Profile</span>
+        </button>
+    </nav>
+    <script>document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });</script>
+
+    <script>
+      const sendHeight = () => {
+        window.parent.postMessage({ type: 'HEIGHT_UPDATE', height: document.body.scrollHeight }, '*');
+      };
+      window.onload = sendHeight;
+      new ResizeObserver(sendHeight).observe(document.documentElement);
+      setInterval(sendHeight, 1000); // Fail-safe check
+
+      window.addEventListener('message', (event) => {
+        if (event.data.type === 'UPDATE_CONTENT') {
+          const parser = new DOMParser();
+          const newDoc = parser.parseFromString(event.data.content, 'text/html');
+          
+          // Update head (styles, links)
+          const newHead = newDoc.head.innerHTML;
+          if (document.head.innerHTML !== newHead) {
+            document.head.innerHTML = newHead;
+          }
+
+          // Update body
+          document.body.innerHTML = newDoc.body.innerHTML;
+          
+          // Re-trigger height update
+          sendHeight();
+        }
+      });
+    </script>
+    <style>
+      ::-webkit-scrollbar { display: none; }
+      body { -ms-overflow-style: none; scrollbar-width: none; margin: 0; padding: 0; background: var(--background); transition: background 0.3s ease; }
+      @keyframes shimmer {
+        100% { transform: translateX(100%); }
+      }
+      .edit-hover-highlight {
+        outline: 2px dotted #6366f1 !important;
+        outline-offset: 2px !important;
+        cursor: pointer !important;
+      }
+      .edit-selected-highlight {
+        outline: 2px solid #6366f1 !important;
+        outline-offset: 2px !important;
+      }
+    </style>
+  </body>
+</html>

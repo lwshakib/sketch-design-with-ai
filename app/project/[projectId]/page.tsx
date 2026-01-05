@@ -44,7 +44,9 @@ import {
   ThumbsDown,
   Eye,
   MoreHorizontal,
+  Tablet,
   Palette,
+  Save,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -53,7 +55,7 @@ import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DefaultChatTransport } from "ai";
-import { extractArtifact, stripArtifact } from "@/lib/artifact-renderer";
+import { extractArtifacts, stripArtifact, type Artifact } from "@/lib/artifact-renderer";
 import {
   Conversation,
   ConversationContent,
@@ -69,6 +71,24 @@ import {
 } from "@/components/ai-elements/message";
 import { ElementSettings } from "./element-settings";
 import { ThemeSettings } from "./theme-settings";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import JSZip from "jszip";
+import html2canvas from "html2canvas";
+import { Editor } from "@monaco-editor/react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Project {
   id: string;
@@ -81,12 +101,42 @@ interface Project {
 const getInjectedHTML = (html: string) => {
   const script = `
     <script>
+      let lastHeight = 0;
       const sendHeight = () => {
-        window.parent.postMessage({ type: 'HEIGHT_UPDATE', height: document.body.scrollHeight }, '*');
+        const height = Math.ceil(Math.max(
+          document.body.scrollHeight, 
+          document.documentElement.scrollHeight,
+          document.body.offsetHeight,
+          document.documentElement.offsetHeight
+        ));
+        
+        // Only update if height changed by more than 5px to avoid jitter
+        if (Math.abs(height - lastHeight) > 5) {
+          lastHeight = height;
+          window.parent.postMessage({ type: 'HEIGHT_UPDATE', height }, '*');
+        }
       };
-      window.onload = sendHeight;
-      new ResizeObserver(sendHeight).observe(document.documentElement);
-      setInterval(sendHeight, 1000); // Fail-safe check
+
+      const observer = new MutationObserver(sendHeight);
+      window.onload = () => {
+        sendHeight();
+        observer.observe(document.body, { 
+          childList: true, 
+          subtree: true, 
+          attributes: true 
+        });
+        // Multi-stage check to handle complex layouts/late loads
+        setTimeout(sendHeight, 100);
+        setTimeout(sendHeight, 500);
+        setTimeout(sendHeight, 1000);
+        setTimeout(sendHeight, 3000);
+      };
+
+      try {
+        new ResizeObserver(sendHeight).observe(document.documentElement);
+      } catch (e) {
+        console.error('ResizeObserver failed', e);
+      }
 
       window.addEventListener('message', (event) => {
         if (event.data.type === 'UPDATE_CONTENT') {
@@ -109,8 +159,19 @@ const getInjectedHTML = (html: string) => {
     </script>
     <style>
       ::-webkit-scrollbar { display: none; }
-      body { -ms-overflow-style: none; scrollbar-width: none; margin: 0; padding: 0; background: white; transition: background 0.3s ease; }
+      html, body { 
+        height: auto !important; 
+        min-height: 100% !important; 
+        overflow: visible !important;
+        -ms-overflow-style: none; 
+        scrollbar-width: none; 
+        margin: 0; 
+        padding: 0; 
+        background: var(--background); 
+        transition: background 0.3s ease; 
+      }
       @keyframes shimmer {
+        0% { transform: translateX(-100%); }
         100% { transform: translateX(100%); }
       }
       .edit-hover-highlight {
@@ -156,6 +217,38 @@ const sanitizeDocumentHtml = (doc: Document, originalHtml: string) => {
 };
 
 
+const ModernShimmer = ({ appliedTheme }: { type?: string; appliedTheme?: any }) => {
+  return (
+    <div 
+      className="absolute inset-0 z-50 overflow-hidden pointer-events-none" 
+      style={{ backgroundColor: appliedTheme?.cssVars.background || 'var(--background)' }}
+    >
+      {/* Standard, Clean Shimmer Effect */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.15) 50%, 
+            transparent 100%
+          )`,
+          width: '60%',
+          transform: 'skewX(-20deg) translateX(-200%)',
+          animation: 'shimmer-standard 1.8s infinite linear',
+        }}
+      />
+
+      <style>{`
+        @keyframes shimmer-standard {
+          0% { transform: skewX(-20deg) translateX(-250%); }
+          100% { transform: skewX(-20deg) translateX(450%); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+
 export default function ProjectPage() {
   const params = useParams();
   const projectId = params.projectId as string;
@@ -165,7 +258,8 @@ export default function ProjectPage() {
   const [loading, setLoading] = useState(true);
   const [attachments, setAttachments] = useState<{ url: string; isUploading: boolean }[]>([]);
   const [input, setInput] = useState("");
-  const [currentArtifact, setCurrentArtifact] = useState<{ content: string, type: 'web' | 'app' | 'general', isComplete: boolean } | null>(null);
+  const [artifacts, setArtifacts] = useState<Artifact[]>([]);
+  const [throttledArtifacts, setThrottledArtifacts] = useState<Artifact[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTool, setActiveTool] = useState<'select' | 'hand' | 'interact'>('select');
   const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 });
@@ -174,15 +268,22 @@ export default function ProjectPage() {
   const [isPanning, setIsPanning] = useState(false);
   const [isDraggingFrame, setIsDraggingFrame] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
-  const [dynamicFrameHeight, setDynamicFrameHeight] = useState<number>(800);
-  const [throttledArtifact, setThrottledArtifact] = useState<{ content: string, type: 'web' | 'app' | 'general', isComplete: boolean } | null>(null);
-  const [isFrameSelected, setIsFrameSelected] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [dynamicFrameHeights, setDynamicFrameHeights] = useState<Record<number, number>>({});
+  const [selectedArtifactIndex, setSelectedArtifactIndex] = useState<number | null>(null);
+  const iframeRefs = useRef<Record<number, HTMLIFrameElement | null>>({});
   const [leftSidebarMode, setLeftSidebarMode] = useState<'chat' | 'properties' | 'theme'>('chat');
   const isEditMode = leftSidebarMode === 'properties';
   const [activeThemeId, setActiveThemeId] = useState<string | null>(null);
+  const [appliedTheme, setAppliedTheme] = useState<any>(null);
   const [selectedEl, setSelectedEl] = useState<HTMLElement | null>(null);
   const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
+  const [artifactPreviewModes, setArtifactPreviewModes] = useState<Record<number, 'mobile' | 'tablet' | 'desktop' | null>>({});
+  const [isCodeViewerOpen, setIsCodeViewerOpen] = useState(false);
+  const [viewingCode, setViewingCode] = useState("");
+  const [viewingTitle, setViewingTitle] = useState("");
+  const [isRegenerateDialogOpen, setIsRegenerateDialogOpen] = useState(false);
+  const [regenerateInstructions, setRegenerateInstructions] = useState("");
+  const [processingArtifact, setProcessingArtifact] = useState<Artifact | null>(null);
 
   // Refs to keep track of state in wheel event listeners without re-attaching
   const zoomRef = useRef(zoom);
@@ -210,12 +311,32 @@ export default function ProjectPage() {
     onFinish: (message: any) => {
       const textContent = (message.parts?.find((p: any) => p.type === 'text') as any)?.text || message.content;
       if (typeof textContent === 'string') {
-        const artifactData = extractArtifact(textContent);
-        if (artifactData) {
-          setCurrentArtifact(artifactData);
-          setThrottledArtifact(artifactData);
+        const artifactData = extractArtifacts(textContent);
+        if (artifactData.length > 0) {
+          // Merge with existing artifacts to preserve positions
+          const mergeArtifacts = (prev: any[]) => {
+            const updated = [...prev];
+            artifactData.forEach(newArt => {
+              const existingIndex = updated.findIndex(a => a.title === newArt.title);
+              if (existingIndex >= 0) {
+                updated[existingIndex] = {
+                  ...updated[existingIndex],
+                  content: newArt.content,
+                  isComplete: true
+                };
+              } else {
+                const lastArt = updated[updated.length - 1];
+                const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
+                const newX = lastArt ? (lastArt.x || 0) + getWidth(lastArt.type) + 80 : 0;
+                updated.push({ ...newArt, x: newX, y: 0, isComplete: true });
+              }
+            });
+            return updated;
+          };
+
+          setArtifacts(mergeArtifacts);
+          setThrottledArtifacts(mergeArtifacts);
         } else if (textContent.toLowerCase().includes('<!doctype') || textContent.toLowerCase().includes('<html')) {
-           // If it finished but still has raw HTML without tags, it's a 'broken' design
            toast.error("Design engine produced an incomplete result.");
         }
       }
@@ -238,6 +359,18 @@ export default function ProjectPage() {
           if (data.canvasData.zoom) setZoom(data.canvasData.zoom);
           if (data.canvasData.canvasOffset) setCanvasOffset(data.canvasData.canvasOffset);
           if (data.canvasData.framePos) setFramePos(data.canvasData.framePos);
+          if (data.canvasData.artifacts) {
+            setArtifacts(data.canvasData.artifacts);
+            setThrottledArtifacts(data.canvasData.artifacts);
+          }
+          if (data.canvasData.appliedTheme) {
+            setAppliedTheme(data.canvasData.appliedTheme);
+            setActiveThemeId(data.canvasData.appliedTheme.id);
+          }
+        } else {
+           // Reset view for empty/new projects
+           setCanvasOffset({ x: 0, y: 0 });
+           setZoom(1);
         }
 
         if (data.messages && data.messages.length > 0) {
@@ -269,51 +402,108 @@ export default function ProjectPage() {
   const lastUpdateRef = useRef(Date.now());
   useEffect(() => {
     const lastAssistantMessage = (messages as any[]).filter(m => m.role === 'assistant').at(-1);
-    if (lastAssistantMessage) {
-      const textContent = (lastAssistantMessage.parts?.find((p: any) => p.type === 'text') as any)?.text || (lastAssistantMessage as any).content;
-      if (typeof textContent === 'string' && textContent.length > 0) {
-        const artifactData = extractArtifact(textContent);
-        if (artifactData) {
-          setCurrentArtifact(artifactData);
-          
-          // Use a throttled version for the iframe to avoid too many re-renders
-          // UNLESS it is complete, then we show it immediately
-          const now = Date.now();
-          if (artifactData.isComplete || now - lastUpdateRef.current > 1000) {
-            setThrottledArtifact(artifactData);
-            lastUpdateRef.current = now;
-          }
+    if (!lastAssistantMessage) {
+        if (messages.length === 0) {
+            setArtifacts([]);
+            setThrottledArtifacts([]);
         }
-      }
-    } else {
-      setCurrentArtifact(null);
-      setThrottledArtifact(null);
+        return;
+    }
+
+    const textContent = (lastAssistantMessage.parts?.find((p: any) => p.type === 'text') as any)?.text || (lastAssistantMessage as any).content;
+    
+    if (typeof textContent === 'string' && textContent.length > 0) {
+      const artifactData = extractArtifacts(textContent);
+      
+      if (artifactData.length > 0) {
+        // 1. Maintain the full state in 'artifacts' for internal reference
+        setArtifacts(prev => {
+           const updated = [...prev];
+           artifactData.forEach(newArt => {
+             const existingIndex = updated.findIndex(a => a.title === newArt.title);
+             if (existingIndex >= 0) {
+               updated[existingIndex] = {
+                 ...updated[existingIndex],
+                 content: newArt.content,
+                 isComplete: newArt.isComplete
+               };
+             } else {
+               updated.push({ ...newArt, x: 0, y: 0 });
+             }
+           });
+           return updated;
+        });
+        
+        // 2. Manage the visible UI (throttledArtifacts)
+        setThrottledArtifacts(prev => {
+            const updated = [...prev];
+            let changed = false;
+
+            artifactData.forEach(newArt => {
+              const existingIndex = updated.findIndex(a => a.title === newArt.title);
+              
+              if (existingIndex === -1) {
+                const lastArt = updated[updated.length - 1];
+                const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
+                const newX = lastArt ? (lastArt.x || 0) + getWidth(lastArt.type) + 80 : 0;
+                updated.push({ 
+                  ...newArt, 
+                  content: "", 
+                  x: newX, 
+                  y: 0, 
+                  isComplete: false 
+                });
+                changed = true;
+              } else {
+                 // Existing artifact: 
+                 // If we are still streaming, we mark it as NOT complete (isComplete: false)
+                 // but we DON'T update the content yet to avoid partial/broken renders.
+                 // This ensures the OLD version stays visible until the NEW version is ready.
+                 if (status === 'streaming' && updated[existingIndex].isComplete) {
+                    updated[existingIndex] = { ...updated[existingIndex], isComplete: false };
+                    changed = true;
+                 }
+                 
+                 // If it's DONE (status ready or onFinish already triggered), 
+                 // the onFinish callback handles the final content update.
+                 // We can also double-check here just in case.
+                 if (status === 'ready' && !updated[existingIndex].isComplete && newArt.isComplete) {
+                    updated[existingIndex] = { 
+                      ...updated[existingIndex], 
+                      content: newArt.content, 
+                      isComplete: true 
+                    };
+                    changed = true;
+                 }
+              }
+            });
+            
+            return changed ? updated : prev;
+        });
+      } 
     }
   }, [messages, status]);
 
-  const memoizedInjectedHTML = React.useMemo(() => {
-    if (!throttledArtifact) return "";
-    return getInjectedHTML(throttledArtifact.content);
-  }, [throttledArtifact?.content]);
-
-  // Live update iframe content without reload during streaming
-  // This useEffect is now primarily for when throttledArtifact becomes complete
-  useEffect(() => {
-    if (throttledArtifact && throttledArtifact.isComplete && iframeRef.current) {
-      const content = getInjectedHTML(throttledArtifact.content);
-      // If the iframe is already rendered, update its content
-      // Otherwise, the srcDoc will handle the initial render
-      iframeRef.current.contentWindow?.postMessage({
-        type: 'UPDATE_CONTENT',
-        content
-      }, '*');
-    }
-  }, [throttledArtifact?.content, throttledArtifact?.isComplete]);
+  // This logic should now be handled inside the rendering loop for each iframe
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data.type === 'HEIGHT_UPDATE' && typeof event.data.height === 'number') {
-        setDynamicFrameHeight(event.data.height);
+        const sourceWindow = event.source as Window;
+        // Find which iframe sent the message
+        const iframes = document.querySelectorAll('iframe');
+        iframes.forEach((iframe, index) => {
+          if (iframe.contentWindow === sourceWindow) {
+            setDynamicFrameHeights(prev => {
+              const currentHeight = prev[index] || 0;
+              // Only update if difference is > 4px to avoid micro-jitter loops
+              if (Math.abs(currentHeight - event.data.height) > 4) {
+                 return { ...prev, [index]: event.data.height };
+              }
+              return prev;
+            });
+          }
+        });
       }
     };
     window.addEventListener('message', handleMessage);
@@ -321,42 +511,30 @@ export default function ProjectPage() {
   }, []);
 
   const commitEdits = useCallback(() => {
-    if (!iframeRef.current?.contentDocument || !currentArtifact) return;
-    const cleanHtml = sanitizeDocumentHtml(iframeRef.current.contentDocument, currentArtifact.content);
+    if (selectedArtifactIndex === null) return;
+    const iframe = iframeRefs.current[selectedArtifactIndex];
+    if (!iframe?.contentDocument) return;
+
+    const currentArtifact = throttledArtifacts[selectedArtifactIndex];
+    if (!currentArtifact) return;
+
+    const cleanHtml = sanitizeDocumentHtml(iframe.contentDocument, currentArtifact.content);
     
-    // Update the artifact content locally
-    setCurrentArtifact(prev => prev ? { ...prev, content: cleanHtml } : null);
-    setThrottledArtifact(prev => prev ? { ...prev, content: cleanHtml } : null);
+    // Update the artifacts locally
+    const updatedArtifacts = [...throttledArtifacts];
+    updatedArtifacts[selectedArtifactIndex] = { ...currentArtifact, content: cleanHtml };
     
-    // Save to backend
-    const saveProject = async () => {
-        try {
-            await fetch(`/api/projects/${projectId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    messages: messages.map((m, i) => {
-                        if (i === messages.length - 1 && m.role === 'assistant') {
-                            // Update the last assistant message with the new content
-                            // This depends on how extractArtifact/stripArtifact work
-                            // For simplicity, we just save the full new HTML as the content if it contained an artifact
-                            return { ...m, content: "```html\n" + cleanHtml + "\n```" };
-                        }
-                        return m;
-                    })
-                }),
-            });
-            toast.success("Design changes saved");
-        } catch (error) {
-            console.error("Failed to save edits:", error);
-            toast.error("Failed to save changes");
-        }
-    };
-    saveProject();
-  }, [currentArtifact, messages, projectId]);
+    setThrottledArtifacts(updatedArtifacts);
+    setArtifacts(updatedArtifacts);
+    toast.info("Edits applied locally. Click Save to persist.");
+  }, [selectedArtifactIndex, throttledArtifacts]);
 
   const applyTheme = useCallback((theme: any) => {
-    const iframe = iframeRef.current;
+    if (selectedArtifactIndex === null) {
+        toast.error("Select a screen to apply theme");
+        return;
+    }
+    const iframe = iframeRefs.current[selectedArtifactIndex];
     if (!iframe || !iframe.contentDocument) return;
 
     const doc = iframe.contentDocument;
@@ -368,7 +546,7 @@ export default function ProjectPage() {
       doc.head.appendChild(styleEl);
     }
 
-    const cssVars = `
+    const getThemeCSS = (theme: any) => `
       :root {
         --background: ${theme.cssVars.background} !important;
         --foreground: ${theme.cssVars.foreground} !important;
@@ -398,19 +576,69 @@ export default function ProjectPage() {
       }
     `;
 
-    styleEl.textContent = cssVars;
-    
-    // Update active theme state
+    styleEl.textContent = getThemeCSS(theme);
     setActiveThemeId(theme.id);
+    setAppliedTheme(theme);
+    toast.success(`Applied ${theme.name} theme locally. Click Save to persist.`);
+  }, [selectedArtifactIndex, artifacts, zoom, canvasOffset, framePos, projectId]);
+
+  // Re-apply theme when artifacts or theme change
+  useEffect(() => {
+    if (!appliedTheme || throttledArtifacts.length === 0) return;
     
-    // Also update the local state so it persists on content refresh if needed
-    commitEdits();
-    toast.success(`${theme.name} theme applied`);
-  }, [commitEdits]);
+    const getThemeCSS = (theme: any) => `
+      :root {
+        --background: ${theme.cssVars.background} !important;
+        --foreground: ${theme.cssVars.foreground} !important;
+        --card: ${theme.cssVars.card} !important;
+        --card-foreground: ${theme.cssVars.cardForeground} !important;
+        --popover: ${theme.cssVars.popover} !important;
+        --popover-foreground: ${theme.cssVars.popoverForeground} !important;
+        --primary: ${theme.cssVars.primary} !important;
+        --primary-foreground: ${theme.cssVars.primaryForeground} !important;
+        --secondary: ${theme.cssVars.secondary} !important;
+        --secondary-foreground: ${theme.cssVars.secondaryForeground} !important;
+        --muted: ${theme.cssVars.muted} !important;
+        --muted-foreground: ${theme.cssVars.mutedForeground} !important;
+        --accent: ${theme.cssVars.accent} !important;
+        --accent-foreground: ${theme.cssVars.accentForeground} !important;
+        --destructive: ${theme.cssVars.destructive} !important;
+        --border: ${theme.cssVars.border} !important;
+        --input: ${theme.cssVars.input} !important;
+        --ring: ${theme.cssVars.ring} !important;
+        --radius: ${theme.cssVars.radius} !important;
+        ${theme.cssVars.fontSans ? `--font-sans: ${theme.cssVars.fontSans} !important;` : ''}
+      }
+      body {
+        background-color: var(--background) !important;
+        color: var(--foreground) !important;
+        ${theme.cssVars.fontSans ? `font-family: var(--font-sans) !important;` : ''}
+      }
+    `;
+
+    const timer = setTimeout(() => {
+        throttledArtifacts.forEach((_, index) => {
+            const iframe = iframeRefs.current[index];
+            if (!iframe || !iframe.contentDocument) return;
+            
+            const doc = iframe.contentDocument;
+            let styleEl = doc.getElementById('theme-overrides') as HTMLStyleElement;
+            if (!styleEl) {
+              styleEl = doc.createElement('style');
+              styleEl.id = 'theme-overrides';
+              doc.head.appendChild(styleEl);
+            }
+            styleEl.textContent = getThemeCSS(appliedTheme);
+        });
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [appliedTheme, throttledArtifacts]);
 
   // Handle Edit Mode selection
   useEffect(() => {
-    const iframe = iframeRef.current;
+    if (selectedArtifactIndex === null) return;
+    const iframe = iframeRefs.current[selectedArtifactIndex];
     if (!iframe || !isEditMode) {
       setHoveredEl(null);
       setSelectedEl(null);
@@ -488,30 +716,42 @@ export default function ProjectPage() {
   }, [isEditMode, hoveredEl, selectedEl, commitEdits]);
 
   // Save canvas data on change
-  useEffect(() => {
+  const handleSave = useCallback(async () => {
     if (!project || loading) return;
+    
+    const savePromise = fetch(`/api/projects/${projectId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        canvasData: {
+          zoom,
+          canvasOffset,
+          framePos,
+          artifacts,
+          appliedTheme
+        },
+      }),
+    });
 
-    const saveCanvasData = async () => {
-      try {
-        await fetch(`/api/projects/${projectId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            canvasData: {
-              zoom,
-              canvasOffset,
-              framePos,
-            },
-          }),
-        });
-      } catch (error) {
-        console.error("Failed to save canvas data:", error);
+    toast.promise(savePromise, {
+      loading: 'Saving project...',
+      success: 'Project saved successfully',
+      error: 'Failed to save project'
+    });
+  }, [project, loading, projectId, zoom, canvasOffset, framePos, artifacts, appliedTheme]);
+
+  // Shortcut for saving (Ctrl + S)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        handleSave();
       }
     };
 
-    const timeoutId = setTimeout(saveCanvasData, 1000); // 1 second debounce
-    return () => clearTimeout(timeoutId);
-  }, [zoom, canvasOffset, framePos, projectId, project, loading]);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSave]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (activeTool === 'hand') {
@@ -524,16 +764,35 @@ export default function ProjectPage() {
 
 
 
+  // Auto-focus on new artifacts
+  const prevArtifactsCount = useRef(0);
+  useEffect(() => {
+    prevArtifactsCount.current = throttledArtifacts.length;
+  }, [throttledArtifacts.length]);
+
   const handleMouseMove = (e: React.MouseEvent) => {
     if (isPanning && activeTool === 'hand') {
       setCanvasOffset({
         x: e.clientX - dragStart.current.x,
         y: e.clientY - dragStart.current.y
       });
-    } else if (isDraggingFrame && activeTool === 'select') {
-      setFramePos({
-        x: (e.clientX - dragStart.current.x) / zoom,
-        y: (e.clientY - dragStart.current.y) / zoom
+    } else if (isDraggingFrame && activeTool === 'select' && selectedArtifactIndex !== null) {
+      const newX = (e.clientX - dragStart.current.x) / zoom;
+      const newY = (e.clientY - dragStart.current.y) / zoom;
+      
+      setThrottledArtifacts(prev => {
+          const next = [...prev];
+          if (next[selectedArtifactIndex]) {
+            next[selectedArtifactIndex] = { ...next[selectedArtifactIndex], x: newX, y: newY };
+          }
+          return next;
+      });
+      setArtifacts(prev => {
+          const next = [...prev];
+          if (next[selectedArtifactIndex]) {
+            next[selectedArtifactIndex] = { ...next[selectedArtifactIndex], x: newX, y: newY };
+          }
+          return next;
       });
     }
   };
@@ -543,11 +802,15 @@ export default function ProjectPage() {
     setIsDraggingFrame(false);
   };
 
-  const startDraggingFrame = (e: React.MouseEvent) => {
+  const startDraggingFrame = (e: React.MouseEvent, index: number) => {
     if (activeTool === 'select') {
       e.stopPropagation();
       setIsDraggingFrame(true);
-      dragStart.current = { x: e.clientX - framePos.x * zoom, y: e.clientY - framePos.y * zoom };
+      setSelectedArtifactIndex(index);
+      const artifact = throttledArtifacts[index];
+      const posX = artifact?.x || 0;
+      const posY = artifact?.y || 0;
+      dragStart.current = { x: e.clientX - posX * zoom, y: e.clientY - posY * zoom };
     }
   };
 
@@ -704,12 +967,16 @@ export default function ProjectPage() {
   };
 
   const copyCode = () => {
+    if (selectedArtifactIndex === null) return;
+    const currentArtifact = throttledArtifacts[selectedArtifactIndex];
     if (!currentArtifact) return;
     navigator.clipboard.writeText(currentArtifact.content);
     toast.success("Code copied to clipboard");
   };
 
   const exportAsHTML = () => {
+    if (selectedArtifactIndex === null) return;
+    const currentArtifact = throttledArtifacts[selectedArtifactIndex];
     if (!currentArtifact) return;
     const fullHTML = getInjectedHTML(currentArtifact.content);
     const blob = new Blob([fullHTML], { type: 'text/html' });
@@ -723,6 +990,8 @@ export default function ProjectPage() {
   };
 
   const openInNewTab = () => {
+    if (selectedArtifactIndex === null) return;
+    const currentArtifact = throttledArtifacts[selectedArtifactIndex];
     if (!currentArtifact) return;
     const fullHTML = getInjectedHTML(currentArtifact.content);
     const blob = new Blob([fullHTML], { type: 'text/html' });
@@ -735,12 +1004,126 @@ export default function ProjectPage() {
     if (!input.trim() && attachments.length === 0) return;
     
     sendMessage({
-      text: input.trim() + "\n\n---\n\n" + "Please generate a vertically expansive design. Do not include any internal scrollbars in the generated HTML. The design should be fully visible without scrolling within the iframe, with the iframe's height adjusting to fit the content.",
+      text: input.trim(),
       files: attachments.map(a => ({ type: "file" as const, url: a.url, mediaType: "image/*" }))
     });
     
     setAttachments([]);
     setInput("");
+  };
+
+  const handleArtifactAction = (action: 'more' | 'regenerate' | 'variations', artifact: Artifact) => {
+    let prompt = "";
+    if (action === 'more') {
+        prompt = `Based on the design of the "${artifact.title}" screen, create 2-3 additional screens that would naturally belong in this same flow (e.g., if this is a dashboard, create a settings Page, a user profile, and a detailed analytics view). Maintain strict visual consistency with the existing design system, colors, and typography.`;
+    } else if (action === 'regenerate') {
+        setProcessingArtifact(artifact);
+        setRegenerateInstructions("");
+        setIsRegenerateDialogOpen(true);
+        return;
+    } else if (action === 'variations') {
+        prompt = `Generate 3 distinct layout variations of the "${artifact.title}" screen. Each variation should explore a different design approach (e.g., more minimal, more data-dense, or a different functional layout) while staying true to the overall theme. Please provide 3 separate artifact blocks, titled "${artifact.title} (Var 1)", "${artifact.title} (Var 2)", and "${artifact.title} (Var 3)".`;
+    }
+
+    if (prompt) {
+        sendMessage({ text: prompt });
+        toast.info(action === 'more' ? "Architecting more pages..." : action === 'regenerate' ? "Regenerating screen..." : "Exploring variations...");
+    }
+  };
+
+  const handleRegenerateSubmit = () => {
+    if (!processingArtifact) return;
+    
+    let prompt = "";
+    if (regenerateInstructions.trim()) {
+      prompt = `Please regenerate the "${processingArtifact.title}" screen with these specific instructions: ${regenerateInstructions.trim()}. Maintain the overall theme and structure but FOCUS on the requested changes. IMPORTANT: Use the EXACT title "${processingArtifact.title}" in your artifact tag so it replaces the previous version.`;
+    } else {
+      prompt = `Please regenerate and improve the "${processingArtifact.title}" screen. Refine the layout, enhance the visual hierarchy, and ensure it follows the highest-fidelity design standards. IMPORTANT: Use the EXACT title "${processingArtifact.title}" in your artifact tag so it replaces the previous version.`;
+    }
+
+    sendMessage({ text: prompt });
+    toast.info("Regenerating screen...");
+    setIsRegenerateDialogOpen(false);
+    setProcessingArtifact(null);
+    setRegenerateInstructions("");
+  };
+
+  const deleteArtifact = (index: number) => {
+    setThrottledArtifacts(prev => prev.filter((_, i) => i !== index));
+    setArtifacts(prev => prev.filter((_, i) => i !== index));
+    setSelectedArtifactIndex(null);
+    toast.success("Screen removed from workspace");
+  };
+
+  const captureFrameImage = async (index: number): Promise<string | null> => {
+    const iframe = iframeRefs.current[index];
+    if (!iframe || !iframe.contentDocument?.body) return null;
+    
+    try {
+        const canvas = await html2canvas(iframe.contentDocument.body, {
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null,
+            scale: 2 // High quality
+        });
+        return canvas.toDataURL("image/png");
+    } catch (error) {
+        console.error("Capture error:", error);
+        return null;
+    }
+  };
+
+  const handleDownloadImage = async (index: number) => {
+    toast.loading("Capturing high-fidelity image...");
+    const dataUrl = await captureFrameImage(index);
+    toast.dismiss();
+    
+    if (dataUrl) {
+      const link = document.createElement('a');
+      link.download = `${throttledArtifacts[index].title.replace(/\s+/g, '_')}_UI.png`;
+      link.href = dataUrl;
+      link.click();
+      toast.success("Image downloaded");
+    } else {
+      toast.error("Failed to capture image");
+    }
+  };
+
+  const handleExportZip = async (index: number) => {
+    toast.loading("Generating production assets...");
+    const artifact = throttledArtifacts[index];
+    const dataUrl = await captureFrameImage(index);
+    
+    const zip = new JSZip();
+    const folderName = artifact.title.replace(/\s+/g, '_');
+    const folder = zip.folder(folderName);
+    
+    if (folder) {
+        // Add HTML
+        folder.file("index.html", getInjectedHTML(artifact.content));
+        
+        // Add PNG
+        if (dataUrl) {
+            const base64Data = dataUrl.replace(/^data:image\/(png|jpg);base64,/, "");
+            folder.file("preview.png", base64Data, { base64: true });
+        }
+    }
+    
+    const content = await zip.generateAsync({ type: "blob" });
+    toast.dismiss();
+    
+    const link = document.createElement('a');
+    link.download = `${folderName}_Package.zip`;
+    link.href = URL.createObjectURL(content);
+    link.click();
+    toast.success("Project assets exported");
+  };
+
+  const openCodeViewer = (index: number) => {
+    const artifact = throttledArtifacts[index];
+    setViewingCode(artifact.content);
+    setViewingTitle(artifact.title);
+    setIsCodeViewerOpen(true);
   };
 
   if (loading) {
@@ -834,7 +1217,7 @@ export default function ProjectPage() {
                                            {message.role === 'assistant' ? (
                                              (() => {
                                                const isRawHtml = textContent.toLowerCase().includes('<!doctype') || textContent.toLowerCase().includes('<html');
-                                               if (isRawHtml && !extractArtifact(textContent)) {
+                                               if (isRawHtml && extractArtifacts(textContent).length === 0) {
                                                   return (
                                                     <div className="flex flex-col gap-2 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
                                                       <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-widest">
@@ -938,7 +1321,7 @@ export default function ProjectPage() {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onClick={(e) => {
-          if (e.target === e.currentTarget) setIsFrameSelected(false);
+          if (e.target === e.currentTarget) setSelectedArtifactIndex(null);
         }}
         className={cn(
           "flex-1 flex flex-col bg-muted relative overflow-hidden",
@@ -967,9 +1350,12 @@ export default function ProjectPage() {
             </div>
             
             <div className="flex items-center gap-4 pointer-events-auto">
-               <button className="flex items-center h-9 px-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[13px] font-bold shadow-lg hover:opacity-90 active:scale-95 transition-all gap-2">
-                 <Share2 className="h-4 w-4" />
-                 Share
+               <button 
+                 onClick={handleSave}
+                 className="flex items-center h-9 px-4 rounded-xl bg-zinc-900 border border-white/10 text-white text-[13px] font-semibold shadow-2xl hover:bg-zinc-800 active:scale-95 transition-all gap-2 group"
+               >
+                 <Save className="h-4 w-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+                 Save
                </button>
                <UserMenu />
             </div>
@@ -982,38 +1368,77 @@ export default function ProjectPage() {
              transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom})`
            }}
          >
-            {currentArtifact ? (
-                 <div 
-                   onMouseDown={(e) => {
-                     setIsFrameSelected(true);
-                   }}
-                   className={cn(
-                     "group relative flex flex-col items-center select-none",
-                     activeTool === 'hand' ? "cursor-grab" : "cursor-default"
-                   )}
-                   style={{
-                     transform: `translate(${framePos.x}px, ${framePos.y}px)`,
-                     transition: isDraggingFrame ? 'none' : 'transform 0.1s ease-out'
-                   }}
-                 >
-                    {/* Modern Floating Toolbar (Matches Reference Image) */}
-                    {(isFrameSelected || isPanning || isDraggingFrame || throttledArtifact?.isComplete) && (
+            {throttledArtifacts.length > 0 ? (
+              <div 
+                className="flex items-start gap-32 p-32"
+                style={{
+                  transform: `translate(${framePos.x}px, ${framePos.y}px)`,
+                  transition: isDraggingFrame ? 'none' : 'transform 0.1s ease-out'
+                }}
+              >
+                {throttledArtifacts.map((artifact, index) => (
+                  <div 
+                    key={index}
+                    onMouseDown={(e) => {
+                      setSelectedArtifactIndex(index);
+                      if (activeTool === 'select') {
+                        startDraggingFrame(e, index);
+                      }
+                    }}
+                    className={cn(
+                      "group relative flex flex-col items-center select-none",
+                      activeTool === 'hand' ? "cursor-grab" : "cursor-default"
+                    )}
+                    style={{
+                      transform: `translate(${artifact.x || 0}px, ${artifact.y || 0}px)`,
+                      transition: isDraggingFrame && selectedArtifactIndex === index ? 'none' : 'transform 0.1s ease-out'
+                    }}
+                  >
+                    {/* Modern Floating Toolbar */}
+                    {(selectedArtifactIndex === index || isPanning || isDraggingFrame || (artifact.isComplete && selectedArtifactIndex === index)) && (
                       <div className={cn(
                         "absolute -top-20 left-1/2 -translate-x-1/2 flex items-center gap-3 z-[70] animate-in fade-in slide-in-from-bottom-2 duration-300 pointer-events-auto",
-                        !isFrameSelected && !isPanning && !isDraggingFrame && "opacity-0 group-hover:opacity-100"
+                        selectedArtifactIndex !== index && !isPanning && !isDraggingFrame && "opacity-0 group-hover:opacity-100"
                       )} onMouseDown={(e) => e.stopPropagation()}>
                         
                         {/* Main Toolbar Container */}
                         <div className="flex items-center gap-1 px-2 py-1.5 bg-zinc-900 border border-white/5 rounded-2xl shadow-2xl">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-9 px-3 text-white hover:bg-white/10 rounded-xl flex items-center gap-2 text-[13px] font-medium"
-                          >
-                            <Sparkles className="h-4 w-4 text-indigo-400" />
-                            Generate
-                            <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-9 px-3 text-white hover:bg-white/10 rounded-xl flex items-center gap-2 text-[13px] font-medium"
+                              >
+                                <Sparkles className="h-4 w-4 text-indigo-400" />
+                                Generate
+                                <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="center" className="w-56 bg-zinc-900 border-white/10 text-zinc-200 rounded-xl shadow-2xl p-1.5 z-[100]">
+                              <DropdownMenuItem 
+                                onClick={() => handleArtifactAction('more', artifact)}
+                                className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/10 cursor-pointer text-[13px] font-medium"
+                              >
+                                <Plus className="h-4 w-4 text-indigo-400" />
+                                Create more pages
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleArtifactAction('regenerate', artifact)}
+                                className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/10 cursor-pointer text-[13px] font-medium"
+                              >
+                                <RotateCcw className="h-4 w-4 text-emerald-400" />
+                                Regenerate
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleArtifactAction('variations', artifact)}
+                                className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/10 cursor-pointer text-[13px] font-medium"
+                              >
+                                <Columns className="h-4 w-4 text-amber-400" />
+                                Variations
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                           
                           <Button 
                             variant="ghost" 
@@ -1054,25 +1479,105 @@ export default function ProjectPage() {
                             <Palette className="h-4 w-4 opacity-70" />
                           </Button>
                           
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-9 px-3 text-white hover:bg-white/10 rounded-xl flex items-center gap-2 text-[13px] font-medium"
-                          >
-                            <Eye className="h-4 w-4 opacity-70" />
-                            Preview
-                            <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-9 px-3 text-white hover:bg-white/10 rounded-xl flex items-center gap-2 text-[13px] font-medium"
+                              >
+                                {(() => {
+                                  const mode = artifactPreviewModes[index] || (artifact.type === 'app' ? 'mobile' : 'desktop');
+                                  if (mode === 'mobile') return <Smartphone className="h-4 w-4 opacity-70" />;
+                                  if (mode === 'tablet') return <Tablet className="h-4 w-4 opacity-70" />;
+                                  return <Monitor className="h-4 w-4 opacity-70" />;
+                                })()}
+                                Preview
+                                <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="center" className="w-48 bg-zinc-900 border-white/10 text-zinc-200 rounded-xl shadow-2xl p-1.5 z-[100]">
+                              <DropdownMenuItem 
+                                onClick={() => setArtifactPreviewModes(prev => ({ ...prev, [index]: 'mobile' }))}
+                                className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-white/10 cursor-pointer text-[13px]"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Smartphone className="h-4 w-4" /> Mobile
+                                </div>
+                                <span className="text-[10px] text-zinc-500">380px</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => setArtifactPreviewModes(prev => ({ ...prev, [index]: 'tablet' }))}
+                                className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-white/10 cursor-pointer text-[13px]"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Tablet className="h-4 w-4" /> Tablet
+                                </div>
+                                <span className="text-[10px] text-zinc-500">768px</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => setArtifactPreviewModes(prev => ({ ...prev, [index]: 'desktop' }))}
+                                className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-white/10 cursor-pointer text-[13px]"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Monitor className="h-4 w-4" /> Desktop
+                                </div>
+                                <span className="text-[10px] text-zinc-500">1280px</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                           
                           <div className="w-[1px] h-4 bg-white/10 mx-1" />
                           
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-9 w-9 p-0 text-white hover:bg-white/10 rounded-xl flex items-center justify-center font-medium"
-                          >
-                            <MoreHorizontal className="h-4 w-4 opacity-70" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-9 w-9 p-0 text-white hover:bg-white/10 rounded-xl flex items-center justify-center font-medium"
+                              >
+                                <MoreHorizontal className="h-4 w-4 opacity-70" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-52 bg-zinc-900 border-white/10 text-zinc-200 rounded-xl shadow-2xl p-1.5 z-[100]">
+                              <DropdownMenuItem 
+                                onClick={() => openCodeViewer(index)}
+                                className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/10 cursor-pointer text-[13px]"
+                              >
+                                <Code className="h-4 w-4 text-zinc-400" />
+                                View Code
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleExportZip(index)}
+                                className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/10 cursor-pointer text-[13px]"
+                              >
+                                <ExternalLink className="h-4 w-4 text-zinc-400" />
+                                Export (ZIP)
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleDownloadImage(index)}
+                                className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/10 cursor-pointer text-[13px]"
+                              >
+                                <ImageIcon className="h-4 w-4 text-zinc-400" />
+                                Download Image
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={exportAsHTML}
+                                className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-white/10 cursor-pointer text-[13px]"
+                              >
+                                <Download className="h-4 w-4 text-zinc-400" />
+                                Download HTML
+                              </DropdownMenuItem>
+                              <div className="h-px bg-white/5 my-1" />
+                              <DropdownMenuItem 
+                                onClick={() => deleteArtifact(index)}
+                                className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-red-500/20 text-red-400 cursor-pointer text-[13px]"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                Delete Screen
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
 
                         {/* Feedback Container */}
@@ -1096,78 +1601,92 @@ export default function ProjectPage() {
                     )}
 
                     {/* Frame Info Overlay (Title & Code Icon) */}
-                    {(isFrameSelected || isDraggingFrame || throttledArtifact?.isComplete) && (
+                     {(selectedArtifactIndex === index || isDraggingFrame || artifact.isComplete) && (
                       <div className="absolute -top-7 left-0 right-0 flex items-center justify-between px-1 pointer-events-none select-none">
-                        <span className="text-[11px] font-medium text-zinc-500/80 tracking-tight">
-                          {project.title || "Untitled Project"}
-                        </span>
+                         <span 
+                           className="text-[11px] font-black uppercase tracking-widest"
+                           style={{ color: appliedTheme?.cssVars.primary || 'var(--primary)' }}
+                         >
+                           {artifact.title || "Untitled Screen"}
+                         </span>
                         <div className="flex items-center gap-2">
-                           <Code className="h-3.5 w-3.5 text-zinc-400/60" />
+                           <Code 
+                             className="h-3.5 w-3.5" 
+                             style={{ color: appliedTheme?.cssVars.mutedForeground || 'var(--muted-foreground)' }}
+                           />
                         </div>
                       </div>
                     )}
 
-                   <div 
-                    className={cn(
-                      "transition-shadow duration-300 ease-in-out shadow-[0_40px_100px_rgba(0,0,0,0.4)] overflow-hidden border border-border/50 relative bg-white",
-                      isFrameSelected && "ring-1 ring-blue-500 border-blue-500",
-                      isDraggingFrame && "shadow-[0_60px_120px_rgba(0,0,0,0.5)] border-blue-500",
-                       currentArtifact.type === 'app' 
-                         ? "w-[380px] rounded-2xl" 
-                         : currentArtifact.type === 'web'
-                           ? "w-[1024px] rounded-lg"
-                           : "w-[800px] rounded-xl"
-                     )}
-                     style={{
-                       height: `${dynamicFrameHeight}px`,
-                       minHeight: currentArtifact.type === 'app' ? '800px' : undefined,
-                       aspectRatio: currentArtifact.type === 'app' && !dynamicFrameHeight ? '9/19' : undefined,
-                       transition: 'height 0.3s ease-in-out'
-                     }}
-                   >
-                      {/* Selection Handles (Blue corner squares from reference) */}
-                      {isFrameSelected && (
-                        <>
-                          <div className="absolute top-0 left-0 w-2 h-2 bg-blue-500 border border-white z-[60] -translate-x-1 -translate-y-1" />
-                          <div className="absolute top-0 right-0 w-2 h-2 bg-blue-500 border border-white z-[60] translate-x-1 -translate-y-1" />
-                          <div className="absolute bottom-0 left-0 w-2 h-2 bg-blue-500 border border-white z-[60] -translate-x-1 translate-y-1" />
-                          <div className="absolute bottom-0 right-0 w-2 h-2 bg-blue-500 border border-white z-[60] translate-x-1 translate-y-1" />
-                        </>
+                    <div 
+                     className={cn(
+                       "transition-all duration-300 ease-in-out shadow-[0_40px_100px_rgba(0,0,0,0.4)] overflow-hidden border relative flex-shrink-0",
+                       selectedArtifactIndex === index && "ring-2",
+                       isDraggingFrame && selectedArtifactIndex === index && "shadow-[0_60px_120px_rgba(0,0,0,0.5)]",
+                        (() => {
+                         const mode = artifactPreviewModes[index];
+                         if (mode === 'mobile') return "w-[380px] rounded-sm";
+                         if (mode === 'tablet') return "w-[768px] rounded-sm";
+                         if (mode === 'desktop') return "w-[1280px] rounded-sm";
+                         
+                         return artifact.type === 'app' 
+                           ? "w-[380px] rounded-sm" 
+                           : artifact.type === 'web'
+                             ? "w-[1024px] rounded-sm"
+                             : "w-[600px] rounded-sm";
+                        })()
                       )}
-                   {currentArtifact && !currentArtifact.isComplete && (
-                     <div className="absolute inset-0 z-50 bg-zinc-50 pointer-events-none overflow-hidden flex items-center justify-center">
-                        <div className="absolute inset-0 bg-white">
-                           {/* Enhanced Shimmer Sweep */}
-                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-zinc-200/50 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite]" />
-                        </div>
-                        
-                        <div className="relative z-10 flex flex-col items-center gap-4">
-                           <div className="relative size-12">
-                              <div className="absolute inset-0 border-2 border-primary/20 rounded-full" />
-                              <div className="absolute inset-0 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                           </div>
-                           <span className="text-[12px] font-bold text-zinc-400 uppercase tracking-[0.2em] animate-pulse">
-                              Crafting Design...
-                           </span>
-                        </div>
-                     </div>
-                   )}
-                  
-                    {throttledArtifact && throttledArtifact.isComplete && (
-                        <iframe 
-                         ref={iframeRef}
-                         srcDoc={memoizedInjectedHTML}
-                         className={cn(
-                           "w-full h-full border-none bg-white transition-opacity duration-500",
-                           (activeTool === 'select' || activeTool === 'hand' || isDraggingFrame) && !isEditMode ? "pointer-events-none" : "pointer-events-auto"
-                         )}
-                         title="Design Preview"
-                         sandbox="allow-scripts allow-same-origin"
-                       />
-                    )}
+                       style={{
+                         height: !artifactPreviewModes[index] && artifact.type !== 'app' && artifact.type !== 'web' 
+                           ? "600px" 
+                           : `${dynamicFrameHeights[index] || (artifactPreviewModes[index] === 'mobile' || (artifact.type === 'app' && !artifactPreviewModes[index]) ? 800 : 700)}px`,
+                         minHeight: (artifactPreviewModes[index] === 'mobile' || (artifact.type === 'app' && !artifactPreviewModes[index])) ? '800px' : '400px',
+                         aspectRatio: (artifactPreviewModes[index] === 'mobile' || (artifact.type === 'app' && !artifactPreviewModes[index])) && !dynamicFrameHeights[index] ? '9/19' : (artifact.type !== 'app' && artifact.type !== 'web' && !artifactPreviewModes[index]) ? '1/1' : undefined,
+                         transition: 'width 0.3s ease-in-out',
+                         backgroundColor: appliedTheme?.cssVars.background || 'var(--background)',
+                         borderColor: selectedArtifactIndex === index ? (appliedTheme?.cssVars.primary || 'var(--primary)') : (appliedTheme?.cssVars.border || 'var(--border)'),
+                         boxShadow: selectedArtifactIndex === index ? `0 0 0 2px ${appliedTheme?.cssVars.primary || 'var(--primary)'}40, 0 40px 100px rgba(0,0,0,0.4)` : undefined
+                       }}
+                    >
+                       {/* Selection Handles */}
+                       {selectedArtifactIndex === index && (
+                         <>
+                           <div 
+                             className="absolute top-0 left-0 w-2.5 h-2.5 border border-white z-[60] -translate-x-1/2 -translate-y-1/2 rounded-full" 
+                             style={{ backgroundColor: appliedTheme?.cssVars.primary || 'var(--primary)' }}
+                           />
+                           <div 
+                             className="absolute top-0 right-0 w-2.5 h-2.5 border border-white z-[60] translate-x-1/2 -translate-y-1/2 rounded-full" 
+                             style={{ backgroundColor: appliedTheme?.cssVars.primary || 'var(--primary)' }}
+                           />
+                           <div 
+                             className="absolute bottom-0 left-0 w-2.5 h-2.5 border border-white z-[60] -translate-x-1/2 translate-y-1/2 rounded-full" 
+                             style={{ backgroundColor: appliedTheme?.cssVars.primary || 'var(--primary)' }}
+                           />
+                           <div 
+                             className="absolute bottom-0 right-0 w-2.5 h-2.5 border border-white z-[60] translate-x-1/2 translate-y-1/2 rounded-full" 
+                             style={{ backgroundColor: appliedTheme?.cssVars.primary || 'var(--primary)' }}
+                           />
+                         </>
+                       )}
+                     {!artifact.isComplete && <ModernShimmer type={artifact.type} appliedTheme={appliedTheme} />}
+                   
+                    <iframe 
+                      ref={el => { iframeRefs.current[index] = el; }}
+                      srcDoc={getInjectedHTML(artifact.content)}
+                      loading="eager"
+                      scrolling="no"
+                      className={cn(
+                        "w-full h-full border-none overflow-hidden",
+                        (activeTool === 'select' || activeTool === 'hand' || isDraggingFrame) && !isEditMode ? "pointer-events-none" : "pointer-events-auto"
+                      )}
+                      title={artifact.title}
+                    />
                     </div>
                   </div>
-               ) : (
+                ))}
+              </div>
+             ) : (
                 <div className="flex flex-col items-center gap-6 opacity-20 pointer-events-none">
                    <Logo iconSize={80} showText={false} />
                    <p className="text-xl font-medium tracking-tight">Generate your first design to see it here</p>
@@ -1247,6 +1766,140 @@ export default function ProjectPage() {
             </Button>
          </div>
       </main>
+
+      {/* Custom Monaco Code Viewer Modal */}
+      <AnimatePresence>
+        {isCodeViewerOpen && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-8 bg-black/80 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="w-[90vw] h-[90vh] bg-[#1e1e1e] rounded-3xl border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col"
+            >
+               <header className="flex items-center justify-between px-8 py-4 bg-[#252526] border-b border-white/5 h-16">
+                   <div className="flex items-center gap-4">
+                       <div className="flex gap-2">
+                           <div className="size-3 rounded-full bg-red-500" />
+                           <div className="size-3 rounded-full bg-amber-500" />
+                           <div className="size-3 rounded-full bg-emerald-500" />
+                       </div>
+                       <span className="text-zinc-400 font-bold text-sm uppercase tracking-widest ml-4 flex items-center gap-2">
+                          <Code className="size-4 text-indigo-400" />
+                          {viewingTitle} source
+                       </span>
+                   </div>
+                   
+                   <div className="flex items-center gap-3">
+                       <Button 
+                         variant="ghost" 
+                         size="icon" 
+                         className="h-10 w-10 text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                         onClick={() => {
+                           navigator.clipboard.writeText(viewingCode);
+                           toast.success("Source code copied");
+                         }}
+                         title="Copy Code"
+                       >
+                           <FilesIcon className="h-5 w-5" />
+                       </Button>
+                       <Button 
+                         variant="ghost" 
+                         size="icon" 
+                         className="h-10 w-10 text-zinc-400 hover:text-white hover:bg-red-500/20 rounded-xl transition-all"
+                         onClick={() => setIsCodeViewerOpen(false)}
+                         title="Close"
+                       >
+                           <X className="h-6 w-6" />
+                       </Button>
+                   </div>
+               </header>
+               
+               <div className="flex-1 w-full bg-[#1e1e1e]">
+                   <Editor
+                       height="100%"
+                       defaultLanguage="html"
+                       theme="vs-dark"
+                       value={viewingCode}
+                       options={{
+                           minimap: { enabled: true },
+                           fontSize: 14,
+                           scrollBeyondLastLine: false,
+                           automaticLayout: true,
+                           padding: { top: 20 },
+                           readOnly: true,
+                           lineNumbers: 'on',
+                           renderLineHighlight: 'all',
+                           cursorStyle: 'line',
+                           fontFamily: 'JetBrains Mono, Menlo, Monaco, Courier New, monospace',
+                       }}
+                   />
+               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <Dialog open={isRegenerateDialogOpen} onOpenChange={setIsRegenerateDialogOpen}>
+          <DialogContent className="sm:max-w-[500px] bg-zinc-950 border-zinc-800 text-white p-0 overflow-hidden rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+              <DialogHeader className="p-6 pb-0">
+                  <div className="flex items-center gap-3 mb-2">
+                     <div className="size-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                        <RotateCcw className="size-5 text-emerald-400" />
+                     </div>
+                     <div>
+                        <DialogTitle className="text-xl font-bold tracking-tight">Regenerate Screen</DialogTitle>
+                        <DialogDescription className="text-zinc-500 text-sm">
+                          Provide specific instructions or leave blank for a general improvement.
+                        </DialogDescription>
+                     </div>
+                  </div>
+              </DialogHeader>
+              
+              <div className="p-6 space-y-4">
+                  <div className="space-y-2">
+                     <label className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Regeneration Instructions</label>
+                     <Textarea 
+                        placeholder="e.g., Change the hero section to use a mesh gradient, or focus on making the data tables more compact..."
+                        className="min-h-[120px] bg-zinc-900/50 border-zinc-800 rounded-2xl resize-none text-sm focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all placeholder:text-zinc-600"
+                        value={regenerateInstructions}
+                        onChange={(e) => setRegenerateInstructions(e.target.value)}
+                     />
+                  </div>
+                  
+                  <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-4 flex items-start gap-3">
+                     <Sparkles className="size-4 text-emerald-400 mt-0.5" />
+                     <p className="text-[12px] text-zinc-400 leading-relaxed">
+                        The AI will focus on your instructions while maintaining visual consistency with the rest of your project.
+                     </p>
+                  </div>
+              </div>
+
+              <DialogFooter className="p-6 bg-zinc-900/30 border-t border-zinc-800/50 flex flex-row items-center justify-end gap-3">
+                  <Button 
+                     variant="ghost" 
+                     onClick={() => setIsRegenerateDialogOpen(false)}
+                     className="rounded-xl hover:bg-zinc-800 text-zinc-400 font-bold text-xs uppercase tracking-widest"
+                  >
+                     Cancel
+                  </Button>
+                  <Button 
+                     onClick={handleRegenerateSubmit}
+                     className="rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-[0.1em] px-6 shadow-[0_10px_20px_rgba(16,185,129,0.2)]"
+                  >
+                     Regenerate
+                  </Button>
+              </DialogFooter>
+          </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
+// Ensure icons like Files are imported if used
+const FilesIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+  </svg>
+);
+

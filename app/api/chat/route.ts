@@ -3,6 +3,7 @@ import { streamText } from "@/llm/streamText";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { extractArtifacts, stripArtifact } from "@/lib/artifact-renderer";
 
 export async function POST(req: Request) {
   try {
@@ -44,15 +45,63 @@ export async function POST(req: Request) {
     // Save assistant message after streaming completes
     const onFinish: any = async (result: any) => {
       try {
+        const fullText = result.text;
+        const artifacts = extractArtifacts(fullText);
+        const strippedText = stripArtifact(fullText);
+
         await prisma.message.create({
           data: {
             projectId: projectId,
             role: "assistant",
-            parts: result.content,
+            parts: [{ type: 'text', text: strippedText }],
           },
         });
+
+        if (artifacts.length > 0) {
+          const project = await prisma.project.findUnique({
+            where: { id: projectId },
+            select: { canvasData: true }
+          });
+          
+          const currentCanvasData = (project?.canvasData as any) || {};
+          const currentArtifacts = currentCanvasData.artifacts || [];
+          
+          // Merge logic: Update existing by title, or append new
+          const updatedArtifacts = [...currentArtifacts];
+          
+          artifacts.forEach(newArt => {
+            const existingIndex = updatedArtifacts.findIndex(a => a.title === newArt.title);
+            if (existingIndex >= 0) {
+              updatedArtifacts[existingIndex] = {
+                ...updatedArtifacts[existingIndex],
+                content: newArt.content,
+                isComplete: newArt.isComplete
+              };
+            } else {
+              // Add new artifact with a default offset to prevent overlapping
+              const lastArt = updatedArtifacts[updatedArtifacts.length - 1];
+              const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
+              const newX = lastArt ? (lastArt.x || 0) + getWidth(lastArt.type) + 80 : 0;
+              updatedArtifacts.push({
+                ...newArt,
+                x: newX,
+                y: 0
+              });
+            }
+          });
+          
+          await prisma.project.update({
+            where: { id: projectId },
+            data: {
+              canvasData: {
+                ...currentCanvasData,
+                artifacts: updatedArtifacts,
+              }
+            }
+          });
+        }
       } catch (error) {
-        console.error("[CHAT] Failed to save assistant message:", error);
+        console.error("[CHAT] Failed to save assistant message or artifacts:", error);
       }
     };
 

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Vitality Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        border: "var(--border)", input: "var(--input)", ring: "var(--ring)", background: "var(--background)", foreground: "var(--foreground)",
+                        primary: { DEFAULT: "var(--primary)", foreground: "var(--primary-foreground)" },
+                        secondary: { DEFAULT: "var(--secondary)", foreground: "var(--secondary-foreground)" },
+                        muted: { DEFAULT: "var(--muted)", foreground: "var(--muted-foreground)" },
+                        accent: { DEFAULT: "var(--accent)", foreground: "var(--accent-foreground)" },
+                        card: { DEFAULT: "var(--card)", foreground: "var(--card-foreground)" },
+                    },
+                    borderRadius: { lg: "var(--radius)", md: "calc(var(--radius) - 2px)", sm: "calc(var(--radius) - 4px)" },
+                    fontFamily: { sans: ['var(--font-sans)', 'Outfit', 'sans-serif'] },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { background-color: var(--background); color: var(--foreground); line-height: 1.6; font-family: var(--font-sans); }
+        .card { background: var(--card); border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        .card-inner-shadow { box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06); }
+        .radial-progress {
+            position: relative;
+            display: inline-block;
+            width: 120px; /* Base size for the ring */
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent) var(--progress, 0%), var(--muted) var(--progress, 0%));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .radial-progress::before {
+            content: '';
+            position: absolute;
+            width: 90px; /* Inner circle size */
+            height: 90px;
+            border-radius: 50%;
+            background: var(--card);
+        }
+    </style>
+</head>
+<body class="selection:bg-primary/30 min-h-screen">
+    <nav class="sticky top-0 w-full z-[100] border-b border-border bg-background/80 backdrop-blur-md px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="size-9 bg-primary rounded-xl flex items-center justify-center"><i data-lucide="activity" class="size-5 text-primary-foreground"></i></div>
+            <span class="text-xl font-extrabold tracking-tighter">Vitality</span>
+        </div>
+        <div class="hidden md:flex items-center gap-12 uppercase text-[10px] font-black tracking-[0.3em] text-muted-foreground">
+            <a href="#" class="hover:text-primary transition-colors">Dashboard</a>
+            <a href="#" class="hover:text-primary transition-colors">Activities</a>
+            <a href="#" class="hover:text-primary transition-colors">Goals</a>
+            <a href="#" class="hover:text-primary transition-colors">Settings</a>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="size-10 flex items-center justify-center rounded-lg border border-border bg-card hover:bg-muted transition-colors"><i data-lucide="bell" class="size-4 text-muted-foreground"></i></button>
+            <img src="https://i.pravatar.cc/128?u=emily" class="size-10 rounded-full object-cover border-2 border-primary" alt="User Avatar" />
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-8 py-12 space-y-8 md:space-y-12">
+        <section class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tighter">Hello, Emily!</h1>
+            <button class="px-6 py-3 bg-primary text-primary-foreground text-xs font-black tracking-widest uppercase rounded-xl hover:scale-105 transition-transform flex items-center gap-2 w-fit">
+                <i data-lucide="plus" class="size-4"></i> Log Activity
+            </button>
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Heart Rate Graph -->
+            <div class="lg:col-span-2 card rounded-3xl p-8 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold tracking-tight">Heart Rate</h2>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-primary">Last 24h</span>
+                </div>
+                <div class="flex items-baseline gap-3">
+                    <span class="text-5xl font-extrabold tracking-tighter">72</span>
+                    <span class="text-muted-foreground font-medium">BPM Avg.</span>
+                    <span class="text-accent text-sm font-bold ml-2 flex items-center gap-1"><i data-lucide="arrow-up" class="size-4"></i> +3%</span>
+                </div>
+                <div class="relative w-full h-48">
+                    <svg class="w-full h-full" viewBox="0 0 100 50" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="heartRateGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.6"/>
+                                <stop offset="100%" stop-color="var(--background)" stop-opacity="0.1"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Grid Lines (Background Interference: opacity-[0.02] is too low, using border/20 for better visibility but still subtle) -->
+                        <path d="M0,10 L100,10 M0,20 L100,20 M0,30 L100,30 M0,40 L100,40" stroke="var(--border)" stroke-width="0.2" opacity="0.4"/>
+                        <path d="M10,0 L10,50 M20,0 L20,50 M30,0 L30,50 M40,0 L40,50 M50,0 L50,50 M60,0 L60,50 M70,0 L70,50 M80,0 L80,50 M90,0 L90,50" stroke="var(--border)" stroke-width="0.2" opacity="0.4"/>
+
+                        <!-- Data Line -->
+                        <polyline fill="none" stroke="var(--primary)" stroke-width="0.7" points="0,30 10,28 20,32 30,25 40,29 50,22 60,27 70,20 80,24 90,18 100,22" />
+                        <!-- Area Fill -->
+                        <path fill="url(#heartRateGradient)" d="M0,30 10,28 20,32 30,25 40,29 50,22 60,27 70,20 80,24 90,18 100,22 L100,50 L0,50 Z" />
+                    </svg>
+                </div>
+                <div class="flex justify-between text-xs text-muted-foreground font-medium uppercase tracking-wide">
+                    <span>12 AM</span><span>6 AM</span><span>12 PM</span><span>6 PM</span><span>12 AM</span>
+                </div>
+            </div>
+
+            <!-- Daily Step Goal Ring -->
+            <div class="card rounded-3xl p-8 space-y-6 flex flex-col items-center justify-center text-center">
+                <h2 class="text-xl font-bold tracking-tight mb-4">Steps Today</h2>
+                <div class="radial-progress flex items-center justify-center" style="--progress: 75%;">
+                    <div class="relative z-10 flex flex-col items-center">
+                        <span class="text-4xl font-extrabold tracking-tighter">7,500</span>
+                        <span class="text-sm text-muted-foreground font-medium">of 10,000 steps</span>
+                    </div>
+                </div>
+                <p class="text-[10px] font-black uppercase tracking-widest text-primary pt-4">Goal: 10,000 steps</p>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Calories Burned -->
+            <div class="card rounded-3xl p-6 flex flex-col items-start space-y-4">
+                <div class="size-12 rounded-xl bg-red-500/10 flex items-center justify-center"><i data-lucide="flame" class="size-6 text-red-500"></i></div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Calories Burned</span>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-extrabold tracking-tighter">520</span>
+                    <span class="text-muted-foreground font-medium">kcal</span>
+                </div>
+                <p class="text-[9px] text-accent font-bold uppercase tracking-wide flex items-center gap-1"><i data-lucide="arrow-up-right" class="size-3"></i> +15% from avg</p>
+            </div>
+
+            <!-- Active Minutes -->
+            <div class="card rounded-3xl p-6 flex flex-col items-start space-y-4">
+                <div class="size-12 rounded-xl bg-blue-500/10 flex items-center justify-center"><i data-lucide="clock" class="size-6 text-blue-500"></i></div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Active Minutes</span>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-extrabold tracking-tighter">75</span>
+                    <span class="text-muted-foreground font-medium">min</span>
+                </div>
+                <p class="text-[9px] text-accent font-bold uppercase tracking-wide flex items-center gap-1"><i data-lucide="arrow-up-right" class="size-3"></i> +10 min</p>
+            </div>
+
+            <!-- Sleep Score -->
+            <div class="card rounded-3xl p-6 flex flex-col items-start space-y-4">
+                <div class="size-12 rounded-xl bg-purple-500/10 flex items-center justify-center"><i data-lucide="moon" class="size-6 text-purple-500"></i></div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Sleep Score</span>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-extrabold tracking-tighter">8.2</span>
+                    <span class="text-muted-foreground font-medium">/10</span>
+                </div>
+                <p class="text-[9px] text-primary font-bold uppercase tracking-wide flex items-center gap-1"><i data-lucide="check" class="size-3"></i> Excellent</p>
+            </div>
+
+            <!-- Hydration -->
+            <div class="card rounded-3xl p-6 flex flex-col items-start space-y-4">
+                <div class="size-12 rounded-xl bg-green-500/10 flex items-center justify-center"><i data-lucide="droplet" class="size-6 text-green-500"></i></div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Hydration</span>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-extrabold tracking-tighter">2.5</span>
+                    <span class="text-muted-foreground font-medium">L</span>
+                </div>
+                <p class="text-[9px] text-accent font-bold uppercase tracking-wide flex items-center gap-1"><i data-lucide="arrow-up-right" class="size-3"></i> Goal Met</p>
+            </div>
+        </section>
+
+        <!-- Recent Activities -->
+        <section class="card rounded-3xl p-8 space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold tracking-tight">Recent Activities</h2>
+                <button class="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline">View All</button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center gap-4 py-3 border-b border-border/50 last:border-b-0">
+                    <div class="size-14 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0"><i data-lucide="running" class="size-6 text-primary"></i></div>
+                    <div class="flex-1 space-y-0.5">
+                        <h3 class="font-semibold tracking-tight text-lg">Morning Run</h3>
+                        <p class="text-xs text-muted-foreground font-medium">35 min • 5.2 km</p>
+                    </div>
+                    <div class="text-right space-y-0.5">
+                        <p class="font-bold text-base">380 kcal</p>
+                        <p class="text-[9px] text-muted-foreground font-medium">2 hours ago</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 py-3 border-b border-border/50 last:border-b-0">
+                    <div class="size-14 rounded-2xl bg-accent/10 flex items-center justify-center flex-shrink-0"><i data-lucide="dumbbell" class="size-6 text-accent"></i></div>
+                    <div class="flex-1 space-y-0.5">
+                        <h3 class="font-semibold tracking-tight text-lg">Weight Training</h3>
+                        <p class="text-xs text-muted-foreground font-medium">60 min • Full Body</p>
+                    </div>
+                    <div class="text-right space-y-0.5">
+                        <p class="font-bold text-base">450 kcal</p>
+                        <p class="text-[9px] text-muted-foreground font-medium">Yesterday</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 py-3 border-b border-border/50 last:border-b-0">
+                    <div class="size-14 rounded-2xl bg-blue-500/10 flex items-center justify-center flex-shrink-0"><i data-lucide="bike" class="size-6 text-blue-500"></i></div>
+                    <div class="flex-1 space-y-0.5">
+                        <h3 class="font-semibold tracking-tight text-lg">Cycling</h3>
+                        <p class="text-xs text-muted-foreground font-medium">45 min • 18 km</p>
+                    </div>
+                    <div class="text-right space-y-0.5">
+                        <p class="font-bold text-base">510 kcal</p>
+                        <p class="text-[9px] text-muted-foreground font-medium">2 days ago</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });</script>
+
+    <script>
+      let lastHeight = 0;
+      const sendHeight = () => {
+        const height = Math.ceil(Math.max(
+          document.body.scrollHeight, 
+          document.documentElement.scrollHeight,
+          document.body.offsetHeight,
+          document.documentElement.offsetHeight
+        ));
+        
+        // Only update if height changed by more than 5px to avoid jitter
+        if (Math.abs(height - lastHeight) > 5) {
+          lastHeight = height;
+          window.parent.postMessage({ type: 'HEIGHT_UPDATE', height }, '*');
+        }
+      };
+
+      const observer = new MutationObserver(sendHeight);
+      window.onload = () => {
+        sendHeight();
+        observer.observe(document.body, { 
+          childList: true, 
+          subtree: true, 
+          attributes: true 
+        });
+        // Multi-stage check to handle complex layouts/late loads
+        setTimeout(sendHeight, 100);
+        setTimeout(sendHeight, 500);
+        setTimeout(sendHeight, 1000);
+        setTimeout(sendHeight, 3000);
+      };
+
+      try {
+        new ResizeObserver(sendHeight).observe(document.documentElement);
+      } catch (e) {
+        console.error('ResizeObserver failed', e);
+      }
+
+      window.addEventListener('message', (event) => {
+        if (event.data.type === 'UPDATE_CONTENT') {
+          const parser = new DOMParser();
+          const newDoc = parser.parseFromString(event.data.content, 'text/html');
+          
+          // Update head (styles, links)
+          const newHead = newDoc.head.innerHTML;
+          if (document.head.innerHTML !== newHead) {
+            document.head.innerHTML = newHead;
+          }
+
+          // Update body
+          document.body.innerHTML = newDoc.body.innerHTML;
+          
+          // Re-trigger height update
+          sendHeight();
+        }
+      });
+    </script>
+    <style>
+      ::-webkit-scrollbar { display: none; }
+      html, body { 
+        height: auto !important; 
+        min-height: 100% !important; 
+        overflow: visible !important;
+        -ms-overflow-style: none; 
+        scrollbar-width: none; 
+        margin: 0; 
+        padding: 0; 
+        background: var(--background); 
+        transition: background 0.3s ease; 
+      }
+      @keyframes shimmer {
+        100% { transform: translateX(100%); }
+      }
+      .edit-hover-highlight {
+        outline: 2px dotted #6366f1 !important;
+        outline-offset: 2px !important;
+        cursor: pointer !important;
+      }
+      .edit-selected-highlight {
+        outline: 2px solid #6366f1 !important;
+        outline-offset: 2px !important;
+      }
+    </style>
+  </body>
+</html>

@@ -1,83 +1,84 @@
+export interface Artifact {
+  content: string;
+  type: 'web' | 'app' | 'general';
+  isComplete: boolean;
+  title: string;
+  x?: number;
+  y?: number;
+}
+
 /**
- * Extracts HTML content from artifact tags in AI responses
- * Supports <artifact>, <web_artifact>, and <app_artifact>
- * Handles partial matches for real-time streaming
+ * Extracts all HTML artifacts from AI responses
+ * Supports <artifact>, <web_artifact>, and <app_artifact> with optional title attribute
  */
-export function extractArtifact(text: string): { content: string, type: 'web' | 'app' | 'general', isComplete: boolean } | null {
-  const tags = [
-    { start: '<web_artifact>', end: '</web_artifact>', type: 'web' as const },
-    { start: '<app_artifact>', end: '</app_artifact>', type: 'app' as const },
-    { start: '<artifact>', end: '</artifact>', type: 'general' as const },
+export function extractArtifacts(text: string): Artifact[] {
+  const artifacts: Artifact[] = [];
+  const tagTypes = [
+    { start: '<web_artifact', end: '</web_artifact>', type: 'web' as const },
+    { start: '<app_artifact', end: '</app_artifact>', type: 'app' as const },
+    { start: '<artifact', end: '</artifact>', type: 'general' as const },
   ];
 
-  for (const tag of tags) {
-    const startIndex = text.toLowerCase().indexOf(tag.start);
-    if (startIndex !== -1) {
-      const contentStart = startIndex + tag.start.length;
-      const endIndex = text.toLowerCase().indexOf(tag.end, contentStart);
-      
-      if (endIndex !== -1) {
-        return { 
-          content: text.substring(contentStart, endIndex).trim(), 
-          type: tag.type,
-          isComplete: true 
-        };
-      } else {
-        return { 
-          content: text.substring(contentStart).trim(), 
-          type: tag.type,
-          isComplete: false 
-        };
-      }
-    }
-  }
+  // Regex to find any of the opening tags and their content
+  // Matches <web_artifact title="..."> or <web_artifact>
+  const tagPattern = /<(web_artifact|app_artifact|artifact)([^>]*)>([\s\S]*?)(?:<\/\1>|$)/gi;
+  let match;
 
-  // Fallback: If the text contains significant HTML markers but no artifact tags,
-  // we treat it as an incomplete or 'broken' artifact to prevent raw code display in chat.
-  const htmlMarkers = ['<!doctype html>', '<html', '<body', '<script', '<style'];
-  const lowerText = text.toLowerCase();
-  const hasHtml = htmlMarkers.some(marker => lowerText.includes(marker));
-  
-  if (hasHtml && text.length > 50) {
-    // Try to guess type based on content or context hints
-    let type: 'web' | 'app' | 'general' = 'web';
-    if (lowerText.includes('mobile') || lowerText.includes('phone') || lowerText.includes('app_artifact')) {
-      type = 'app';
-    }
+  while ((match = tagPattern.exec(text)) !== null) {
+    const tagName = match[1].toLowerCase();
+    const attributes = match[2];
+    const content = match[3].trim();
+    const isComplete = text.toLowerCase().includes(`</${tagName}>`, match.index + match[0].length - (text.toLowerCase().endsWith(`</${tagName}>`) ? 0 : 1));
 
-    return {
-      content: text.trim(),
+    // Simple title attribute parser
+    const titleMatch = attributes.match(/title=["']([^"']+)["']/i);
+    const title = titleMatch ? titleMatch[1] : (tagName === 'web_artifact' ? 'Web Design' : tagName === 'app_artifact' ? 'App Design' : 'Component');
+
+    let type: 'web' | 'app' | 'general' = 'general';
+    if (tagName === 'web_artifact') type = 'web';
+    else if (tagName === 'app_artifact') type = 'app';
+
+    artifacts.push({
+      content,
       type,
-      isComplete: false // Treat as incomplete until we see a closing tag or it's finished
-    };
+      isComplete: text.toLowerCase().includes(`</${tagName}>`, match.index),
+      title
+    });
   }
 
-  return null;
+  // Fallback for raw HTML without tags (Legacy support and error recovery)
+  if (artifacts.length === 0) {
+    const htmlMarkers = ['<!doctype html>', '<html', '<body', '<script', '<style'];
+    const lowerText = text.toLowerCase();
+    const hasHtml = htmlMarkers.some(marker => lowerText.includes(marker));
+    
+    if (hasHtml && text.length > 50) {
+      let type: 'web' | 'app' | 'general' = 'web';
+      if (lowerText.includes('mobile') || lowerText.includes('phone') || lowerText.includes('app_artifact')) {
+        type = 'app';
+      }
+
+      artifacts.push({
+        content: text.trim(),
+        type,
+        isComplete: false,
+        title: "Untitled Design"
+      });
+    }
+  }
+
+  return artifacts;
 }
 
 /**
  * Removes all types of artifact blocks from text for display
- * Also removes partial tags at the end of strings during streaming
  */
 export function stripArtifact(text: string): string {
-  let cleaned = text;
-  
-  // Remove full artifacts
-  cleaned = cleaned
-    .replace(/<web_artifact>[\s\S]*?<\/web_artifact>/gi, '')
-    .replace(/<app_artifact>[\s\S]*?<\/app_artifact>/gi, '')
-    .replace(/<artifact>[\s\S]*?<\/artifact>/gi, '');
-
-  // Remove trailing open tags
-  const openTags = ['<web_artifact>', '<app_artifact>', '<artifact>'];
-  for (const tag of openTags) {
-    const lastOpen = cleaned.toLowerCase().lastIndexOf(tag);
-    if (lastOpen !== -1) {
-      cleaned = cleaned.substring(0, lastOpen);
-    }
-  }
-
-  return cleaned.trim();
+  return text
+    .replace(/<(web_artifact|app_artifact|artifact)[^>]*>([\s\S]*?)<\/\1>/gi, '')
+    // Also remove partial tags at the end
+    .replace(/<(web_artifact|app_artifact|artifact)[^>]*>[\s\S]*$/gi, '')
+    .trim();
 }
 
 /**
