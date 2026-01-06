@@ -45,6 +45,6 @@ export async function streamText(messages: UIMessage[], options?: StreamTextOpti
     messages: await convertToModelMessages(messages),
     maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
     onFinish,
-    temperature: 1,
+    temperature: 0.7,
   });
 }

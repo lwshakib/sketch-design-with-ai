@@ -6,6 +6,7 @@ import { useChat } from "@ai-sdk/react";
 import {
   Plus,
   ArrowLeft,
+  ChevronLeft,
   ArrowRight,
   ChevronDown,
   Sparkles,
@@ -92,6 +93,16 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { authClient } from "@/lib/auth-client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Project {
   id: string;
@@ -107,23 +118,47 @@ const getInjectedHTML = (html: string) => {
   const script = `
     <script>
       let lastHeight = 0;
+      
+      const fixVHUnits = () => {
+        // Find elements that might have vh units and convert them to fixed px
+        // This prevents the grow-loop if the AI ignores the 'no vh' rule
+        const elements = document.querySelectorAll('*');
+        elements.forEach(el => {
+          const heightAttr = el.getAttribute('class') || '';
+          if (heightAttr.includes('h-[') && heightAttr.includes('vh]')) {
+             // Extract vh value
+             const match = heightAttr.match(/h-\\[(\\d+)vh\\]/);
+             if (match) {
+               const vhValue = parseInt(match[1]);
+               el.style.height = (vhValue * 8) + 'px'; // Base 800px viewport
+               el.style.minHeight = '0';
+             }
+          }
+        });
+      };
+
       const sendHeight = () => {
-        const height = Math.ceil(Math.max(
-          document.body.scrollHeight, 
+        fixVHUnits();
+        
+        const height = Math.max(
+          document.body.scrollHeight,
           document.documentElement.scrollHeight,
           document.body.offsetHeight,
           document.documentElement.offsetHeight
-        ));
+        );
         
-        // Only update if height changed by more than 5px to avoid jitter
-        if (Math.abs(height - lastHeight) > 5) {
-          lastHeight = height;
-          window.parent.postMessage({ type: 'HEIGHT_UPDATE', height }, '*');
+        // Loop protection: Cap at 5000px and stop if growing too fast
+        const cappedHeight = Math.min(height, 5000);
+
+        if (Math.abs(cappedHeight - lastHeight) > 5) {
+          lastHeight = cappedHeight;
+          window.parent.postMessage({ type: 'HEIGHT_UPDATE', height: cappedHeight }, '*');
         }
       };
 
       const observer = new MutationObserver(sendHeight);
       window.onload = () => {
+        fixVHUnits();
         sendHeight();
         observer.observe(document.body, { 
           childList: true, 
@@ -131,66 +166,39 @@ const getInjectedHTML = (html: string) => {
           attributes: true,
           characterData: true
         });
-        // More aggressive multi-stage check for slow loading assets/images
         [100, 300, 600, 1000, 2000, 4000].forEach(delay => setTimeout(sendHeight, delay));
       };
 
-      // Listen for image loads specifically
       window.addEventListener('load', sendHeight);
-      document.addEventListener('readystatechange', () => {
-        if (document.readyState === 'complete') sendHeight();
-      });
-
       try {
         new ResizeObserver(sendHeight).observe(document.documentElement);
-      } catch (e) {
-        console.error('ResizeObserver failed', e);
-      }
+      } catch (e) {}
 
       window.addEventListener('message', (event) => {
         if (event.data.type === 'UPDATE_CONTENT') {
           const parser = new DOMParser();
           const newDoc = parser.parseFromString(event.data.content, 'text/html');
-          
-          // Update head (styles, links)
-          const newHead = newDoc.head.innerHTML;
-          if (document.head.innerHTML !== newHead) {
-            document.head.innerHTML = newHead;
-          }
-
-          // Update body
+          document.head.innerHTML = newDoc.head.innerHTML;
           document.body.innerHTML = newDoc.body.innerHTML;
-          
-          // Re-trigger height update
+          fixVHUnits();
           sendHeight();
         }
       });
     </script>
     <style>
       ::-webkit-scrollbar { display: none; }
-      html, body { 
-        height: auto !important; 
-        min-height: 100% !important; 
+      html {
+        height: 800px !important; 
+        overflow-y: visible !important;
+        overflow-x: hidden !important;
+      }
+      body { 
+        height: auto !important;
+        min-height: 0 !important;
         overflow: visible !important;
-        -ms-overflow-style: none; 
-        scrollbar-width: none; 
         margin: 0; 
         padding: 0; 
         background: var(--background); 
-        transition: background 0.3s ease; 
-      }
-      @keyframes shimmer {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-      }
-      .edit-hover-highlight {
-        outline: 2px dotted #6366f1 !important;
-        outline-offset: 2px !important;
-        cursor: pointer !important;
-      }
-      .edit-selected-highlight {
-        outline: 2px solid #6366f1 !important;
-        outline-offset: 2px !important;
       }
     </style>
   `;
@@ -300,6 +308,7 @@ export default function ProjectPage() {
   const resizingStartFramePos = useRef({ x: 0, y: 0 });
   const [isEditTitleDialogOpen, setIsEditTitleDialogOpen] = useState(false);
   const [editingTitle, setEditingTitle] = useState("");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Refs to keep track of state in wheel event listeners without re-attaching
   const zoomRef = useRef(zoom);
@@ -332,22 +341,28 @@ export default function ProjectPage() {
           // Merge with existing artifacts to preserve positions
           const mergeArtifacts = (prev: any[]) => {
             const updated = [...prev];
+            let changed = false;
             artifactData.forEach(newArt => {
               const existingIndex = updated.findIndex(a => a.title === newArt.title);
               if (existingIndex >= 0) {
-                updated[existingIndex] = {
-                  ...updated[existingIndex],
-                  content: newArt.content,
-                  isComplete: true
-                };
+                // Only update if content or isComplete actually changed
+                if (updated[existingIndex].content !== newArt.content || !updated[existingIndex].isComplete) {
+                  updated[existingIndex] = {
+                    ...updated[existingIndex],
+                    content: newArt.content,
+                    isComplete: true
+                  };
+                  changed = true;
+                }
               } else {
                 const lastArt = updated[updated.length - 1];
                 const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
                 const newX = lastArt ? (lastArt.x || 0) + getWidth(lastArt.type) + 80 : 0;
                 updated.push({ ...newArt, x: newX, y: 0, isComplete: true });
+                changed = true;
               }
             });
-            return updated;
+            return changed ? updated : prev;
           };
 
           setArtifacts(mergeArtifacts);
@@ -420,8 +435,9 @@ export default function ProjectPage() {
     const lastAssistantMessage = (messages as any[]).filter(m => m.role === 'assistant').at(-1);
     if (!lastAssistantMessage) {
         if (messages.length === 0) {
-            setArtifacts([]);
-            setThrottledArtifacts([]);
+            // Only clear if there are actually items to clear
+            setArtifacts(prev => prev.length > 0 ? [] : prev);
+            setThrottledArtifacts(prev => prev.length > 0 ? [] : prev);
         }
         return;
     }
@@ -435,19 +451,24 @@ export default function ProjectPage() {
         // 1. Maintain the full state in 'artifacts' for internal reference
         setArtifacts(prev => {
            const updated = [...prev];
+           let changed = false;
            artifactData.forEach(newArt => {
              const existingIndex = updated.findIndex(a => a.title === newArt.title);
              if (existingIndex >= 0) {
-               updated[existingIndex] = {
-                 ...updated[existingIndex],
-                 content: newArt.content,
-                 isComplete: newArt.isComplete
-               };
+               if (updated[existingIndex].content !== newArt.content || updated[existingIndex].isComplete !== newArt.isComplete) {
+                   updated[existingIndex] = {
+                     ...updated[existingIndex],
+                     content: newArt.content,
+                     isComplete: newArt.isComplete
+                   };
+                   changed = true;
+               }
              } else {
                updated.push({ ...newArt, x: 0, y: 0 });
+               changed = true;
              }
            });
-           return updated;
+           return changed ? updated : prev;
         });
         
         // 2. Manage the visible UI (throttledArtifacts)
@@ -651,6 +672,19 @@ export default function ProjectPage() {
     return () => clearTimeout(timer);
   }, [appliedTheme, throttledArtifacts]);
 
+  // Refs for tracking hovered/selected elements to avoid re-running useEffect
+  const hoveredElRef = useRef<HTMLElement | null>(null);
+  const selectedElRef = useRef<HTMLElement | null>(null);
+  
+  // Keep refs in sync with state
+  useEffect(() => {
+    hoveredElRef.current = hoveredEl;
+  }, [hoveredEl]);
+  
+  useEffect(() => {
+    selectedElRef.current = selectedEl;
+  }, [selectedEl]);
+
   // Handle Edit Mode selection
   useEffect(() => {
     if (selectedArtifactIndex === null) return;
@@ -668,19 +702,25 @@ export default function ProjectPage() {
         const target = e.target as HTMLElement;
         if (!target || target === doc.body || target === doc.documentElement) return;
         
-        if (hoveredEl && hoveredEl !== target && hoveredEl !== selectedEl) {
-            hoveredEl.classList.remove('edit-hover-highlight');
+        const currentHovered = hoveredElRef.current;
+        const currentSelected = selectedElRef.current;
+        
+        if (currentHovered && currentHovered !== target && currentHovered !== currentSelected) {
+            currentHovered.classList.remove('edit-hover-highlight');
         }
         
-        if (target !== selectedEl) {
+        if (target !== currentSelected) {
             setHoveredEl(target);
             target.classList.add('edit-hover-highlight');
         }
     };
 
     const handlePointerLeave = () => {
-        if (hoveredEl && hoveredEl !== selectedEl) {
-            hoveredEl.classList.remove('edit-hover-highlight');
+        const currentHovered = hoveredElRef.current;
+        const currentSelected = selectedElRef.current;
+        
+        if (currentHovered && currentHovered !== currentSelected) {
+            currentHovered.classList.remove('edit-hover-highlight');
         }
         setHoveredEl(null);
     };
@@ -691,8 +731,9 @@ export default function ProjectPage() {
         const target = e.target as HTMLElement;
         if (!target || target === doc.body || target === doc.documentElement) return;
 
-        if (selectedEl) {
-            selectedEl.classList.remove('edit-selected-highlight');
+        const currentSelected = selectedElRef.current;
+        if (currentSelected) {
+            currentSelected.classList.remove('edit-selected-highlight');
         }
 
         setSelectedEl(target);
@@ -725,11 +766,13 @@ export default function ProjectPage() {
         doc.body.removeEventListener('click', handleClick, true);
         doc.body.removeEventListener('dblclick', handleDoubleClick, true);
         
-        // Clean up highlights on exit
-        if (hoveredEl) hoveredEl.classList.remove('edit-hover-highlight');
-        if (selectedEl) selectedEl.classList.remove('edit-selected-highlight');
+        // Clean up highlights on exit using refs for current values
+        const currentHovered = hoveredElRef.current;
+        const currentSelected = selectedElRef.current;
+        if (currentHovered) currentHovered.classList.remove('edit-hover-highlight');
+        if (currentSelected) currentSelected.classList.remove('edit-selected-highlight');
     };
-  }, [isEditMode, hoveredEl, selectedEl, commitEdits]);
+  }, [isEditMode, selectedArtifactIndex, commitEdits]);
 
   // Save canvas data on change
   const handleSave = async () => {
@@ -778,8 +821,7 @@ export default function ProjectPage() {
     }
   };
 
-  const deleteProject = async () => {
-    if (!confirm("Are you sure you want to delete this project? This action cannot be undone.")) return;
+  const handleDeleteProject = async () => {
     
     try {
       const response = await fetch(`/api/projects/${projectId}`, {
@@ -1310,10 +1352,10 @@ export default function ProjectPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56">
                       <DropdownMenuItem onClick={() => router.push('/')}>
-                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        <ChevronLeft className="mr-2 h-4 w-4" />
                         Go to all projects
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={deleteProject} className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                      <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)} className="text-destructive focus:text-destructive focus:bg-destructive/10">
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete Project
                       </DropdownMenuItem>
@@ -2190,6 +2232,24 @@ export default function ProjectPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your
+              project and remove your data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteProject} className="bg-destructive hover:bg-destructive/90">
+              Delete Project
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
