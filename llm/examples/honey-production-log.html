@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Honey Production Log Entry</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec13",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102210",
+                        "surface-dark": "#1c271c",
+                        "border-dark": "#3b543b",
+                        "text-muted": "#9db99d"
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111811] dark:text-white font-display min-h-screen flex flex-col overflow-x-hidden transition-colors duration-200">
+<!-- Top Navbar -->
+<header class="w-full border-b border-gray-200 dark:border-[#283928] bg-white dark:bg-[#111811] px-6 py-3 sticky top-0 z-50">
+<div class="max-w-[1280px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="size-8 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">hive</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em] dark:text-white">BeeManager</h2>
+</div>
+<nav class="hidden md:flex flex-1 justify-end gap-8 items-center">
+<div class="flex items-center gap-6">
+<a class="text-sm font-medium leading-normal text-gray-600 dark:text-white hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-medium leading-normal text-gray-600 dark:text-white hover:text-primary transition-colors" href="#">Hives</a>
+<a class="text-sm font-medium leading-normal text-primary" href="#">Harvests</a>
+<a class="text-sm font-medium leading-normal text-gray-600 dark:text-white hover:text-primary transition-colors" href="#">Settings</a>
+</div>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-transparent hover:border-primary cursor-pointer transition-all" data-alt="User profile picture showing a beekeeper in protective gear" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB09dzeexnS_s0fCo4F7AaoTVoz0zda1kwQQMn0C4QeMaljXTwNv0HdQEv7z9hHVrGzjqmkkpx1-OVmiWAoDqWO7GKhWk2vqArYKfG4fkD6QbvvSuiWhM-qn-6D9eUsmVvBMBmOv-qNV-x0tauLOpbOJPIgls4Q69OqkbEblHo-08ZK-LgDe77IfURoa0H8MsTyy-k9POWzD2cEZwAPmJo-sJv1MHth3h0aQTViBgeMAwUVw2yCsPyQo7MJmS1d03uuagjM06hgS30");'>
+</div>
+</nav>
+<!-- Mobile Menu Icon -->
+<button class="md:hidden text-gray-600 dark:text-white">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex justify-center py-8 px-4 sm:px-6 lg:px-8">
+<div class="w-full max-w-[960px] flex flex-col">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap gap-2 items-center mb-6 text-sm">
+<a class="text-text-muted hover:text-primary transition-colors font-medium" href="#">Dashboard</a>
+<span class="text-text-muted font-medium">/</span>
+<a class="text-text-muted hover:text-primary transition-colors font-medium" href="#">Harvest Logs</a>
+<span class="text-text-muted font-medium">/</span>
+<span class="text-gray-900 dark:text-white font-medium">New Entry</span>
+</div>
+<!-- Page Heading -->
+<div class="flex flex-col gap-2 mb-8">
+<h1 class="text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em] text-gray-900 dark:text-white">
+                    Log Production Data
+                </h1>
+<p class="text-gray-500 dark:text-text-muted text-base font-normal">
+                    Record quantitative and qualitative details from your latest extraction.
+                </p>
+</div>
+<!-- Form Container -->
+<form class="bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark rounded-xl p-6 md:p-8 shadow-sm">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+<!-- Source Hive -->
+<div class="flex flex-col gap-2">
+<label class="text-gray-900 dark:text-white text-base font-medium" for="hive-id">Source Hive</label>
+<div class="relative">
+<select class="w-full h-14 bg-gray-50 dark:bg-[#111811] text-gray-900 dark:text-white border border-gray-300 dark:border-border-dark rounded-lg px-4 focus:ring-1 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer transition-colors" id="hive-id">
+<option disabled="" selected="" value="">Select hive ID...</option>
+<option value="h1">Hive #01 - North Garden</option>
+<option value="h2">Hive #04 - Orchard East</option>
+<option value="h3">Hive #07 - River Bank</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Extraction Date -->
+<div class="flex flex-col gap-2">
+<label class="text-gray-900 dark:text-white text-base font-medium" for="date">Extraction Date</label>
+<div class="flex w-full items-center rounded-lg relative">
+<input class="w-full h-14 bg-gray-50 dark:bg-[#111811] text-gray-900 dark:text-white border border-gray-300 dark:border-border-dark rounded-lg px-4 pr-12 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors placeholder:text-text-muted" id="date" type="date" value="2023-10-27"/>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none flex items-center">
+<span class="material-symbols-outlined">calendar_today</span>
+</div>
+</div>
+</div>
+<!-- Weight / Quantity -->
+<div class="flex flex-col gap-2">
+<label class="text-gray-900 dark:text-white text-base font-medium" for="weight">Yield Weight</label>
+<div class="flex rounded-lg overflow-hidden border border-gray-300 dark:border-border-dark focus-within:ring-1 focus-within:ring-primary focus-within:border-primary bg-gray-50 dark:bg-[#111811]">
+<input class="flex-1 h-14 bg-transparent border-none text-gray-900 dark:text-white px-4 focus:ring-0 placeholder:text-text-muted" id="weight" placeholder="0.0" step="0.1" type="number"/>
+<div class="h-14 w-px bg-gray-300 dark:bg-border-dark"></div>
+<select class="h-14 bg-transparent border-none text-gray-900 dark:text-white pl-4 pr-8 focus:ring-0 cursor-pointer text-sm font-medium">
+<option>kg</option>
+<option>lbs</option>
+<option>oz</option>
+</select>
+</div>
+</div>
+<!-- Honey Type -->
+<div class="flex flex-col gap-2">
+<label class="text-gray-900 dark:text-white text-base font-medium" for="honey-type">Floral Source</label>
+<div class="relative">
+<select class="w-full h-14 bg-gray-50 dark:bg-[#111811] text-gray-900 dark:text-white border border-gray-300 dark:border-border-dark rounded-lg px-4 focus:ring-1 focus:ring-primary focus:border-primary outline-none appearance-none cursor-pointer transition-colors" id="honey-type">
+<option disabled="" selected="" value="">Select primary source...</option>
+<option value="wildflower">Wildflower</option>
+<option value="clover">Clover</option>
+<option value="manuka">Manuka</option>
+<option value="acacia">Acacia</option>
+<option value="mixed">Mixed/Polyfloral</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">local_florist</span>
+</div>
+</div>
+<!-- Quality Grade (Full Width) -->
+<div class="md:col-span-2 flex flex-col gap-3">
+<label class="text-gray-900 dark:text-white text-base font-medium">Quality Grade</label>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<!-- Option 1 -->
+<label class="cursor-pointer group relative">
+<input checked="" class="peer sr-only" name="grade" type="radio" value="premium"/>
+<div class="h-full p-4 rounded-lg border border-gray-300 dark:border-border-dark bg-gray-50 dark:bg-[#111811] hover:border-primary/50 peer-checked:border-primary peer-checked:bg-primary/10 transition-all flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-bold text-gray-900 dark:text-white">Premium</span>
+<span class="material-symbols-outlined text-primary opacity-0 peer-checked:opacity-100 transition-opacity">check_circle</span>
+</div>
+<p class="text-xs text-text-muted">Perfect clarity, exceptional taste.</p>
+</div>
+</label>
+<!-- Option 2 -->
+<label class="cursor-pointer group relative">
+<input class="peer sr-only" name="grade" type="radio" value="standard"/>
+<div class="h-full p-4 rounded-lg border border-gray-300 dark:border-border-dark bg-gray-50 dark:bg-[#111811] hover:border-primary/50 peer-checked:border-primary peer-checked:bg-primary/10 transition-all flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-bold text-gray-900 dark:text-white">Standard</span>
+<span class="material-symbols-outlined text-primary opacity-0 peer-checked:opacity-100 transition-opacity">check_circle</span>
+</div>
+<p class="text-xs text-text-muted">Good for general sale and consumption.</p>
+</div>
+</label>
+<!-- Option 3 -->
+<label class="cursor-pointer group relative">
+<input class="peer sr-only" name="grade" type="radio" value="utility"/>
+<div class="h-full p-4 rounded-lg border border-gray-300 dark:border-border-dark bg-gray-50 dark:bg-[#111811] hover:border-primary/50 peer-checked:border-primary peer-checked:bg-primary/10 transition-all flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-bold text-gray-900 dark:text-white">Baker's</span>
+<span class="material-symbols-outlined text-primary opacity-0 peer-checked:opacity-100 transition-opacity">check_circle</span>
+</div>
+<p class="text-xs text-text-muted">Best for cooking or feed supplements.</p>
+</div>
+</label>
+</div>
+</div>
+<!-- Notes Area -->
+<div class="md:col-span-2 flex flex-col gap-2">
+<label class="text-gray-900 dark:text-white text-base font-medium" for="notes">Observations &amp; Notes</label>
+<textarea class="w-full bg-gray-50 dark:bg-[#111811] text-gray-900 dark:text-white border border-gray-300 dark:border-border-dark rounded-lg p-4 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-colors placeholder:text-text-muted resize-none" id="notes" placeholder="Enter observations about color, viscosity, or bee temperament..." rows="4"></textarea>
+</div>
+<!-- Image Upload -->
+<div class="md:col-span-2 flex flex-col gap-2">
+<label class="text-gray-900 dark:text-white text-base font-medium">Visual Evidence</label>
+<div class="border-2 border-dashed border-gray-300 dark:border-border-dark rounded-lg p-8 flex flex-col items-center justify-center text-center hover:border-primary/50 hover:bg-gray-50 dark:hover:bg-white/5 transition-all cursor-pointer group">
+<div class="bg-gray-200 dark:bg-[#283928] rounded-full p-3 mb-3 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-gray-500 dark:text-text-muted text-2xl">add_a_photo</span>
+</div>
+<p class="text-gray-900 dark:text-white font-medium">Click to upload or drag and drop</p>
+<p class="text-text-muted text-sm mt-1">SVG, PNG, JPG or GIF (max. 5MB)</p>
+</div>
+<!-- File Preview (Static for design) -->
+<div class="flex gap-4 mt-2">
+<div class="relative group">
+<div class="size-16 rounded-lg bg-cover bg-center border border-gray-300 dark:border-border-dark" data-alt="Close up of honeycomb frame filled with honey" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC_9EyRTTLS2LOrGKZYE7EDV2NfG5H4a3Y84BeRY7qRrNLaXODxKh6rvBuoHplefrSIEEfd-x_Ak-xZjS0GIVCa5AXUahXo96Ck1-2R5E2s-fwTk80r6JoKr2vNsYpcNbJf6P1E16Jhcd5F2-Nfn0L22BwUpfWf4x5a-xmq5K3l6MWKcO05bA7MiXS1TE8xKxgJyfUyIE3ixdjsGLtaQI5-lFAywscHF05TkXot7EZKJjNxIFaPW8h8x3dKjPOI4QMdOubyIfaK3rs");'></div>
+<button class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Footer -->
+<div class="flex flex-col sm:flex-row justify-end items-center gap-4 mt-10 pt-6 border-t border-gray-200 dark:border-border-dark">
+<button class="w-full sm:w-auto px-6 py-3 rounded-lg text-gray-700 dark:text-text-muted font-medium hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-colors" type="button">
+                        Cancel
+                    </button>
+<button class="w-full sm:w-auto px-8 py-3 rounded-lg bg-primary text-[#102210] font-bold hover:bg-[#0fd60f] transition-colors shadow-[0_0_15px_rgba(19,236,19,0.2)] flex items-center justify-center gap-2" type="submit">
+<span class="material-symbols-outlined">save</span>
+                        Save Entry
+                    </button>
+</div>
+</form>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Signal Atlas - Profile &amp; Settings</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13b6ec",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#101d22",
+                        "surface-dark": "#16262c",
+                        "surface-highlight": "#233f48",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom range slider styling for Webkit/Blink */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            margin-top: -8px; 
+            box-shadow: 0 0 10px rgba(19, 182, 236, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #233f48;
+            border-radius: 2px;
+        }
+        /* Style for the filled part of the slider would ideally need JS to update dynamic width, 
+           so we simulate it with a gradient background or just accept the track color for this CSS-only version */
+        .glass-nav {
+            background: rgba(16, 29, 34, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-white selection:bg-primary/30">
+<div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-24">
+<!-- Top App Bar -->
+<div class="sticky top-0 z-20 flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between">
+<div class="text-white flex size-12 shrink-0 items-center justify-center opacity-0 pointer-events-none">
+<!-- Placeholder for spacing -->
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Profile</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 bg-transparent text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0 transition-opacity hover:opacity-70">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+</button>
+</div>
+</div>
+<!-- Profile Header with Signal Visualization -->
+<div class="flex p-4 flex-col gap-6">
+<div class="flex w-full flex-col gap-4 items-center relative">
+<!-- Avatar with glowing ring -->
+<div class="relative">
+<div class="absolute inset-0 rounded-full bg-primary blur-md opacity-40"></div>
+<div class="relative bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-32 w-32 border-4 border-surface-dark" data-alt="Portrait of a user with a futuristic digital overlay effect" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBQrs1VrZmxPfHoD2QIWiUg8QDJfHkkISmkPre8oXXDfx4-TdjLy1tbRpfpXJUVSYITkG251_5Vf8BFoDjyZX2MKQDvxY_dTnMeljhBYCzTeqpzASvQAgVPSLCjYbIE0EzIqMvxNi2WooDTKI3D0eJFF4p-7UUzCsw9pdK3uyVk1QP4BLv49vYMxLgGjOpXmvVED0Syo0U0TIzGzIvfhtVu3nDDwmtKrvKi8qEu4LGMBOlDNQq8JBYbH4jSJOBIiTNM0jYg7x3tQVI");'>
+</div>
+<div class="absolute bottom-0 right-0 bg-primary text-background-dark rounded-full p-1.5 border-4 border-surface-dark">
+<span class="material-symbols-outlined text-[16px] font-bold block">verified</span>
+</div>
+</div>
+<div class="flex flex-col items-center justify-center gap-1">
+<p class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] text-center">Alex Chen</p>
+<p class="text-primary text-sm font-medium tracking-wide text-center uppercase">Signal Level: Optimal</p>
+<p class="text-[#92bbc9] text-sm font-normal leading-normal text-center opacity-80">Digital Wellbeing Score: 92/100</p>
+</div>
+<!-- Signal Wave Visualization (Static CSS) -->
+<div class="flex items-end justify-center gap-1 h-8 w-full max-w-[200px] mt-2 opacity-80">
+<div class="w-1.5 bg-primary/20 h-3 rounded-full"></div>
+<div class="w-1.5 bg-primary/40 h-5 rounded-full"></div>
+<div class="w-1.5 bg-primary/60 h-4 rounded-full"></div>
+<div class="w-1.5 bg-primary/80 h-7 rounded-full"></div>
+<div class="w-1.5 bg-primary h-5 rounded-full"></div>
+<div class="w-1.5 bg-primary/90 h-8 rounded-full"></div>
+<div class="w-1.5 bg-primary/70 h-6 rounded-full"></div>
+<div class="w-1.5 bg-primary/50 h-4 rounded-full"></div>
+<div class="w-1.5 bg-primary/30 h-3 rounded-full"></div>
+<div class="w-1.5 bg-primary/10 h-2 rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="h-px bg-white/5 mx-4 my-2"></div>
+<!-- Section: Account -->
+<div class="flex flex-col">
+<h3 class="text-[#92bbc9] text-xs font-bold uppercase tracking-wider px-6 pb-2 pt-6">Account</h3>
+<!-- List Item: Edit Profile -->
+<button class="flex items-center gap-4 bg-transparent px-6 min-h-[64px] justify-between group active:bg-surface-highlight/30 transition-colors">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-xl bg-surface-highlight shrink-0 size-10">
+<span class="material-symbols-outlined">edit</span>
+</div>
+<p class="text-white text-base font-normal leading-normal flex-1 truncate text-left">Edit Profile</p>
+</div>
+<div class="shrink-0 text-white/40 group-hover:text-white/80 transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</button>
+<!-- List Item: Subscription -->
+<button class="flex items-center gap-4 bg-transparent px-6 min-h-[64px] justify-between group active:bg-surface-highlight/30 transition-colors">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-xl bg-surface-highlight shrink-0 size-10">
+<span class="material-symbols-outlined">diamond</span>
+</div>
+<div class="flex flex-col items-start">
+<p class="text-white text-base font-normal leading-normal truncate">Subscription Plan</p>
+<p class="text-xs text-primary">Pro Active</p>
+</div>
+</div>
+<div class="shrink-0 bg-surface-highlight rounded-full px-3 py-1">
+<p class="text-white text-xs font-medium leading-normal">Manage</p>
+</div>
+</button>
+</div>
+<!-- Section: Signal Configuration -->
+<div class="flex flex-col">
+<h3 class="text-[#92bbc9] text-xs font-bold uppercase tracking-wider px-6 pb-2 pt-6">Signal Configuration</h3>
+<!-- Slider Item: Daily Goal -->
+<div class="flex flex-col gap-3 bg-transparent px-6 py-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-xl bg-surface-highlight shrink-0 size-10">
+<span class="material-symbols-outlined">timer</span>
+</div>
+<p class="text-white text-base font-normal leading-normal">Daily Attention Goal</p>
+</div>
+<span class="text-primary font-bold text-sm">4h 30m</span>
+</div>
+<div class="pl-14 pr-2 pt-2">
+<input class="w-full h-1 bg-surface-highlight rounded-lg appearance-none cursor-pointer accent-primary" max="12" min="1" type="range" value="4.5"/>
+</div>
+</div>
+<!-- List Item: Connected Apps -->
+<button class="flex items-center gap-4 bg-transparent px-6 min-h-[64px] justify-between group active:bg-surface-highlight/30 transition-colors">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-xl bg-surface-highlight shrink-0 size-10">
+<span class="material-symbols-outlined">apps</span>
+</div>
+<p class="text-white text-base font-normal leading-normal flex-1 truncate text-left">Connected Apps</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs text-[#92bbc9]">12 Active</span>
+<span class="material-symbols-outlined text-white/40">chevron_right</span>
+</div>
+</button>
+</div>
+<!-- Section: Preferences -->
+<div class="flex flex-col">
+<h3 class="text-[#92bbc9] text-xs font-bold uppercase tracking-wider px-6 pb-2 pt-6">Preferences</h3>
+<!-- Toggle Item: Notifications -->
+<div class="flex items-center gap-4 bg-transparent px-6 min-h-[64px] justify-between">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-xl bg-surface-highlight shrink-0 size-10">
+<span class="material-symbols-outlined">notifications_active</span>
+</div>
+<p class="text-white text-base font-normal leading-normal flex-1 truncate">Weekly Report</p>
+</div>
+<!-- Toggle ON State -->
+<button class="relative inline-flex h-7 w-12 items-center rounded-full bg-primary transition-colors focus:outline-none">
+<span class="inline-block h-5 w-5 transform rounded-full bg-white transition translate-x-6 shadow-sm"></span>
+</button>
+</div>
+<!-- Toggle Item: Haptic Feedback -->
+<div class="flex items-center gap-4 bg-transparent px-6 min-h-[64px] justify-between">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-xl bg-surface-highlight shrink-0 size-10">
+<span class="material-symbols-outlined">vibration</span>
+</div>
+<p class="text-white text-base font-normal leading-normal flex-1 truncate">Haptic Feedback</p>
+</div>
+<!-- Toggle ON State -->
+<button class="relative inline-flex h-7 w-12 items-center rounded-full bg-primary transition-colors focus:outline-none">
+<span class="inline-block h-5 w-5 transform rounded-full bg-white transition translate-x-6 shadow-sm"></span>
+</button>
+</div>
+<!-- Toggle Item: Dark Mode (Disabled/System) -->
+<div class="flex items-center gap-4 bg-transparent px-6 min-h-[64px] justify-between">
+<div class="flex items-center gap-4">
+<div class="text-[#92bbc9] flex items-center justify-center rounded-xl bg-surface-highlight shrink-0 size-10">
+<span class="material-symbols-outlined">dark_mode</span>
+</div>
+<p class="text-white text-base font-normal leading-normal flex-1 truncate">Dark Mode</p>
+</div>
+<!-- Toggle OFF State -->
+<button class="relative inline-flex h-7 w-12 items-center rounded-full bg-surface-highlight transition-colors focus:outline-none">
+<span class="inline-block h-5 w-5 transform rounded-full bg-[#92bbc9] transition translate-x-1 shadow-sm"></span>
+</button>
+</div>
+</div>
+<!-- Section: Privacy & Data -->
+<div class="flex flex-col mb-6">
+<h3 class="text-[#92bbc9] text-xs font-bold uppercase tracking-wider px-6 pb-2 pt-6">Privacy &amp; Data</h3>
+<!-- List Item: Export Data -->
+<button class="flex items-center gap-4 bg-transparent px-6 min-h-[64px] justify-between group active:bg-surface-highlight/30 transition-colors">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-xl bg-surface-highlight shrink-0 size-10">
+<span class="material-symbols-outlined">download</span>
+</div>
+<p class="text-white text-base font-normal leading-normal flex-1 truncate text-left">Export My Data</p>
+</div>
+<div class="shrink-0 text-white/40 group-hover:text-white/80 transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</button>
+<!-- List Item: Delete Account -->
+<button class="flex items-center gap-4 bg-transparent px-6 min-h-[64px] justify-between group active:bg-red-900/10 transition-colors">
+<div class="flex items-center gap-4">
+<div class="text-red-400 flex items-center justify-center rounded-xl bg-red-900/20 shrink-0 size-10">
+<span class="material-symbols-outlined">delete_forever</span>
+</div>
+<p class="text-red-400 text-base font-normal leading-normal flex-1 truncate text-left">Delete Account</p>
+</div>
+</button>
+</div>
+<div class="flex flex-col items-center justify-center pb-8 opacity-40">
+<p class="text-xs text-white font-medium">Signal Atlas v1.0.2</p>
+</div>
+<!-- Bottom Navigation Bar -->
+<div class="fixed bottom-0 left-0 w-full glass-nav z-50 px-6 pb-6 pt-3">
+<div class="flex justify-between items-center max-w-md mx-auto">
+<button class="flex flex-col items-center gap-1 text-[#92bbc9] hover:text-white transition-colors w-16">
+<span class="material-symbols-outlined text-[24px]">dashboard</span>
+<span class="text-[10px] font-medium">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#92bbc9] hover:text-white transition-colors w-16">
+<span class="material-symbols-outlined text-[24px]">map</span>
+<span class="text-[10px] font-medium">Atlas</span>
+</button>
+<!-- Central FAB-like action (optional) -->
+<!-- 
+                <div class="relative -top-5">
+                    <button class="flex items-center justify-center size-14 bg-primary rounded-full shadow-[0_0_15px_rgba(19,182,236,0.4)] text-background-dark">
+                        <span class="material-symbols-outlined text-[28px]">search</span>
+                    </button>
+                </div>
+                -->
+<button class="flex flex-col items-center gap-1 text-[#92bbc9] hover:text-white transition-colors w-16">
+<span class="material-symbols-outlined text-[24px]">bar_chart</span>
+<span class="text-[10px] font-medium">Insights</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary w-16">
+<span class="material-symbols-outlined text-[24px] fill-current">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

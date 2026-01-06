@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Traceform Explore Page</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7f0df2",
+                        "primary-dark": "#5e0ab5",
+                        "accent": "#ad90cb",
+                        "background-light": "#f7f5f8",
+                        "background-dark": "#191022", // Deep charcoal/purple
+                        "surface-dark": "#241830", // Slightly lighter for cards
+                        "surface-border": "#362249", // Borders
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for horizontal lists */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex flex-col font-display selection:bg-primary selection:text-white">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 w-full border-b border-surface-border bg-background-dark/80 backdrop-blur-md">
+<div class="flex items-center justify-between px-6 py-3 lg:px-10">
+<div class="flex items-center gap-8">
+<!-- Logo -->
+<a class="flex items-center gap-3 text-white transition-opacity hover:opacity-80" href="#">
+<div class="flex size-8 items-center justify-center rounded bg-gradient-to-br from-primary to-purple-400 text-white">
+<span class="material-symbols-outlined text-[20px]">account_tree</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">Traceform</h2>
+</a>
+<!-- Search Bar -->
+<div class="hidden md:flex relative group w-64 lg:w-96">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-accent">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="block w-full rounded-lg border-none bg-surface-border/50 py-2.5 pl-10 pr-4 text-sm text-white placeholder-accent focus:ring-2 focus:ring-primary focus:bg-surface-border transition-all" placeholder="Search for narratives, keywords, or origins..." type="text"/>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+<span class="text-xs text-accent/50 border border-accent/30 rounded px-1.5 py-0.5">⌘K</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<!-- Nav Links -->
+<nav class="hidden lg:flex items-center gap-6">
+<a class="text-white text-sm font-medium hover:text-primary transition-colors" href="#">Explore</a>
+<a class="text-accent text-sm font-medium hover:text-white transition-colors" href="#">My Traces</a>
+<a class="text-accent text-sm font-medium hover:text-white transition-colors" href="#">Saved</a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 rounded-lg bg-primary hover:bg-primary-dark transition-colors h-9 px-4 text-white text-sm font-bold shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span class="hidden sm:inline">New Trace</span>
+</button>
+<button class="flex size-9 items-center justify-center rounded-lg bg-surface-border hover:bg-surface-border/80 text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex size-9 items-center justify-center rounded-lg overflow-hidden border border-surface-border">
+<div class="bg-cover bg-center w-full h-full" data-alt="User profile avatar showing abstract pattern" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBaUQdcYItBj1yf1hMNI2HzmskQJtZkiUico7mNrZPlMJumWwCSvA_yWIt_QNrt9dpEm05HvSkB4S5wGc6ggDrnpLN9GX8SGFs9-5bNbfzaSj8g3EqiBK1yuYcq4TxmbPW7BJ7TS7qgVNSnyMxCnvCYeUrFzd5Gw3msc8-sB8fV5g0EHoNWR86-VMyeoDfT983kyOXPkTF2vKC6lNY1bwtVcVKAo93BiisKRWY4OEE_csXTS3VVuDfti9HdNheyNGLi5Ta3Q2wzJYo");'></div>
+</button>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-8">
+<!-- Header Section -->
+<section class="mb-8">
+<h1 class="text-4xl md:text-5xl font-black tracking-tight text-white mb-2">
+                Explore the <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-300">Noosphere</span>
+</h1>
+<p class="text-accent text-lg max-w-2xl">
+                Visualize the genealogy of ideas. Track how narratives split, evolve, and merge across the internet.
+            </p>
+</section>
+<!-- Filters (Chips) -->
+<section class="mb-10 overflow-x-auto no-scrollbar py-1">
+<div class="flex gap-3 min-w-max">
+<button class="flex items-center gap-2 rounded-full bg-white text-background-dark px-5 py-2 text-sm font-bold transition-transform active:scale-95">
+<span class="material-symbols-outlined text-[18px]">apps</span>
+                    All
+                </button>
+<button class="flex items-center gap-2 rounded-full bg-surface-border hover:bg-surface-border/80 text-white px-5 py-2 text-sm font-medium border border-white/5 transition-colors">
+                    Philosophy
+                </button>
+<button class="flex items-center gap-2 rounded-full bg-surface-border hover:bg-surface-border/80 text-white px-5 py-2 text-sm font-medium border border-white/5 transition-colors">
+                    Tech &amp; AI
+                </button>
+<button class="flex items-center gap-2 rounded-full bg-surface-border hover:bg-surface-border/80 text-white px-5 py-2 text-sm font-medium border border-white/5 transition-colors">
+                    Politics
+                </button>
+<button class="flex items-center gap-2 rounded-full bg-surface-border hover:bg-surface-border/80 text-white px-5 py-2 text-sm font-medium border border-white/5 transition-colors">
+                    Internet Culture
+                </button>
+<button class="flex items-center gap-2 rounded-full bg-surface-border hover:bg-surface-border/80 text-white px-5 py-2 text-sm font-medium border border-white/5 transition-colors">
+                    Economics
+                </button>
+<button class="flex items-center gap-2 rounded-full bg-surface-border hover:bg-surface-border/80 text-white px-5 py-2 text-sm font-medium border border-white/5 transition-colors">
+                    Art History
+                </button>
+</div>
+</section>
+<!-- Hero / Spotlight Section -->
+<section class="mb-16">
+<div class="relative w-full rounded-2xl overflow-hidden bg-surface-dark border border-surface-border group">
+<!-- Background Image with Overlay -->
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Abstract network visualization of simulation theory data points connected by glowing lines" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCDO4yAFD7AesfnGj49W4dihepo9YwfZxUHa2XknlsNJRqSK_lwJlzdlVJVvN0KLbVtnpym5WPVDbKqxVi2rsR_zHPE3AkNN9EKVpRdHU2LaAOx1d5h3SoFfTiF9SON9Ze2v0iR-D4BlbNfxZtoc0SDC6yaj_qEBDO12aD75UnJZTyjIsN7LyeIwzFiAO6FLTFDEOomFMAI8BLxUPN62OhwQkibhrLT543Tql1NV9E56cRZlv-say3QtPcQ32f6KfkUN0SgIB-e9_c");'>
+</div>
+<div class="absolute inset-0 bg-gradient-to-r from-background-dark via-background-dark/80 to-transparent"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent"></div>
+<div class="relative z-10 flex flex-col justify-end min-h-[420px] p-8 md:p-12 max-w-3xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 backdrop-blur-sm text-primary-300 text-xs font-bold uppercase tracking-wider w-fit mb-4">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                        Spotlight Lineage
+                    </div>
+<h2 class="text-4xl md:text-6xl font-black text-white leading-[0.95] mb-4 tracking-tighter">
+                        The Simulation<br/>Theory Arc
+                    </h2>
+<p class="text-gray-300 text-base md:text-lg mb-8 max-w-xl font-body leading-relaxed">
+                        From philosophical roots in Platonism to Nick Bostrom’s paper and modern pop culture interpretations. Explore 20 years of discourse visualization.
+                    </p>
+<div class="flex flex-wrap gap-4">
+<button class="flex items-center gap-2 bg-white text-background-dark hover:bg-gray-100 px-6 py-3 rounded-lg font-bold text-sm transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_tree</span>
+                            Trace Lineage
+                        </button>
+<button class="flex items-center gap-2 bg-black/40 hover:bg-black/60 backdrop-blur-md text-white border border-white/10 px-6 py-3 rounded-lg font-bold text-sm transition-colors">
+<span class="material-symbols-outlined text-[20px]">play_circle</span>
+                            Watch Summary
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Dashboard Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
+<!-- Main Column: Trending Lineages -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<div class="flex items-center justify-between pb-2 border-b border-surface-border">
+<h3 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">trending_up</span>
+                        Trending Lineages
+                    </h3>
+<a class="text-xs font-bold text-accent hover:text-white uppercase tracking-wider flex items-center gap-1" href="#">
+                        View All <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Card 1 -->
+<div class="group relative bg-surface-dark border border-surface-border rounded-xl p-5 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div class="size-10 rounded-lg bg-surface-border flex items-center justify-center text-accent group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">work</span>
+</div>
+<div class="px-2 py-1 rounded bg-surface-border/50 text-[10px] font-bold text-accent uppercase tracking-wider">
+                                4 Active Branches
+                            </div>
+</div>
+<h4 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Remote Work Evolution</h4>
+<p class="text-sm text-accent mb-6 flex-1 font-body">Tracking the split from "Digital Nomadism" into "RTO Mandates" and "Async Work Culture".</p>
+<!-- Mini Viz Representation -->
+<div class="h-12 w-full flex items-end gap-1 mb-4 opacity-50 group-hover:opacity-100 transition-opacity">
+<div class="w-1/4 bg-surface-border h-[40%] rounded-t-sm"></div>
+<div class="w-1/4 bg-surface-border h-[60%] rounded-t-sm"></div>
+<div class="w-1/4 bg-primary/60 h-[80%] rounded-t-sm"></div>
+<div class="w-1/4 bg-primary h-[100%] rounded-t-sm"></div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-surface-border/50 text-xs text-accent/70">
+<span>Origin: 2018</span>
+<span class="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                Explore <span class="material-symbols-outlined text-[14px]">arrow_right_alt</span>
+</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group relative bg-surface-dark border border-surface-border rounded-xl p-5 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div class="size-10 rounded-lg bg-surface-border flex items-center justify-center text-accent group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<div class="px-2 py-1 rounded bg-surface-border/50 text-[10px] font-bold text-accent uppercase tracking-wider">
+                                12 Active Branches
+                            </div>
+</div>
+<h4 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Generative AI Aesthetics</h4>
+<p class="text-sm text-accent mb-6 flex-1 font-body">From deep dream hallucinations to hyper-realism and the "uncanny valley" resurgence.</p>
+<!-- Mini Viz Representation -->
+<div class="h-12 w-full relative mb-4 overflow-hidden rounded-md opacity-60 group-hover:opacity-100 transition-opacity">
+<div class="absolute inset-0 bg-gradient-to-r from-surface-border via-primary/20 to-primary/40"></div>
+<svg class="absolute bottom-0 left-0 w-full h-full text-primary" preserveaspectratio="none" viewbox="0 0 100 40">
+<path d="M0 35 Q 20 35, 30 20 T 60 20 T 100 5" fill="none" stroke="currentColor" stroke-width="2"></path>
+</svg>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-surface-border/50 text-xs text-accent/70">
+<span>Origin: 2015</span>
+<span class="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                Explore <span class="material-symbols-outlined text-[14px]">arrow_right_alt</span>
+</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group relative bg-surface-dark border border-surface-border rounded-xl p-5 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div class="size-10 rounded-lg bg-surface-border flex items-center justify-center text-accent group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">public</span>
+</div>
+<div class="px-2 py-1 rounded bg-surface-border/50 text-[10px] font-bold text-accent uppercase tracking-wider">
+                                Global
+                            </div>
+</div>
+<h4 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Effective Altruism</h4>
+<p class="text-sm text-accent mb-6 flex-1 font-body">Analyzing the schism between "Neartermism" and "Longtermism" movements.</p>
+<!-- Mini Viz Representation -->
+<div class="h-12 w-full flex items-center gap-2 mb-4">
+<div class="h-1 w-full bg-surface-border rounded-full overflow-hidden">
+<div class="h-full bg-primary w-2/3 group-hover:w-full transition-all duration-1000 ease-out"></div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-surface-border/50 text-xs text-accent/70">
+<span>Origin: 2009</span>
+<span class="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                Explore <span class="material-symbols-outlined text-[14px]">arrow_right_alt</span>
+</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group relative bg-surface-dark border border-surface-border rounded-xl p-5 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div class="size-10 rounded-lg bg-surface-border flex items-center justify-center text-accent group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">eco</span>
+</div>
+<div class="px-2 py-1 rounded bg-surface-border/50 text-[10px] font-bold text-accent uppercase tracking-wider">
+                                Emergent
+                            </div>
+</div>
+<h4 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Solar Punk</h4>
+<p class="text-sm text-accent mb-6 flex-1 font-body">Optimistic sci-fi aesthetics meeting permaculture and decentralized tech.</p>
+<!-- Mini Viz Representation -->
+<div class="h-12 w-full flex items-center justify-center gap-1 mb-4 opacity-60 group-hover:opacity-100 transition-opacity">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="w-2 h-2 rounded-full bg-surface-border"></span>
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="w-2 h-2 rounded-full bg-surface-border"></span>
+<span class="w-12 h-1 bg-surface-border rounded-full"></span>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-surface-border/50 text-xs text-accent/70">
+<span>Origin: 2014</span>
+<span class="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                Explore <span class="material-symbols-outlined text-[14px]">arrow_right_alt</span>
+</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Sidebar: Rising Signals -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<div class="flex items-center justify-between pb-2 border-b border-surface-border">
+<h3 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-yellow-400">bolt</span>
+                        Rising Signals
+                    </h3>
+</div>
+<div class="bg-surface-dark border border-surface-border rounded-xl overflow-hidden">
+<div class="p-4 border-b border-surface-border/50 bg-surface-border/20">
+<p class="text-xs text-accent font-medium">Emerging narratives detected in the last 24h</p>
+</div>
+<ul class="divide-y divide-surface-border/50">
+<li class="p-4 hover:bg-surface-border/30 transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-1">
+<span class="font-bold text-white text-sm group-hover:text-primary transition-colors">Crypto Biometrics</span>
+<span class="text-xs text-green-400 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 12%
+                                </span>
+</div>
+<p class="text-xs text-accent/70 line-clamp-1">Worldcoin orb discussions spiking globally.</p>
+</li>
+<li class="p-4 hover:bg-surface-border/30 transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-1">
+<span class="font-bold text-white text-sm group-hover:text-primary transition-colors">Algorithmic Folklore</span>
+<span class="text-xs text-green-400 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 8%
+                                </span>
+</div>
+<p class="text-xs text-accent/70 line-clamp-1">New wave of creepypastas generated by LLMs.</p>
+</li>
+<li class="p-4 hover:bg-surface-border/30 transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-1">
+<span class="font-bold text-white text-sm group-hover:text-primary transition-colors">Post-Authenticity</span>
+<span class="text-xs text-green-400 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 5%
+                                </span>
+</div>
+<p class="text-xs text-accent/70 line-clamp-1">Shifting values in content consumption.</p>
+</li>
+<li class="p-4 hover:bg-surface-border/30 transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-1">
+<span class="font-bold text-white text-sm group-hover:text-primary transition-colors">Digital Homesteading</span>
+<span class="text-xs text-gray-500 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">remove</span> 0%
+                                </span>
+</div>
+<p class="text-xs text-accent/70 line-clamp-1">Personal server ownership movement.</p>
+</li>
+<li class="p-4 hover:bg-surface-border/30 transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-1">
+<span class="font-bold text-white text-sm group-hover:text-primary transition-colors">Prompt Engineering decay</span>
+<span class="text-xs text-red-400 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span> 2%
+                                </span>
+</div>
+<p class="text-xs text-accent/70 line-clamp-1">Is the skill becoming obsolete?</p>
+</li>
+</ul>
+<div class="p-3 text-center">
+<button class="text-xs font-bold text-primary hover:text-white transition-colors uppercase tracking-wider">
+                            Load More Signals
+                        </button>
+</div>
+</div>
+<!-- Featured Collection in Sidebar -->
+<div class="bg-gradient-to-br from-primary to-purple-800 rounded-xl p-6 text-white relative overflow-hidden group">
+<div class="absolute -right-4 -bottom-4 opacity-20">
+<span class="material-symbols-outlined text-[120px]">auto_stories</span>
+</div>
+<h4 class="font-bold text-lg mb-2 relative z-10">Editors' Pick</h4>
+<p class="text-sm text-purple-100 mb-4 relative z-10">The complete history of the "Dead Internet Theory".</p>
+<button class="bg-white text-primary px-4 py-2 rounded-lg text-xs font-bold shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all relative z-10">
+                        Read Collection
+                    </button>
+</div>
+</div>
+</div>
+<!-- Horizontal Rail: Deep Dives -->
+<section class="mb-12">
+<div class="flex items-center justify-between pb-4">
+<h3 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-400">layers</span>
+                    Curated Deep Dives
+                </h3>
+<div class="flex gap-2">
+<button class="size-8 rounded-full border border-surface-border flex items-center justify-center text-white hover:bg-surface-border hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="size-8 rounded-full border border-surface-border flex items-center justify-center text-white hover:bg-surface-border hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="flex gap-6 overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory">
+<!-- Card 1 -->
+<div class="min-w-[300px] md:min-w-[380px] snap-center bg-surface-dark rounded-xl overflow-hidden border border-surface-border group hover:border-primary/50 transition-all">
+<div class="h-48 bg-cover bg-center relative" data-alt="Cyberpunk style illustration of a city with neon lights representing urban design evolution" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBEjuX70SAq0_Tc22poeha6msMTe-q4MreX699Qj-wXz-tbPIF-zgiRmJZfTAEvT_mgQplbAWU-WcPvYHgx2zDhPNP6ng7xN6GwAK_M2tZ_3Kv6CPT_JTG1lBg1zwD938cEBVYWFxjsRP9nB2dlaDXGHv1nMrxC5zxPRKRzJJ5JpbR_bA1iIFwfC2-KxBg6Mj7LQuTPJRuUkq6K3R263O8gacZmNAbAZS8QdeT8QOiwHn4fx5SB2PoQ2gcuFU4wDKklAEw_sSnfLe0");'>
+<div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
+<div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10">
+                            URBANISM
+                        </div>
+</div>
+<div class="p-5">
+<h4 class="text-lg font-bold text-white mb-2 line-clamp-1">The 15-Minute City Controversy</h4>
+<p class="text-sm text-accent mb-4 line-clamp-2">How a standard urban planning concept became a focal point for conspiracy narratives and political polarization.</p>
+<div class="flex items-center gap-3">
+<div class="flex -space-x-2">
+<div class="size-6 rounded-full border-2 border-surface-dark bg-gray-300" data-alt="Avatar of contributor 1" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuClGyKvBt31SC_BD149Eb_RbMPKw2TGYDeVsMzva9S_h0F8qIQTLlEwkYD-Szx4gI7gExsYm48e6k7RbrSGW1PHLtVTb-GQVwUIUc_KNT7KcQo4KlxKyo_RqW_03e6bVc2_-AX-JJaZ11AlA6J2H8yW3bsoHUIaAzAJ9GwB73mKcDwRnP9l9rQCB45rVsyqLguIRKIVKlbXLV6pAGQ_AfNnLzDub6GBVhag_rxLTx7mAWLqvqdGnl2_dVxqmv2zfEea5pjdoqAoKi8");'></div>
+<div class="size-6 rounded-full border-2 border-surface-dark bg-gray-400" data-alt="Avatar of contributor 2" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuByy2OoNeL6nizaJulmxLKP1kXHCatkjiJbPpjX5C6FqyX0y3C7s2WDmx_RGXFx1KgWst2yHl02w0QtwR2d1a1VidxV_aOuzBe7U1MBbSA6quqWAg9G7dPus6mfAnLTu4X9EQfsloKFu3mfhX7Yxzh05dUPDVw8QFiSdAqXybyZs3R3RPfRchfxNEGtf_M2xMlFNpV2o5wWy0TlEHD2KRDwDSw0CRUbP5jitmjUUImwh3XXtgi4zJQ_Iefi7fUHCBohIR4EKY4go_A");'></div>
+</div>
+<span class="text-xs text-accent">Curated by UrbanLab</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="min-w-[300px] md:min-w-[380px] snap-center bg-surface-dark rounded-xl overflow-hidden border border-surface-border group hover:border-primary/50 transition-all">
+<div class="h-48 bg-cover bg-center relative" data-alt="Minimalist abstract art with blue and white colors" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAS4YrKYcSmz1V2qB4iEV18C_zy9rscMrqvO9TZQ-tw0KcTXyD9UATStTuSCA4yKfZpunSauYv_Od8Amz-I-ewkC37wY9mgmYspcV9pGVr3PNzBmCt60Pxgyy1F8P9XaLYLsCpNBT35NCtE5AGYIsR4HmXG7apcf03MLn9BRi1adS68S6GkTb_lbiQnJqrPV5avIuTqZDtall2dO4_j7c53zuCLIKjgxNSO96eXAl1qADd-_nncJBLXC2__LrXF7_nG0xCJKuOJp68");'>
+<div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
+<div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10">
+                            FINANCE
+                        </div>
+</div>
+<div class="p-5">
+<h4 class="text-lg font-bold text-white mb-2 line-clamp-1">DeFi: The Governance Wars</h4>
+<p class="text-sm text-accent mb-4 line-clamp-2">Tracing the evolution of DAO voting mechanisms and the rise of plutocratic governance models.</p>
+<div class="flex items-center gap-3">
+<div class="flex -space-x-2">
+<div class="size-6 rounded-full border-2 border-surface-dark bg-gray-300" data-alt="Avatar of contributor 1" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDsBPkDgABIJumTAGFQ675VhPYOAiQyQ-TxUu4wOtRaxVM1FMQMXx6XFTyfTnSaMcj8FEFX7mDgQ4fqyWCRbgLXaex491ZKqQerZbIqxFqD1YlB1Fer1owXEbyfHumqc4E7VAJ42HgkFGXWscHj31Bgp8RvcZPTgBlK6s4l2Cxj9HughGyniVb93nVuqV_5ztvl9BA68cehR2uZcOsMh8LstHRlEPH5M4jQSQ-WYDyuhx4N6h4K-ub26liD0R42Q_Tb-IQ8VFjtzTw");'></div>
+</div>
+<span class="text-xs text-accent">Curated by ChainWatch</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="min-w-[300px] md:min-w-[380px] snap-center bg-surface-dark rounded-xl overflow-hidden border border-surface-border group hover:border-primary/50 transition-all">
+<div class="h-48 bg-cover bg-center relative" data-alt="Vintage computer terminal screen showing code" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA-HBscFJP-nriZeUKxKNjGXUJEkKzh7m9HnrMtEn8TG4hAwqB4cMsDUCfWixHGT9HfhsUzUqjr4Z1woUBni1Lhvig0lepmucmo2PjMwfzyalNQUn6LeXiTU0h3Dq5p4ljvJ8Md5vy0Ps5sxhmjSK5UdxHWaYnHBnc_Hs1N1ol7jttd5EKpnPDWgh0KN0yICLF9OPs0C3IQabiwpda8-112ye6_uCKlFVUxNycMVzSKjzJe26dvL2no4Vf55tLLXZo8vjSTLbpFoFs");'>
+<div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
+<div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10">
+                            HISTORY
+                        </div>
+</div>
+<div class="p-5">
+<h4 class="text-lg font-bold text-white mb-2 line-clamp-1">The Hacker Ethic: 1980-2024</h4>
+<p class="text-sm text-accent mb-4 line-clamp-2">How "Information wants to be free" evolved into modern cybersecurity policies and hacktivism.</p>
+<div class="flex items-center gap-3">
+<div class="flex -space-x-2">
+<div class="size-6 rounded-full border-2 border-surface-dark bg-gray-300" data-alt="Avatar of contributor 1" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuClQMyHUxJM_XnTcOrOg3AW-Nfu6m-dmEnLtpzQ6I9uxpwfszg5373nIvqCOPdnDYAy1bTOUyvgUldFALDZomhdMkRgeylQ0JfMK-KWABzhGQKfFgPmNK3Yu2BALMq7ahhsYfXKcyRfZU2Bo8bwV_tqJdoUUNrUwvxQCfXOkRR8vlmiiZAXmJJrxH54V-_F0XBpd7rLrLN6JEhGX5YhhPebZb9DiBltHwE6fFZZUAGLqzEdMY58rZtKQvJnniSdC4Bo840T5Rwddao");'></div>
+<div class="size-6 rounded-full border-2 border-surface-dark bg-gray-300" data-alt="Avatar of contributor 2" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCi--EeEg10Z9CYm8SHOb9XfJqspBRIdGhKEBWdW2aKJM6FLYQl0EmCCTW2bt0h38eh820MtrFI4e6_OlUwJpTY__PBimEMfjRB2QuFEj5t4X10fofJOgblXG9HhDTbYzqkKgpZtcYsFou-QjaUSyILC7ZXj_RZNY-oPvRedo3a7xZdo1e4ymE_EXlW_l28d2mtrV0uJHjIASVi_gyDnSrNRBsHgqSWbLyPeRZLDyQMLV4tXmpRJFbPla2Rw7nf9QFwaC5SWik9h10");'></div>
+<div class="size-6 rounded-full border-2 border-surface-dark bg-gray-300" data-alt="Avatar of contributor 3" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAePTpFTvjemPn_ZaJT7ElC_nTcIE6-XSLfEH5GEQgYDYbgQbJQPzn6y-unBujz3gyGswOLg1Zqq4avrUxQ0O29n1wiuWJZShjhCGNGhlAoVspBq0CHpapL74mj0HXf76zCaXixXccNUt1m8SKWnMD2xv2iEdlmCpQ8bPS5pSsa3foEEjr0V3Mx4s4eR6BQKljomgDhSWYo8U0jqnQW2WROUlVGQa8lQL48zFd4fEuUqR7lszxpjfPy5eh6PbM5hwy4-va1Qj-PYwg");'></div>
+</div>
+<span class="text-xs text-accent">Curated by Archive.org</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="border-t border-surface-border bg-background-dark py-12 px-6">
+<div class="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 text-white">
+<span class="material-symbols-outlined text-[20px]">account_tree</span>
+<span class="font-bold">Traceform</span>
+</div>
+<p class="text-accent text-sm">Mapping the collective consciousness.</p>
+</div>
+<div class="flex gap-8">
+<a class="text-accent hover:text-white text-sm" href="#">About</a>
+<a class="text-accent hover:text-white text-sm" href="#">Methodology</a>
+<a class="text-accent hover:text-white text-sm" href="#">API</a>
+<a class="text-accent hover:text-white text-sm" href="#">Privacy</a>
+</div>
+<p class="text-accent/50 text-xs">© 2024 Traceform Inc.</p>
+</div>
+</footer>
+</body></html>

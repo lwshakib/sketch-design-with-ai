@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FinTrack Mobile - Elegant Wealth Management</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    :root {
+        --background: #f6f7f8;
+        --foreground: #0f172a;
+        --primary: #137fec;
+        --primary-foreground: #ffffff;
+        --secondary: #e2e8f0;
+        --secondary-foreground: #0f172a;
+        --muted: #f1f5f9;
+        --muted-foreground: #64748b;
+        --accent: #137fec;
+        --accent-foreground: #ffffff;
+        --card: #ffffff;
+        --card-foreground: #0f172a;
+        --border: #e2e8f0;
+        --input: #ffffff;
+        --ring: #137fec;
+        --radius: 0.75rem;
+    }
+    .dark {
+        --background: #101922;
+        --foreground: #f8fafc;
+        --card: #1c2632;
+        --card-foreground: #f8fafc;
+        --border: #23303e;
+        --muted: #151b24;
+        --muted-foreground: #94a3b8;
+    }
+    ::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive, #ef4444)",
+                        foreground: "var(--destructive-foreground, #ffffff)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                },
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                fontFamily: {
+                    sans: ["Inter", "sans-serif"],
+                },
+            },
+        },
+    }
+</script>
+</head>
+<body class="bg-background text-foreground font-sans antialiased selection:bg-primary/30 transition-colors duration-300">
+<div class="relative min-h-screen w-full flex flex-col pb-24 max-w-md mx-auto border-x border-border shadow-2xl">
+<!-- Header -->
+<header class="flex items-center justify-between p-5 pt-8 sticky top-0 z-20 bg-background/90 backdrop-blur-md">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="size-11 rounded-full bg-cover bg-center border-2 border-primary/20" data-alt="User profile picture" style="background-image: url('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80');">
+</div>
+<div class="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full border-2 border-background"></div>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-medium text-muted-foreground">Good Morning,</span>
+<span class="text-lg font-bold leading-tight">Alex Morgan</span>
+</div>
+</div>
+<button class="group flex size-10 items-center justify-center rounded-full bg-card shadow-sm border border-border active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-foreground group-hover:text-primary transition-colors" style="font-size: 24px;">notifications</span>
+<div class="absolute top-2 right-2.5 size-2 bg-red-500 rounded-full border border-background"></div>
+</button>
+</header>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col gap-6 px-5">
+<!-- Hero: Total Balance -->
+<section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card to-muted border border-border shadow-lg p-6">
+<div class="absolute -top-10 -right-10 size-40 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col items-center justify-center text-center gap-2">
+<p class="text-sm font-medium text-muted-foreground">Total Balance</p>
+<h1 class="text-4xl font-bold tracking-tight text-foreground">$24,500.00</h1>
+<div class="flex items-center gap-1.5 mt-1 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/10">
+<span class="material-symbols-outlined text-green-500 text-sm font-bold">trending_up</span>
+<span class="text-green-500 text-xs font-bold">+2.4% this month</span>
+</div>
+</div>
+</section>
+<!-- KPI Grid -->
+<section class="grid grid-cols-3 gap-3">
+<!-- Income -->
+<div class="flex flex-col gap-1 rounded-xl bg-card p-3 border border-border shadow-sm">
+<div class="flex items-center gap-2 mb-1">
+<div class="size-6 rounded-full bg-green-500/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-500 text-[14px]">arrow_downward</span>
+</div>
+<span class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Income</span>
+</div>
+<p class="text-lg font-bold text-foreground">$4,200</p>
+</div>
+<!-- Expenses -->
+<div class="flex flex-col gap-1 rounded-xl bg-card p-3 border border-border shadow-sm">
+<div class="flex items-center gap-2 mb-1">
+<div class="size-6 rounded-full bg-red-500/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-red-500 text-[14px]">arrow_upward</span>
+</div>
+<span class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Expense</span>
+</div>
+<p class="text-lg font-bold text-foreground">$1,800</p>
+</div>
+<!-- Savings -->
+<div class="flex flex-col gap-1 rounded-xl bg-card p-3 border border-border shadow-sm">
+<div class="flex items-center gap-2 mb-1">
+<div class="size-6 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[14px]">savings</span>
+</div>
+<span class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Saved</span>
+</div>
+<p class="text-lg font-bold text-foreground">$500</p>
+</div>
+</section>
+<!-- Charts Section -->
+<section class="rounded-2xl bg-card border border-border shadow-sm p-5">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-bold text-foreground">Net Worth Trend</h3>
+<button class="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded hover:bg-primary/20 transition-colors">Last 30 days</button>
+</div>
+<div class="relative h-48 w-full">
+<div class="absolute inset-0 flex flex-col justify-between text-xs text-muted-foreground/30">
+<div class="w-full border-b border-dashed border-border"></div>
+<div class="w-full border-b border-dashed border-border"></div>
+<div class="w-full border-b border-dashed border-border"></div>
+<div class="w-full border-b border-dashed border-border"></div>
+</div>
+<svg class="absolute inset-0 h-full w-full visible" preserveaspectratio="none">
+<defs>
+<lineargradient id="chartGradientWealth" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="var(--primary)" stop-opacity="0.4"></stop>
+<stop offset="100%" stop-color="var(--primary)" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,150 C30,140 60,100 90,110 C120,120 150,90 180,80 C210,70 240,100 270,60 C300,20 330,40 360,10 V192 H0 Z" fill="url(#chartGradientWealth)"></path>
+<path d="M0,150 C30,140 60,100 90,110 C120,120 150,90 180,80 C210,70 240,100 270,60 C300,20 330,40 360,10" fill="none" stroke="var(--primary)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+<circle cx="270" cy="60" fill="var(--background)" stroke="var(--primary)" stroke-width="3" r="5"></circle>
+</svg>
+<div class="absolute top-8 right-16 bg-foreground text-background text-[10px] font-bold px-2 py-1 rounded shadow-lg transform -translate-x-1/2">
+                        $23,840
+                        <div class="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-foreground rotate-45"></div>
+</div>
+</div>
+</section>
+<!-- Spending Activity -->
+<section class="rounded-2xl bg-card border border-border shadow-sm p-5">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-bold text-foreground">Spending Activity</h3>
+<span class="material-symbols-outlined text-muted-foreground cursor-pointer hover:text-foreground text-lg">more_horiz</span>
+</div>
+<div class="flex items-end justify-between h-40 gap-2">
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer">
+<div class="w-full bg-muted rounded-t-md relative h-32 flex items-end overflow-hidden group-hover:bg-muted/80 transition-colors">
+<div class="w-full bg-primary/40 group-hover:bg-primary transition-all duration-300 rounded-t-sm" style="height: 40%;"></div>
+</div>
+<span class="text-[10px] text-muted-foreground font-medium">Mon</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer">
+<div class="w-full bg-muted rounded-t-md relative h-32 flex items-end overflow-hidden group-hover:bg-muted/80 transition-colors">
+<div class="w-full bg-primary/40 group-hover:bg-primary transition-all duration-300 rounded-t-sm" style="height: 65%;"></div>
+</div>
+<span class="text-[10px] text-muted-foreground font-medium">Tue</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer">
+<div class="w-full bg-muted rounded-t-md relative h-32 flex items-end overflow-hidden group-hover:bg-muted/80 transition-colors">
+<div class="w-full bg-primary rounded-t-sm shadow-[0_0_10px_rgba(19,127,236,0.5)]" style="height: 85%;"></div>
+</div>
+<span class="text-[10px] text-foreground font-bold">Wed</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer">
+<div class="w-full bg-muted rounded-t-md relative h-32 flex items-end overflow-hidden group-hover:bg-muted/80 transition-colors">
+<div class="w-full bg-primary/40 group-hover:bg-primary transition-all duration-300 rounded-t-sm" style="height: 30%;"></div>
+</div>
+<span class="text-[10px] text-muted-foreground font-medium">Thu</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer">
+<div class="w-full bg-muted rounded-t-md relative h-32 flex items-end overflow-hidden group-hover:bg-muted/80 transition-colors">
+<div class="w-full bg-primary/40 group-hover:bg-primary transition-all duration-300 rounded-t-sm" style="height: 45%;"></div>
+</div>
+<span class="text-[10px] text-muted-foreground font-medium">Fri</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer">
+<div class="w-full bg-muted rounded-t-md relative h-32 flex items-end overflow-hidden group-hover:bg-muted/80 transition-colors">
+<div class="w-full bg-primary/40 group-hover:bg-primary transition-all duration-300 rounded-t-sm" style="height: 20%;"></div>
+</div>
+<span class="text-[10px] text-muted-foreground font-medium">Sat</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer">
+<div class="w-full bg-muted rounded-t-md relative h-32 flex items-end overflow-hidden group-hover:bg-muted/80 transition-colors">
+<div class="w-full bg-primary/40 group-hover:bg-primary transition-all duration-300 rounded-t-sm" style="height: 55%;"></div>
+</div>
+<span class="text-[10px] text-muted-foreground font-medium">Sun</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 flex h-[80px] w-full max-w-md mx-auto items-start justify-around border-t border-border bg-background/95 backdrop-blur-lg px-2 pt-3 pb-safe">
+<button class="flex flex-1 flex-col items-center justify-center gap-1 text-primary">
+<span class="material-symbols-outlined filled" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</button>
+<button class="flex flex-1 flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-[10px] font-medium">Transactions</span>
+</button>
+<div class="relative -top-6">
+<button class="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/40 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-size: 28px;">add</span>
+</button>
+</div>
+<button class="flex flex-1 flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
+<span class="material-symbols-outlined">pie_chart</span>
+<span class="text-[10px] font-medium">Budget</span>
+</button>
+<button class="flex flex-1 flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</button>
+</nav>
+</div>
+</body></html>

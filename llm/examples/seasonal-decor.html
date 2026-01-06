@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Seasonal Decor Catalog</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    :root {
+        --background: #f8f7f5;
+        --foreground: #0f172a;
+        --primary: #f5993d;
+        --primary-foreground: #ffffff;
+        --secondary: #e2e8f0;
+        --secondary-foreground: #0f172a;
+        --muted: #f1f5f9;
+        --muted-foreground: #64748b;
+        --accent: #f5993d;
+        --accent-foreground: #ffffff;
+        --card: #ffffff;
+        --card-foreground: #0f172a;
+        --border: #e2e8f0;
+        --input: #ffffff;
+        --ring: #f5993d;
+        --radius: 0.75rem;
+    }
+    .dark {
+        --background: #221910;
+        --foreground: #f8fafc;
+        --card: #32281e;
+        --card-foreground: #f8fafc;
+        --border: #4a3b2b;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive, #ef4444)",
+                        foreground: "var(--destructive-foreground, #ffffff)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                },
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                fontFamily: {
+                    sans: ["Plus Jakarta Sans", "sans-serif"],
+                },
+            },
+        },
+    }
+</script>
+</head>
+<body class="bg-background text-foreground font-sans transition-colors duration-300">
+<div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden pb-20">
+<!-- Header -->
+<header class="sticky top-0 z-10 flex items-center justify-between bg-background/95 backdrop-blur-md p-4 pb-2 border-b border-border">
+<div class="w-12">
+<button aria-label="Menu" class="flex items-center justify-center text-foreground">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<h2 class="text-xl font-bold leading-tight tracking-tight flex-1 text-center text-foreground">
+                Seasonal Decor
+            </h2>
+<div class="flex w-12 items-center justify-end gap-3">
+<button class="flex items-center justify-center text-foreground relative">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="flex items-center justify-center text-foreground relative">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">2</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1">
+<!-- Seasonal Categories (Chips) -->
+<div class="sticky top-[60px] z-10 bg-background pt-3 pb-2">
+<div class="flex gap-3 px-4 overflow-x-auto no-scrollbar">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary px-5 shadow-sm transition-transform active:scale-95">
+<p class="text-primary-foreground text-sm font-semibold leading-normal">All</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card border border-border px-5 shadow-sm transition-transform active:scale-95 hover:border-primary/50">
+<p class="text-foreground text-sm font-medium leading-normal">Spring</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card border border-border px-5 shadow-sm transition-transform active:scale-95 hover:border-primary/50">
+<p class="text-foreground text-sm font-medium leading-normal">Summer</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card border border-border px-5 shadow-sm transition-transform active:scale-95 hover:border-primary/50">
+<p class="text-foreground text-sm font-medium leading-normal">Autumn</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-card border border-border px-5 shadow-sm transition-transform active:scale-95 hover:border-primary/50">
+<p class="text-foreground text-sm font-medium leading-normal">Winter</p>
+</button>
+</div>
+</div>
+<!-- Sort & Filters -->
+<div class="flex gap-3 px-4 py-2 overflow-x-auto no-scrollbar border-b border-transparent">
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-1.5 rounded-lg bg-transparent py-1 pr-3">
+<span class="material-symbols-outlined text-muted-foreground text-lg">tune</span>
+<p class="text-muted-foreground text-sm font-medium leading-normal">Filters</p>
+</button>
+<div class="w-[1px] h-6 bg-border self-center mx-1"></div>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-card border border-border px-3">
+<p class="text-foreground text-xs font-medium leading-normal">Price: Low to High</p>
+<span class="material-symbols-outlined text-muted-foreground text-base">keyboard_arrow_down</span>
+</button>
+<button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-card border border-border px-3">
+<p class="text-foreground text-xs font-medium leading-normal">On Sale</p>
+</button>
+</div>
+<!-- Product Grid -->
+<div class="grid grid-cols-2 gap-x-4 gap-y-6 p-4">
+<!-- Item 1 -->
+<div class="group flex flex-col gap-3">
+<div class="relative w-full aspect-[3/4] overflow-hidden rounded-xl bg-muted">
+<button class="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-card/80 backdrop-blur-sm text-foreground transition-transform active:scale-90 hover:bg-card">
+<span class="material-symbols-outlined text-xl">favorite</span>
+</button>
+<div class="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Pumpkin Vase" style="background-image: url('https://loremflickr.com/400/600/pumpkin,vase');">
+</div>
+<div class="absolute bottom-2 left-2 rounded bg-primary/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground backdrop-blur-sm">
+                            New
+                        </div>
+</div>
+<div>
+<div class="flex justify-between items-start">
+<p class="text-foreground text-base font-bold leading-tight line-clamp-2">Ceramic Pumpkin Vase</p>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<p class="text-primary text-sm font-bold leading-normal">$24.00</p>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-primary text-[14px] fill-current">star</span>
+<span class="text-[10px] text-muted-foreground ml-0.5">(4.8)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="group flex flex-col gap-3">
+<div class="relative w-full aspect-[3/4] overflow-hidden rounded-xl bg-muted">
+<button class="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-card/80 backdrop-blur-sm text-foreground transition-transform active:scale-90 hover:bg-card">
+<span class="material-symbols-outlined text-xl">favorite</span>
+</button>
+<div class="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Woven Throw" style="background-image: url('https://loremflickr.com/400/600/blanket,woven');">
+</div>
+</div>
+<div>
+<p class="text-foreground text-base font-bold leading-tight line-clamp-2">Woven Summer Throw</p>
+<div class="flex items-center gap-2 mt-1">
+<p class="text-primary text-sm font-bold leading-normal">$45.00</p>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="group flex flex-col gap-3">
+<div class="relative w-full aspect-[3/4] overflow-hidden rounded-xl bg-muted">
+<button class="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-card/80 backdrop-blur-sm text-foreground transition-transform active:scale-90 hover:bg-card">
+<span class="material-symbols-outlined text-xl">favorite</span>
+</button>
+<div class="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Pinecone Wreath" style="background-image: url('https://loremflickr.com/400/600/wreath,pinecone');">
+</div>
+</div>
+<div>
+<p class="text-foreground text-base font-bold leading-tight line-clamp-2">Pinecone Wreath</p>
+<div class="flex items-center gap-2 mt-1">
+<p class="text-primary text-sm font-bold leading-normal">$32.50</p>
+<p class="text-muted-foreground text-xs line-through decoration-muted-foreground">$40.00</p>
+</div>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="group flex flex-col gap-3">
+<div class="relative w-full aspect-[3/4] overflow-hidden rounded-xl bg-muted">
+<button class="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-card/80 backdrop-blur-sm text-foreground transition-transform active:scale-90 hover:bg-card">
+<span class="material-symbols-outlined text-xl">favorite</span>
+</button>
+<div class="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Table Runner" style="background-image: url('https://loremflickr.com/400/600/table,runner');">
+</div>
+<div class="absolute bottom-2 left-2 rounded bg-red-500/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+                            -20%
+                        </div>
+</div>
+<div>
+<p class="text-foreground text-base font-bold leading-tight line-clamp-2">Floral Table Runner</p>
+<div class="flex items-center gap-2 mt-1">
+<p class="text-primary text-sm font-bold leading-normal">$18.00</p>
+</div>
+</div>
+</div>
+<!-- Item 5 -->
+<div class="group flex flex-col gap-3">
+<div class="relative w-full aspect-[3/4] overflow-hidden rounded-xl bg-muted">
+<button class="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-card/80 backdrop-blur-sm text-foreground transition-transform active:scale-90 hover:bg-card">
+<span class="material-symbols-outlined text-xl">favorite</span>
+</button>
+<div class="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Autumn Garland" style="background-image: url('https://loremflickr.com/400/600/autumn,garland');">
+</div>
+</div>
+<div>
+<p class="text-foreground text-base font-bold leading-tight line-clamp-2">Autumn Leaf Garland</p>
+<div class="flex items-center gap-2 mt-1">
+<p class="text-primary text-sm font-bold leading-normal">$15.00</p>
+</div>
+</div>
+</div>
+<!-- Item 6 -->
+<div class="group flex flex-col gap-3">
+<div class="relative w-full aspect-[3/4] overflow-hidden rounded-xl bg-muted">
+<button class="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-card/80 backdrop-blur-sm text-foreground transition-transform active:scale-90 hover:bg-card">
+<span class="material-symbols-outlined text-xl">favorite</span>
+</button>
+<div class="h-full w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Candle Holder" style="background-image: url('https://loremflickr.com/400/600/candle,holder');">
+</div>
+</div>
+<div>
+<p class="text-foreground text-base font-bold leading-tight line-clamp-2">Snowy Candle Holder</p>
+<div class="flex items-center gap-2 mt-1">
+<p class="text-primary text-sm font-bold leading-normal">$12.00</p>
+</div>
+</div>
+</div>
+</div>
+<div class="h-8"></div> <!-- Spacer for bottom nav -->
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 z-50 w-full border-t border-border bg-background pb-safe">
+<div class="flex justify-between items-end px-6 pb-2 pt-3">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-muted-foreground hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">home</span>
+<p class="text-[10px] font-medium leading-normal tracking-wide">Home</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-2xl filled" style="font-variation-settings: 'FILL' 1">grid_view</span>
+<p class="text-[10px] font-bold leading-normal tracking-wide">Catalog</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-muted-foreground hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">favorite</span>
+<p class="text-[10px] font-medium leading-normal tracking-wide">Wishlist</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-muted-foreground hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">person</span>
+<p class="text-[10px] font-medium leading-normal tracking-wide">Profile</p>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

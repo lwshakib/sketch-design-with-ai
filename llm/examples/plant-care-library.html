@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Plant Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec37",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102213",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2c1e",
+                        "text-main-light": "#0d1b10",
+                        "text-main-dark": "#e7f3e9",
+                        "text-secondary-light": "#4c9a59",
+                        "text-secondary-dark": "#8bc495",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-main-light dark:text-text-main-dark transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e7f3e9] dark:border-[#2a3c2e] bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md px-10 py-3">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary">
+<span class="material-symbols-outlined !text-[32px]">potted_plant</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">Plant Library</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Library</a>
+<a class="text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">My Plants</a>
+<a class="text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Community</a>
+<a class="text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Guides</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-[#e7f3e9] dark:bg-[#2a3c2e] hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-primary/20" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAwUlvt-5v1O3P-8cYwJBx_Rs0ZLTaVslQIORlA5ECnHhQ2nD8B7KEpoQ7ay-hHy8HP8B1OYTtZkfEW0YZF8DECOQp67sXHd4-lKl5tX0OJEnFClwjWo0KjPFhoGphqG_0jjXpQqtJJloQiPqj4GDvhZ6Jfn33mwGpnBvILjfb5QS4ORA9aWdBENd_WwvgzlAbQ1ghvbSb1MxjV5Dln2WCSlrItaBBa7Ng2_kXVymQTP3mfceJx3hc8djzeUKXKx5WL5EJUk3QUkQg");'></div>
+</div>
+</div>
+</header>
+<main class="flex flex-col items-center w-full">
+<!-- Hero Section -->
+<section class="w-full max-w-[1200px] px-4 py-8 md:px-10">
+<div class="@container">
+<div class="flex min-h-[400px] flex-col gap-6 bg-cover bg-center bg-no-repeat rounded-2xl items-center justify-center p-8 relative overflow-hidden group" data-alt="Greenhouse interior with lush plants" style='background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuD0n9lzrk_3OIOd9DA7cQyr24rfItqY2AMnyYHdcCjLRy6Y5xyH-H-7lCc3JqOUAmcEefLpJEu9Ak_IvphjJ--JsU-m9YqX9sBL37jLWFcD9KSJhusYIM5fYI9FRosMTGz-XTuOsAlQ7tx_QNXz_MkClyU63feHG7AEGix8Cqftkmpmb-fbPzH2EynIPgRsgHBWjOD6IcXg2c6K37oVfmnTGHYNtLNbXaO2Xhf1byTTlnnsPM7sMbHWU4yYEUB_uirqkPVQg83EfZw");'>
+<div class="flex flex-col gap-4 text-center max-w-2xl relative z-10">
+<h1 class="text-white text-4xl font-black leading-tight tracking-[-0.033em] md:text-5xl drop-shadow-lg">
+                                Find your perfect plant companion
+                            </h1>
+<p class="text-white/90 text-base font-normal leading-relaxed md:text-lg drop-shadow-md">
+                                Explore our comprehensive database of indoor plants, care guides, and troubleshooting tips tailored for your home.
+                            </p>
+</div>
+<div class="w-full max-w-[600px] relative z-10 mt-4">
+<label class="flex flex-col w-full h-14 md:h-16 shadow-lg rounded-xl overflow-hidden transition-transform focus-within:scale-[1.02]">
+<div class="flex w-full flex-1 items-center bg-surface-light dark:bg-surface-dark">
+<div class="pl-4 pr-2 text-text-secondary-light dark:text-text-secondary-dark flex items-center justify-center">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="w-full h-full bg-transparent border-none text-text-main-light dark:text-text-main-dark placeholder:text-text-secondary-light/60 dark:placeholder:text-text-secondary-dark/60 focus:ring-0 text-base md:text-lg" placeholder="Search plants (e.g. Monstera, Low light)"/>
+<button class="h-[calc(100%-16px)] mr-2 px-6 bg-primary hover:bg-primary/90 text-surface-dark font-bold rounded-lg transition-colors">
+                                        Search
+                                    </button>
+</div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Featured Plant Section -->
+<section class="w-full max-w-[1200px] px-4 md:px-10 mb-12">
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-6 md:p-8 shadow-sm border border-[#e7f3e9] dark:border-[#2a3c2e] flex flex-col md:flex-row gap-8 items-center">
+<div class="flex-1 flex flex-col gap-6">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary w-fit">
+<span class="material-symbols-outlined text-sm">stars</span>
+<span class="text-xs font-bold uppercase tracking-wide">Plant of the Week</span>
+</div>
+<div class="flex flex-col gap-4">
+<h2 class="text-3xl md:text-4xl font-bold leading-tight">
+                                Fiddle Leaf Fig
+                            </h2>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-base md:text-lg leading-relaxed max-w-[600px]">
+                                Make a statement with the <i class="italic">Ficus lyrata</i>. Known for its large, violin-shaped leaves, this popular indoor tree loves bright, filtered light and adds a dramatic touch to any room.
+                            </p>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<div class="flex flex-col gap-2 p-3 rounded-lg bg-background-light dark:bg-background-dark border border-[#e7f3e9] dark:border-[#2a3c2e]">
+<span class="material-symbols-outlined text-primary">light_mode</span>
+<div>
+<div class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-medium">Light</div>
+<div class="font-bold text-sm">Bright indirect</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 p-3 rounded-lg bg-background-light dark:bg-background-dark border border-[#e7f3e9] dark:border-[#2a3c2e]">
+<span class="material-symbols-outlined text-primary">water_drop</span>
+<div>
+<div class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-medium">Water</div>
+<div class="font-bold text-sm">Weekly</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 p-3 rounded-lg bg-background-light dark:bg-background-dark border border-[#e7f3e9] dark:border-[#2a3c2e]">
+<span class="material-symbols-outlined text-primary">bar_chart</span>
+<div>
+<div class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-medium">Difficulty</div>
+<div class="font-bold text-sm">Intermediate</div>
+</div>
+</div>
+</div>
+<button class="mt-2 px-6 py-3 bg-primary text-surface-dark font-bold rounded-lg w-fit hover:bg-primary/90 transition-colors flex items-center gap-2">
+<span>Read Care Guide</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="w-full md:w-1/3 aspect-[3/4] rounded-xl overflow-hidden shadow-md relative">
+<div class="absolute inset-0 bg-gray-200 animate-pulse" style="display:none"></div>
+<img alt="Large Fiddle Leaf Fig plant in a living room corner" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEDOT6D8-MyQe-922FQyJKfUiAFZNocb-lHEMqpzV2zBLO8idNuf5dFh_0uBKIz7xBzN-wDGkbcmDngg3StJ5u0IWBVImkcQ9JprXWz42TtVP07SxOHrHz-9Y_h_nvbF3GAisPbn9DZk8Id7y7IatwMsU3DjL4MaDsCA7wp08e5QT13h9hxHFyL7CIBF93bxwvqa0vKHxY8CSLkT9uoy4Y4WAuIZ_YkxfSIiqG3hs_UeZ5gbFJjtllPjczFve6-7BBuUOyPV4a3rQ"/>
+</div>
+</div>
+</section>
+<!-- Categories & Filters -->
+<section class="w-full max-w-[1200px] px-4 md:px-10 mb-8">
+<div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-6">
+<h2 class="text-2xl font-bold">Browse by Category</h2>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg border border-[#e7f3e9] dark:border-[#2a3c2e] hover:bg-surface-light dark:hover:bg-surface-dark text-text-secondary-light dark:text-text-secondary-dark">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+<button class="p-2 rounded-lg border border-[#e7f3e9] dark:border-[#2a3c2e] hover:bg-surface-light dark:hover:bg-surface-dark text-text-secondary-light dark:text-text-secondary-dark">
+<span class="material-symbols-outlined">sort</span>
+</button>
+</div>
+</div>
+<div class="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary text-surface-dark px-4 transition-transform hover:scale-105">
+<span class="text-sm font-bold">All Plants</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-light dark:bg-surface-dark border border-[#e7f3e9] dark:border-[#2a3c2e] px-4 hover:border-primary/50 transition-colors">
+<span class="material-symbols-outlined text-sm text-text-secondary-light dark:text-text-secondary-dark">eco</span>
+<span class="text-sm font-medium">Succulents</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-light dark:bg-surface-dark border border-[#e7f3e9] dark:border-[#2a3c2e] px-4 hover:border-primary/50 transition-colors">
+<span class="material-symbols-outlined text-sm text-text-secondary-light dark:text-text-secondary-dark">forest</span>
+<span class="text-sm font-medium">Tropical</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-light dark:bg-surface-dark border border-[#e7f3e9] dark:border-[#2a3c2e] px-4 hover:border-primary/50 transition-colors">
+<span class="material-symbols-outlined text-sm text-text-secondary-light dark:text-text-secondary-dark">grass</span>
+<span class="text-sm font-medium">Ferns</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-light dark:bg-surface-dark border border-[#e7f3e9] dark:border-[#2a3c2e] px-4 hover:border-primary/50 transition-colors">
+<span class="material-symbols-outlined text-sm text-text-secondary-light dark:text-text-secondary-dark">pets</span>
+<span class="text-sm font-medium">Pet Safe</span>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-light dark:bg-surface-dark border border-[#e7f3e9] dark:border-[#2a3c2e] px-4 hover:border-primary/50 transition-colors">
+<span class="material-symbols-outlined text-sm text-text-secondary-light dark:text-text-secondary-dark">dark_mode</span>
+<span class="text-sm font-medium">Low Light</span>
+</button>
+</div>
+</section>
+<!-- Plant Grid -->
+<section class="w-full max-w-[1200px] px-4 md:px-10 mb-20">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-[#e7f3e9] dark:border-[#2a3c2e] hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer">
+<div class="relative aspect-square overflow-hidden bg-gray-100">
+<img alt="Monstera deliciosa leaf close up" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiEWKtuKVhc3PrA3hM6x-Y9moqxH3UZdlOgraIKVmX5ICsR02nWEIORhQiestng9WfqAtlrBZWN9vFrdcss-QHNTrKVKzA9_d3ElYTfYyjYIjPzFDds8tPNJE5Vu-OkvE2wZ2dExBP8oY0YLvSW08m-dJ2pSIzXk30OjI77kIQ7I-hbM8qD8uTqO8MnZm1NEsNqJgikUNkjZwAQKfHYQR6lAn1LR2Q3TK9u53Xww3c1gDe8-T0o95qVm6m1xuvGtEisKfiz5VQx9w"/>
+<div class="absolute top-3 right-3 bg-white/90 dark:bg-black/60 backdrop-blur-sm rounded-full p-1.5 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm block">favorite</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex items-start justify-between mb-1">
+<h3 class="font-bold text-lg">Monstera Deliciosa</h3>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark italic mb-4">Swiss Cheese Plant</p>
+<div class="mt-auto flex gap-2">
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> Moderate
+                                </div>
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">light_mode</span> Bright
+                                </div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-[#e7f3e9] dark:border-[#2a3c2e] hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer">
+<div class="relative aspect-square overflow-hidden bg-gray-100">
+<img alt="Snake plant in a white pot" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArf0iQgnvCFH_I-kXyvKzAbYJs-5BJmOOmRxJYIbQLhU42sLLGsbChE0bRuA5LrSo0FLAH7JXH9kT_rrwfTiAyNm9CQ0YauHOYy3xRhs9CtkWOY5ucz61bXyfDfS_qx2Vr3Ovc6jOuf6_Qeu6G66c5B8KPM4Mi1u1QxIH6gwlCFxH9ORmvkC6f9ESMLkyN7_k1FIVMMtWIY_4Ul_PGzQYVbpTAPfMvqodhp9K0eOrgoKgzNCECJA5VdSXwaMAt_VdvyIdIQJcS0sc"/>
+<div class="absolute top-3 right-3 bg-white/90 dark:bg-black/60 backdrop-blur-sm rounded-full p-1.5 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm block">favorite</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex items-start justify-between mb-1">
+<h3 class="font-bold text-lg">Snake Plant</h3>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark italic mb-4">Sansevieria</p>
+<div class="mt-auto flex gap-2">
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> Low
+                                </div>
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">dark_mode</span> Low Light
+                                </div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-[#e7f3e9] dark:border-[#2a3c2e] hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer">
+<div class="relative aspect-square overflow-hidden bg-gray-100">
+<img alt="Pothos plant hanging from shelf" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQ4uGyYo6fKD0R4WqAPppf97cJiwvUn2AgIxALwwC07KAEoinZSVZL2Fc2TP6EkOMCS5-SI_F_9ZPgs6eaZ4ffKVDFeUdI_7oH1xv0zmGYJ0F5u-CaYfzueHZv_8p8W8YjwFlZFoXth81Li0eORa51PW1i2hvplBaJxPZspFvfs_ds2ppdXqzzLlg-LM__-m25TkahVBKgt9XLrin94OlrKpIFqNt3NYzVwBIslA9GsbY0O-4ZpaAKoy5i0qFSip20cIdFwC-NiSI"/>
+<div class="absolute top-3 right-3 bg-white/90 dark:bg-black/60 backdrop-blur-sm rounded-full p-1.5 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm block">favorite</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex items-start justify-between mb-1">
+<h3 class="font-bold text-lg">Golden Pothos</h3>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark italic mb-4">Epipremnum aureum</p>
+<div class="mt-auto flex gap-2">
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> Weekly
+                                </div>
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">bolt</span> Easy
+                                </div>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-[#e7f3e9] dark:border-[#2a3c2e] hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer">
+<div class="relative aspect-square overflow-hidden bg-gray-100">
+<img alt="ZZ Plant in modern pot" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA90RaMFpNOEOhV43yoTqSqTDb5txkNQ1IxzFEoND19WyAnvvn8dRid_pHPL9aBXlR0OJOdwsjjM8fz9zc388InIAVAjwx4MxcNDMFNXFuktISOTrqkO4j_M-4vyHbuU1L5MKRuSjaNUKSU5NjfLLymJotcZCqv9U7bbUtRr1pSSk6mHy_OWpgt75UTRK0wfcvBX2NQUGVoW2rgupfHJbzLKHMcK2wp7DfPwVfKGCg4Tka_UtcGUvucY_t8OKdo60f9ZK-u6STMNYg"/>
+<div class="absolute top-3 right-3 bg-white/90 dark:bg-black/60 backdrop-blur-sm rounded-full p-1.5 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm block">favorite</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex items-start justify-between mb-1">
+<h3 class="font-bold text-lg">ZZ Plant</h3>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark italic mb-4">Zamioculcas zamiifolia</p>
+<div class="mt-auto flex gap-2">
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> Low
+                                </div>
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">verified_user</span> Tough
+                                </div>
+</div>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-[#e7f3e9] dark:border-[#2a3c2e] hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer">
+<div class="relative aspect-square overflow-hidden bg-gray-100">
+<img alt="Spider plant hanging" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUDebwBeLsn9ULMed0iMKUQxq7_fvI7oq5ywqL0kidgfqLlbEBR5XDias7t4J1CKfqpegeYgoaasn5_F7y_pMJdJAF-bMDtMrUxL3QbcfoZDMs89BCFra4S4u6WVPjw_zhUH7BeUR9tereCAFei8UuHXAzWNXoTSlh3yd9FghlYfztVNeNX6lEdNX2UQ7M_St52UNAEPNQEpjRFbKwL45aFqp4Vb56UQDZyrNX50ArK1fdIxF8tmRClS136nPCKg4NJBGfaN4fSg0"/>
+<div class="absolute top-3 right-3 bg-white/90 dark:bg-black/60 backdrop-blur-sm rounded-full p-1.5 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm block">favorite</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex items-start justify-between mb-1">
+<h3 class="font-bold text-lg">Spider Plant</h3>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark italic mb-4">Chlorophytum comosum</p>
+<div class="mt-auto flex gap-2">
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">pets</span> Pet Safe
+                                </div>
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> Weekly
+                                </div>
+</div>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-[#e7f3e9] dark:border-[#2a3c2e] hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer">
+<div class="relative aspect-square overflow-hidden bg-gray-100">
+<img alt="Peace Lily with white flower" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9KXrhLbF7zVeygZmTSjYuBNh3nTDWLtgvPzJu5DcnUxaeq0wcIF-eFgzpiSbwJYr3JZVKKF-d9Z9O8BIdANuaBnF2ZQxdE2Y4r85uVVTls5keMlfkHkzbE9RGgfe84wEp43JyNQrvDxwKsEL1NfVU6uwB_qUvP8mWPPywL25cXqanDrWoYfueSwevbRxq2mgogbL-_0RPt-bltqe5VQBZcMuxIownJJeV4Oo2z6gEX5Qnztz3Q1u-YfWyqL1P8cETestpqPBR47k"/>
+<div class="absolute top-3 right-3 bg-white/90 dark:bg-black/60 backdrop-blur-sm rounded-full p-1.5 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm block">favorite</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex items-start justify-between mb-1">
+<h3 class="font-bold text-lg">Peace Lily</h3>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark italic mb-4">Spathiphyllum</p>
+<div class="mt-auto flex gap-2">
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> High
+                                </div>
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">dark_mode</span> Low Light
+                                </div>
+</div>
+</div>
+</div>
+<!-- Card 7 -->
+<div class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-[#e7f3e9] dark:border-[#2a3c2e] hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer">
+<div class="relative aspect-square overflow-hidden bg-gray-100">
+<img alt="Aloe Vera plant" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJUi-LefRt26OrwYO6mbFrTMO6omIEXNU4zNuPS_VkjuNaT5IDJOqqPvCBkS9Ac6SjCuUtowXMoAbRUhGXe_q6vadAVdH44xT9HWcLtxp_JFxs2Ie7sNRLwYYmprOT0cJ7HbeEhLk2ANmg2z3VRYSuLGD5xZw8Da3mJbQqQhGOfU9hetS4ankCUdrPGoZW-GgozXd354RQONDBA-xX4Zo6QHKX8bMBXBADxlXKoGJFWtCecHueEeZ3-hYYoxp3VDXV0zBL-wkYD3Y"/>
+<div class="absolute top-3 right-3 bg-white/90 dark:bg-black/60 backdrop-blur-sm rounded-full p-1.5 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm block">favorite</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex items-start justify-between mb-1">
+<h3 class="font-bold text-lg">Aloe Vera</h3>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark italic mb-4">Aloe barbadensis miller</p>
+<div class="mt-auto flex gap-2">
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">sunny</span> Direct Sun
+                                </div>
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">healing</span> Medicinal
+                                </div>
+</div>
+</div>
+</div>
+<!-- Card 8 -->
+<div class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-[#e7f3e9] dark:border-[#2a3c2e] hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer">
+<div class="relative aspect-square overflow-hidden bg-gray-100">
+<img alt="Rubber plant with dark leaves" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaQ55v9YzoyNA3nnoFvWzp0f4xGkeJ6zIY9rJ_Rkd7_psrrr3PocFRBGZE5Vlzd43qVH_GJaX5p5HAS9247fLiv2jGqAQSEPiVfqnWYqlKRsa58L_7K4D-yvIxnbF23N9D55r-Rx2LG8yLWhz44crB4V82s18bES_i-jjpzAzMri-sGo3KRIyDUbNcNEuQz_pvOWUPkG_wQ5omqxDGfVVH1Tk-uMvvXN7cdWVIxhnDFtQV3Jpo6wNY9_Ylpa91hPMcRPCYZbYXWeE"/>
+<div class="absolute top-3 right-3 bg-white/90 dark:bg-black/60 backdrop-blur-sm rounded-full p-1.5 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm block">favorite</span>
+</div>
+</div>
+<div class="p-4 flex flex-col flex-1">
+<div class="flex items-start justify-between mb-1">
+<h3 class="font-bold text-lg">Rubber Plant</h3>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark italic mb-4">Ficus elastica</p>
+<div class="mt-auto flex gap-2">
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">light_mode</span> Bright
+                                </div>
+<div class="px-2 py-1 rounded bg-background-light dark:bg-background-dark text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> Weekly
+                                </div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex justify-center mt-12">
+<button class="px-8 py-3 rounded-lg border border-[#e7f3e9] dark:border-[#2a3c2e] hover:bg-surface-light dark:hover:bg-surface-dark font-bold text-text-main-light dark:text-text-main-dark transition-all">
+                        Load More Plants
+                    </button>
+</div>
+</section>
+</main>
+<footer class="bg-surface-light dark:bg-surface-dark border-t border-[#e7f3e9] dark:border-[#2a3c2e] py-12 px-10">
+<div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between gap-10">
+<div class="flex flex-col gap-4 max-w-sm">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined !text-[28px]">potted_plant</span>
+<h2 class="text-xl font-bold text-text-main-light dark:text-text-main-dark">Plant Library</h2>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark leading-relaxed">
+                        Helping you grow your indoor jungle, one leaf at a time. Join our community of plant enthusiasts.
+                    </p>
+</div>
+<div class="flex gap-12 flex-wrap">
+<div class="flex flex-col gap-3">
+<h4 class="font-bold text-base">Explore</h4>
+<a class="text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors" href="#">Plant Database</a>
+<a class="text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors" href="#">Care Guides</a>
+<a class="text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors" href="#">Tools</a>
+</div>
+<div class="flex flex-col gap-3">
+<h4 class="font-bold text-base">Community</h4>
+<a class="text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors" href="#">Forums</a>
+<a class="text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors" href="#">Events</a>
+<a class="text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors" href="#">Blog</a>
+</div>
+<div class="flex flex-col gap-3">
+<h4 class="font-bold text-base">Legal</h4>
+<a class="text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors" href="#">Terms</a>
+</div>
+</div>
+</div>
+<div class="max-w-[1200px] mx-auto mt-12 pt-8 border-t border-[#e7f3e9] dark:border-[#2a3c2e] flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">© 2024 Plant Library. All rights reserved.</p>
+<div class="flex gap-4">
+<a class="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary" href="#"><span class="material-symbols-outlined">mail</span></a>
+</div>
+</div>
+</footer>
+</div>
+</body></html>
