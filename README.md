@@ -11,20 +11,33 @@
 
 **Sketch** is an intelligent AI-powered design tool that transforms your ideas into reality. Whether you're a developer needing a quick UI mockup or a designer iterating on concepts, this tool empowers you to:
 
-- 🎨 **Sketch Your Ideas**: Use an intuitive canvas to draw and sketch your design concepts
+- 🎨 **Text-to-Design**: Describe your idea in plain text and watch it come to life
+- 📸 **Screenshot-to-Code**: Upload a screenshot or wireframe to generate editable code
+- ✏️ **Sketch Integration**: Use the canvas to draw and iterate on concepts manually
 - 🤖 **AI-Powered Design**: Leverage Google Gemini AI to transform sketches into modern, aesthetically pleasing designs
 - 👁️ **Instant Preview**: See your design evolve in real-time with instant rendering
 - 💻 **Export to Code**: Get production-ready code (HTML/React/CSS) instantly
 - 🎭 **Theme Customization**: Apply and customize themes with glassmorphism, dark mode, and vibrant color palettes
 - 📱 **Responsive Design**: Generate designs that work seamlessly across all device sizes
 
+## 📸 Screenshots
+
+<div align="center">
+  <h3>Light Mode</h3>
+  <img src="public/light.png" alt="Light Mode" width="100%" />
+  <br/><br/>
+  
+  <h3>Dark Mode</h3>
+  <img src="public/dark.png" alt="Dark Mode" width="100%" />
+</div>
+
 ## ✨ Key Features
 
 ### Design Creation
-- **Interactive Canvas**: Smooth, intuitive drawing experience for sketching your design ideas
-- **AI Chat Interface**: Conversational AI to refine and iterate on your designs
+- **Prompt Interface**: Robust text input for describing complex UI requirements
+- **Image Upload**: Upload screenshots, mood boards, or existing sketches for reference
+- **Interactive Canvas**: Intuitive drawing tools for manual adjustments
 - **Multi-Frame Workspace**: Work on multiple design variations simultaneously
-- **Image Upload**: Upload reference images or existing sketches
 
 ### AI Capabilities
 - **Smart Design Generation**: AI understands context and generates pixel-perfect designs
@@ -98,7 +111,13 @@ npm install
 
 ### 3. Environment Setup
 
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file in the root directory. You can start by copying the example file:
+
+```bash
+cp .env.example .env
+```
+
+Then fill in the following variables:
 
 ```env
 # Database
