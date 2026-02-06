@@ -81,7 +81,13 @@ export async function POST(req: Request) {
               // Add new artifact with a default offset to prevent overlapping
               const lastArt = updatedArtifacts[updatedArtifacts.length - 1];
               const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
-              const newX = lastArt ? (lastArt.x || 0) + getWidth(lastArt.type) + 80 : 0;
+              const currentWidth = getWidth(newArt.type);
+              
+              // Center the first artifact, or place the next one to the right
+              const newX = lastArt 
+                ? (lastArt.x || 0) + (lastArt.width || getWidth(lastArt.type)) + 120 
+                : -(currentWidth / 2);
+
               updatedArtifacts.push({
                 ...newArt,
                 x: newX,

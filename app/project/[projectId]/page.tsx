@@ -752,7 +752,13 @@ export default function ProjectPage() {
               } else {
                 const lastArt = updated[updated.length - 1];
                 const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
-                const newX = lastArt ? (lastArt.x || 0) + getWidth(lastArt.type) + 80 : 0;
+                const currentWidth = getWidth(newArt.type);
+                
+                // Center the first artifact, or place the next one to the right
+                const newX = lastArt 
+                  ? (lastArt.x || 0) + (lastArt.width || getWidth(lastArt.type)) + 120 
+                  : -(currentWidth / 2);
+
                 updated.push({ ...newArt, x: newX, y: 0, isComplete: true });
                 changed = true;
               }
@@ -1968,7 +1974,8 @@ export default function ProjectPage() {
          {/* Content Layer */}
           <div 
             className={cn(
-                "absolute inset-0 flex items-center justify-center select-none",
+                "absolute inset-0 flex select-none",
+                throttledArtifacts.length === 0 ? "items-center justify-center pb-20" : "items-start justify-center pt-36",
                 !isDraggingFrame && !isResizing && "transition-transform duration-75 ease-out"
             )}
             style={{
