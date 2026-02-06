@@ -111,12 +111,17 @@ export async function POST(req: Request) {
       }
     };
 
-    const result = await streamText(messages, {
-      onFinish,
-    });
+    try {
+      const result = await streamText(messages, {
+        onFinish,
+      });
 
-    // Create a custom response using the Vercel AI SDK method
-    return result.toUIMessageStreamResponse();
+      // Create a custom response using the Vercel AI SDK method
+      return result.toUIMessageStreamResponse();
+    } catch (error) {
+      console.error("[CHAT] Error during streaming:", error);
+      throw error;
+    }
   } catch (error) {
     console.error("[CHAT]", error);
     return NextResponse.json({ error: "Failed to chat" }, { status: 500 });

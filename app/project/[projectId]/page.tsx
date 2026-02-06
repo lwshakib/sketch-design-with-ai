@@ -717,6 +717,7 @@ export default function ProjectPage() {
     setMessages,
     status,
     stop,
+    reload,
   } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
@@ -726,7 +727,12 @@ export default function ProjectPage() {
     }),
     onError: (error) => {
       console.error(error);
-      toast.error("Engine has been error occurred. Please try again.");
+      toast.error("Engine encountered an error.", {
+        action: {
+          label: "Retry",
+          onClick: () => reload(),
+        },
+      });
     },
     onFinish: (message: any) => {
       const textContent = (message.parts?.find((p: any) => p.type === 'text') as any)?.text || message.content;
@@ -836,7 +842,6 @@ export default function ProjectPage() {
     const lastAssistantMessage = (messages as any[]).filter(m => m.role === 'assistant').at(-1);
     if (!lastAssistantMessage) {
         if (messages.length === 0) {
-            // Only clear if there are actually items to clear
             setArtifacts(prev => prev.length > 0 ? [] : prev);
             setThrottledArtifacts(prev => prev.length > 0 ? [] : prev);
         }
@@ -849,7 +854,17 @@ export default function ProjectPage() {
       const artifactData = extractArtifacts(textContent);
       
       if (artifactData.length > 0) {
-        // 1. Maintain the full state in 'artifacts' for internal reference
+        // Shared layout helper
+        const getNewX = (existingArtifacts: any[], newType: string) => {
+          const lastArt = existingArtifacts[existingArtifacts.length - 1];
+          const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
+          const currentWidth = getWidth(newType);
+          return lastArt 
+            ? (lastArt.x || 0) + (lastArt.width || getWidth(lastArt.type)) + 120 
+            : -(currentWidth / 2);
+        };
+
+        // 1. Maintain full state in 'artifacts'
         setArtifacts(prev => {
            const updated = [...prev];
            let changed = false;
@@ -865,14 +880,14 @@ export default function ProjectPage() {
                    changed = true;
                }
              } else {
-               updated.push({ ...newArt, x: 0, y: 0 });
+               updated.push({ ...newArt, x: getNewX(updated, newArt.type), y: 0 });
                changed = true;
              }
            });
            return changed ? updated : prev;
         });
         
-        // 2. Manage the visible UI (throttledArtifacts)
+        // 2. Visible UI (throttledArtifacts)
         setThrottledArtifacts(prev => {
             const updated = [...prev];
             let changed = false;
@@ -881,30 +896,20 @@ export default function ProjectPage() {
               const existingIndex = updated.findIndex(a => a.title === newArt.title);
               
               if (existingIndex === -1) {
-                const lastArt = updated[updated.length - 1];
-                const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
-                const newX = lastArt ? (lastArt.x || 0) + getWidth(lastArt.type) + 80 : 0;
                 updated.push({ 
                   ...newArt, 
                   content: "", 
-                  x: newX, 
+                  x: getNewX(updated, newArt.type), 
                   y: 0, 
                   isComplete: false 
                 });
                 changed = true;
               } else {
-                 // Existing artifact: 
-                 // If we are still streaming, we mark it as NOT complete (isComplete: false)
-                 // but we DON'T update the content yet to avoid partial/broken renders.
-                 // This ensures the OLD version stays visible until the NEW version is ready.
                  if (status === 'streaming' && updated[existingIndex].isComplete) {
                     updated[existingIndex] = { ...updated[existingIndex], isComplete: false };
                     changed = true;
                  }
                  
-                 // If it's DONE (status ready or onFinish already triggered), 
-                 // the onFinish callback handles the final content update.
-                 // We can also double-check here just in case.
                  if (status === 'ready' && !updated[existingIndex].isComplete && newArt.isComplete) {
                     updated[existingIndex] = { 
                       ...updated[existingIndex], 

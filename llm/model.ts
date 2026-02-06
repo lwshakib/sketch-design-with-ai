@@ -1,41 +1,33 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
-let keyIndex = 0;
-let modelIndex = 0;
+let requestCount = 0;
 
 const MODELS = [
   "gemini-2.5-flash",
-  "gemini-2.5-flash-lite"
+  "gemini-2.5-flash-lite",
 ];
 
-export const getSingleAPIKey = () => {
+export const GeminiModel = () => {
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
     throw new Error("GOOGLE_API_KEY is not set");
   }
-  const keys = apiKey.split(",");
-  const selectedKey = keys[keyIndex % keys.length];
-  // Increment index for next call
-  keyIndex = (keyIndex + 1) % keys.length;
-  return selectedKey;
-};
-
-export const getSingleModel = () => {
-  const selectedModel = MODELS[modelIndex % MODELS.length];
-  // Increment index for next call
-  modelIndex = (modelIndex + 1) % MODELS.length;
-  return selectedModel;
-};
-
-export const GeminiModel = () => {
-  const model = getSingleModel();
-  const apiKey = getSingleAPIKey();
   
-  console.log(`[AI] Using model: ${model} (Index: ${modelIndex})`);
+  const keys = apiKey.split(",");
+  const currentKeyIndex = requestCount % keys.length;
+  const currentModelIndex = requestCount % MODELS.length;
+  
+  const selectedKey = keys[currentKeyIndex];
+  const selectedModel = MODELS[currentModelIndex];
+  
+  // Increment global counter for the NEXT call (rotation)
+  requestCount++;
+
+  console.log(`[AI] Requesting: ${selectedModel} (Key Index: ${currentKeyIndex}, Model Index: ${currentModelIndex})`);
 
   const google = createGoogleGenerativeAI({
-    apiKey: apiKey,
+    apiKey: selectedKey,
   });
   
-  return google(model); 
+  return google(selectedModel); 
 };
