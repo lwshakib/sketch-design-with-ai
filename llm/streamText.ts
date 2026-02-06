@@ -39,12 +39,34 @@ export async function streamText(messages: UIMessage[], options?: StreamTextOpti
   const examples = loadExamples();
   const systemPrompt = SYSTEM_PROMPT.replace("{{EXAMPLES}}", examples);
 
-  return _streamText({
-    model: GeminiModel(),
-    system: systemPrompt,
-    messages: await convertToModelMessages(messages),
-    maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
-    onFinish,
-    temperature: 0.7,
-  });
+  const MAX_RETRIES = 3;
+  let lastError;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      // Each call to GeminiModel() will now return a DIFFERENT model/key 
+      // due to the round-robin implementation in model.ts
+      return await _streamText({
+        model: GeminiModel(),
+        system: systemPrompt,
+        messages: await convertToModelMessages(messages),
+        maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
+        onFinish,
+        temperature: 0.7,
+      });
+    } catch (error) {
+      lastError = error;
+      console.error(`[AI] Attempt ${attempt} failed:`, error);
+      
+      if (attempt < MAX_RETRIES) {
+        console.log(`[AI] Retrying with a different model and API key...`);
+        // Small delay before retry
+        await new Promise(resolve => setTimeout(resolve, 500));
+        continue;
+      }
+    }
+  }
+
+  // If all retries fail, throw the last error
+  throw lastError;
 }
