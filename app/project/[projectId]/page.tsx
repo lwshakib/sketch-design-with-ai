@@ -717,7 +717,7 @@ export default function ProjectPage() {
     setMessages,
     status,
     stop,
-    reload,
+    error,
   } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
@@ -725,14 +725,9 @@ export default function ProjectPage() {
         projectId,
       },
     }),
-    onError: (error) => {
-      console.error(error);
-      toast.error("Engine encountered an error.", {
-        action: {
-          label: "Retry",
-          onClick: () => reload(),
-        },
-      });
+    onError: (err) => {
+      console.error(err);
+      toast.error("Engine encountered an error.");
     },
     onFinish: (message: any) => {
       const textContent = (message.parts?.find((p: any) => p.type === 'text') as any)?.text || message.content;
@@ -784,6 +779,25 @@ export default function ProjectPage() {
        console.log(data);
     }
   });
+  
+  const handleRetry = useCallback(() => {
+    const lastUserMessage = (messages as any[]).filter(m => m.role === 'user').at(-1);
+    if (lastUserMessage) {
+        const msg = lastUserMessage as any;
+        const text = typeof msg.content === 'string' 
+          ? msg.content 
+          : msg.parts?.find((p: any) => p.type === 'text')?.text || "";
+        
+        const files = msg.parts?.filter((p: any) => p.type === 'file').map((p: any) => ({
+          type: "file",
+          url: p.file?.url || p.url || p.file,
+          mediaType: p.file?.mediaType || p.mediaType || "image/*"
+        })) || [];
+
+        sendMessage({ text, files });
+    }
+  }, [messages, sendMessage]);
+
 
   useEffect(() => {
     const fetchProjectAndInitialize = async () => {
@@ -1860,6 +1874,23 @@ export default function ProjectPage() {
                             </div>
                           </div>
                         ))}
+                        
+                        {error && (
+                          <div className="flex justify-center p-6 border-t border-destructive/10 bg-destructive/5 rounded-2xl mx-4 my-2 animate-in fade-in slide-in-from-bottom-2">
+                            <div className="flex flex-col items-center gap-3">
+                              <p className="text-sm text-destructive font-medium">Message failed to send</p>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => handleRetry()}
+                                className="gap-2 text-destructive border-destructive/20 hover:bg-destructive/10 hover:text-destructive transition-all"
+                              >
+                                <RotateCcw className="size-3" />
+                                Retry sending now
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
