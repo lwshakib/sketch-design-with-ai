@@ -121,6 +121,30 @@ const getInjectedHTML = (html: string) => {
   }
 
   const headInjections = `
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style id="sketch-material-icons-fix">
+      .material-icons {
+        font-family: 'Material Icons' !important;
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-feature-settings: 'liga';
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        -moz-osx-font-smoothing: grayscale;
+        font-feature-settings: 'liga';
+      }
+    </style>
     <script id="sketch-tailwind-cdn" src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="sketch-tailwind-config">
       if (window.tailwind) {
@@ -1613,11 +1637,56 @@ export default function ProjectPage() {
     if (!iframe || !iframe.contentDocument?.body) return null;
     
     try {
+        // 1. Ensure fonts are loaded in the iframe
+        if (iframe.contentDocument.fonts) {
+            await iframe.contentDocument.fonts.ready;
+        }
+
+        // 2. Extra safety: ensure fonts are pre-loaded in the parent document too
+        // html2canvas sometimes needs this to resolve font-faces during cloning
+        const fontLinks = iframe.contentDocument.querySelectorAll('link[rel="stylesheet"]');
+        for (const link of Array.from(fontLinks)) {
+            const href = (link as HTMLLinkElement).href;
+            if (href.includes('fonts.googleapis.com')) {
+                if (!document.querySelector(`link[href="${href}"]`)) {
+                    const newLink = document.createElement('link');
+                    newLink.rel = 'stylesheet';
+                    newLink.href = href;
+                    document.head.appendChild(newLink);
+                }
+            }
+        }
+        
+        // Wait for parent fonts just in case
+        if (document.fonts) await document.fonts.ready;
+
+        // 3. Significant delay for styles and ligatures to settle
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         const canvas = await html2canvas(iframe.contentDocument.body, {
             useCORS: true,
             allowTaint: true,
-            backgroundColor: null,
-            scale: 2 // High quality
+            backgroundColor: appliedTheme?.cssVars.background || '#ffffff',
+            scale: 2,
+            logging: false,
+            onclone: (clonedDoc) => {
+                // Ensure the cloned document has the same head content (fonts/styles)
+                if (iframe.contentDocument) {
+                    clonedDoc.head.innerHTML = iframe.contentDocument.head.innerHTML;
+                }
+
+                // Force material icons to render as ligatures in the clone
+                const icons = clonedDoc.querySelectorAll('.material-icons');
+                icons.forEach(icon => {
+                    const el = icon as HTMLElement;
+                    el.style.fontFamily = "'Material Icons'";
+                    el.style.textRendering = "optimizeLegibility";
+                    el.style.fontFeatureSettings = "'liga'";
+                    (el.style as any)['-webkit-font-feature-settings'] = "'liga'";
+                    el.style.display = "inline-block";
+                    el.style.visibility = "visible";
+                });
+            }
         });
         return canvas.toDataURL("image/png");
     } catch (error) {
