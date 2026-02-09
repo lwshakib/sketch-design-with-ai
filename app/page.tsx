@@ -144,7 +144,6 @@ interface Attachment {
 }
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'app' | 'web'>("app");
   const [inputValue, setInputValue] = useState("");
   const [isMounted, setIsMounted] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -199,13 +198,13 @@ export default function Home() {
 
   useEffect(() => {
     if (isMounted) {
-      const allPrompts = PROMPTS[activeTab];
-      const shuffled = [...allPrompts]
+      const allPrompts = [...PROMPTS.app, ...PROMPTS.web];
+      const shuffled = allPrompts
         .sort(() => Math.random() - 0.5)
         .slice(0, 3);
       setShuffledPrompts(shuffled);
     }
-  }, [activeTab, isMounted]);
+  }, [isMounted]);
 
   const onSubmit = async () => {
     if (!inputValue.trim() && attachments.length === 0) return;
@@ -360,53 +359,17 @@ export default function Home() {
             
             {/* Main Title Row */}
             <div className="flex items-center justify-center gap-4 flex-wrap text-center">
-              <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground whitespace-nowrap">
-                Start a new
-              </h1>
-              
-              {/* Custom Toggle */}
-              <div className="bg-secondary p-1 rounded-xl flex items-center border border-border shadow-2xl transition-colors">
-                <button
-                  onClick={() => setActiveTab("app")}
-                  className={cn(
-                    "px-4 py-1.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2",
-                    activeTab === "app" ? "bg-card text-foreground shadow-lg" : "text-muted-foreground hover:text-foreground/80"
-                  )}
-                >
-                  <Smartphone className="h-4 w-4" />
-                  App
-                </button>
-                <button
-                  onClick={() => setActiveTab("web")}
-                  className={cn(
-                    "px-4 py-1.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2",
-                    activeTab === "web" ? "bg-card text-foreground shadow-lg" : "text-muted-foreground hover:text-foreground/80"
-                  )}
-                >
-                   <Monitor className="h-4 w-4" />
-                  Web
-                </button>
-              </div>
-
-              <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground whitespace-nowrap">
-                design
+              <h1 className="text-3xl md:text-5xl font-black tracking-tight text-foreground whitespace-nowrap uppercase italic translate-y-2">
+                Start a new design
               </h1>
             </div>
 
             {/* Premium Chat Input */}
             <div className="relative group w-full">
               {/* Outer Glow Overlay */}
-              <div className={cn(
-                "absolute -inset-[1px] rounded-[32px] opacity-0 group-focus-within:opacity-100 transition-all duration-700 blur-xl pointer-events-none",
-                activeTab === 'app' ? "bg-purple-500/20" : "bg-blue-500/20"
-              )} />
+              <div className="absolute -inset-[1px] rounded-[32px] opacity-0 group-focus-within:opacity-100 transition-all duration-700 blur-xl pointer-events-none bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20" />
               
-              <div className={cn(
-                "relative bg-card rounded-[32px] p-8 space-y-4 border transition-all duration-500 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)]",
-                activeTab === 'app' 
-                  ? "border-purple-500/10 group-focus-within:border-purple-500/40 group-focus-within:shadow-[0_0_40px_-5px_rgba(168,85,247,0.15)]" 
-                  : "border-blue-500/10 group-focus-within:border-blue-500/40 group-focus-within:shadow-[0_0_40px_-5px_rgba(59,130,246,0.15)]"
-              )}>
+              <div className="relative bg-card rounded-[32px] p-8 space-y-4 border border-white/5 transition-all duration-500 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] group-focus-within:border-primary/20 group-focus-within:shadow-[0_0_60px_-10px_rgba(var(--primary-rgb),0.2)]">
                 
                 {/* Image Previews */}
                 <AnimatePresence>
