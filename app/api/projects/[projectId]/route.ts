@@ -29,6 +29,11 @@ export async function GET(
             createdAt: "asc",
           }
         },
+        screens: {
+          orderBy: {
+            createdAt: "asc",
+          }
+        }
       }
     });
 
