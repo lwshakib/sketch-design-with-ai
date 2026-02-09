@@ -1,6 +1,6 @@
 export interface Artifact {
   content: string;
-  type: 'web' | 'app' | 'general';
+  type: 'web' | 'app';
   isComplete: boolean;
   title: string;
   x?: number;
@@ -11,16 +11,11 @@ export interface Artifact {
 
 /**
  * Extracts all HTML artifacts from AI responses
- * Supports <artifact>, <web_artifact>, and <app_artifact> with optional title attribute
+ * Supports <artifact>, <web_artifact>, <mobile_artifact>, and <app_artifact>
  */
 export function extractArtifacts(text: string): Artifact[] {
   const artifacts: Artifact[] = [];
-  const tagTypes = [
-    { start: '<web_artifact', end: '</web_artifact>', type: 'web' as const },
-    { start: '<app_artifact', end: '</app_artifact>', type: 'app' as const },
-    { start: '<artifact', end: '</artifact>', type: 'general' as const },
-  ];
-
+  
   // Regex to find any of the opening tags and their content
   // Matches <web_artifact title="..."> or <web_artifact>
   const tagPattern = /<(web_artifact|app_artifact|artifact)([^>]*)>([\s\S]*?)(?:<\/\1>|$)/gi;
@@ -30,15 +25,14 @@ export function extractArtifacts(text: string): Artifact[] {
     const tagName = match[1].toLowerCase();
     const attributes = match[2];
     const content = match[3].trim();
-    const isComplete = text.toLowerCase().includes(`</${tagName}>`, match.index + match[0].length - (text.toLowerCase().endsWith(`</${tagName}>`) ? 0 : 1));
 
     // Simple title attribute parser
     const titleMatch = attributes.match(/title=["']([^"']+)["']/i);
-    const title = titleMatch ? titleMatch[1] : (tagName === 'web_artifact' ? 'Web Design' : tagName === 'app_artifact' ? 'App Design' : 'Component');
+    const defaultTitle = tagName === 'web_artifact' ? 'Web Design' : 'App Design';
+    const title = titleMatch ? titleMatch[1] : defaultTitle;
 
-    let type: 'web' | 'app' | 'general' = 'general';
+    let type: 'web' | 'app' = 'app';
     if (tagName === 'web_artifact') type = 'web';
-    else if (tagName === 'app_artifact') type = 'app';
 
     artifacts.push({
       content,
@@ -48,15 +42,15 @@ export function extractArtifacts(text: string): Artifact[] {
     });
   }
 
-  // Fallback for raw HTML without tags (Legacy support and error recovery)
+  // Fallback for raw HTML without tags
   if (artifacts.length === 0) {
     const htmlMarkers = ['<!doctype html>', '<html', '<body', '<script', '<style'];
     const lowerText = text.toLowerCase();
     const hasHtml = htmlMarkers.some(marker => lowerText.includes(marker));
     
     if (hasHtml && text.length > 50) {
-      let type: 'web' | 'app' | 'general' = 'web';
-      if (lowerText.includes('mobile') || lowerText.includes('phone') || lowerText.includes('app_artifact')) {
+      let type: 'web' | 'app' = 'web';
+      if (lowerText.includes('mobile') || lowerText.includes('phone') || lowerText.includes('app') || lowerText.includes('iphone')) {
         type = 'app';
       }
 
