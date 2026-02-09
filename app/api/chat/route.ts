@@ -1,9 +1,8 @@
 import { auth } from "@/lib/auth";
-import { streamText } from "@/llm/streamText";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { extractArtifacts, stripArtifact } from "@/lib/artifact-renderer";
+import { inngest } from "@/inngest/client";
 
 export async function POST(req: Request) {
   try {
@@ -33,97 +32,42 @@ export async function POST(req: Request) {
       );
     }
 
-    // Save user message
+    // Save user message - extract text from either content or parts
+    const messageContent = typeof lastMessage.content === 'string' 
+      ? lastMessage.content 
+      : lastMessage.parts?.find((p: any) => p.type === 'text')?.text || "";
+    
     await prisma.message.create({
       data: {
         projectId: projectId,
         role: "user",
-        parts: lastMessage.parts
+        content: messageContent
       },
     });
 
-    // Save assistant message after streaming completes
-    const onFinish: any = async (result: any) => {
-      try {
-        const fullText = result.text;
-        const artifacts = extractArtifacts(fullText);
-        const strippedText = stripArtifact(fullText);
+    // Normalize messages for Inngest - convertToModelMessages expects { role, content } format
+    const normalizedMessages = (messages || []).map((msg: any) => {
+      const content = typeof msg.content === 'string' 
+        ? msg.content 
+        : msg.parts?.find((p: any) => p.type === 'text')?.text || "";
+      return {
+        role: msg.role,
+        content
+      };
+    }).filter((msg: any) => msg.content); // Remove empty messages
 
-        await prisma.message.create({
-          data: {
-            projectId: projectId,
-            role: "assistant",
-            parts: [{ type: 'text', text: strippedText }],
-          },
-        });
+    // Trigger Inngest function
+    await inngest.send({
+      name: "app/design.generate",
+      data: {
+        messages: normalizedMessages,
+        projectId,
+      },
+    });
 
-        if (artifacts.length > 0) {
-          const project = await prisma.project.findUnique({
-            where: { id: projectId },
-            select: { canvasData: true }
-          });
-          
-          const currentCanvasData = (project?.canvasData as any) || {};
-          const currentArtifacts = currentCanvasData.artifacts || [];
-          
-          // Merge logic: Update existing by title, or append new
-          const updatedArtifacts = [...currentArtifacts];
-          
-          artifacts.forEach(newArt => {
-            const existingIndex = updatedArtifacts.findIndex(a => a.title === newArt.title);
-            if (existingIndex >= 0) {
-              updatedArtifacts[existingIndex] = {
-                ...updatedArtifacts[existingIndex],
-                content: newArt.content,
-                isComplete: newArt.isComplete
-              };
-            } else {
-              // Add new artifact with a default offset to prevent overlapping
-              const lastArt = updatedArtifacts[updatedArtifacts.length - 1];
-              const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
-              const currentWidth = getWidth(newArt.type);
-              
-              // Center the first artifact, or place the next one to the right
-              const newX = lastArt 
-                ? (lastArt.x || 0) + (lastArt.width || getWidth(lastArt.type)) + 120 
-                : -(currentWidth / 2);
-
-              updatedArtifacts.push({
-                ...newArt,
-                x: newX,
-                y: 0
-              });
-            }
-          });
-          
-          await prisma.project.update({
-            where: { id: projectId },
-            data: {
-              canvasData: {
-                ...currentCanvasData,
-                artifacts: updatedArtifacts,
-              }
-            }
-          });
-        }
-      } catch (error) {
-        console.error("[CHAT] Failed to save assistant message or artifacts:", error);
-      }
-    };
-
-    try {
-      const result = await streamText(messages, {
-        onFinish,
-      });
-
-      // Create a custom response using the Vercel AI SDK method
-      return result.toUIMessageStreamResponse();
-    } catch (error) {
-      console.error("[CHAT] Error during streaming:", error);
-      throw error;
-    }
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[CHAT]", error);
-    return NextResponse.json({ error: "Failed to chat" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to start design generation" }, { status: 500 });
   }
 }
