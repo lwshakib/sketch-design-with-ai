@@ -83,6 +83,7 @@ model Project {
   userId     String
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages   Message[]
+  screens    Screen[]
   canvasData Json?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
@@ -99,11 +100,32 @@ enum MESSAGE_ROLE {
 model Message {
   id          String   @id @default(cuid())
   role        MESSAGE_ROLE @default(user)
-  parts       Json[]
+  content     String   @db.Text
+  plan        Json?
   projectId   String
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
 
   @@index([projectId])
   @@map("message")
+}
+
+model Screen {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  type      String   // web | mobile | app | general
+  x         Float    @default(0)
+  y         Float    @default(0)
+  width     Int?
+  height    Int?
+  
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@map("screen")
 }
