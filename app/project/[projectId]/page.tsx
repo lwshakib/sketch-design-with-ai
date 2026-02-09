@@ -50,7 +50,17 @@ import {
   Palette,
   Square,
   Save,
+  Copy,
+  Check,
+  Clipboard,
 } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserMenu } from "@/components/user-menu";
@@ -728,6 +738,9 @@ export default function ProjectPage() {
   const [isEditTitleDialogOpen, setIsEditTitleDialogOpen] = useState(false);
   const [editingTitle, setEditingTitle] = useState("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isExportSheetOpen, setIsExportSheetOpen] = useState(false);
+  const [exportArtifactIndex, setExportArtifactIndex] = useState<number | null>(null);
+  const [hasCopied, setHasCopied] = useState(false);
 
   // Refs to keep track of state in wheel event listeners without re-attaching
   const zoomRef = useRef(zoom);
@@ -1550,6 +1563,17 @@ export default function ProjectPage() {
     toast.success("Design exported as HTML");
   };
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setHasCopied(true);
+      toast.success("Code copied to clipboard");
+      setTimeout(() => setHasCopied(false), 2000);
+    } catch (err) {
+      toast.error("Failed to copy code");
+    }
+  };
+
   const openInNewTab = () => {
     if (selectedArtifactIndex === null) return;
     const currentArtifact = throttledArtifacts[selectedArtifactIndex];
@@ -1717,25 +1741,22 @@ export default function ProjectPage() {
     const dataUrl = await captureFrameImage(index);
     
     const zip = new JSZip();
-    const folderName = artifact.title.replace(/\s+/g, '_');
-    const folder = zip.folder(folderName);
+    const fileName = artifact.title.replace(/\s+/g, '_');
     
-    if (folder) {
-        // Add HTML
-        folder.file("index.html", getInjectedHTML(artifact.content));
-        
-        // Add PNG
-        if (dataUrl) {
-            const base64Data = dataUrl.replace(/^data:image\/(png|jpg);base64,/, "");
-            folder.file("preview.png", base64Data, { base64: true });
-        }
+    // Add HTML
+    zip.file("code.html", getInjectedHTML(artifact.content));
+    
+    // Add PNG
+    if (dataUrl) {
+        const base64Data = dataUrl.replace(/^data:image\/(png|jpg);base64,/, "");
+        zip.file("screen.png", base64Data, { base64: true });
     }
     
     const content = await zip.generateAsync({ type: "blob" });
     toast.dismiss();
     
     const link = document.createElement('a');
-    link.download = `${folderName}_Package.zip`;
+    link.download = `${fileName}_Package.zip`;
     link.href = URL.createObjectURL(content);
     link.click();
     toast.success("Project assets exported");
@@ -2273,25 +2294,21 @@ export default function ProjectPage() {
                                 View Code
                               </DropdownMenuItem>
                               <DropdownMenuItem 
+                                onClick={() => {
+                                  setExportArtifactIndex(index);
+                                  setIsExportSheetOpen(true);
+                                }}
+                                className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
+                              >
+                                <Share2 className="h-4 w-4 text-muted-foreground" />
+                                Export
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
                                 onClick={() => handleExportZip(index)}
                                 className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
                               >
-                                <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                                Export (ZIP)
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleDownloadImage(index)}
-                                className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
-                              >
-                                <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                                Download Image
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={exportAsHTML}
-                                className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
-                              >
                                 <Download className="h-4 w-4 text-muted-foreground" />
-                                Download HTML
+                                Download
                               </DropdownMenuItem>
                               <div className="h-px bg-border my-1" />
                               <DropdownMenuItem 
@@ -2299,7 +2316,7 @@ export default function ProjectPage() {
                                 className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-destructive/20 text-destructive cursor-pointer text-[13px]"
                               >
                                 <Trash2 className="h-4 w-4" />
-                                Delete Screen
+                                Delete
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -2695,22 +2712,109 @@ export default function ProjectPage() {
       </Dialog>
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your
-              project and remove your data from our servers.
+            <AlertDialogTitle className="text-foreground">Delete Project</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              Are you sure you want to delete this project? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteProject} className="bg-destructive hover:bg-destructive/90">
-              Delete Project
+            <AlertDialogCancel className="bg-muted text-foreground hover:bg-muted/80">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteProject}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Export Sheet */}
+      <Sheet open={isExportSheetOpen} onOpenChange={setIsExportSheetOpen}>
+        <SheetContent side="right" className="w-[400px] bg-card border-l border-border p-0">
+          <SheetHeader className="p-6 border-b border-border bg-sidebar/50">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Share2 className="size-4 text-primary" />
+              </div>
+              <SheetTitle className="text-lg font-bold text-foreground">Export Design</SheetTitle>
+            </div>
+            <SheetDescription className="text-muted-foreground text-sm">
+              Prepare and package "{exportArtifactIndex !== null ? throttledArtifacts[exportArtifactIndex]?.title : ''}" for production.
+            </SheetDescription>
+          </SheetHeader>
+
+          <div className="p-6 space-y-8">
+            {/* Export Options */}
+            <div className="space-y-4">
+              <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest px-1">Production Assets</h4>
+              
+              <div className="grid gap-3">
+                <button 
+                  onClick={() => {
+                    if (exportArtifactIndex !== null) handleExportZip(exportArtifactIndex);
+                    setIsExportSheetOpen(false);
+                  }}
+                  className="group flex items-start gap-4 p-4 bg-muted/40 border border-border rounded-2xl hover:bg-muted/80 hover:border-primary/30 transition-all text-left"
+                >
+                  <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Download className="size-5 text-primary" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-bold text-foreground">Download Project (ZIP)</span>
+                    <span className="text-[11px] text-muted-foreground leading-relaxed">
+                      Includes the complete HTML, CSS, and a high-resolution preview image.
+                    </span>
+                  </div>
+                </button>
+
+                <button 
+                  onClick={() => {
+                    if (exportArtifactIndex !== null) {
+                      const art = throttledArtifacts[exportArtifactIndex];
+                      copyToClipboard(getInjectedHTML(art.content));
+                    }
+                  }}
+                  className="group flex items-start gap-4 p-4 bg-muted/40 border border-border rounded-2xl hover:bg-muted/80 hover:border-primary/30 transition-all text-left"
+                >
+                  <div className="size-10 rounded-xl bg-orange-500/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    {hasCopied ? <Check className="size-5 text-orange-500" /> : <Clipboard className="size-5 text-orange-500" />}
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-bold text-foreground">Copy Code to Clipboard</span>
+                    <span className="text-[11px] text-muted-foreground leading-relaxed">
+                      Instant copy of the production-ready HTML and Tailwind CSS structure.
+                    </span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Preview Section */}
+            <div className="space-y-4">
+               <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest px-1">Design Specs</h4>
+               <div className="p-4 bg-muted/40 border border-border rounded-2xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-muted-foreground font-medium">Screen Type</span>
+                    <span className="text-[11px] font-bold text-foreground">
+                      {exportArtifactIndex !== null ? (throttledArtifacts[exportArtifactIndex]?.type === 'app' ? 'Mobile App' : 'Web Application') : ''}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-muted-foreground font-medium">Framework</span>
+                    <span className="text-[11px] font-bold text-foreground">Tailwind CSS (CDN)</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-muted-foreground font-medium">Typography</span>
+                    <span className="text-[11px] font-bold text-foreground">Outfit / Inter</span>
+                  </div>
+               </div>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
