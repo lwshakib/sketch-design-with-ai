@@ -53,6 +53,7 @@ import {
   Copy,
   Check,
   Clipboard,
+  Files,
 } from "lucide-react";
 import {
   Sheet,
@@ -68,6 +69,8 @@ import { Logo, LogoIcon } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DefaultChatTransport } from "ai";
+import { useInngestSubscription } from "@inngest/realtime/hooks";
+import { fetchInngestToken } from "@/app/actions/inngest";
 import { extractArtifacts, stripArtifact, type Artifact } from "@/lib/artifact-renderer";
 import {
   Conversation,
@@ -84,6 +87,7 @@ import {
 } from "@/components/ai-elements/message";
 import { ElementSettings } from "./element-settings";
 import { ThemeSettings } from "./theme-settings";
+import { PlanningDisplay } from "@/components/planning-display";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -714,17 +718,18 @@ export default function ProjectPage() {
   const [isPanning, setIsPanning] = useState(false);
   const [isDraggingFrame, setIsDraggingFrame] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
-  const [dynamicFrameHeights, setDynamicFrameHeights] = useState<Record<number, number>>({});
+  const [dynamicFrameHeights, setDynamicFrameHeights] = useState<Record<string, number>>({});
   const [selectedArtifactIndex, setSelectedArtifactIndex] = useState<number | null>(null);
-  const iframeRefs = useRef<Record<number, HTMLIFrameElement | null>>({});
+  const iframeRefs = useRef<Record<string, HTMLIFrameElement | null>>({});
   const [leftSidebarMode, setLeftSidebarMode] = useState<'chat' | 'properties' | 'theme'>('chat');
   const isEditMode = leftSidebarMode === 'properties';
   const [activeThemeId, setActiveThemeId] = useState<string | null>(null);
   const [appliedTheme, setAppliedTheme] = useState<any>(null);
   const [selectedEl, setSelectedEl] = useState<HTMLElement | null>(null);
   const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
-  const [artifactPreviewModes, setArtifactPreviewModes] = useState<Record<number, 'mobile' | 'tablet' | 'desktop' | null>>({});
+  const [artifactPreviewModes, setArtifactPreviewModes] = useState<Record<string, 'mobile' | 'tablet' | 'desktop' | null>>({});
   const [isCodeViewerOpen, setIsCodeViewerOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [viewingCode, setViewingCode] = useState("");
   const [viewingTitle, setViewingTitle] = useState("");
   const [isRegenerateDialogOpen, setIsRegenerateDialogOpen] = useState(false);
@@ -741,13 +746,11 @@ export default function ProjectPage() {
   const [isExportSheetOpen, setIsExportSheetOpen] = useState(false);
   const [exportArtifactIndex, setExportArtifactIndex] = useState<number | null>(null);
   const [hasCopied, setHasCopied] = useState(false);
-
-  // Refs to keep track of state in wheel event listeners without re-attaching
-  const zoomRef = useRef(zoom);
-  const canvasOffsetRef = useRef(canvasOffset);
-  useEffect(() => { zoomRef.current = zoom; }, [zoom]);
-  useEffect(() => { canvasOffsetRef.current = canvasOffset; }, [canvasOffset]);
-
+  const [designPlan, setDesignPlan] = useState<{ title: string; type: string; description: string }[]>([]);
+  const [realtimeStatus, setRealtimeStatus] = useState<{ message: string; status: string; currentScreen?: string } | null>(null);
+  const [isPlanDialogOpen, setIsPlanDialogOpen] = useState(false);
+  const [viewingPlan, setViewingPlan] = useState<any>(null);
+  
   const {
     messages,
     sendMessage,
@@ -766,50 +769,8 @@ export default function ProjectPage() {
       console.error(err);
       toast.error("Engine encountered an error.");
     },
-    onFinish: (message: any) => {
-      const textContent = (message.parts?.find((p: any) => p.type === 'text') as any)?.text || message.content;
-      if (typeof textContent === 'string') {
-        const artifactData = extractArtifacts(textContent);
-        if (artifactData.length > 0) {
-          // Merge with existing artifacts to preserve positions
-          const mergeArtifacts = (prev: any[]) => {
-            const updated = [...prev];
-            let changed = false;
-            artifactData.forEach(newArt => {
-              const existingIndex = updated.findIndex(a => a.title === newArt.title);
-              if (existingIndex >= 0) {
-                // Only update if content or isComplete actually changed
-                if (updated[existingIndex].content !== newArt.content || !updated[existingIndex].isComplete) {
-                  updated[existingIndex] = {
-                    ...updated[existingIndex],
-                    content: newArt.content,
-                    isComplete: true
-                  };
-                  changed = true;
-                }
-              } else {
-                const lastArt = updated[updated.length - 1];
-                const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
-                const currentWidth = getWidth(newArt.type);
-                
-                // Center the first artifact, or place the next one to the right
-                const newX = lastArt 
-                  ? (lastArt.x || 0) + (lastArt.width || getWidth(lastArt.type)) + 120 
-                  : -(currentWidth / 2);
-
-                updated.push({ ...newArt, x: newX, y: 0, isComplete: true });
-                changed = true;
-              }
-            });
-            return changed ? updated : prev;
-          };
-
-          setArtifacts(mergeArtifacts);
-          setThrottledArtifacts(mergeArtifacts);
-        } else if (textContent.toLowerCase().includes('<!doctype') || textContent.toLowerCase().includes('<html')) {
-           toast.error("Design engine produced an incomplete result.");
-        }
-      }
+    onFinish: () => {
+      // Background generation started, polling will handle result
     },
     onData: (data) => {
        // Optional: handle custom data if backend sends it
@@ -821,20 +782,132 @@ export default function ProjectPage() {
     const lastUserMessage = (messages as any[]).filter(m => m.role === 'user').at(-1);
     if (lastUserMessage) {
         const msg = lastUserMessage as any;
-        const text = typeof msg.content === 'string' 
-          ? msg.content 
-          : msg.parts?.find((p: any) => p.type === 'text')?.text || "";
+        const text = msg.content || "";
         
-        const files = msg.parts?.filter((p: any) => p.type === 'file').map((p: any) => ({
-          type: "file",
-          url: p.file?.url || p.url || p.file,
-          mediaType: p.file?.mediaType || p.mediaType || "image/*"
-        })) || [];
-
-        sendMessage({ text, files });
+        setIsGenerating(true);
+        sendMessage({ text, files: [] }); // Files not stored in new simplified model for now
     }
   }, [messages, sendMessage]);
 
+  // Inngest Realtime Subscription
+  const { data: realtimeData } = useInngestSubscription({
+    refreshToken: () => fetchInngestToken(projectId as string),
+  });
+
+  // Handle incoming realtime data
+  useEffect(() => {
+    if (!realtimeData || realtimeData.length === 0) return;
+    
+    // Process messages in order
+    realtimeData.forEach((event: any) => {
+      if (event.topic === 'plan') {
+        const plan = event.data;
+        if (plan?.screens) {
+          setDesignPlan(plan.screens);
+        }
+      } else if (event.topic === 'status') {
+        setRealtimeStatus(event.data);
+        
+        // If vision is received, update messages locally
+        if (event.data.status === 'vision') {
+          setMessages(prev => {
+            const assistantMessages = prev.filter(m => m.role === 'assistant');
+            const visionExists = assistantMessages.some((m: any) => {
+              return m.content && m.content.includes(event.data.message);
+            });
+            if (visionExists) return prev;
+            return [...prev, { 
+              id: Math.random().toString(), 
+              role: 'assistant', 
+              content: event.data.message,
+            } as any];
+          });
+        }
+
+        // All screens finished
+        if (event.data.status === 'complete') {
+          setIsGenerating(false);
+          toast.success("Design generation complete!");
+        }
+
+        // If a screen is complete, update artifacts locally for instant view
+        if (event.data.status === 'partial_complete' && event.data.screen) {
+          const newScreen = event.data.screen;
+          
+          const updateFn = (prev: any[]) => {
+            const updated = [...prev];
+            const idx = updated.findIndex(a => a.title === newScreen.title);
+            if (idx >= 0) {
+              updated[idx] = { ...updated[idx], ...newScreen, isComplete: true };
+            } else {
+              const getNewX = (existing: any[], type: string) => {
+                const last = existing[existing.length - 1];
+                const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
+                const currentWidth = getWidth(type);
+                return last 
+                  ? (last.x || 0) + (last.width || getWidth(last.type)) + 120 
+                  : -(currentWidth / 2);
+              };
+              updated.push({ ...newScreen, isComplete: true, x: getNewX(updated, newScreen.type), y: 0 });
+            }
+            return updated;
+          };
+
+          setArtifacts(updateFn);
+          setThrottledArtifacts(updateFn);
+        }
+      }
+    });
+  }, [realtimeData, setMessages, projectId]);
+
+  // Refs to keep track of state in wheel event listeners without re-attaching
+  const zoomRef = useRef(zoom);
+  const canvasOffsetRef = useRef(canvasOffset);
+  useEffect(() => { zoomRef.current = zoom; }, [zoom]);
+  useEffect(() => { canvasOffsetRef.current = canvasOffset; }, [canvasOffset]);
+
+
+  useEffect(() => {
+    let pollInterval: NodeJS.Timeout;
+
+    const pollProject = async () => {
+      try {
+        const res = await fetch(`/api/projects/${projectId}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        // Update project, artifacts, and messages
+        setProject(data);
+        if (data.screens) {
+          const fetchedArtifacts = data.screens.map((s: any) => ({ ...s, isComplete: true }));
+          setArtifacts(fetchedArtifacts);
+          setThrottledArtifacts(fetchedArtifacts);
+        }
+
+        // Check if we are done based on screens vs plan
+        const planCount = designPlan.length;
+        const screensCount = data.screens?.length || 0;
+        
+        if (planCount > 0 && screensCount >= planCount) {
+             setIsGenerating(false);
+        }
+
+        if (data.messages && data.messages.length > 0) {
+          setMessages(data.messages);
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    };
+
+    if (isGenerating) {
+      pollInterval = setInterval(pollProject, 3000);
+    }
+
+    return () => {
+      if (pollInterval) clearInterval(pollInterval);
+    };
+  }, [isGenerating, projectId, setMessages]);
 
   useEffect(() => {
     const fetchProjectAndInitialize = async () => {
@@ -844,13 +917,18 @@ export default function ProjectPage() {
         const data = await res.json();
         setProject(data);
         
+        if (data.messages) {
+          setMessages(data.messages);
+        }
+
         if (data.canvasData) {
           if (data.canvasData.zoom) setZoom(data.canvasData.zoom);
           if (data.canvasData.canvasOffset) setCanvasOffset(data.canvasData.canvasOffset);
-          if (data.canvasData.framePos) setFramePos(data.canvasData.framePos);
-          if (data.canvasData.artifacts) {
-            setArtifacts(data.canvasData.artifacts);
-            setThrottledArtifacts(data.canvasData.artifacts);
+          if (data.canvasData. framePos) setFramePos(data.canvasData.framePos);
+          if (data.screens) {
+            const fetchedArtifacts = data.screens.map((s: any) => ({ ...s, isComplete: true }));
+            setArtifacts(fetchedArtifacts);
+            setThrottledArtifacts(fetchedArtifacts);
           }
           if (data.canvasData.appliedTheme) {
             setAppliedTheme(data.canvasData.appliedTheme);
@@ -985,15 +1063,18 @@ export default function ProjectPage() {
       if (event.data.type === 'HEIGHT_UPDATE' && typeof event.data.height === 'number') {
         const sourceWindow = event.source as Window;
         const iframes = document.querySelectorAll('iframe');
-        iframes.forEach((iframe, index) => {
+        iframes.forEach((iframe) => {
           if (iframe.contentWindow === sourceWindow) {
-            setDynamicFrameHeights(prev => {
-              const currentHeight = prev[index] || 0;
-              if (Math.abs(currentHeight - event.data.height) > 10) { // Increased threshold to prevent vibration
-                 return { ...prev, [index]: event.data.height };
-              }
-              return prev;
-            });
+            const artifactTitle = (iframe as any).dataset.artifactTitle;
+            if (artifactTitle) {
+              setDynamicFrameHeights(prev => {
+                const currentHeight = prev[artifactTitle] || 0;
+                if (Math.abs(currentHeight - event.data.height) > 10) {
+                   return { ...prev, [artifactTitle]: event.data.height };
+                }
+                return prev;
+              });
+            }
           }
         });
       }
@@ -1055,7 +1136,10 @@ export default function ProjectPage() {
 
   const commitEdits = useCallback(() => {
     if (selectedArtifactIndex === null) return;
-    const iframe = iframeRefs.current[selectedArtifactIndex];
+    const selectedArtifact = throttledArtifacts[selectedArtifactIndex];
+    if (!selectedArtifact) return;
+
+    const iframe = iframeRefs.current[selectedArtifact.title];
     if (!iframe?.contentDocument) return;
 
     const currentArtifact = throttledArtifacts[selectedArtifactIndex];
@@ -1099,7 +1183,10 @@ export default function ProjectPage() {
   // Handle Edit Mode selection
   useEffect(() => {
     if (selectedArtifactIndex === null) return;
-    const iframe = iframeRefs.current[selectedArtifactIndex];
+    const currentArtifact = throttledArtifacts[selectedArtifactIndex];
+    if (!currentArtifact) return;
+
+    const iframe = iframeRefs.current[currentArtifact.title];
     if (!iframe || !isEditMode) {
       setHoveredEl(null);
       setSelectedEl(null);
@@ -1341,6 +1428,15 @@ export default function ProjectPage() {
         }
         
         next[selectedArtifactIndex] = { ...art, width: newWidth, height: newHeight, x: newX, y: newY };
+        
+        // Clear preview mode on manual resize
+        if (artifactPreviewModes[art.title]) {
+          setArtifactPreviewModes(prev => {
+            const n = { ...prev };
+            delete n[art.title];
+            return n;
+          });
+        }
         return next;
       };
 
@@ -1364,9 +1460,9 @@ export default function ProjectPage() {
     setSelectedArtifactIndex(index);
     
     const art = throttledArtifacts[index];
-    const mode = artifactPreviewModes[index];
+    const mode = artifactPreviewModes[art.title];
     const defaultWidth = mode === 'mobile' ? 380 : mode === 'tablet' ? 768 : mode === 'desktop' ? 1280 : (art.type === 'app' ? 380 : 1024);
-    const defaultHeight = dynamicFrameHeights[index] || 800;
+    const defaultHeight = dynamicFrameHeights[art.title] || 800;
 
     resizingStartSize.current = { 
       width: art.width || defaultWidth, 
@@ -1594,6 +1690,10 @@ export default function ProjectPage() {
 
     if (!input.trim() && attachments.length === 0) return;
     
+    setIsGenerating(true);
+    setDesignPlan([]);
+    setRealtimeStatus(null);
+    
     sendMessage({
       text: input.trim(),
       files: attachments.map(a => ({ type: "file" as const, url: a.url, mediaType: "image/*" }))
@@ -1622,6 +1722,7 @@ export default function ProjectPage() {
     }
 
     if (prompt) {
+        setIsGenerating(true);
         sendMessage({ text: prompt });
         toast.info(action === 'more' ? "Architecting more pages..." : "Exploring variations...");
     }
@@ -1642,6 +1743,7 @@ export default function ProjectPage() {
       prompt = `Please regenerate and improve the "${processingArtifact.title}" screen. Refine the layout, enhance the visual hierarchy, and ensure it follows the highest-fidelity design standards. IMPORTANT: Use the EXACT title "${processingArtifact.title}" in your artifact tag so it replaces the previous version.`;
     }
 
+    setIsGenerating(true);
     sendMessage({ text: prompt });
     toast.info("Regenerating screen...");
     setIsRegenerateDialogOpen(false);
@@ -1657,7 +1759,9 @@ export default function ProjectPage() {
   };
 
   const captureFrameImage = async (index: number): Promise<string | null> => {
-    const iframe = iframeRefs.current[index];
+    const currentArtifact = throttledArtifacts[index];
+    if (!currentArtifact) return null;
+    const iframe = iframeRefs.current[currentArtifact.title];
     if (!iframe || !iframe.contentDocument?.body) return null;
     
     try {
@@ -1863,7 +1967,9 @@ export default function ProjectPage() {
                       </div>
                     ) : (
                       <div className="">
-                        {messages.map((message) => (
+                        {messages.map((message) => {
+                          const msg = message as any;
+                          return (
                           <div 
                             key={message.id} 
                             className={cn(
@@ -1873,10 +1979,10 @@ export default function ProjectPage() {
                             <div className="px-5 py-5 flex gap-3">
                               {/* Avatar */}
                               {message.role === 'user' ? (
-                                session.data?.user?.image ? (
+                                (session.data?.user as any)?.image ? (
                                   <img 
-                                    src={session.data.user.image} 
-                                    alt={session.data.user.name || 'User'}
+                                    src={(session.data?.user as any).image} 
+                                    alt={session.data?.user?.name || 'User'}
                                     className="h-8 w-8 rounded-lg object-cover flex-shrink-0"
                                   />
                                 ) : (
@@ -1899,71 +2005,78 @@ export default function ProjectPage() {
                                   </span>
                                   
                                   <MessageContent className="p-0 bg-transparent text-foreground leading-relaxed text-[15px]">
-                                    {message.parts?.map((part: any, i: number) => {
-                                      if (part.type === 'text') {
-                                        const textContent = typeof part.text === 'string' ? part.text : part.text?.text;
-                                        if (!textContent) return null;
-                                        return (
-                                          <div key={i} className="whitespace-pre-wrap">
-                                             {message.role === 'assistant' ? (
-                                               (() => {
-                                                 const isRawHtml = textContent.toLowerCase().includes('<!doctype') || textContent.toLowerCase().includes('<html');
-                                                 if (isRawHtml && extractArtifacts(textContent).length === 0) {
-                                                    return (
-                                                      <div className="flex flex-col gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl mt-2">
-                                                        <div className="flex items-center gap-2 text-destructive font-bold text-[10px] uppercase tracking-wide">
-                                                          <X className="size-3" />
-                                                          Error
-                                                        </div>
-                                                        <p className="text-destructive/80 text-sm leading-relaxed">Engine error occurred. Please try a different prompt.</p>
-                                                      </div>
-                                                    );
-                                                 }
-                                                 return (
-                                                   <div className="text-foreground/90 leading-relaxed text-[15px]">
-                                                     <MessageResponse>{stripArtifact(textContent)}</MessageResponse>
-                                                   </div>
-                                                 );
-                                               })()
-                                             ) : (
-                                               <div className="text-foreground/90 leading-relaxed text-[15px]">
-                                                 {textContent}
-                                               </div>
+                                    <div className="whitespace-pre-wrap">
+                                      {message.role === 'assistant' ? (
+                                        (() => {
+                                          const textContent = msg.content || "";
+                                          const isRawHtml = textContent.toLowerCase().includes('<!doctype') || textContent.toLowerCase().includes('<html');
+                                          if (isRawHtml && extractArtifacts(textContent).length === 0) {
+                                            return (
+                                              <div className="flex flex-col gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl mt-2">
+                                                <div className="flex items-center gap-2 text-destructive font-bold text-[10px] uppercase tracking-wide">
+                                                  <X className="size-3" />
+                                                  Error
+                                                </div>
+                                                <p className="text-destructive/80 text-sm leading-relaxed">Engine error occurred. Please try a different prompt.</p>
+                                              </div>
+                                            );
+                                          }
+                                          return (
+                                            <div className="text-foreground/90 leading-relaxed text-[15px]">
+                                              <MessageResponse>{stripArtifact(textContent)}</MessageResponse>
+                                              {msg.plan && (
+                                                <div className="mt-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                                  <PlanningDisplay 
+                                                    plan={msg.plan} 
+                                                    onClick={() => {
+                                                      setViewingPlan(msg.plan);
+                                                      setIsPlanDialogOpen(true);
+                                                    }}
+                                                  />
+                                                </div>
                                               )}
-                                          </div>
-                                        );
-                                      }
-                                      if (part.type === 'file') {
-                                        const fileUrl = typeof part.file === 'string' ? part.file : part.file?.url;
-                                        if (!fileUrl) return null;
-                                        return (
-                                          <div key={i} className="mt-3 rounded-xl overflow-hidden border border-border/50 max-w-[280px]">
-                                             <img src={fileUrl} alt="Attachment" className="w-full h-auto object-cover" />
-                                          </div>
-                                        );
-                                      }
-                                      return null;
-                                    })}
-                                    
-                                    {!message.parts && (
-                                      <div className="whitespace-pre-wrap">
-                                         {message.role === 'assistant' ? (
-                                           <div className="text-foreground/90 leading-relaxed text-[15px]">
-                                              <MessageResponse>{stripArtifact((message as any).content)}</MessageResponse>
-                                           </div>
-                                         ) : (
-                                           <div className="text-foreground/90 leading-relaxed text-[15px]">
-                                             {(message as any).content}
-                                           </div>
-                                         )}
-                                      </div>
-                                    )}
+                                            </div>
+                                          );
+                                        })()
+                                      ) : (
+                                        <div className="text-foreground/90 leading-relaxed text-[15px]">
+                                          {msg.content}
+                                        </div>
+                                      )}
+                                    </div>
                                   </MessageContent>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        ))}
+                        );})}
+                        
+                        {isGenerating && (
+                          <div className="flex gap-4 p-6 animate-in fade-in slide-in-from-bottom-2">
+                            <div className="size-8 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                               <Sparkles className="size-4 text-primary animate-pulse" />
+                            </div>
+                            <div className="flex-1 space-y-4 pr-6">
+                               <div className="flex items-center gap-2">
+                                  <span className="text-[11px] font-black uppercase tracking-widest text-primary">Sketch AI</span>
+                                  <span className="size-1 rounded-full bg-primary/30" />
+                                  <span className="text-[11px] font-medium text-foreground/40 uppercase tracking-widest">Generating</span>
+                               </div>
+                               <div className="space-y-4">
+                                  <div className="h-4 bg-primary/5 rounded-full w-[80%] animate-pulse" />
+                                  <div className="h-4 bg-primary/5 rounded-full w-[60%] animate-pulse" />
+                                  
+                                  {(realtimeStatus?.status === 'generating' || realtimeStatus?.status === 'planning') && (
+                                     <PlanningDisplay 
+                                       isPlanning={true} 
+                                       plan={{ screens: [] }}
+                                       className="mt-2"
+                                     />
+                                  )}
+                               </div>
+                            </div>
+                          </div>
+                        )}
                         
                         {error && (
                           <div className="flex justify-center p-6 border-t border-destructive/10 bg-destructive/5 rounded-2xl mx-4 my-2 animate-in fade-in slide-in-from-bottom-2">
@@ -2233,7 +2346,7 @@ export default function ProjectPage() {
                                 className="h-9 px-3 text-foreground hover:bg-muted rounded-xl flex items-center gap-2 text-[13px] font-medium"
                               >
                                 {(() => {
-                                  const mode = artifactPreviewModes[index] || (artifact.type === 'app' ? 'mobile' : 'desktop');
+                                  const mode = artifactPreviewModes[artifact.title] || (artifact.type === 'app' ? 'mobile' : 'desktop');
                                   if (mode === 'mobile') return <Smartphone className="h-4 w-4 opacity-70" />;
                                   if (mode === 'tablet') return <Tablet className="h-4 w-4 opacity-70" />;
                                   return <Monitor className="h-4 w-4 opacity-70" />;
@@ -2244,7 +2357,12 @@ export default function ProjectPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="center" className="w-48 bg-card border-border text-foreground rounded-xl shadow-2xl p-1.5 z-[100]">
                               <DropdownMenuItem 
-                                onClick={() => setArtifactPreviewModes(prev => ({ ...prev, [index]: 'mobile' }))}
+                                onClick={() => {
+                                  setArtifactPreviewModes(prev => ({ ...prev, [artifact.title]: 'mobile' }));
+                                  // Clear manual sizing to adopt mobile preset
+                                  setThrottledArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
+                                  setArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
+                                }}
                                 className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
                               >
                                 <div className="flex items-center gap-2">
@@ -2253,7 +2371,11 @@ export default function ProjectPage() {
                                 <span className="text-[10px] text-muted-foreground">380px</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem 
-                                onClick={() => setArtifactPreviewModes(prev => ({ ...prev, [index]: 'tablet' }))}
+                                onClick={() => {
+                                  setArtifactPreviewModes(prev => ({ ...prev, [artifact.title]: 'tablet' }));
+                                  setThrottledArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
+                                  setArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
+                                }}
                                 className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
                               >
                                 <div className="flex items-center gap-2">
@@ -2262,7 +2384,11 @@ export default function ProjectPage() {
                                 <span className="text-[10px] text-muted-foreground">768px</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem 
-                                onClick={() => setArtifactPreviewModes(prev => ({ ...prev, [index]: 'desktop' }))}
+                                onClick={() => {
+                                  setArtifactPreviewModes(prev => ({ ...prev, [artifact.title]: 'desktop' }));
+                                  setThrottledArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
+                                  setArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
+                                }}
                                 className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
                               >
                                 <div className="flex items-center gap-2">
@@ -2365,10 +2491,10 @@ export default function ProjectPage() {
                         "transition-shadow duration-300 ease-in-out shadow-[0_40px_100px_rgba(0,0,0,0.4)] overflow-hidden border relative flex-shrink-0",
                         isDraggingFrame && selectedArtifactIndex === index && "shadow-[0_60px_120px_rgba(0,0,0,0.5)]",
                         (() => {
-                         const mode = artifactPreviewModes[index];
-                         if (mode === 'mobile') return "w-[380px] rounded-sm";
-                         if (mode === 'tablet') return "w-[768px] rounded-sm";
-                         if (mode === 'desktop') return "w-[1280px] rounded-sm";
+                          const mode = artifactPreviewModes[artifact.title];
+                          if (mode === 'mobile') return "w-[380px] rounded-sm";
+                          if (mode === 'tablet') return "w-[768px] rounded-sm";
+                          if (mode === 'desktop') return "w-[1280px] rounded-sm transition-all duration-300";
                          
                          return artifact.type === 'app' 
                            ? "w-[380px] rounded-sm" 
@@ -2378,16 +2504,20 @@ export default function ProjectPage() {
                         })()
                       )}
                         style={{
-                          width: artifact.width ? `${artifact.width}px` : (() => {
-                            const mode = artifactPreviewModes[index];
+                          width: (() => {
+                            const mode = artifactPreviewModes[artifact.title];
                             if (mode === 'mobile') return "380px";
                             if (mode === 'tablet') return "768px";
                             if (mode === 'desktop') return "1280px";
-                            return artifact.type === 'app' ? "380px" : artifact.type === 'web' ? "1024px" : "600px";
+                            return artifact.width ? `${artifact.width}px` : (artifact.type === 'app' ? "380px" : artifact.type === 'web' ? "1024px" : "600px");
                           })(),
-                          height: artifact.height ? `${artifact.height}px` : `${dynamicFrameHeights[index] || (artifactPreviewModes[index] === 'mobile' || (artifact.type === 'app' && !artifactPreviewModes[index]) ? 800 : 700)}px`,
-                          minHeight: (artifactPreviewModes[index] === 'mobile' || (artifact.type === 'app' && !artifactPreviewModes[index])) ? '800px' : '400px',
-                          transition: isResizing ? 'none' : 'width 0.3s ease-in-out, height 0.3s ease-in-out',
+                          height: (() => {
+                            const mode = artifactPreviewModes[artifact.title];
+                            const heightFallback = dynamicFrameHeights[artifact.title] || (artifact.type === 'app' ? 800 : 700);
+                            return artifact.height ? `${artifact.height}px` : `${heightFallback}px`;
+                          })(),
+                          minHeight: (artifactPreviewModes[artifact.title] === 'mobile' || (artifact.type === 'app' && !artifactPreviewModes[artifact.title])) ? '800px' : '400px',
+                          transition: isResizing ? 'none' : 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                           backgroundColor: appliedTheme?.cssVars.background || 'var(--background)',
                           borderColor: selectedArtifactIndex === index ? SELECTION_BLUE : (appliedTheme?.cssVars.border || 'var(--border)'),
                           boxShadow: selectedArtifactIndex === index ? `0 0 0 2px ${SELECTION_BLUE}40, 0 40px 100px rgba(0,0,0,0.4)` : undefined
@@ -2402,7 +2532,10 @@ export default function ProjectPage() {
                        activeTool={activeTool}
                        isDraggingFrame={isDraggingFrame}
                        appliedTheme={appliedTheme}
-                       onRef={(i, el) => { iframeRefs.current[i] = el; }}
+                        onRef={(idx, el) => { 
+                          if (el) (el as any).dataset.artifactTitle = artifact.title;
+                          iframeRefs.current[artifact.title] = el; 
+                        }}
                      />
                      </div>
 
@@ -2479,9 +2612,145 @@ export default function ProjectPage() {
                 <div className="flex flex-col items-center gap-6 opacity-20 pointer-events-none">
                    <Logo iconSize={80} showText={false} />
                    <p className="text-xl font-medium tracking-tight">Generate your first design to see it here</p>
+                   {isGenerating && (
+                     <div className="w-[380px] h-[600px] border border-border/20 rounded-2xl overflow-hidden bg-card/10 backdrop-blur-sm relative">
+                       <ModernShimmer type="mobile" appliedTheme={appliedTheme} />
+                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/20">
+                          <Loader2 className="size-8 text-primary animate-spin" />
+                          <span className="text-sm font-bold text-white uppercase tracking-widest animate-pulse">Designing...</span>
+                       </div>
+                     </div>
+                   )}
                 </div>
              )}
           </div>
+
+          {/* Design Execution Console (Plan & Realtime Status) */}
+          <AnimatePresence>
+            {isGenerating && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9, x: 20 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.9, x: 20 }}
+                className="absolute right-8 top-8 w-80 z-40"
+              >
+                <div className="bg-card/40 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.4)] overflow-hidden">
+                  {/* Header */}
+                  <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="size-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Execution Console</span>
+                    </div>
+                    {realtimeStatus?.status === 'generating' && (
+                      <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+                        <Loader2 className="size-2.5 text-primary animate-spin" />
+                        <span className="text-[8px] font-bold text-primary uppercase tracking-wider">Live</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-6 space-y-6">
+                    {/* Vision Status */}
+                    {realtimeStatus?.status === 'vision' && (
+                       <motion.div 
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-4 bg-white/5 border border-white/5 rounded-xl"
+                       >
+                          <p className="text-[13px] text-white/90 italic leading-relaxed font-medium block">
+                            &ldquo;{realtimeStatus.message}&rdquo;
+                          </p>
+                       </motion.div>
+                    )}
+
+                    {/* Planning Manifest */}
+                    {designPlan.length > 0 && (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Architectural Plan</span>
+                          <span className="text-[10px] text-white/20 font-mono">{designPlan.length} Screens</span>
+                        </div>
+                        <div className="space-y-2">
+                          {designPlan.map((p, i) => {
+                            const isCurrent = realtimeStatus?.currentScreen === p.title;
+                            // Check if this screen is already in artifacts
+                            const isDone = artifacts.some(a => a.title === p.title);
+                            
+                            return (
+                              <motion.div 
+                                key={i}
+                                initial={{ opacity: 0, x: -5 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: i * 0.1 }}
+                                className={cn(
+                                  "relative p-3 rounded-xl border transition-all duration-300",
+                                  isCurrent ? "bg-primary/10 border-primary/30" : 
+                                  isDone ? "bg-accent/5 border-accent/20" : "bg-white/2 border-white/5"
+                                )}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <div className={cn(
+                                      "size-6 rounded-lg flex items-center justify-center border",
+                                      isCurrent ? "bg-primary border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]" : 
+                                      isDone ? "bg-accent border-accent text-accent-foreground" : "bg-white/5 border-white/10 text-white/40"
+                                    )}>
+                                      {isDone ? <Check className="size-3.5" /> : 
+                                       isCurrent ? <Loader2 className="size-3.5 text-background animate-spin" /> : 
+                                       (p.type === 'app') ? <Smartphone className="size-3" /> : <Monitor className="size-3" />}
+                                    </div>
+                                    <div className="flex flex-col">
+                                      <span className={cn(
+                                        "text-xs font-bold tracking-tight",
+                                        isCurrent ? "text-primary" : isDone ? "text-accent/80" : "text-white/60"
+                                      )}>{p.title}</span>
+                                      <span className="text-[9px] text-white/30 truncate max-w-[140px]">{p.description}</span>
+                                    </div>
+                                  </div>
+                                  {isCurrent && (
+                                    <div className="h-4 w-12 bg-primary/20 rounded-full overflow-hidden relative">
+                                       <motion.div 
+                                         animate={{ x: ["-100%", "100%"] }}
+                                         transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                         className="absolute inset-0 bg-primary/40"
+                                       />
+                                    </div>
+                                  )}
+                                </div>
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Realtime Feedback */}
+                    {realtimeStatus?.status === 'generating' && (
+                      <div className="pt-4 border-t border-white/5">
+                        <div className="flex items-center gap-2 mb-2">
+                           <Zap className="size-3 text-primary" />
+                           <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Designing Assets</span>
+                        </div>
+                        <p className="text-[11px] text-white/50 leading-relaxed">
+                          {realtimeStatus.message}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Waiting Message */}
+                    {!realtimeStatus && !designPlan.length && (
+                      <div className="py-8 flex flex-col items-center justify-center gap-4 text-center">
+                         <Loader2 className="size-6 text-primary animate-spin opacity-40" />
+                         <p className="text-[10px] text-white/30 font-bold uppercase tracking-[0.2em] animate-pulse">
+                            Establishing Vision...
+                         </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Bottom Floating Toolbar */}
          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 p-1.5 bg-card/90 backdrop-blur-xl rounded-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-1 z-30">
@@ -2578,7 +2847,7 @@ export default function ProjectPage() {
                          }}
                          title="Copy Code"
                        >
-                           <FilesIcon className="h-5 w-5" />
+                           <Files className="h-5 w-5" />
                        </Button>
                        <Button 
                          variant="ghost" 
@@ -2731,6 +3000,57 @@ export default function ProjectPage() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Plan Details Dialog */}
+      <Dialog open={isPlanDialogOpen} onOpenChange={setIsPlanDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] bg-zinc-950 border-zinc-800 text-white p-0 overflow-hidden rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+          <DialogHeader className="p-8 pb-0">
+             <div className="flex items-center gap-4 mb-2">
+                <div className="size-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                   <Layout className="size-6 text-primary" />
+                </div>
+                <div>
+                   <DialogTitle className="text-2xl font-black uppercase tracking-tight">Project Manifest</DialogTitle>
+                   <DialogDescription className="text-zinc-500 text-sm font-medium">
+                     Detailed architecture and screen flow plan.
+                   </DialogDescription>
+                </div>
+             </div>
+          </DialogHeader>
+          
+          <div className="p-8 max-h-[60vh] overflow-y-auto scrollbar-hide">
+             <div className="space-y-4">
+                {viewingPlan?.screens?.map((screen: any, idx: number) => (
+                  <div key={idx} className="p-5 bg-white/5 border border-white/5 rounded-2xl flex items-start gap-4 hover:border-primary/20 transition-all group">
+                     <div className="size-10 rounded-xl bg-white/5 flex items-center justify-center text-zinc-500 font-mono text-xs group-hover:bg-primary/10 group-hover:text-primary transition-all">
+                        {String(idx + 1).padStart(2, '0')}
+                     </div>
+                     <div className="flex-1 space-y-1">
+                        <div className="flex items-center justify-between">
+                           <span className="font-bold text-white tracking-tight">{screen.title}</span>
+                           <span className="px-2 py-0.5 rounded-full bg-white/5 text-[9px] font-black uppercase tracking-widest text-zinc-500 border border-white/5">
+                              {screen.type}
+                           </span>
+                        </div>
+                        <p className="text-sm text-zinc-400 leading-relaxed font-medium">
+                           {screen.description}
+                        </p>
+                     </div>
+                  </div>
+                ))}
+             </div>
+          </div>
+
+          <DialogFooter className="p-8 bg-zinc-900/30 border-t border-zinc-800/50">
+             <Button 
+               onClick={() => setIsPlanDialogOpen(false)}
+               className="w-full h-12 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-widest"
+             >
+               Close Manifest
+             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Export Sheet */}
       <Sheet open={isExportSheetOpen} onOpenChange={setIsExportSheetOpen}>
         <SheetContent side="right" className="w-[400px] bg-card border-l border-border p-0">
@@ -2818,11 +3138,4 @@ export default function ProjectPage() {
     </div>
   );
 }
-
-// Ensure icons like Files are imported if used
-const FilesIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-  </svg>
-);
 
