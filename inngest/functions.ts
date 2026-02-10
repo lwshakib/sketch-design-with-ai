@@ -1,5 +1,6 @@
 import { inngest } from "./client";
-import { generateText, stepCountIs } from "ai";
+import { stepCountIs } from "ai";
+import { generateText, generateObject } from "../llm/generate";
 import { z } from "zod";
 import { GeminiModel } from "../llm/model";
 import { 
@@ -7,7 +8,7 @@ import {
   PlanningPrompt, 
   ScreenGenerationPrompt,
 } from "../llm/prompts";
-import { getDesignInspiration } from "../llm/tools";
+import { getAllExamples } from "../llm/tools";
 import prisma from "../lib/prisma";
 import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
 import { extractArtifacts } from "../lib/artifact-renderer";
@@ -20,6 +21,7 @@ interface PlanScreen {
 
 interface Plan {
   screens: PlanScreen[];
+  themes?: any[];
 }
 
 // --- orchestrator: generate whole design ---
@@ -41,134 +43,120 @@ export const generateDesign = inngest.createFunction(
       safeMessages = [{ role: 'user', content: 'Create a modern design' }];
     }
 
-    // --- STEP 1: VISION RESPONSE ---
-    const vision = await step.run("generate-vision", async () => {
-      // Normalize messages inside step to avoid Inngest closure issues
+    // --- STEP 1 & 2: VISION & PLANNING ---
+    await publish({
+      channel: `project:${projectId}`,
+      topic: "status",
+      data: { message: "Synthesizing design vision...", status: "vision" }
+    });
+
+    const { plan, planMarkdown, vision } = await step.run("generate-design-manifest", async () => {
+      // Normalize messages
       let stepMessages = Array.isArray(messages) ? messages : [];
       if (stepMessages.length === 0) {
         stepMessages = [{ role: 'user', content: 'Create a modern design' }];
       }
       
-      const lastUserMessage = [...stepMessages].reverse().find(m => m.role === 'user')?.content || '';
-      const isAppRequest = lastUserMessage.toLowerCase().match(/mobile|app|phone|ios|android/);
-      const searchType = isAppRequest ? 'app' : 'web';
-      
-      // Fetch inspiration for the overall vision
-      const inspiration = await getDesignInspiration.execute({
-        type: searchType,
-        query: lastUserMessage
+      const inspiration = getAllExamples();
+
+      const { object } = await generateObject({
+        system: PlanningPrompt + `\n\nUse these high-fidelity design examples as your primary inspiration for quality and code structure:\n${inspiration}`,
+        messages: stepMessages as any,
+        schema: z.object({
+          vision: z.string().describe("A single, high-fidelity sentence describing the core visual style and design philosophy."),
+          themes: z.array(z.object({
+            name: z.string(),
+            colors: z.object({
+              background: z.string(),
+              foreground: z.string(),
+              primary: z.string(),
+              primaryForeground: z.string(),
+              secondary: z.string(),
+              secondaryForeground: z.string(),
+              muted: z.string(),
+              mutedForeground: z.string(),
+              accent: z.string(),
+              accentForeground: z.string(),
+              border: z.string(),
+              input: z.string(),
+              ring: z.string(),
+              radius: z.string(),
+              card: z.string(),
+              cardForeground: z.string(),
+              popover: z.string(),
+              popoverForeground: z.string(),
+            })
+          })).length(10),
+          screens: z.array(z.object({
+            title: z.string(),
+            type: z.enum(['web', 'app']),
+            description: z.string(),
+            prompt: z.string().describe("Extremely detailed, technical prompt for generating this specific screen's code, including layout, components, and interaction states.")
+          }))
+        })
       });
 
-      console.log('[generate-vision] Processing messages:', JSON.stringify(stepMessages));
+      const planJson = { 
+        screens: object.screens, 
+        themes: object.themes
+      };
       
-      const { text } = await generateText({
-        model: GeminiModel(),
-        system: InitialResponsePrompt + `\n\nUse this inspiration to guide your vision:\n${inspiration}`,
-        messages: stepMessages,
-        tools: {
-          getDesignInspiration
-        },
-        stopWhen: stepCountIs(5),
-        toolChoice: 'auto'
-      });
+      // Update Project with themes
+      if (object.themes && object.themes.length > 0) {
+        await prisma.project.update({
+          where: { id: projectId },
+          data: { themes: object.themes }
+        });
+      }
 
-      // Stream vision response to UI via Realtime
+      // Stream the plan and vision to the UI
       await publish({
         channel: `project:${projectId}`,
         topic: "status",
-        data: { message: text, status: "vision" }
+        data: { message: object.vision, status: "vision" }
       });
 
-      return text;
+      await publish({
+        channel: `project:${projectId}`,
+        topic: "plan",
+        data: { plan: planJson, markdown: object.plan }
+      });
+
+      return { plan: planJson, planMarkdown: object.plan, vision: object.vision };
     });
 
-    // --- STEP 2: PLANNING ---
+    // Save vision message to database
+    const messageId = await step.run("save-vision-message", async () => {
+      const msg = await prisma.message.create({
+        data: {
+          projectId: projectId,
+          role: "assistant",
+          content: vision,
+          plan: JSON.parse(JSON.stringify(plan))
+        },
+      });
+      return msg.id;
+    });
+
     await publish({
       channel: `project:${projectId}`,
       topic: "status",
       data: { message: "Architecting project manifest...", status: "planning" }
     });
 
-    // 2. Generate detailed architectural plan
-    const { plan, planMarkdown } = await step.run("generate-plan", async () => {
-      const { text } = await generateText({
-        model: GeminiModel(),
-        system: PlanningPrompt,
-        messages: [
-          ...safeMessages,
-          { role: 'assistant', content: vision }
-        ],
-        maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
-        temperature: 0.7,
-      });
-
-      // Simple extraction of JSON within <plan> tags
-      const planMatch = text.match(/<plan>([\s\S]*?)<\/plan>/i);
-      let planJson: Plan = { screens: [] };
-      
-      if (planMatch) {
-         try {
-           planJson = JSON.parse(planMatch[1].trim());
-           // Normalize screen types in the plan
-           if (planJson.screens) {
-             planJson.screens = planJson.screens.map(s => ({
-               ...s,
-               type: s.type === 'app' ? 'app' : 'web'
-             }));
-           }
-         } catch (e) {
-           console.error("Failed to parse plan JSON", e);
-         }
-      }
-
-      const markdown = text.replace(/<plan>([\s\S]*?)<\/plan>/i, "").trim();
-
-      // Stream the plan and markdown to the UI via Realtime
-      await publish({
-        channel: `project:${projectId}`,
-        topic: "plan",
-        data: { plan: planJson, markdown }
-      });
-
-      return { plan: planJson, planMarkdown: markdown };
-    });
-
-    // Save as assistant message with vision, plan markdown, and the JSON plan
-    await step.run("save-assistant-message", async () => {
-      await prisma.message.create({
+    // Update previously created assistant message with plan JSON
+    await step.run("update-message-with-plan", async () => {
+      await prisma.message.update({
+        where: { id: messageId },
         data: {
-          projectId: projectId,
-          role: "assistant",
-          content: vision + "\n\n" + planMarkdown,
           plan: JSON.parse(JSON.stringify(plan))
         },
       });
-
-      // Also pre-create screen placeholders so they show up immediately in the UI
-      let lastX = -500; // Start position
-      for (const screen of plan.screens) {
-        const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
-        const width = getWidth(screen.type);
-        
-        await prisma.screen.create({
-          data: {
-            projectId: projectId,
-            title: screen.title,
-            content: "", // Placeholder
-            type: screen.type,
-            x: lastX,
-            y: 0,
-            width,
-            height: 800
-          }
-        });
-        
-        lastX += width + 120; // Increment for next screen
-      }
     });
 
     // 3. Sequentially generate each screen in the plan
     if (plan.screens.length > 0) {
+      let screensContext: { title: string; content: string }[] = [];
       for (let i = 0; i < plan.screens.length; i++) {
         const screen = plan.screens[i];
         if (!screen) continue;
@@ -178,34 +166,69 @@ export const generateDesign = inngest.createFunction(
           channel: `project:${projectId}`,
           topic: "status",
           data: { 
-            message: `Architecting "${screen.title}"...`, 
+            message: `Designing "${screen.title}"...`, 
             status: "generating", 
             currentScreen: screen.title 
           }
         });
 
         const generatedScreen = await step.run(`generate-screen-${i}`, async () => {
-          // Fetch relevant inspiration based on screen title and description
-          const inspiration = await getDesignInspiration.execute({
-            type: screen.type,
-            query: `${screen.title} ${screen.description}`
+          // Notify inner status
+          await publish({
+            channel: `project:${projectId}`,
+            topic: "status",
+            data: { 
+              message: `Applying theme to "${screen.title}"...`, 
+              status: "generating", 
+              currentScreen: screen.title 
+            }
+          });
+          
+          // Fetch relevant inspiration
+          const inspiration = getAllExamples();
+          
+          // Contextual messages: Vision + Plan + Previous Screens
+          const themes = (plan as any).themes || [];
+          const selectedTheme = themes.length > 0 ? themes[0] : null;
+
+          await publish({
+            channel: `project:${projectId}`,
+            topic: "status",
+            data: { 
+              message: `Building components for "${screen.title}"...`, 
+              status: "generating", 
+              currentScreen: screen.title 
+            }
           });
 
+          const contextMessages = [
+             { role: 'assistant', content: vision || '' },
+             { role: 'assistant', content: `Design Plan: ${JSON.stringify({ screens: plan.screens })}` }, // Pass FULL plan for context
+             ...screensContext.map(s => ({
+                role: 'assistant',
+                content: `Earlier, I generated the "${s.title}" screen. Here is its code:\n\n${s.content}`
+             }))
+          ];
+
           const { text } = await generateText({
-            model: GeminiModel(),
-            system: ScreenGenerationPrompt,
+            system: ScreenGenerationPrompt + "\n\nCRITICAL: You are generating a highly detailed, production-ready screen. Do not use placeholders. Ensure all content is realistic and high-fidelity.",
             messages: [
               ...safeMessages,
-              { role: 'assistant', content: vision || '' },
-              { role: 'assistant', content: `Design Plan: ${JSON.stringify({ screens: [screen] })}` },
-              { role: 'user', content: `Here is some high-fidelity design inspiration for this screen:\n\n${inspiration}` },
-              { role: 'user', content: `Now generate the ${screen.title} (${screen.type}) screen based on the vision and the inspiration provided above. Description: ${screen.description}. SPECIFIC PROMPT: ${(screen as any).prompt || ''}` }
-            ],
-            tools: {
-              getDesignInspiration
-            },
-            stopWhen: stepCountIs(5),
-            toolChoice: 'auto',
+              ...contextMessages,
+              { role: 'user', content: `Here are ALL the high-fidelity design examples available. Use them as references for component structure and quality, regardless of their specific type:\n\n${inspiration}` },
+              { role: 'user', content: `Now generate the "${screen.title}" (${screen.type}) screen based on the vision, the full plan, and the previous screens provided above. 
+Description: ${screen.description}. 
+SPECIFIC PROMPT: ${(screen as any).prompt || ''}
+
+${selectedTheme ? `IMPORTANT: Use this theme for the color palette:\n${JSON.stringify(selectedTheme, null, 2)}` : ''}
+
+CRITICAL INSTRUCTIONS:
+1. CONSTISTENCY: You MUST use the exact same color palette, typography, and corner variations as the previous screens.
+2. DETAIL: The code must be extremely detailed. Use strict Tailwind classes for everything.
+3. THEME: Ensure the theme is consistent. If previous screens used a specific background gradient, YOU MUST USE IT TOO.
+4. CONTENT: Use realistic data. No 'Lorem Ipsum'.` }
+            ] as any,
+            stopWhen: stepCountIs(5) as any,
             maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
             temperature: 0.7,
           });
@@ -225,6 +248,12 @@ export const generateDesign = inngest.createFunction(
             content: artifact.content,
             type
           };
+        });
+        
+        // Add to context for next iteration
+        screensContext.push({
+           title: generatedScreen.title,
+           content: generatedScreen.content
         });
 
         // Save the screen to database and notify UI
