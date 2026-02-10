@@ -34,7 +34,16 @@ export function extractArtifacts(text: string): Artifact[] {
     const defaultTitle = tagName === 'web_artifact' ? 'Web Design' : 'App Design';
     const title = titleMatch ? titleMatch[1] : defaultTitle;
 
-    const type: 'web' | 'app' = tagName === 'web_artifact' ? 'web' : 'app';
+    // Parse type attribute if present
+    const typeMatch = attributes.match(/type=["']([^"']+)["']/i);
+    let type: 'web' | 'app' = tagName === 'web_artifact' ? 'web' : 'app';
+    
+    if (typeMatch) {
+      const val = typeMatch[1].toLowerCase();
+      if (val === 'web' || val === 'app') {
+        type = val as 'web' | 'app';
+      }
+    }
 
     artifacts.push({
       content,
