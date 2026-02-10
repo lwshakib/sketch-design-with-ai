@@ -2248,10 +2248,18 @@ export default function ProjectPage() {
                    >
                     {/* Modern Floating Toolbar */}
                     {activeTool === 'select' && (selectedArtifactIndex === index || (artifact.isComplete && selectedArtifactIndex === index)) && (
-                      <div className={cn(
-                        "absolute -top-20 left-1/2 -translate-x-1/2 flex items-center gap-3 z-[70] animate-in fade-in slide-in-from-bottom-2 duration-300 pointer-events-auto",
-                        selectedArtifactIndex !== index && "opacity-0 group-hover:opacity-100"
-                      )} onMouseDown={(e) => e.stopPropagation()}>
+                      <div 
+                        className={cn(
+                          "absolute left-1/2 flex items-center gap-3 z-[70] animate-in fade-in slide-in-from-bottom-2 duration-300 pointer-events-auto",
+                          selectedArtifactIndex !== index && "opacity-0 group-hover:opacity-100"
+                        )} 
+                        onMouseDown={(e) => e.stopPropagation()}
+                        style={{
+                          bottom: `calc(100% + ${28 + 20 / zoom}px)`,
+                          transform: `translateX(-50%) scale(${1 / zoom})`,
+                          transformOrigin: 'bottom center'
+                        }}
+                      >
                         
                         {/* Main Toolbar Container */}
                         <div className="flex items-center gap-1 px-2 py-1.5 bg-card/95 backdrop-blur-md border border-border rounded-2xl shadow-2xl">
