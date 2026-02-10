@@ -120,20 +120,9 @@ export default function ProjectPage() {
     }
   }, [messages, sendMessage, setIsGenerating]);
 
-  // Optimistically show vision message when it arrives via realtime
-  useEffect(() => {
-    if (realtimeStatus?.status === 'vision' && realtimeStatus.message) {
-      setMessages(prev => {
-        if (prev.some(m => m.content === realtimeStatus.message)) return prev;
-        return [...prev, {
-          id: `vision-${Date.now()}`,
-          role: 'assistant',
-          content: realtimeStatus.message,
-          createdAt: new Date(),
-        } as any];
-      });
-    }
-  }, [realtimeStatus, setMessages]);
+  // Initial waiting state is handled by the generation block in ChatSidebar.
+  // Vision and Plan will be merged into the assistant message once the manifest is generated.
+
 
   const { data: realtimeData } = useInngestSubscription({
     refreshToken: () => fetchInngestToken(projectId),

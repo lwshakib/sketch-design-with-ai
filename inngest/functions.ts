@@ -24,6 +24,8 @@ interface Plan {
   themes?: any[];
 }
 
+
+
 // --- orchestrator: generate whole design ---
 export const generateDesign = inngest.createFunction(
   { id: "generate-design", retries: 5 },
@@ -50,7 +52,7 @@ export const generateDesign = inngest.createFunction(
       data: { message: "Synthesizing design vision...", status: "vision" }
     });
 
-    const { plan, planMarkdown, vision } = await step.run("generate-design-manifest", async () => {
+    const { plan, vision, conclusionText, suggestion } = await step.run("generate-design-manifest", async () => {
       // Normalize messages
       let stepMessages = Array.isArray(messages) ? messages : [];
       if (stepMessages.length === 0) {
@@ -58,6 +60,9 @@ export const generateDesign = inngest.createFunction(
       }
       
       const inspiration = getAllExamples();
+
+
+
 
       const { object } = await generateObject({
         system: PlanningPrompt + `\n\nUse these high-fidelity design examples as your primary inspiration for quality and code structure:\n${inspiration}`,
@@ -86,19 +91,23 @@ export const generateDesign = inngest.createFunction(
               popover: z.string(),
               popoverForeground: z.string(),
             })
-          })).length(10),
+            })).min(1),
           screens: z.array(z.object({
             title: z.string(),
             type: z.enum(['web', 'app']),
             description: z.string(),
             prompt: z.string().describe("Extremely detailed, technical prompt for generating this specific screen's code, including layout, components, and interaction states.")
-          }))
+          })),
+          conclusionText: z.string().describe("A short sentence confirm that all requested screens have been generated successfully."),
+          suggestion: z.string().describe("A single brief suggestion for the next potential design step (e.g., 'Design a community leaderboard screen').")
         })
       });
 
       const planJson = { 
         screens: object.screens, 
-        themes: object.themes
+        themes: object.themes,
+        conclusionText: object.conclusionText,
+        suggestion: object.suggestion
       };
       
       // Update Project with themes
@@ -119,10 +128,18 @@ export const generateDesign = inngest.createFunction(
       await publish({
         channel: `project:${projectId}`,
         topic: "plan",
-        data: { plan: planJson, markdown: object.plan }
+        data: { 
+          plan: planJson, 
+          markdown: `Vision: ${object.vision}\n\nConclusion: ${object.conclusionText}\n\nSuggestion: ${object.suggestion}` 
+        }
       });
 
-      return { plan: planJson, planMarkdown: object.plan, vision: object.vision };
+      return { 
+        plan: planJson, 
+        vision: object.vision,
+        conclusionText: object.conclusionText,
+        suggestion: object.suggestion
+      };
     });
 
     // Save vision message to database
@@ -152,6 +169,49 @@ export const generateDesign = inngest.createFunction(
           plan: JSON.parse(JSON.stringify(plan))
         },
       });
+    });
+
+    // Create placeholder screens in DB so they appear on UI immediately
+    await step.run("init-placeholder-screens", async () => {
+      // Get the last screen to determine starting X position
+      const lastScreen = await prisma.screen.findFirst({
+         where: { projectId: projectId },
+         orderBy: { x: 'desc' }
+      });
+
+      let currentX = lastScreen 
+        ? lastScreen.x + (lastScreen.width || (lastScreen.type === 'app' ? 380 : lastScreen.type === 'web' ? 1024 : 800)) + 120 
+        : 0;
+
+      // Adjust for first screen if no previous screens exist
+      if (!lastScreen) {
+         const firstWidth = plan.screens[0].type === 'app' ? 380 : plan.screens[0].type === 'web' ? 1024 : 800;
+         currentX = -(firstWidth / 2);
+      }
+
+      for (const screen of plan.screens) {
+         const width = screen.type === 'app' ? 380 : screen.type === 'web' ? 1024 : 800;
+         
+         // If there was a previous screen (or loop iteration), add spacing
+         // Actually, the initial currentX is set.
+         // But we need to increment it for subsequent screens in the loop.
+         
+         await prisma.screen.create({
+           data: {
+             projectId: projectId,
+             title: screen.title,
+             content: "", // Empty content = placeholder
+             type: screen.type,
+             x: currentX,
+             y: 0,
+             width: width,
+             height: 800
+           }
+         });
+
+         // Increment X for next screen
+         currentX += width + 120;
+      }
     });
 
     // 3. Sequentially generate each screen in the plan
@@ -316,7 +376,7 @@ CRITICAL INSTRUCTIONS:
         channel: `project:${projectId}`,
         topic: "status",
         data: { 
-          message: "All screens architected successfully!", 
+          message: plan.conclusionText || "All screens architected successfully!", 
           status: "complete" 
         }
       });

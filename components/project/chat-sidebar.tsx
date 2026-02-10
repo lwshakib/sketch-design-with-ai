@@ -14,7 +14,9 @@ import {
   Square,
   ArrowRight,
   Menu,
+  Lightbulb,
 } from "lucide-react";
+import { GenerationStatus } from "./generation-status";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -197,6 +199,7 @@ export function ChatSidebar({
                                         (() => {
                                           const textContent = msg.content || "";
                                           const isRawHtml = textContent.toLowerCase().includes('<!doctype') || textContent.toLowerCase().includes('<html');
+                                          
                                           if (isRawHtml && extractArtifacts(textContent).length === 0) {
                                             return (
                                               <div className="flex flex-col gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl mt-2">
@@ -208,11 +211,48 @@ export function ChatSidebar({
                                               </div>
                                             );
                                           }
+
+                                          const hasPlan = !!msg.plan;
+                                          const isLastMessage = idx === messages.length - 1;
+                                          const isComplete = !isGenerating || !isLastMessage;
+                                          const plan = msg.plan;
+                                          
+                                          // Show status if it has a plan OR if it's the latest and still generating
+                                          const showStatus = hasPlan || (isLastMessage && isGenerating);
+
                                           return (
-                                            <div className="flex flex-col">
+                                            <div className="flex flex-col gap-5">
                                               <div className="text-foreground/90 leading-relaxed text-[15px]">
                                                 <MessageResponse>{stripArtifact(textContent)}</MessageResponse>
                                               </div>
+                                              
+                                              {showStatus && (
+                                                <div className="flex flex-col gap-6">
+                                                  <GenerationStatus 
+                                                    isComplete={isComplete}
+                                                    conclusionText={plan?.conclusionText}
+                                                    status={realtimeStatus?.status}
+                                                  />
+
+                                                  {isComplete && plan?.suggestion && (
+                                                    <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-700 delay-300">
+                                                      <div className="flex items-center gap-3">
+                                                        <div className="h-[1px] flex-1 bg-border" />
+                                                        <span className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em] shrink-0">Suggested Reply</span>
+                                                      </div>
+                                                      
+                                                      <button 
+                                                        onClick={() => setInput(plan.suggestion)}
+                                                        className="group px-4 py-2 rounded-xl bg-muted/50 border border-border hover:bg-muted hover:border-primary/20 transition-all duration-200 text-left w-fit shadow-sm hover:shadow-md"
+                                                      >
+                                                        <span className="text-[13px] font-medium text-foreground/80 group-hover:text-foreground transition-colors">
+                                                          {plan.suggestion}
+                                                        </span>
+                                                      </button>
+                                                    </div>
+                                                  )}
+                                                </div>
+                                              )}
                                             </div>
                                           );
                                         })()
@@ -235,43 +275,18 @@ export function ChatSidebar({
                         );
                       })}
 
-                      {isGenerating && (
-                        <div className="flex gap-4 p-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                          <div className="size-16 rounded-2xl bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0">
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
-                            <style>{`
-                              @keyframes shimmer {
-                                0% { transform: translateX(-100%); }
-                                100% { transform: translateX(100%); }
-                              }
-                            `}</style>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Sparkles className="size-6 text-primary animate-pulse" />
+                      {isGenerating && !messages.some(m => m.role === 'assistant') && (
+                        <div className="flex flex-col gap-4 px-5 py-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                          <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-full flex items-center justify-center bg-primary/10 border border-primary/20 flex-shrink-0">
+                              <LogoIcon className="h-4 w-4 text-primary"/>
                             </div>
+                            <span className="text-sm font-bold text-foreground tracking-tight">Sketch AI</span>
                           </div>
-
-                          <div className="flex-1 flex flex-col justify-center gap-1.5">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-semibold text-foreground">Sketch AI</span>
-                            </div>
-                            {realtimeStatus?.message ? (
-                              <div className="space-y-3">
-                                <p className="text-sm text-foreground/70 font-medium italic">
-                                  {realtimeStatus.message.replace(/\s*\.*$/, '')}...
-                                </p>
-                                <div className="flex gap-1.5">
-                                  <div className={cn("h-1 rounded-full transition-all duration-700", (realtimeStatus.status === 'vision' || realtimeStatus.status === 'planning') ? "w-12 bg-primary animate-pulse" : "w-12 bg-emerald-500")} />
-                                  <div className={cn("h-1 rounded-full transition-all duration-700", realtimeStatus.status === 'planning' ? "w-12 bg-primary animate-pulse" : (realtimeStatus.status === 'generating' || realtimeStatus.status === 'partial_complete' || realtimeStatus.status === 'complete') ? "w-12 bg-emerald-500" : "w-2 bg-muted")} />
-                                  <div className={cn("h-1 rounded-full transition-all duration-700", realtimeStatus.status === 'generating' ? "w-12 bg-primary animate-pulse" : realtimeStatus.status === 'complete' ? "w-12 bg-emerald-500" : "w-2 bg-muted")} />
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="space-y-3">
-                                <div className="h-3 bg-white/5 rounded-full w-[80%] animate-pulse" />
-                                <div className="h-3 bg-white/5 rounded-full w-[40%] animate-pulse" />
-                              </div>
-                            )}
-                          </div>
+                          <GenerationStatus 
+                            isComplete={false}
+                            status={realtimeStatus?.status}
+                          />
                         </div>
                       )}
                       
