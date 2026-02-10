@@ -7,6 +7,7 @@ import {
   Plus,
   ArrowLeft,
   ChevronLeft,
+  ChevronRight,
   ArrowRight,
   ChevronDown,
   Sparkles,
@@ -54,6 +55,8 @@ import {
   Check,
   Clipboard,
   Files,
+  Boxes,
+  Cloud,
 } from "lucide-react";
 import {
   Sheet,
@@ -62,6 +65,13 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserMenu } from "@/components/user-menu";
@@ -87,7 +97,6 @@ import {
 } from "@/components/ai-elements/message";
 import { ElementSettings } from "./element-settings";
 import { ThemeSettings } from "./theme-settings";
-import { PlanningDisplay } from "@/components/planning-display";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -542,24 +551,49 @@ const sanitizeDocumentHtml = (doc: Document, originalHtml: string) => {
 };
 
 
-const ModernShimmer = ({ appliedTheme }: { type?: string; appliedTheme?: any }) => {
+const ModernShimmer = ({ type = 'app', appliedTheme }: { type?: 'web' | 'app' | string; appliedTheme?: any }) => {
+  const isWeb = type === 'web';
   return (
     <div 
-      className="absolute inset-0 z-50 overflow-hidden pointer-events-none" 
+      className="absolute inset-0 z-50 overflow-hidden pointer-events-none flex flex-col p-10 gap-10" 
       style={{ backgroundColor: appliedTheme?.cssVars.background || 'var(--background)' }}
     >
-      {/* Standard, Clean Shimmer Effect */}
+      {/* Wireframe Skeletons */}
+      <div className="flex items-center justify-between w-full opacity-40">
+         <div className="h-4 w-24 bg-foreground/10 rounded-full animate-pulse" />
+         <div className="flex gap-3">
+            <div className="size-5 bg-foreground/10 rounded-full animate-pulse" />
+            <div className="size-5 bg-foreground/10 rounded-full animate-pulse" />
+         </div>
+      </div>
+      
+      <div className="space-y-5 opacity-40">
+         <div className="h-8 w-3/4 bg-foreground/10 rounded-xl animate-pulse" />
+         <div className="h-3 w-1/2 bg-foreground/10 rounded-lg animate-pulse" />
+      </div>
+
+      <div className={cn("grid gap-6 w-full opacity-40", isWeb ? "grid-cols-3" : "grid-cols-1")}>
+         <div className="h-40 bg-foreground/10 rounded-3xl animate-pulse" />
+         {isWeb && (
+           <>
+             <div className="h-40 bg-foreground/10 rounded-3xl animate-pulse" />
+             <div className="h-40 bg-foreground/10 rounded-3xl animate-pulse" />
+           </>
+         )}
+      </div>
+
+      {/* Standard Shimmer Overlay */}
       <div 
         className="absolute inset-0"
         style={{
           background: `linear-gradient(90deg, 
             transparent 0%, 
-            rgba(255, 255, 255, 0.15) 50%, 
+            rgba(255, 255, 255, 0.05) 50%, 
             transparent 100%
           )`,
-          width: '60%',
+          width: '100%',
           transform: 'skewX(-20deg) translateX(-200%)',
-          animation: 'shimmer-standard 1.8s infinite linear',
+          animation: 'shimmer-standard 2.5s infinite linear',
         }}
       />
 
@@ -721,6 +755,7 @@ export default function ProjectPage() {
   const [dynamicFrameHeights, setDynamicFrameHeights] = useState<Record<string, number>>({});
   const [selectedArtifactIndex, setSelectedArtifactIndex] = useState<number | null>(null);
   const iframeRefs = useRef<Record<string, HTMLIFrameElement | null>>({});
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [leftSidebarMode, setLeftSidebarMode] = useState<'chat' | 'properties' | 'theme'>('chat');
   const isEditMode = leftSidebarMode === 'properties';
   const [activeThemeId, setActiveThemeId] = useState<string | null>(null);
@@ -735,6 +770,8 @@ export default function ProjectPage() {
   const [isRegenerateDialogOpen, setIsRegenerateDialogOpen] = useState(false);
   const [regenerateInstructions, setRegenerateInstructions] = useState("");
   const [processingArtifact, setProcessingArtifact] = useState<Artifact | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [resizingHandle, setResizingHandle] = useState<string | null>(null);
   const resizingStartSize = useRef({ width: 0, height: 0 });
@@ -750,6 +787,8 @@ export default function ProjectPage() {
   const [realtimeStatus, setRealtimeStatus] = useState<{ message: string; status: string; currentScreen?: string } | null>(null);
   const [isPlanDialogOpen, setIsPlanDialogOpen] = useState(false);
   const [viewingPlan, setViewingPlan] = useState<any>(null);
+  const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
+  const [viewingPrompt, setViewingPrompt] = useState("");
   
   const {
     messages,
@@ -801,27 +840,77 @@ export default function ProjectPage() {
     // Process messages in order
     realtimeData.forEach((event: any) => {
       if (event.topic === 'plan') {
-        const plan = event.data;
+        const { plan, markdown } = event.data;
         if (plan?.screens) {
           setDesignPlan(plan.screens);
+        }
+        if (markdown) {
+          setMessages(prev => {
+            const last = prev[prev.length - 1] as any;
+            if (last && last.role === 'assistant') {
+              const updated = [...prev];
+              // Avoid double appending if it already has the markdown
+              const lastContent = last.content || '';
+              if (!lastContent.includes(markdown.substring(0, 20))) {
+                updated[updated.length - 1] = { 
+                  ...last, 
+                  content: lastContent + "\n\n" + markdown,
+                  plan: plan 
+                } as any;
+              }
+              return updated;
+            } else {
+              // Create new assistant message if none exists
+               return [...prev, { 
+                id: Math.random().toString(), 
+                role: 'assistant', 
+                content: markdown,
+                plan: plan 
+              } as any];
+            }
+          });
         }
       } else if (event.topic === 'status') {
         setRealtimeStatus(event.data);
         
-        // If vision is received, update messages locally
-        if (event.data.status === 'vision') {
-          setMessages(prev => {
-            const assistantMessages = prev.filter(m => m.role === 'assistant');
-            const visionExists = assistantMessages.some((m: any) => {
-              return m.content && m.content.includes(event.data.message);
-            });
-            if (visionExists) return prev;
-            return [...prev, { 
-              id: Math.random().toString(), 
-              role: 'assistant', 
-              content: event.data.message,
-            } as any];
-          });
+        if (event.data.status === 'vision' || event.data.status === 'planning') {
+          setIsGenerating(true);
+        }
+
+        // If a screen starts generating, show a shimmer placeholder
+        if (event.data.status === 'generating' && event.data.currentScreen) {
+          setIsGenerating(true);
+          const title = event.data.currentScreen;
+          
+          const updateFn = (prev: any[]) => {
+            if (prev.some(a => a.title === title)) return prev;
+            
+            // Find type from designPlan if possible
+            const planItem = designPlan.find(p => p.title === title);
+            const type = planItem?.type || 'web';
+
+            const getNewX = (existing: any[], scrType: string) => {
+              const last = existing[existing.length - 1];
+              const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
+              const currentWidth = getWidth(scrType);
+              return last 
+                ? (last.x || 0) + (last.width || getWidth(last.type)) + 120 
+                : -(currentWidth / 2);
+            };
+
+            const newPlaceholder = {
+              title,
+              content: "",
+              type: type as 'web' | 'app',
+              isComplete: false,
+              x: getNewX(prev, type),
+              y: 0
+            };
+            return [...prev, newPlaceholder];
+          };
+
+          setArtifacts(updateFn);
+          setThrottledArtifacts(updateFn);
         }
 
         // All screens finished
@@ -832,13 +921,21 @@ export default function ProjectPage() {
 
         // If a screen is complete, update artifacts locally for instant view
         if (event.data.status === 'partial_complete' && event.data.screen) {
+          setIsGenerating(true);
           const newScreen = event.data.screen;
           
           const updateFn = (prev: any[]) => {
             const updated = [...prev];
             const idx = updated.findIndex(a => a.title === newScreen.title);
             if (idx >= 0) {
-              updated[idx] = { ...updated[idx], ...newScreen, isComplete: true };
+              // Preserve current coordinates if it was already in the list (e.g. from generating status)
+              updated[idx] = { 
+                ...updated[idx], 
+                ...newScreen, 
+                x: updated[idx].x, 
+                y: updated[idx].y,
+                isComplete: true 
+              };
             } else {
               const getNewX = (existing: any[], type: string) => {
                 const last = existing[existing.length - 1];
@@ -848,7 +945,7 @@ export default function ProjectPage() {
                   ? (last.x || 0) + (last.width || getWidth(last.type)) + 120 
                   : -(currentWidth / 2);
               };
-              updated.push({ ...newScreen, isComplete: true, x: getNewX(updated, newScreen.type), y: 0 });
+              updated.push({ ...newScreen, isComplete: true, x: newScreen.x || getNewX(updated, newScreen.type), y: newScreen.y || 0 });
             }
             return updated;
           };
@@ -858,7 +955,7 @@ export default function ProjectPage() {
         }
       }
     });
-  }, [realtimeData, setMessages, projectId]);
+  }, [realtimeData, setMessages, projectId, designPlan]);
 
   // Refs to keep track of state in wheel event listeners without re-attaching
   const zoomRef = useRef(zoom);
@@ -1273,8 +1370,9 @@ export default function ProjectPage() {
   }, [isEditMode, selectedArtifactIndex]); // Removed commitEdits from dependencies
 
   // Save canvas data on change
-  const handleSave = async () => {
+  const handleSave = useCallback(async (showToast = true) => {
     if (!project) return;
+    setIsSaving(true);
     try {
       await fetch(`/api/projects/${projectId}`, {
         method: 'PATCH',
@@ -1292,12 +1390,24 @@ export default function ProjectPage() {
           }
         })
       });
-      toast.success("Project saved successfully!");
+      setHasUnsavedChanges(false);
     } catch (error) {
       console.error('Save error:', error);
       toast.error("Failed to save project");
+    } finally {
+      setIsSaving(false);
     }
-  };
+  }, [project, projectId, messages, artifacts, framePos, zoom, canvasOffset, dynamicFrameHeights, artifactPreviewModes, appliedTheme]);
+
+  const debouncedSave = useCallback(() => {
+    setHasUnsavedChanges(true);
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    saveTimeoutRef.current = setTimeout(() => {
+      handleSave(false);
+    }, 5000);
+  }, [handleSave]);
 
   const updateProjectTitle = async (newTitle: string) => {
     if (!project || !newTitle.trim()) return;
@@ -1342,13 +1452,19 @@ export default function ProjectPage() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
-        handleSave();
+        debouncedSave();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleSave]);
+  }, [debouncedSave]);
+
+  // Auto-save canvas state when zoom, offset, or artifacts change
+  useEffect(() => {
+    if (loading) return;
+    debouncedSave();
+  }, [zoom, canvasOffset, framePos, artifacts, dynamicFrameHeights, artifactPreviewModes, appliedTheme, loading, debouncedSave]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (activeTool === 'hand') {
@@ -1366,6 +1482,26 @@ export default function ProjectPage() {
   useEffect(() => {
     prevArtifactsCount.current = throttledArtifacts.length;
   }, [throttledArtifacts.length]);
+
+  const handlePersistFrame = async (index: number) => {
+    const artifact = artifacts[index];
+    if (!artifact || !artifact.id) return;
+
+    try {
+      await fetch(`/api/screens/${artifact.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          x: artifact.x,
+          y: artifact.y,
+          width: artifact.width,
+          height: artifact.height
+        })
+      });
+    } catch (error) {
+      console.error('Failed to persist frame:', error);
+    }
+  };
 
   const handleMouseMove = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -1446,6 +1582,12 @@ export default function ProjectPage() {
   };
 
   const handleMouseUp = () => {
+    if ((isDraggingFrame || isResizing) && selectedArtifactIndex !== null) {
+      handlePersistFrame(selectedArtifactIndex);
+    }
+    if (isPanning || isDraggingFrame || isResizing) {
+      debouncedSave();
+    }
     setIsPanning(false);
     setIsDraggingFrame(false);
     setIsResizing(false);
@@ -1886,6 +2028,37 @@ export default function ProjectPage() {
     );
   }
 
+  const handleFeedback = async (index: number, action: 'like' | 'dislike' | 'none') => {
+    const artifact = artifacts[index];
+    if (!artifact || !artifact.id) return;
+
+    try {
+      const res = await fetch(`/api/screens/${artifact.id}/feedback`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      });
+
+      if (!res.ok) throw new Error('Failed to update feedback');
+
+      const updatedScreen = await res.json();
+      const updateFn = (prev: Artifact[]) => prev.map((a, i) => i === index ? { 
+        ...a, 
+        isLiked: updatedScreen.isLiked, 
+        isDisliked: updatedScreen.isDisliked 
+      } : a);
+
+      setArtifacts(updateFn);
+      setThrottledArtifacts(updateFn);
+      
+      if (action === 'like') toast.success("Glad you like it!");
+      else if (action === 'dislike') toast.info("Feedback received. We'll try better.");
+    } catch (error) {
+      console.error('Feedback error:', error);
+      toast.error("Failed to save feedback");
+    }
+  };
+
   if (!project) return null;
 
   return (
@@ -1952,7 +2125,7 @@ export default function ProjectPage() {
               <Conversation className="relative h-full">
                 <ConversationContent className="p-0 scrollbar-hide">
                   <div className="flex flex-col min-h-full pb-8">
-                    {messages.length === 0 ? (
+                    {messages.length === 0 && artifacts.length === 0 && !isGenerating ? (
                       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center min-h-[400px]">
                         <div className="relative mb-6">
                            <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
@@ -2001,7 +2174,7 @@ export default function ProjectPage() {
                                 {/* Name inline with message */}
                                 <div className="flex flex-col gap-1">
                                   <span className="text-sm font-semibold text-foreground">
-                                    {message.role === 'user' ? (session.data?.user?.name || 'User') : 'Sketch'}
+                                    {message.role === 'user' ? (session.data?.user?.name || 'User') : 'Sketch AI'}
                                   </span>
                                   
                                   <MessageContent className="p-0 bg-transparent text-foreground leading-relaxed text-[15px]">
@@ -2021,18 +2194,119 @@ export default function ProjectPage() {
                                               </div>
                                             );
                                           }
-                                          return (
+                                           return (
                                             <div className="text-foreground/90 leading-relaxed text-[15px]">
                                               <MessageResponse>{stripArtifact(textContent)}</MessageResponse>
-                                              {msg.plan && (
-                                                <div className="mt-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                                  <PlanningDisplay 
-                                                    plan={msg.plan} 
-                                                    onClick={() => {
-                                                      setViewingPlan(msg.plan);
-                                                      setIsPlanDialogOpen(true);
-                                                    }}
-                                                  />
+                                               {msg.plan && (
+                                                <div className="mt-6 space-y-3 animate-in fade-in slide-in-from-bottom-3 duration-700">
+                                                  {/* Design Specification Card */}
+                                                  <motion.div 
+                                                     initial={{ opacity: 0, scale: 0.95 }}
+                                                     animate={{ opacity: 1, scale: 1 }}
+                                                     className="p-4 bg-card/40 backdrop-blur-md border border-border/40 rounded-2xl group cursor-pointer hover:bg-card/60 transition-all shadow-sm"
+                                                     onClick={() => {
+                                                       setViewingPlan(msg.plan);
+                                                       setIsPlanDialogOpen(true);
+                                                     }}
+                                                  >
+                                                     <div className="flex items-center justify-between mb-2">
+                                                       <div className="flex items-center gap-2.5">
+                                                         <div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                                                           <Boxes className="h-4 w-4 text-primary" />
+                                                         </div>
+                                                         <span className="text-[12px] font-bold text-foreground/90">Design Specification</span>
+                                                       </div>
+                                                       <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/30 group-hover:text-primary transition-colors" />
+                                                     </div>
+                                                     <p className="text-[11px] text-muted-foreground/60 leading-relaxed font-medium pl-10">
+                                                       {msg.plan.screens.length} Screens defined. Click to view detailed layout, components, and state logic.
+                                                     </p>
+                                                  </motion.div>
+
+                                                  {/* Sequential Screen Cards inside Accordion */}
+                                                  <div className="rounded-xl border border-primary/20 bg-background/40 overflow-hidden my-2 shadow-inner">
+                                                    <Accordion
+                                                      type="single"
+                                                      collapsible
+                                                      defaultValue="screens"
+                                                      className="w-full"
+                                                    >
+                                                      <AccordionItem value="screens" className="border-none">
+                                                        <AccordionTrigger className="hover:no-underline py-2.5 px-4 text-xs font-semibold transition-colors hover:bg-muted/30">
+                                                          <div className="flex items-center gap-3 w-full">
+                                                            <div className="relative flex items-center justify-center">
+                                                              {isGenerating ? (
+                                                                <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                                                              ) : (
+                                                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                                                              )}
+                                                            </div>
+                                                            <span className="text-foreground font-medium">
+                                                              {isGenerating ? "Synthesizing Design..." : "Design Complete"}
+                                                            </span>
+                                                            <div className="flex-1" />
+                                                            <Badge
+                                                              variant="secondary"
+                                                              className="text-[10px] h-4.5 px-2 bg-primary/10 text-primary border-none font-bold"
+                                                            >
+                                                              {msg.plan.screens.length}{" "}
+                                                              {msg.plan.screens.length === 1 ? "Screen" : "Screens"}
+                                                            </Badge>
+                                                          </div>
+                                                        </AccordionTrigger>
+                                                        <AccordionContent>
+                                                          <div className="px-3 pb-3 space-y-1.5 mt-1">
+                                                            {msg.plan.screens.map((screen: any, idx: number) => {
+                                                              const isCurrent = realtimeStatus?.currentScreen === screen.title && isGenerating;
+                                                              const isComplete = artifacts.some(a => a.title === screen.title && a.isComplete);
+                                                              
+                                                              return (
+                                                                <div 
+                                                                  key={idx}
+                                                                  onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setViewingPrompt(screen.prompt || "No dimensional prompt archived.");
+                                                                    setIsPromptDialogOpen(true);
+                                                                  }}
+                                                                  className={cn(
+                                                                    "flex items-center justify-between text-xs py-2 px-3 rounded-lg hover:bg-muted/20 transition-colors group/file cursor-pointer",
+                                                                    isCurrent && "bg-primary/5"
+                                                                  )}
+                                                                >
+                                                                  <div className="flex items-center gap-2.5 min-w-0">
+                                                                    {isComplete ? (
+                                                                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                                                                    ) : isCurrent ? (
+                                                                      <Loader2 className="h-3.5 w-3.5 text-primary animate-spin shrink-0" />
+                                                                    ) : (
+                                                                      <div className="h-3.5 w-3.5 rounded-full border border-border/50 shrink-0" />
+                                                                    )}
+                                                                    <div className="flex flex-col min-w-0">
+                                                                      <span className={cn(
+                                                                        "font-bold truncate text-[11px] transition-colors",
+                                                                        isCurrent ? "text-primary" : isComplete ? "text-emerald-400" : "text-muted-foreground group-hover/file:text-foreground"
+                                                                      )}>
+                                                                        {screen.title}
+                                                                      </span>
+                                                                       <span className="text-[9px] text-muted-foreground/40 font-bold tracking-widest">{screen.type}</span>
+                                                                    </div>
+                                                                  </div>
+                                                                  {isCurrent && (
+                                                                    <span className="text-[10px] text-primary/70 font-medium animate-pulse shrink-0 ml-4">
+                                                                      Designing...
+                                                                    </span>
+                                                                  )}
+                                                                  {isComplete && (
+                                                                    <ChevronRight className="size-3 text-muted-foreground/30 group-hover/file:text-primary transition-colors" />
+                                                                  )}
+                                                                </div>
+                                                              );
+                                                            })}
+                                                          </div>
+                                                        </AccordionContent>
+                                                      </AccordionItem>
+                                                    </Accordion>
+                                                  </div>
                                                 </div>
                                               )}
                                             </div>
@@ -2051,28 +2325,18 @@ export default function ProjectPage() {
                           </div>
                         );})}
                         
-                        {isGenerating && (
+                        {isGenerating && messages[messages.length - 1]?.role !== 'assistant' && (
                           <div className="flex gap-4 p-6 animate-in fade-in slide-in-from-bottom-2">
                             <div className="size-8 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                                <Sparkles className="size-4 text-primary animate-pulse" />
                             </div>
                             <div className="flex-1 space-y-4 pr-6">
-                               <div className="flex items-center gap-2">
-                                  <span className="text-[11px] font-black uppercase tracking-widest text-primary">Sketch AI</span>
-                                  <span className="size-1 rounded-full bg-primary/30" />
-                                  <span className="text-[11px] font-medium text-foreground/40 uppercase tracking-widest">Generating</span>
-                               </div>
+                                <div className="flex items-center gap-2">
+                                   <span className="text-sm font-semibold text-foreground">Sketch AI</span>
+                                </div>
                                <div className="space-y-4">
                                   <div className="h-4 bg-primary/5 rounded-full w-[80%] animate-pulse" />
                                   <div className="h-4 bg-primary/5 rounded-full w-[60%] animate-pulse" />
-                                  
-                                  {(realtimeStatus?.status === 'generating' || realtimeStatus?.status === 'planning') && (
-                                     <PlanningDisplay 
-                                       isPlanning={true} 
-                                       plan={{ screens: [] }}
-                                       className="mt-2"
-                                     />
-                                  )}
                                </div>
                             </div>
                           </div>
@@ -2198,16 +2462,22 @@ export default function ProjectPage() {
                </div>
             </div>
             
-            <div className="flex items-center gap-4 pointer-events-auto">
-               <button 
-                 onClick={handleSave}
-                 className="flex items-center h-9 px-4 rounded-xl bg-primary text-primary-foreground text-[13px] font-semibold shadow-lg hover:bg-primary/90 active:scale-95 transition-all gap-2 group"
-               >
-                 <Save className="h-4 w-4 group-hover:scale-110 transition-transform" />
-                 Save
-               </button>
-               <UserMenu />
-            </div>
+             <div className="flex items-center gap-4 pointer-events-auto">
+                {/* Minimalist Save Status */}
+                <div className="flex items-center justify-center w-8 h-8">
+                   {isSaving ? (
+                      <Loader2 className="h-4 w-4 text-foreground/40 animate-spin" />
+                   ) : hasUnsavedChanges ? (
+                       <div title="Unsaved"><Cloud className="h-4 w-4 text-foreground/40" /></div>
+                   ) : (
+                      <div className="relative opacity-20" title="Saved">
+                        <Cloud className="h-4 w-4 text-foreground" />
+                        <Check className="absolute -bottom-0.5 -right-0.5 h-2 w-2 text-foreground stroke-[4px]" />
+                      </div>
+                   )}
+                </div>
+                <UserMenu />
+             </div>
          </header>
 
          {/* Content Layer */}
@@ -2262,14 +2532,14 @@ export default function ProjectPage() {
                       >
                         
                         {/* Main Toolbar Container */}
-                        <div className="flex items-center gap-1 px-2 py-1.5 bg-card/95 backdrop-blur-md border border-border rounded-2xl shadow-2xl">
+                        <div className="flex items-center gap-1 px-2 py-1.5 bg-card/95 backdrop-blur-md border border-border/50 rounded-xl shadow-2xl">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
                                 disabled={status !== 'ready'}
-                                className="h-9 px-3 text-foreground hover:bg-muted rounded-xl flex items-center gap-2 text-[13px] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="h-9 px-3 text-foreground/80 hover:text-foreground rounded-lg flex items-center gap-2 text-[13px] font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                               >
                                 {status !== 'ready' ? (
                                   <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -2318,8 +2588,8 @@ export default function ProjectPage() {
                                 }
                             }}
                             className={cn(
-                                "h-9 w-9 text-foreground rounded-xl flex items-center justify-center transition-all disabled:opacity-30",
-                                leftSidebarMode === 'properties' ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "hover:bg-muted"
+                                "h-9 w-9 text-foreground/80 hover:text-foreground rounded-lg flex items-center justify-center transition-all disabled:opacity-30",
+                                leftSidebarMode === 'properties' && "bg-primary/10 text-primary shadow-lg shadow-primary/5"
                             )}
                             title="Edit Mode"
                           >
@@ -2338,8 +2608,8 @@ export default function ProjectPage() {
                                 }
                             }}
                             className={cn(
-                                "h-9 w-9 text-foreground rounded-xl flex items-center justify-center transition-all disabled:opacity-30",
-                                leftSidebarMode === 'theme' ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "hover:bg-muted"
+                                "h-9 w-9 text-foreground/80 hover:text-foreground rounded-lg flex items-center justify-center transition-all disabled:opacity-30",
+                                leftSidebarMode === 'theme' && "bg-primary/10 text-primary shadow-lg shadow-primary/5"
                             )}
                             title="Theme Settings"
                           >
@@ -2351,7 +2621,7 @@ export default function ProjectPage() {
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="h-9 px-3 text-foreground hover:bg-muted rounded-xl flex items-center gap-2 text-[13px] font-medium"
+                                className="h-9 px-3 text-foreground/80 hover:text-foreground rounded-lg flex items-center gap-2 text-[13px] font-medium transition-colors"
                               >
                                 {(() => {
                                   const mode = artifactPreviewModes[artifact.title] || (artifact.type === 'app' ? 'mobile' : 'desktop');
@@ -2414,7 +2684,7 @@ export default function ProjectPage() {
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="h-9 w-9 p-0 text-foreground hover:bg-muted rounded-xl flex items-center justify-center font-medium"
+                                className="h-9 w-9 p-0 text-foreground/80 hover:text-foreground rounded-lg flex items-center justify-center font-medium transition-colors"
                               >
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
@@ -2457,20 +2727,28 @@ export default function ProjectPage() {
                         </div>
 
                         {/* Feedback Container */}
-                        <div className="flex items-center gap-0.5 px-1.5 py-1.5 bg-card/95 backdrop-blur-md border border-border rounded-2xl shadow-2xl">
+                        <div className="flex items-center gap-0.5 px-1.5 py-1.5 bg-card/95 backdrop-blur-md border border-border/50 rounded-xl shadow-2xl">
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="h-9 w-9 p-0 text-foreground hover:bg-muted rounded-xl"
+                            onClick={() => handleFeedback(index, artifact.isLiked ? 'none' : 'like')}
+                            className={cn(
+                              "h-9 w-9 p-0 rounded-lg transition-all",
+                              artifact.isLiked ? "text-primary bg-primary/10" : "text-foreground/80 hover:text-foreground"
+                            )}
                           >
-                            <ThumbsUp className="h-4 w-4" />
+                            <ThumbsUp className={cn("h-4 w-4", artifact.isLiked && "fill-current")} />
                           </Button>
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="h-9 w-9 p-0 text-foreground hover:bg-muted rounded-xl"
+                            onClick={() => handleFeedback(index, artifact.isDisliked ? 'none' : 'dislike')}
+                            className={cn(
+                              "h-9 w-9 p-0 rounded-lg transition-all",
+                              artifact.isDisliked ? "text-red-500 bg-red-500/10" : "text-foreground/80 hover:text-foreground"
+                            )}
                           >
-                            <ThumbsDown className="h-4 w-4" />
+                            <ThumbsDown className={cn("h-4 w-4", artifact.isDisliked && "fill-current")} />
                           </Button>
                         </div>
                       </div>
@@ -2618,192 +2896,111 @@ export default function ProjectPage() {
               </div>
              ) : (
                 <div className="flex flex-col items-center gap-6 opacity-20 pointer-events-none">
-                   <Logo iconSize={80} showText={false} />
-                   <p className="text-xl font-medium tracking-tight">Generate your first design to see it here</p>
+                   {!isGenerating && (
+                     <>
+                       <Logo iconSize={80} showText={false} />
+                       <p className="text-xl font-medium tracking-tight">Generate your first design to see it here</p>
+                     </>
+                   )}
                    {isGenerating && (
-                     <div className="w-[380px] h-[600px] border border-border/20 rounded-2xl overflow-hidden bg-card/10 backdrop-blur-sm relative">
-                       <ModernShimmer type="mobile" appliedTheme={appliedTheme} />
-                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/20">
-                          <Loader2 className="size-8 text-primary animate-spin" />
-                          <span className="text-sm font-bold text-white uppercase tracking-widest animate-pulse">Designing...</span>
+                     <motion.div 
+                       initial={{ opacity: 0, scale: 0.9 }}
+                       animate={{ opacity: 1, scale: 1 }}
+                       className={cn(
+                         "border border-border/20 rounded-2xl overflow-hidden bg-white/5 backdrop-blur-sm relative transition-all duration-700 shadow-[0_50px_100px_rgba(0,0,0,0.4)]",
+                         (designPlan[0]?.type === 'web') ? "w-[1024px] h-[640px]" : "w-[380px] h-[740px]"
+                       )}
+                     >
+                       <ModernShimmer type={designPlan[0]?.type || 'app'} appliedTheme={appliedTheme} />
+                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/40 backdrop-blur-[2px] z-[60]">
+                          <Loader2 className="size-10 text-primary animate-spin" />
+                          <span className="text-sm font-bold text-white tracking-[0.2em] animate-pulse">Synthesizing Vision...</span>
                        </div>
-                     </div>
+                     </motion.div>
                    )}
                 </div>
              )}
           </div>
 
-          {/* Design Execution Console (Plan & Realtime Status) */}
-          <AnimatePresence>
-            {isGenerating && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9, x: 20 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.9, x: 20 }}
-                className="absolute right-8 top-8 w-80 z-40"
-              >
-                <div className="bg-card/40 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.4)] overflow-hidden">
-                  {/* Header */}
-                  <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="size-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Execution Console</span>
-                    </div>
-                    {realtimeStatus?.status === 'generating' && (
-                      <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
-                        <Loader2 className="size-2.5 text-primary animate-spin" />
-                        <span className="text-[8px] font-bold text-primary uppercase tracking-wider">Live</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-6 space-y-6">
-                    {/* Vision Status */}
-                    {realtimeStatus?.status === 'vision' && (
-                       <motion.div 
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="p-4 bg-white/5 border border-white/5 rounded-xl"
-                       >
-                          <p className="text-[13px] text-white/90 italic leading-relaxed font-medium block">
-                            &ldquo;{realtimeStatus.message}&rdquo;
-                          </p>
-                       </motion.div>
-                    )}
-
-                    {/* Planning Manifest */}
-                    {designPlan.length > 0 && (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Architectural Plan</span>
-                          <span className="text-[10px] text-white/20 font-mono">{designPlan.length} Screens</span>
-                        </div>
-                        <div className="space-y-2">
-                          {designPlan.map((p, i) => {
-                            const isCurrent = realtimeStatus?.currentScreen === p.title;
-                            // Check if this screen is already in artifacts
-                            const isDone = artifacts.some(a => a.title === p.title);
-                            
-                            return (
-                              <motion.div 
-                                key={i}
-                                initial={{ opacity: 0, x: -5 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: i * 0.1 }}
-                                className={cn(
-                                  "relative p-3 rounded-xl border transition-all duration-300",
-                                  isCurrent ? "bg-primary/10 border-primary/30" : 
-                                  isDone ? "bg-accent/5 border-accent/20" : "bg-white/2 border-white/5"
-                                )}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <div className={cn(
-                                      "size-6 rounded-lg flex items-center justify-center border",
-                                      isCurrent ? "bg-primary border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]" : 
-                                      isDone ? "bg-accent border-accent text-accent-foreground" : "bg-white/5 border-white/10 text-white/40"
-                                    )}>
-                                      {isDone ? <Check className="size-3.5" /> : 
-                                       isCurrent ? <Loader2 className="size-3.5 text-background animate-spin" /> : 
-                                       (p.type === 'app') ? <Smartphone className="size-3" /> : <Monitor className="size-3" />}
-                                    </div>
-                                    <div className="flex flex-col">
-                                      <span className={cn(
-                                        "text-xs font-bold tracking-tight",
-                                        isCurrent ? "text-primary" : isDone ? "text-accent/80" : "text-white/60"
-                                      )}>{p.title}</span>
-                                      <span className="text-[9px] text-white/30 truncate max-w-[140px]">{p.description}</span>
-                                    </div>
-                                  </div>
-                                  {isCurrent && (
-                                    <div className="h-4 w-12 bg-primary/20 rounded-full overflow-hidden relative">
-                                       <motion.div 
-                                         animate={{ x: ["-100%", "100%"] }}
-                                         transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                                         className="absolute inset-0 bg-primary/40"
-                                       />
-                                    </div>
-                                  )}
-                                </div>
-                              </motion.div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Realtime Feedback */}
-                    {realtimeStatus?.status === 'generating' && (
-                      <div className="pt-4 border-t border-white/5">
-                        <div className="flex items-center gap-2 mb-2">
-                           <Zap className="size-3 text-primary" />
-                           <span className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Designing Assets</span>
-                        </div>
-                        <p className="text-[11px] text-white/50 leading-relaxed">
-                          {realtimeStatus.message}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Waiting Message */}
-                    {!realtimeStatus && !designPlan.length && (
-                      <div className="py-8 flex flex-col items-center justify-center gap-4 text-center">
-                         <Loader2 className="size-6 text-primary animate-spin opacity-40" />
-                         <p className="text-[10px] text-white/30 font-bold uppercase tracking-[0.2em] animate-pulse">
-                            Establishing Vision...
-                         </p>
-                      </div>
-                    )}
-                  </div>
+          {/* Prompt Details Dialog */}
+          <Dialog open={isPromptDialogOpen} onOpenChange={setIsPromptDialogOpen}>
+            <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-900 text-white rounded-3xl p-8">
+              <DialogHeader>
+                <div className="size-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
+                  <Sparkles className="size-6 text-primary" />
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <DialogTitle className="text-2xl font-black tracking-tight">Generation Node</DialogTitle>
+                <DialogDescription className="text-zinc-500 font-medium pt-1">
+                  The specific architectural prompt used to synthesize this screen.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="mt-6 p-6 bg-white/5 border border-white/5 rounded-2xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Code className="size-12" />
+                </div>
+                <p className="text-sm font-medium leading-relaxed text-zinc-300 italic relative z-10">
+                  &ldquo;{viewingPrompt}&rdquo;
+                </p>
+              </div>
+              <DialogFooter className="mt-8">
+                <Button 
+                  onClick={() => setIsPromptDialogOpen(false)}
+                  className="w-full h-12 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-widest"
+                >
+                  Close Prompt
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* Bottom Floating Toolbar */}
-         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 p-1.5 bg-card/90 backdrop-blur-xl rounded-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-1 z-30">
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 p-1.5 bg-card/95 backdrop-blur-xl rounded-xl border border-border/50 shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center gap-1 z-30">
             <Button 
               onClick={() => setActiveTool('select')}
               variant="ghost" 
               size="icon" 
               className={cn(
-                "h-10 w-10 rounded-xl transition-all",
-                activeTool === 'select' ? "bg-primary text-background shadow-lg shadow-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                "h-9 w-9 rounded-lg transition-all duration-200",
+                activeTool === 'select' 
+                  ? "bg-primary/10 text-primary" 
+                  : "text-muted-foreground hover:text-foreground"
               )}
               title="Select Tool (V)"
             >
-               <MousePointer2 className="h-5 w-5" />
+               <MousePointer2 className="h-4.5 w-4.5" />
             </Button>
             <Button 
               onClick={() => setActiveTool('hand')}
               variant="ghost" 
               size="icon" 
               className={cn(
-                "h-10 w-10 rounded-xl transition-all",
-                activeTool === 'hand' ? "bg-primary text-background shadow-lg shadow-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                "h-9 w-9 rounded-lg transition-all duration-200",
+                activeTool === 'hand' 
+                  ? "bg-primary/10 text-primary" 
+                  : "text-muted-foreground hover:text-foreground"
               )}
               title="Hand Tool (H)"
             >
-               <Hand className="h-5 w-5" />
+               <Hand className="h-4.5 w-4.5" />
             </Button>
-            <div className="w-[1px] h-6 bg-border mx-1" />
+            <div className="w-[1px] h-4 bg-border/50 mx-1" />
             <Button 
               onClick={() => setZoom(prev => Math.min(prev * 1.2, 5))}
               variant="ghost" 
               size="icon" 
-              className="h-10 w-10 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted"
+              className="h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground transition-all duration-200"
               title="Zoom In (Ctrl +)"
             >
-               <ZoomIn className="h-5 w-5" />
+               <ZoomIn className="h-4.5 w-4.5" />
             </Button>
             <Button 
               onClick={() => setZoom(prev => Math.max(prev / 1.2, 0.1))}
               variant="ghost" 
               size="icon" 
-              className="h-10 w-10 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted"
+              className="h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground transition-all duration-200"
               title="Zoom Out (Ctrl -)"
             >
-               <ZoomOut className="h-5 w-5" />
+               <ZoomOut className="h-4.5 w-4.5" />
             </Button>
             <Button 
               onClick={() => {
@@ -2813,12 +3010,12 @@ export default function ProjectPage() {
               }}
               variant="ghost" 
               size="icon" 
-              className="h-10 w-10 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted"
+              className="h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground transition-all duration-200"
               title="Reset View"
             >
-               <RotateCcw className="h-5 w-5" />
+               <RotateCcw className="h-4 w-4" />
             </Button>
-         </div>
+          </div>
       </main>
 
       {/* Custom Monaco Code Viewer Modal */}
@@ -3027,24 +3224,64 @@ export default function ProjectPage() {
           
           <div className="p-8 max-h-[60vh] overflow-y-auto scrollbar-hide">
              <div className="space-y-4">
-                {viewingPlan?.screens?.map((screen: any, idx: number) => (
-                  <div key={idx} className="p-5 bg-white/5 border border-white/5 rounded-2xl flex items-start gap-4 hover:border-primary/20 transition-all group">
-                     <div className="size-10 rounded-xl bg-white/5 flex items-center justify-center text-zinc-500 font-mono text-xs group-hover:bg-primary/10 group-hover:text-primary transition-all">
-                        {String(idx + 1).padStart(2, '0')}
-                     </div>
-                     <div className="flex-1 space-y-1">
-                        <div className="flex items-center justify-between">
-                           <span className="font-bold text-white tracking-tight">{screen.title}</span>
-                           <span className="px-2 py-0.5 rounded-full bg-white/5 text-[9px] font-black uppercase tracking-widest text-zinc-500 border border-white/5">
-                              {screen.type}
-                           </span>
-                        </div>
-                        <p className="text-sm text-zinc-400 leading-relaxed font-medium">
-                           {screen.description}
-                        </p>
-                     </div>
-                  </div>
-                ))}
+                {viewingPlan?.screens?.map((screen: any, idx: number) => {
+                  const isGeneratingThisScreen = isGenerating && realtimeStatus?.currentScreen === screen.title;
+                  const isScreeenComplete = artifacts.some(a => a.title === screen.title && a.isComplete);
+
+                  return (
+                    <div 
+                      key={idx} 
+                      className={cn(
+                        "p-5 bg-white/5 border border-white/5 rounded-2xl flex items-start gap-4 transition-all group relative overflow-hidden",
+                        isGeneratingThisScreen ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20" : 
+                        isScreeenComplete ? "border-emerald-500/20 bg-emerald-500/5 shadow-[0_0_20px_-10px_rgba(16,185,129,0.2)]" : "hover:border-white/10"
+                      )}
+                    >
+                       {isGeneratingThisScreen && (
+                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite] pointer-events-none" />
+                       )}
+
+                       <div className={cn(
+                         "size-10 rounded-xl bg-white/5 flex items-center justify-center transition-all",
+                         isGeneratingThisScreen ? "bg-primary border border-primary text-white shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" : 
+                         isScreeenComplete ? "bg-emerald-500 border border-emerald-500 text-white" : "text-zinc-500 font-mono text-xs group-hover:bg-primary/10 group-hover:text-primary"
+                       )}>
+                          {isScreeenComplete ? <Check className="size-5" /> : 
+                           isGeneratingThisScreen ? <Loader2 className="size-5 animate-spin" /> : 
+                           String(idx + 1).padStart(2, '0')}
+                       </div>
+
+                       <div className="flex-1 space-y-1">
+                          <div className="flex items-center justify-between">
+                             <div className="flex items-center gap-2">
+                               <span className={cn(
+                                 "font-bold text-white tracking-tight transition-colors",
+                                 isGeneratingThisScreen && "text-primary",
+                                 isScreeenComplete && "text-emerald-400"
+                               )}>{screen.title}</span>
+                               {isGeneratingThisScreen && (
+                                 <span className="px-1.5 py-0.5 rounded bg-primary/10 text-[8px] font-black uppercase tracking-tighter text-primary border border-primary/20 animate-pulse">
+                                   Designing...
+                                 </span>
+                               )}
+                               {isScreeenComplete && (
+                                 <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-[8px] font-black uppercase tracking-tighter text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                                    <div className="size-1 rounded-full bg-emerald-400" />
+                                    Online
+                                 </span>
+                               )}
+                             </div>
+                             <span className="px-2 py-0.5 rounded-full bg-white/5 text-[9px] font-black uppercase tracking-widest text-zinc-500 border border-white/5">
+                                {screen.type}
+                             </span>
+                          </div>
+                          <p className="text-sm text-zinc-400 leading-relaxed font-medium">
+                             {screen.description}
+                          </p>
+                       </div>
+                    </div>
+                  );
+                })}
              </div>
           </div>
 

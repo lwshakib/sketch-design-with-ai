@@ -1,4 +1,5 @@
 export interface Artifact {
+  id?: string;
   content: string;
   type: 'web' | 'app';
   isComplete: boolean;
@@ -7,6 +8,8 @@ export interface Artifact {
   y?: number;
   width?: number;
   height?: number;
+  isLiked?: boolean;
+  isDisliked?: boolean;
 }
 
 /**

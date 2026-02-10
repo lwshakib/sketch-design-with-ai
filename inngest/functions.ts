@@ -89,7 +89,8 @@ export const generateDesign = inngest.createFunction(
       data: { message: "Architecting project manifest...", status: "planning" }
     });
 
-    const plan = await step.run("generate-plan", async (): Promise<Plan> => {
+    // 2. Generate detailed architectural plan
+    const { plan, planMarkdown } = await step.run("generate-plan", async () => {
       const { text } = await generateText({
         model: GeminiModel(),
         system: PlanningPrompt,
@@ -113,30 +114,32 @@ export const generateDesign = inngest.createFunction(
          }
       }
 
-      // Stream the plan to the UI via Realtime
+      const markdown = text.replace(/<plan>([\s\S]*?)<\/plan>/i, "").trim();
+
+      // Stream the plan and markdown to the UI via Realtime
       await publish({
         channel: `project:${projectId}`,
         topic: "plan",
-        data: planJson
+        data: { plan: planJson, markdown }
       });
 
-      return planJson;
+      return { plan: planJson, planMarkdown: markdown };
     });
 
-    // Save as assistant message with both vision and plan
+    // Save as assistant message with vision, plan markdown, and the JSON plan
     await step.run("save-assistant-message", async () => {
       await prisma.message.create({
         data: {
           projectId: projectId,
           role: "assistant",
-          content: vision,
+          content: vision + "\n\n" + planMarkdown,
           plan: JSON.parse(JSON.stringify(plan))
         },
       });
     });
 
-    // --- STEP 3: SEQUENTIAL GENERATION ---
-    if (plan.screens && plan.screens.length > 0) {
+    // 3. Sequentially generate each screen in the plan
+    if (plan.screens.length > 0) {
       for (let i = 0; i < plan.screens.length; i++) {
         const screen = plan.screens[i];
         if (!screen) continue;
@@ -167,7 +170,7 @@ export const generateDesign = inngest.createFunction(
               { role: 'assistant', content: vision || '' },
               { role: 'assistant', content: `Design Plan: ${JSON.stringify({ screens: [screen] })}` },
               { role: 'user', content: `Here is some high-fidelity design inspiration for this screen:\n\n${inspiration}` },
-              { role: 'user', content: `Now generate the ${screen.title} (${screen.type}) screen based on the vision and the inspiration provided above. Description: ${screen.description}` }
+              { role: 'user', content: `Now generate the ${screen.title} (${screen.type}) screen based on the vision and the inspiration provided above. Description: ${screen.description}. SPECIFIC PROMPT: ${(screen as any).prompt || ''}` }
             ],
             tools: {
               getDesignInspiration
@@ -197,8 +200,8 @@ export const generateDesign = inngest.createFunction(
           };
         });
 
-        // Save the screen to database
-        await step.run(`save-screen-${i}-db`, async () => {
+        // Save the screen to database and notify UI
+        const savedScreen = await step.run(`save-screen-${i}-db`, async () => {
           const existingScreen = await prisma.screen.findFirst({
             where: {
               projectId: projectId,
@@ -207,7 +210,7 @@ export const generateDesign = inngest.createFunction(
           });
 
           if (existingScreen) {
-             await prisma.screen.update({
+             return await prisma.screen.update({
                where: { id: existingScreen.id },
                data: {
                  content: generatedScreen.content,
@@ -227,7 +230,7 @@ export const generateDesign = inngest.createFunction(
                ? lastScreen.x + (lastScreen.width || getWidth(lastScreen.type)) + 120 
                : -(currentWidth / 2);
 
-             await prisma.screen.create({
+             return await prisma.screen.create({
                data: {
                  projectId: projectId,
                  title: generatedScreen.title,
@@ -240,14 +243,14 @@ export const generateDesign = inngest.createFunction(
           }
         });
 
-        // Notify UI: screen complete
+        // Notify UI: screen complete with database record
         await publish({
           channel: `project:${projectId}`,
           topic: "status",
           data: { 
             message: `"${screen.title}" complete.`, 
             status: "partial_complete",
-            screen: generatedScreen
+            screen: savedScreen
           }
         });
       }

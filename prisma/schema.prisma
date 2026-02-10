@@ -119,6 +119,8 @@ model Screen {
   y         Float    @default(0)
   width     Int?
   height    Int?
+  isLiked   Boolean  @default(false)
+  isDisliked Boolean  @default(false)
   
   projectId String
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)

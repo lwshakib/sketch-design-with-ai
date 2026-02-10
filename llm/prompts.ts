@@ -295,19 +295,33 @@ Example Vision: "I am architecting a **Luminescent Fintech** app with a deep obs
 `;
 
 export const PlanningPrompt = `YOU ARE A SENIOR PRODUCT ARCHITECT.
-Based on the user's request, create a detailed design plan (a manifest) for the screens required.
-Define exactly how many screens are needed, their names, and their specific platform type (web or app).
+Based on the user's request, create a concise architectural plan for the screens required. 
 
-Provide a brief architectural overview, and then list the screens.
-**MANDATORY**: You MUST output the final JSON manifest wrapped in \`<plan>\` tags.
+### 📜 Output Format:
+1. **Architectural Plan**: Provide a high-fidelity markdown description of the design language and user flow. **MANDATORY**: Keep this description very concise, exactly 4-5 sentences. DO NOT EXCEED THIS LIMIT.
+2. **Project Manifest**: Wrap the final JSON manifest in \`<plan>\` tags.
+
+**MANDATORY**: Each screen in the manifest MUST include a 'prompt' field: a detailed, high-fidelity prompt used to generate that specific screen.
+Ensure all screens follow a unified visual identity.
 
 Example Output:
-The project requires a high-fidelity dashboard and a mobile login app.
+I am architecting a premium **Crypto Wallet** ecosystem with deep glass surfaces and a clean navigation flow. The interface uses an obsidian background with neon-emerald accents and subtle slate borders. All mobile screens utilize a high-fidelity floating bottom bar with a central glass action button. This approach ensures maximum security visual cues and a world-class user experience.
+
 \<plan\>
 {
   "screens": [
-    { "title": "Dashboard", "type": "web", "description": "Global stats with glass cards" },
-    { "title": "Login mobile", "type": "app", "description": "Biometric auth with premium gradients" }
+    { 
+      "title": "Onboarding", 
+      "type": "app", 
+      "description": "High-impact hero images with sleek biometric entry points.",
+      "prompt": "Generate a crypto wallet onboarding screen with a deep obsidian bg, glass cards, and emerald CTAs. Use Outfit font."
+    },
+    { 
+      "title": "Dashboard", 
+      "type": "app", 
+      "description": "Glass card charts and integrated floating bottom nav.",
+      "prompt": "Create a financial dashboard showing balance and recent transactions using Chart.js. Include a floating nav bar."
+    }
   ]
 }
 \</plan\>
@@ -320,6 +334,11 @@ Your task is to generate the production-ready HTML and Tailwind CSS code for a S
 - **getDesignInspiration**: Use this tool to see high-fidelity blueprints for either "web" or "app" platforms. You can provide keywords to find specific examples (e.g., 'dashboard', 'e-commerce', 'fitness'). This is CRITICAL for maintaining our "Elite Aesthetics" standard. ALWAYS call this tool if you need a reference for quality or specific component patterns.
 
 ${CORE_DESIGN_PRINCIPLES}
+
+### 🔄 Multi-Screen Consistency (CRITICAL):
+- **Universal Layout**: If this is part of a multi-screen "app" project, your layout (especially headers and bottom navigation) MUST match the other screens in the plan exactly.
+- **State Transformation**: If there is a navigation bar, ensure the "Active" state (color/icon fill) translates correctly to the current screen's title. For example, if designing the "Settings" screen, the "Settings" icon in the bottom bar must be active/highlighted.
+- **Shared Variables**: Use the exact same CSS variable definitions (\`:root\`) and Tailwind config across all screens to ensure a perfectly unified design system.
 
 ### 📊 Dynamic Data Visualization: 
 - If the design requires charts, graphs, or complex data tracking, use **Chart.js via CDN**: <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>.
