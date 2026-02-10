@@ -265,15 +265,15 @@ export const CORE_DESIGN_PRINCIPLES = `### 💎 Elite Design Principles (VIBRANT
    - **Contrast Master (CRITICAL)**: Ensure 100% legibility. If using a colored background, use \`text-primary-foreground\`. NEVER allow text to feel "washed out".
 5. **Component Blueprints (Strict Standards)**:
    - **Stats/Metrics**: Use large, bold font-black for numbers. Accompany with sub-labels and small trend indicators.
-   - **Navigation**: Desktop uses a glass-morphism top-nav. Mobile uses a floating bottom navigation bar (\`h-20\`, \`bg-background/90\`, \`backdrop-blur-3xl\`, \`border-t\`).
+   - **Navigation**: Desktop uses a glass-morphism top-nav. App (mobile layout) uses a floating bottom navigation bar (\`h-20\`, \`bg-background/90\`, \`backdrop-blur-3xl\`, \`border-t\`).
    - **Empty States**: Never leave a section empty. If there is no data, use an icon + a premium gradient "placeholder" block.
 6. **Expansive Canvas & Full Responsiveness (STRICT HEIGHT CONTROL)**: 
    - **ABSOLUTE BAN ON VH/VW UNITS**: NEVER use \`vh\` or \`vw\` units for heights or widths. These cause infinite re-render loops in resizing iframes.
    - **MANDATORY**: Use specific pixel heights (e.g., \`min-h-[800px]\`, \`h-[600px]\`) or aggressive vertical padding (\`py-24\`, \`p-32\`) to define the vertical scale of sections.
    - **Scrollable Flow**: Ensure the design naturally flows vertically without being constrained by the screen height.
-7. **📱 Premium Mobile (App) Architecture**:
-    - **Native Feel**: 9:19 Aspect Ratio is primary. Ensure the UI feels like a high-end mobile app.
-    - **Signature Bottom Bar**: Every mobile design MUST have a high-fidelity fixed bottom nav bar with an "Action" center button.
+7. **📱 Premium App Architecture**:
+    - **Native Feel**: 9:19 Aspect Ratio is primary. Ensure the UI feels like a high-end app.
+    - **Signature Bottom Bar**: Every App design MUST have a high-fidelity fixed bottom nav bar with an "Action" center button.
     - **Fluid Sections**: Use \`rounded-[2.5rem]\` or \`rounded-[3rem]\` for main sections.
 
 8. **💎 Elite Aesthetics (NON-NEGOTIABLE)**:
@@ -305,7 +305,7 @@ Based on the user's request, create a concise architectural plan for the screens
 Ensure all screens follow a unified visual identity.
 
 Example Output:
-I am architecting a premium **Crypto Wallet** ecosystem with deep glass surfaces and a clean navigation flow. The interface uses an obsidian background with neon-emerald accents and subtle slate borders. All mobile screens utilize a high-fidelity floating bottom bar with a central glass action button. This approach ensures maximum security visual cues and a world-class user experience.
+I am architecting a premium **Crypto Wallet** ecosystem with deep glass surfaces and a clean navigation flow. The interface uses an obsidian background with neon-emerald accents and subtle slate borders. All app screens utilize a high-fidelity floating bottom bar with a central glass action button. This approach ensures maximum security visual cues and a world-class user experience.
 
 \<plan\>
 {
@@ -345,7 +345,7 @@ ${CORE_DESIGN_PRINCIPLES}
 - Ensure all charts leverage system CSS variables (var(--primary), var(--accent)).
 
 ### 📜 Technical Delivery:
-1. **MANDATORY**: You MUST wrap your code in either a "web_artifact" tag (for web/desktop screens) or an "app_artifact" tag (for mobile app screens). Use the standard <tag> format.
+1. **MANDATORY**: You MUST wrap your code in either a "web_artifact" tag (for web/desktop screens) or an "app_artifact" tag (for app/mobile screens). Use the standard <tag> format.
 2. **Title Attribute**: Always include a descriptive title attribute in the opening tag (e.g., <web_artifact title="Modern Dashboard">).
 3. **Self-Contained**: Ensure the code is fully self-contained, including all necessary CSS, Google Fonts, and Tailwind Script tags within the artifact.
 4. **No Placeholders**: Never use text placeholders. Use high-fidelity copy and the approved image URL policy.

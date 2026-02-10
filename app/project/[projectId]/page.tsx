@@ -558,29 +558,6 @@ const ModernShimmer = ({ type = 'app', appliedTheme }: { type?: 'web' | 'app' | 
       className="absolute inset-0 z-50 overflow-hidden pointer-events-none flex flex-col p-10 gap-10" 
       style={{ backgroundColor: appliedTheme?.cssVars.background || 'var(--background)' }}
     >
-      {/* Wireframe Skeletons */}
-      <div className="flex items-center justify-between w-full opacity-40">
-         <div className="h-4 w-24 bg-foreground/10 rounded-full animate-pulse" />
-         <div className="flex gap-3">
-            <div className="size-5 bg-foreground/10 rounded-full animate-pulse" />
-            <div className="size-5 bg-foreground/10 rounded-full animate-pulse" />
-         </div>
-      </div>
-      
-      <div className="space-y-5 opacity-40">
-         <div className="h-8 w-3/4 bg-foreground/10 rounded-xl animate-pulse" />
-         <div className="h-3 w-1/2 bg-foreground/10 rounded-lg animate-pulse" />
-      </div>
-
-      <div className={cn("grid gap-6 w-full opacity-40", isWeb ? "grid-cols-3" : "grid-cols-1")}>
-         <div className="h-40 bg-foreground/10 rounded-3xl animate-pulse" />
-         {isWeb && (
-           <>
-             <div className="h-40 bg-foreground/10 rounded-3xl animate-pulse" />
-             <div className="h-40 bg-foreground/10 rounded-3xl animate-pulse" />
-           </>
-         )}
-      </div>
 
       {/* Standard Shimmer Overlay */}
       <div 
@@ -762,7 +739,7 @@ export default function ProjectPage() {
   const [appliedTheme, setAppliedTheme] = useState<any>(null);
   const [selectedEl, setSelectedEl] = useState<HTMLElement | null>(null);
   const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);
-  const [artifactPreviewModes, setArtifactPreviewModes] = useState<Record<string, 'mobile' | 'tablet' | 'desktop' | null>>({});
+  const [artifactPreviewModes, setArtifactPreviewModes] = useState<Record<string, 'app' | 'web' | null>>({});
   const [isCodeViewerOpen, setIsCodeViewerOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [viewingCode, setViewingCode] = useState("");
@@ -966,7 +943,6 @@ export default function ProjectPage() {
 
   useEffect(() => {
     let pollInterval: NodeJS.Timeout;
-
     const pollProject = async () => {
       try {
         const res = await fetch(`/api/projects/${projectId}`);
@@ -975,8 +951,11 @@ export default function ProjectPage() {
         
         // Update project, artifacts, and messages
         setProject(data);
-        if (data.screens) {
-          const fetchedArtifacts = data.screens.map((s: any) => ({ ...s, isComplete: true }));
+        if (data.screens && data.screens.length > 0) {
+          const fetchedArtifacts = data.screens.map((s: any) => ({ 
+            ...s, 
+            isComplete: !!s.content 
+          }));
           setArtifacts(fetchedArtifacts);
           setThrottledArtifacts(fetchedArtifacts);
         }
@@ -989,6 +968,8 @@ export default function ProjectPage() {
              setIsGenerating(false);
         }
 
+        // IMPORTANT: Prevent flickering/wiping local messages if DB hasn't updated yet
+        // Only update if we have new messages from the DB
         if (data.messages && data.messages.length > 0) {
           setMessages(data.messages);
         }
@@ -997,6 +978,8 @@ export default function ProjectPage() {
       }
     };
 
+    // If we are just starting (messages.length === 1), wait for DB to actually have content
+    // to avoid wiping out the local prompt before it's persisted.
     if (isGenerating) {
       pollInterval = setInterval(pollProject, 3000);
     }
@@ -1046,6 +1029,7 @@ export default function ProjectPage() {
           const { content, attachments: initialAttachments } = JSON.parse(pendingPromptRaw);
           sessionStorage.removeItem(`pending_prompt_${projectId}`);
           
+          setIsGenerating(true); // Signal generation immediate to hide empty state
           sendMessage({
             text: content,
             files: initialAttachments.map((url: string) => ({ type: "file" as const, url, mediaType: "image/*" })),
@@ -1603,7 +1587,7 @@ export default function ProjectPage() {
     
     const art = throttledArtifacts[index];
     const mode = artifactPreviewModes[art.title];
-    const defaultWidth = mode === 'mobile' ? 380 : mode === 'tablet' ? 768 : mode === 'desktop' ? 1280 : (art.type === 'app' ? 380 : 1024);
+    const defaultWidth = mode === 'app' ? 380 : mode === 'web' ? 1280 : (art.type === 'app' ? 380 : 1024);
     const defaultHeight = dynamicFrameHeights[art.title] || 800;
 
     resizingStartSize.current = { 
@@ -2242,7 +2226,7 @@ export default function ProjectPage() {
                                                               )}
                                                             </div>
                                                             <span className="text-foreground font-medium">
-                                                              {isGenerating ? "Synthesizing Design..." : "Design Complete"}
+                                                              {isGenerating ? "Designing..." : "Design Complete"}
                                                             </span>
                                                             <div className="flex-1" />
                                                             <Badge
@@ -2539,7 +2523,7 @@ export default function ProjectPage() {
                                 variant="ghost" 
                                 size="sm" 
                                 disabled={status !== 'ready'}
-                                className="h-9 px-3 text-foreground/80 hover:text-foreground rounded-lg flex items-center gap-2 text-[13px] font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="h-9 px-3 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-lg flex items-center gap-2 text-[13px] font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                               >
                                 {status !== 'ready' ? (
                                   <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -2588,7 +2572,7 @@ export default function ProjectPage() {
                                 }
                             }}
                             className={cn(
-                                "h-9 w-9 text-foreground/80 hover:text-foreground rounded-lg flex items-center justify-center transition-all disabled:opacity-30",
+                                "h-9 w-9 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-lg flex items-center justify-center transition-all disabled:opacity-30",
                                 leftSidebarMode === 'properties' && "bg-primary/10 text-primary shadow-lg shadow-primary/5"
                             )}
                             title="Edit Mode"
@@ -2608,7 +2592,7 @@ export default function ProjectPage() {
                                 }
                             }}
                             className={cn(
-                                "h-9 w-9 text-foreground/80 hover:text-foreground rounded-lg flex items-center justify-center transition-all disabled:opacity-30",
+                                "h-9 w-9 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-lg flex items-center justify-center transition-all disabled:opacity-30",
                                 leftSidebarMode === 'theme' && "bg-primary/10 text-primary shadow-lg shadow-primary/5"
                             )}
                             title="Theme Settings"
@@ -2621,12 +2605,11 @@ export default function ProjectPage() {
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="h-9 px-3 text-foreground/80 hover:text-foreground rounded-lg flex items-center gap-2 text-[13px] font-medium transition-colors"
+                                className="h-9 px-3 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-lg flex items-center gap-2 text-[13px] font-medium transition-colors"
                               >
                                 {(() => {
-                                  const mode = artifactPreviewModes[artifact.title] || (artifact.type === 'app' ? 'mobile' : 'desktop');
-                                  if (mode === 'mobile') return <Smartphone className="h-4 w-4 opacity-70" />;
-                                  if (mode === 'tablet') return <Tablet className="h-4 w-4 opacity-70" />;
+                                  const mode = artifactPreviewModes[artifact.title] || artifact.type;
+                                  if (mode === 'app') return <Smartphone className="h-4 w-4 opacity-70" />;
                                   return <Monitor className="h-4 w-4 opacity-70" />;
                                 })()}
                                 Preview
@@ -2636,41 +2619,28 @@ export default function ProjectPage() {
                             <DropdownMenuContent align="center" className="w-48 bg-card border-border text-foreground rounded-xl shadow-2xl p-1.5 z-[100]">
                               <DropdownMenuItem 
                                 onClick={() => {
-                                  setArtifactPreviewModes(prev => ({ ...prev, [artifact.title]: 'mobile' }));
-                                  // Clear manual sizing to adopt mobile preset
+                                  setArtifactPreviewModes(prev => ({ ...prev, [artifact.title]: 'app' }));
+                                  // Clear manual sizing to adopt app preset
                                   setThrottledArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
                                   setArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
                                 }}
                                 className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
                               >
                                 <div className="flex items-center gap-2">
-                                  <Smartphone className="h-4 w-4" /> Mobile
+                                  <Smartphone className="h-4 w-4" /> App
                                 </div>
                                 <span className="text-[10px] text-muted-foreground">380px</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem 
                                 onClick={() => {
-                                  setArtifactPreviewModes(prev => ({ ...prev, [artifact.title]: 'tablet' }));
+                                  setArtifactPreviewModes(prev => ({ ...prev, [artifact.title]: 'web' }));
                                   setThrottledArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
                                   setArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
                                 }}
                                 className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
                               >
                                 <div className="flex items-center gap-2">
-                                  <Tablet className="h-4 w-4" /> Tablet
-                                </div>
-                                <span className="text-[10px] text-muted-foreground">768px</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => {
-                                  setArtifactPreviewModes(prev => ({ ...prev, [artifact.title]: 'desktop' }));
-                                  setThrottledArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
-                                  setArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
-                                }}
-                                className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <Monitor className="h-4 w-4" /> Desktop
+                                  <Monitor className="h-4 w-4" /> Web
                                 </div>
                                 <span className="text-[10px] text-muted-foreground">1280px</span>
                               </DropdownMenuItem>
@@ -2684,7 +2654,7 @@ export default function ProjectPage() {
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="h-9 w-9 p-0 text-foreground/80 hover:text-foreground rounded-lg flex items-center justify-center font-medium transition-colors"
+                                className="h-9 w-9 p-0 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-lg flex items-center justify-center font-medium transition-colors"
                               >
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
@@ -2734,7 +2704,7 @@ export default function ProjectPage() {
                             onClick={() => handleFeedback(index, artifact.isLiked ? 'none' : 'like')}
                             className={cn(
                               "h-9 w-9 p-0 rounded-lg transition-all",
-                              artifact.isLiked ? "text-primary bg-primary/10" : "text-foreground/80 hover:text-foreground"
+                              artifact.isLiked ? "text-primary bg-primary/10" : "text-foreground/80 hover:text-foreground hover:bg-transparent"
                             )}
                           >
                             <ThumbsUp className={cn("h-4 w-4", artifact.isLiked && "fill-current")} />
@@ -2745,7 +2715,7 @@ export default function ProjectPage() {
                             onClick={() => handleFeedback(index, artifact.isDisliked ? 'none' : 'dislike')}
                             className={cn(
                               "h-9 w-9 p-0 rounded-lg transition-all",
-                              artifact.isDisliked ? "text-red-500 bg-red-500/10" : "text-foreground/80 hover:text-foreground"
+                              artifact.isDisliked ? "text-red-500 bg-red-500/10" : "text-foreground/80 hover:text-foreground hover:bg-transparent"
                             )}
                           >
                             <ThumbsDown className={cn("h-4 w-4", artifact.isDisliked && "fill-current")} />
@@ -2778,31 +2748,27 @@ export default function ProjectPage() {
                         isDraggingFrame && selectedArtifactIndex === index && "shadow-[0_60px_120px_rgba(0,0,0,0.5)]",
                         (() => {
                           const mode = artifactPreviewModes[artifact.title];
-                          if (mode === 'mobile') return "w-[380px] rounded-sm";
-                          if (mode === 'tablet') return "w-[768px] rounded-sm";
-                          if (mode === 'desktop') return "w-[1280px] rounded-sm transition-all duration-300";
+                          if (mode === 'app') return "w-[380px] rounded-sm";
+                          if (mode === 'web') return "w-[1280px] rounded-sm transition-all duration-300";
                          
                          return artifact.type === 'app' 
                            ? "w-[380px] rounded-sm" 
-                           : artifact.type === 'web'
-                             ? "w-[1024px] rounded-sm"
-                             : "w-[600px] rounded-sm";
+                           : "w-[1024px] rounded-sm";
                         })()
                       )}
                         style={{
                           width: (() => {
                             const mode = artifactPreviewModes[artifact.title];
-                            if (mode === 'mobile') return "380px";
-                            if (mode === 'tablet') return "768px";
-                            if (mode === 'desktop') return "1280px";
-                            return artifact.width ? `${artifact.width}px` : (artifact.type === 'app' ? "380px" : artifact.type === 'web' ? "1024px" : "600px");
+                            if (mode === 'app') return "380px";
+                            if (mode === 'web') return "1280px";
+                            return artifact.width ? `${artifact.width}px` : (artifact.type === 'app' ? "380px" : "1024px");
                           })(),
                           height: (() => {
-                            const mode = artifactPreviewModes[artifact.title];
+                          const mode = artifactPreviewModes[artifact.title];
                             const heightFallback = dynamicFrameHeights[artifact.title] || (artifact.type === 'app' ? 800 : 700);
                             return artifact.height ? `${artifact.height}px` : `${heightFallback}px`;
                           })(),
-                          minHeight: (artifactPreviewModes[artifact.title] === 'mobile' || (artifact.type === 'app' && !artifactPreviewModes[artifact.title])) ? '800px' : '400px',
+                          minHeight: (artifactPreviewModes[artifact.title] === 'app' || (artifact.type === 'app' && !artifactPreviewModes[artifact.title])) ? '800px' : '400px',
                           transition: isResizing ? 'none' : 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                           backgroundColor: appliedTheme?.cssVars.background || 'var(--background)',
                           borderColor: selectedArtifactIndex === index ? SELECTION_BLUE : (appliedTheme?.cssVars.border || 'var(--border)'),
@@ -2912,10 +2878,7 @@ export default function ProjectPage() {
                        )}
                      >
                        <ModernShimmer type={designPlan[0]?.type || 'app'} appliedTheme={appliedTheme} />
-                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/40 backdrop-blur-[2px] z-[60]">
-                          <Loader2 className="size-10 text-primary animate-spin" />
-                          <span className="text-sm font-bold text-white tracking-[0.2em] animate-pulse">Synthesizing Vision...</span>
-                       </div>
+
                      </motion.div>
                    )}
                 </div>
@@ -2924,32 +2887,45 @@ export default function ProjectPage() {
 
           {/* Prompt Details Dialog */}
           <Dialog open={isPromptDialogOpen} onOpenChange={setIsPromptDialogOpen}>
-            <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-900 text-white rounded-3xl p-8">
-              <DialogHeader>
-                <div className="size-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
-                  <Sparkles className="size-6 text-primary" />
+            <DialogContent className="sm:max-w-xl bg-background border-border text-foreground rounded-2xl p-0 overflow-hidden">
+              <div className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-primary">
+                    <Sparkles className="size-4" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">Architectural Vision</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-black tracking-tight uppercase italic italic-none">Generation Prompt</h2>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-10 rounded-xl hover:bg-muted"
+                      onClick={() => {
+                        navigator.clipboard.writeText(viewingPrompt);
+                        toast.success("Prompt copied to clipboard");
+                      }}
+                    >
+                      <Files className="size-4" />
+                    </Button>
+                  </div>
                 </div>
-                <DialogTitle className="text-2xl font-black tracking-tight">Generation Node</DialogTitle>
-                <DialogDescription className="text-zinc-500 font-medium pt-1">
-                  The specific architectural prompt used to synthesize this screen.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="mt-6 p-6 bg-white/5 border border-white/5 rounded-2xl relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Code className="size-12" />
+                
+                <div className="p-6 bg-muted/50 rounded-xl border border-border/50">
+                  <p className="text-sm font-medium leading-relaxed text-muted-foreground whitespace-pre-wrap">
+                    {viewingPrompt}
+                  </p>
                 </div>
-                <p className="text-sm font-medium leading-relaxed text-zinc-300 italic relative z-10">
-                  &ldquo;{viewingPrompt}&rdquo;
-                </p>
+
+                <div className="flex justify-end">
+                  <Button 
+                    onClick={() => setIsPromptDialogOpen(false)}
+                    variant="outline"
+                    className="rounded-xl font-bold uppercase tracking-widest text-[11px] px-8 h-11"
+                  >
+                    Close
+                  </Button>
+                </div>
               </div>
-              <DialogFooter className="mt-8">
-                <Button 
-                  onClick={() => setIsPromptDialogOpen(false)}
-                  className="w-full h-12 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-widest"
-                >
-                  Close Prompt
-                </Button>
-              </DialogFooter>
             </DialogContent>
           </Dialog>
 
@@ -2963,7 +2939,7 @@ export default function ProjectPage() {
                 "h-9 w-9 rounded-lg transition-all duration-200",
                 activeTool === 'select' 
                   ? "bg-primary/10 text-primary" 
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-transparent"
               )}
               title="Select Tool (V)"
             >
@@ -2977,7 +2953,7 @@ export default function ProjectPage() {
                 "h-9 w-9 rounded-lg transition-all duration-200",
                 activeTool === 'hand' 
                   ? "bg-primary/10 text-primary" 
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-transparent"
               )}
               title="Hand Tool (H)"
             >
@@ -2988,7 +2964,7 @@ export default function ProjectPage() {
               onClick={() => setZoom(prev => Math.min(prev * 1.2, 5))}
               variant="ghost" 
               size="icon" 
-              className="h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground transition-all duration-200"
+              className="h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground hover:bg-transparent transition-all duration-200"
               title="Zoom In (Ctrl +)"
             >
                <ZoomIn className="h-4.5 w-4.5" />
@@ -2997,7 +2973,7 @@ export default function ProjectPage() {
               onClick={() => setZoom(prev => Math.max(prev / 1.2, 0.1))}
               variant="ghost" 
               size="icon" 
-              className="h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground transition-all duration-200"
+              className="h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground hover:bg-transparent transition-all duration-200"
               title="Zoom Out (Ctrl -)"
             >
                <ZoomOut className="h-4.5 w-4.5" />
@@ -3232,22 +3208,19 @@ export default function ProjectPage() {
                     <div 
                       key={idx} 
                       className={cn(
-                        "p-5 bg-white/5 border border-white/5 rounded-2xl flex items-start gap-4 transition-all group relative overflow-hidden",
-                        isGeneratingThisScreen ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20" : 
-                        isScreeenComplete ? "border-emerald-500/20 bg-emerald-500/5 shadow-[0_0_20px_-10px_rgba(16,185,129,0.2)]" : "hover:border-white/10"
+                        "p-4 bg-secondary/20 border border-border/40 rounded-xl flex items-start gap-3 transition-colors group relative overflow-hidden",
+                        isGeneratingThisScreen ? "bg-primary/5 border-primary/30" : 
+                        isScreeenComplete ? "bg-emerald-500/5 border-emerald-500/20" : "hover:bg-secondary/30"
                       )}
                     >
-                       {isGeneratingThisScreen && (
-                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite] pointer-events-none" />
-                       )}
 
                        <div className={cn(
-                         "size-10 rounded-xl bg-white/5 flex items-center justify-center transition-all",
-                         isGeneratingThisScreen ? "bg-primary border border-primary text-white shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" : 
-                         isScreeenComplete ? "bg-emerald-500 border border-emerald-500 text-white" : "text-zinc-500 font-mono text-xs group-hover:bg-primary/10 group-hover:text-primary"
+                         "size-8 rounded-lg bg-secondary/50 flex items-center justify-center transition-all",
+                         isGeneratingThisScreen ? "bg-primary text-white" : 
+                         isScreeenComplete ? "bg-emerald-500 text-white" : "text-muted-foreground font-mono text-[10px]"
                        )}>
-                          {isScreeenComplete ? <Check className="size-5" /> : 
-                           isGeneratingThisScreen ? <Loader2 className="size-5 animate-spin" /> : 
+                          {isScreeenComplete ? <Check className="size-4" /> : 
+                           isGeneratingThisScreen ? <Loader2 className="size-4" /> : 
                            String(idx + 1).padStart(2, '0')}
                        </div>
 
@@ -3256,11 +3229,10 @@ export default function ProjectPage() {
                              <div className="flex items-center gap-2">
                                <span className={cn(
                                  "font-bold text-white tracking-tight transition-colors",
-                                 isGeneratingThisScreen && "text-primary",
-                                 isScreeenComplete && "text-emerald-400"
+                                 isGeneratingThisScreen && "text-primary"
                                )}>{screen.title}</span>
                                {isGeneratingThisScreen && (
-                                 <span className="px-1.5 py-0.5 rounded bg-primary/10 text-[8px] font-black uppercase tracking-tighter text-primary border border-primary/20 animate-pulse">
+                                 <span className="px-1.5 py-0.5 rounded bg-primary/10 text-[8px] font-black uppercase tracking-tighter text-primary border border-primary/20">
                                    Designing...
                                  </span>
                                )}
@@ -3271,7 +3243,7 @@ export default function ProjectPage() {
                                  </span>
                                )}
                              </div>
-                             <span className="px-2 py-0.5 rounded-full bg-white/5 text-[9px] font-black uppercase tracking-widest text-zinc-500 border border-white/5">
+                             <span className="px-2 py-0.5 rounded-full bg-secondary/50 text-[8px] font-black uppercase tracking-widest text-muted-foreground border border-border/50">
                                 {screen.type}
                              </span>
                           </div>
@@ -3285,10 +3257,10 @@ export default function ProjectPage() {
              </div>
           </div>
 
-          <DialogFooter className="p-8 bg-zinc-900/30 border-t border-zinc-800/50">
+          <DialogFooter className="p-6 bg-secondary/10 border-t border-border/50">
              <Button 
                onClick={() => setIsPlanDialogOpen(false)}
-               className="w-full h-12 rounded-2xl bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-widest"
+               className="w-full h-11 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-bold uppercase tracking-widest text-[11px]"
              >
                Close Manifest
              </Button>

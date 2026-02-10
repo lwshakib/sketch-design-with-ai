@@ -50,8 +50,8 @@ export const generateDesign = inngest.createFunction(
       }
       
       const lastUserMessage = [...stepMessages].reverse().find(m => m.role === 'user')?.content || '';
-      const isMobileRequest = lastUserMessage.toLowerCase().match(/mobile|app|phone|ios|android/);
-      const searchType = isMobileRequest ? 'app' : 'web';
+      const isAppRequest = lastUserMessage.toLowerCase().match(/mobile|app|phone|ios|android/);
+      const searchType = isAppRequest ? 'app' : 'web';
       
       // Fetch inspiration for the overall vision
       const inspiration = await getDesignInspiration.execute({
@@ -109,6 +109,13 @@ export const generateDesign = inngest.createFunction(
       if (planMatch) {
          try {
            planJson = JSON.parse(planMatch[1].trim());
+           // Normalize screen types in the plan
+           if (planJson.screens) {
+             planJson.screens = planJson.screens.map(s => ({
+               ...s,
+               type: s.type === 'app' ? 'app' : 'web'
+             }));
+           }
          } catch (e) {
            console.error("Failed to parse plan JSON", e);
          }
@@ -136,6 +143,28 @@ export const generateDesign = inngest.createFunction(
           plan: JSON.parse(JSON.stringify(plan))
         },
       });
+
+      // Also pre-create screen placeholders so they show up immediately in the UI
+      let lastX = -500; // Start position
+      for (const screen of plan.screens) {
+        const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
+        const width = getWidth(screen.type);
+        
+        await prisma.screen.create({
+          data: {
+            projectId: projectId,
+            title: screen.title,
+            content: "", // Placeholder
+            type: screen.type,
+            x: lastX,
+            y: 0,
+            width,
+            height: 800
+          }
+        });
+        
+        lastX += width + 120; // Increment for next screen
+      }
     });
 
     // 3. Sequentially generate each screen in the plan
@@ -188,15 +217,13 @@ export const generateDesign = inngest.createFunction(
             type: screen.type 
           };
 
-          let type = artifact.type as string;
-          if (type === 'app' || type === 'general' || !type) {
-            type = screen.type;
-          }
+          // Use type from artifact extraction (already normalized) or fall back to plan type
+          const type: 'web' | 'app' = artifact.type === 'app' ? 'app' : screen.type === 'app' ? 'app' : 'web';
 
           return {
             title: artifact.title || screen.title,
             content: artifact.content,
-            type: type as 'web' | 'app'
+            type
           };
         });
 

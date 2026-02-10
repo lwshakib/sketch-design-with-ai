@@ -14,7 +14,7 @@ export interface Artifact {
 
 /**
  * Extracts all HTML artifacts from AI responses
- * Supports <artifact>, <web_artifact>, <mobile_artifact>, and <app_artifact>
+ * Supports <artifact>, <web_artifact>, and <app_artifact>
  */
 export function extractArtifacts(text: string): Artifact[] {
   const artifacts: Artifact[] = [];
@@ -34,8 +34,7 @@ export function extractArtifacts(text: string): Artifact[] {
     const defaultTitle = tagName === 'web_artifact' ? 'Web Design' : 'App Design';
     const title = titleMatch ? titleMatch[1] : defaultTitle;
 
-    let type: 'web' | 'app' = 'app';
-    if (tagName === 'web_artifact') type = 'web';
+    const type: 'web' | 'app' = tagName === 'web_artifact' ? 'web' : 'app';
 
     artifacts.push({
       content,
@@ -52,10 +51,7 @@ export function extractArtifacts(text: string): Artifact[] {
     const hasHtml = htmlMarkers.some(marker => lowerText.includes(marker));
     
     if (hasHtml && text.length > 50) {
-      let type: 'web' | 'app' = 'web';
-      if (lowerText.includes('mobile') || lowerText.includes('phone') || lowerText.includes('app') || lowerText.includes('iphone')) {
-        type = 'app';
-      }
+      const type: 'web' | 'app' = lowerText.includes('app') ? 'app' : 'web';
 
       artifacts.push({
         content: text.trim(),
