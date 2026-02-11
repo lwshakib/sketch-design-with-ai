@@ -611,16 +611,6 @@ export function ChatSidebar({
                   </div>
                   
                   <div className="flex items-center gap-3">
-                    <div className="px-3 py-1.5 rounded-full bg-zinc-900/40 border border-white/5 flex items-center shadow-sm">
-                      <span className="text-[11px] font-medium text-zinc-400 flex items-center gap-1.5">
-                        <NumberFlow 
-                          value={(credits || 0) / 1000} 
-                          format={{ minimumFractionDigits: 1, maximumFractionDigits: 1 }}
-                        />
-                        <span className="text-zinc-500">k credits remaining</span>
-                      </span>
-                    </div>
-
                     <Button 
                       onClick={handleCustomSubmit}
                       disabled={status === 'ready' && (!input.trim() && attachments.length === 0)}

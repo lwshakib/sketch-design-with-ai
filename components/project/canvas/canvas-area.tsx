@@ -45,6 +45,8 @@ import {
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useWorkspaceStore } from "@/hooks/use-workspace-store";
+import NumberFlow from "@number-flow/react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -154,6 +156,8 @@ export function CanvasArea({
     project
   } = useProjectStore();
 
+  const { credits } = useWorkspaceStore();
+
   const isEditMode = secondarySidebarMode === 'properties';
   const status = isGenerating ? 'streaming' : 'ready'; // Simplification for UI checks
   
@@ -200,7 +204,17 @@ export function CanvasArea({
           </Button>
         </div>
         
-        <div className="flex items-center gap-4 pointer-events-auto">
+        <div className="flex items-center gap-6 pointer-events-auto">
+          <div className="flex items-center pointer-events-none">
+             <span className="text-[11px] font-medium text-muted-foreground/60 transition-colors hover:text-muted-foreground flex items-center gap-1">
+                <NumberFlow 
+                  value={(credits || 0) / 1000} 
+                  format={{ minimumFractionDigits: 1, maximumFractionDigits: 1 }}
+                />
+                <span>k credits remaining</span>
+             </span>
+          </div>
+
           <div className="flex items-center justify-center w-8 h-8">
             {isSaving ? (
               <Loader2 className="h-4 w-4 text-foreground/40 animate-spin" />
