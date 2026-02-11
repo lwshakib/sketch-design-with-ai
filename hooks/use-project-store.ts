@@ -30,7 +30,7 @@ interface ProjectState {
   canvasOffset: { x: number; y: number };
   framePos: { x: number; y: number };
   dynamicFrameHeights: Record<string, number>;
-  artifactPreviewModes: Record<string, 'app' | 'web' | null>;
+  artifactPreviewModes: Record<string, 'app' | 'web' | 'tablet' | null>;
   selectedArtifactIds: Set<string>;
   selectionBox: { x1: number; y1: number; x2: number; y2: number } | null;
 
@@ -87,7 +87,7 @@ interface ProjectState {
   setCanvasOffset: (val: { x: number; y: number } | ((prev: { x: number; y: number }) => { x: number; y: number })) => void;
   setFramePos: (val: { x: number; y: number } | ((prev: { x: number; y: number }) => { x: number; y: number })) => void;
   setDynamicFrameHeights: (val: Record<string, number> | ((prev: Record<string, number>) => Record<string, number>)) => void;
-  setArtifactPreviewModes: (val: Record<string, 'app' | 'web' | null> | ((prev: Record<string, 'app' | 'web' | null>) => Record<string, 'app' | 'web' | null>)) => void;
+  setArtifactPreviewModes: (val: Record<string, 'app' | 'web' | 'tablet' | null> | ((prev: Record<string, 'app' | 'web' | 'tablet' | null>) => Record<string, 'app' | 'web' | 'tablet' | null>)) => void;
   setSelectedArtifactIds: (val: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
   setSelectionBox: (box: { x1: number; y1: number; x2: number; y2: number } | null) => void;
 

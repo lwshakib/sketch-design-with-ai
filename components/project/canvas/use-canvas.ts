@@ -181,7 +181,7 @@ export function useCanvas({
         artifacts.forEach(art => {
            if (!art.id) return;
            const mode = artifactPreviewModes[art.title];
-           const width = art.width || (mode === 'app' ? 380 : mode === 'web' ? 1280 : (art.type === 'app' ? 380 : 1024));
+           const width = art.width || (mode === 'app' ? 380 : mode === 'web' ? 1280 : mode === 'tablet' ? 768 : (art.type === 'app' ? 380 : 1024));
            const height = art.height || dynamicFrameHeights[art.title] || 800;
            
            // Artifact world to screen coordinates
@@ -235,7 +235,7 @@ export function useCanvas({
     setSelectedArtifactIds(new Set([art.id]));
     
     const mode = artifactPreviewModes[art.title];
-    const defaultWidth = mode === 'app' ? 380 : mode === 'web' ? 1280 : (art.type === 'app' ? 380 : 1024);
+    const defaultWidth = mode === 'app' ? 380 : mode === 'web' ? 1280 : mode === 'tablet' ? 768 : (art.type === 'app' ? 380 : 1024);
     const defaultHeight = dynamicFrameHeights[art.title] || 800;
 
     resizingStartSize.current = { 

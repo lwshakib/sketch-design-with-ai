@@ -474,17 +474,37 @@ export default function ProjectPage() {
     }
   }, [selectedEl]);
 
-  const commitEdits = useCallback(() => {
-    const selectedId = Array.from(selectedArtifactIds)[0];
-    const selectedArtifact = throttledArtifacts.find(a => a.id === selectedId);
-    if (!selectedArtifact) return;
-    const iframe = iframeRefs.current[selectedArtifact.title];
+  const commitEdits = useCallback(async (screenId?: string) => {
+    const targetId = screenId || Array.from(selectedArtifactIds)[0];
+    const targetArtifact = artifacts.find(a => a.id === targetId);
+    if (!targetArtifact || !targetId) return;
+    
+    const iframe = iframeRefs.current[targetArtifact.title];
     if (!iframe?.contentDocument) return;
-    const cleanHtml = sanitizeDocumentHtml(iframe.contentDocument, selectedArtifact.content);
-    const updatedArtifacts = throttledArtifacts.map(a => a.id === selectedId ? { ...a, content: cleanHtml } : a);
-    setThrottledArtifacts(updatedArtifacts);
-    setArtifacts(updatedArtifacts);
-  }, [selectedArtifactIds, throttledArtifacts, setThrottledArtifacts, setArtifacts]);
+    
+    const cleanHtml = sanitizeDocumentHtml(iframe.contentDocument, targetArtifact.content);
+    
+    // Update local state immediately
+    const updateFn = (prev: Artifact[]) => prev.map(a => a.id === targetId ? { ...a, content: cleanHtml } : a);
+    setThrottledArtifacts(updateFn);
+    setArtifacts(updateFn);
+
+    // Persist to database
+    try {
+      const res = await fetch(`/api/screens/${targetId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: cleanHtml })
+      });
+      
+      if (!res.ok) throw new Error("Failed to save changes");
+      toast.success("Changes saved");
+      setHasUnsavedChanges(true); 
+    } catch (error) {
+      console.error('Commit error:', error);
+      toast.error("Failed to persist edits");
+    }
+  }, [selectedArtifactIds, artifacts, setThrottledArtifacts, setArtifacts, setHasUnsavedChanges]);
 
   const commitEditsRef = useRef(commitEdits);
   useEffect(() => { commitEditsRef.current = commitEdits; }, [commitEdits]);
@@ -542,7 +562,8 @@ export default function ProjectPage() {
       if (!target || target === doc.body) return;
       target.setAttribute("contenteditable", "true"); target.focus();
       const handleBlur = () => {
-        target.removeAttribute("contenteditable"); commitEditsRef.current();
+        target.removeAttribute("contenteditable"); 
+        commitEditsRef.current(selectedId);
         target.removeEventListener("blur", handleBlur);
       };
       target.addEventListener("blur", handleBlur);

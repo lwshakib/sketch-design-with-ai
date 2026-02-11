@@ -10,6 +10,7 @@ import {
   Palette, 
   Smartphone, 
   Monitor, 
+  Tablet,
   MoreHorizontal, 
   Code, 
   Share2, 
@@ -326,6 +327,7 @@ export function CanvasArea({
                             {(() => {
                               const mode = artifactPreviewModes[artifact.title] || artifact.type;
                               if (mode === 'app') return <Smartphone className="h-4 w-4 opacity-70" />;
+                              if (mode === 'tablet') return <Tablet className="h-4 w-4 opacity-70" />;
                               return <Monitor className="h-4 w-4 opacity-70" />;
                             })()}
                             Preview
@@ -360,6 +362,20 @@ export function CanvasArea({
                               <Monitor className="h-4 w-4" /> Web
                             </div>
                             <span className="text-[10px] text-muted-foreground">1280px</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => {
+                              const newModes = { ...artifactPreviewModes, [artifact.title]: 'tablet' as const };
+                              setArtifactPreviewModes(newModes);
+                              setThrottledArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
+                              setArtifacts(prev => prev.map((a, i) => i === index ? { ...a, width: undefined, height: undefined } : a));
+                            }}
+                            className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Tablet className="h-4 w-4" /> Tablet
+                            </div>
+                            <span className="text-[10px] text-muted-foreground">768px</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -469,6 +485,7 @@ export function CanvasArea({
                       const mode = artifactPreviewModes[artifact.title];
                       if (mode === 'app') return "380px";
                       if (mode === 'web') return "1280px";
+                      if (mode === 'tablet') return "768px";
                       return artifact.width ? `${artifact.width}px` : (artifact.type === 'app' ? "380px" : "1024px");
                     })(),
                     height: (() => {
