@@ -386,7 +386,7 @@ export function ProjectDialogs({
           </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading="Navigation">
-            <CommandItem onSelect={() => { window.location.href = '/dashboard'; }}>
+            <CommandItem onSelect={() => { window.location.href = '/'; }}>
               <LayoutGrid className="mr-2 h-4 w-4" />
               <span>Go to Dashboard</span>
             </CommandItem>

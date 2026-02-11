@@ -169,7 +169,6 @@ export function useCanvas({
 
   const handleMouseUp = useCallback(() => {
     if (selectionBox) {
-      // Calculate selected artifacts
       const rect = previewRef.current?.getBoundingClientRect();
       if (rect) {
         const x1 = Math.min(selectionBox.x1, selectionBox.x2);
@@ -182,7 +181,7 @@ export function useCanvas({
            if (!art.id) return;
            const mode = artifactPreviewModes[art.title];
            const width = art.width || (mode === 'app' ? 380 : mode === 'web' ? 1280 : mode === 'tablet' ? 768 : (art.type === 'app' ? 380 : 1024));
-           const height = art.height || dynamicFrameHeights[art.title] || 800;
+           const height = art.height || dynamicFrameHeights[art.title] || (art.type === 'app' ? 800 : 700);
            
            // Artifact world to screen coordinates
            const ax1 = (art.x || 0) * zoom + canvasOffset.x;
@@ -196,13 +195,20 @@ export function useCanvas({
            }
         });
 
-        if (newlySelected.size > 0) {
-          setSelectedArtifactIds(prev => {
+        // Use the event stored from mousedown/mousemove if possible, 
+        // but since shiftKey is on the MouseUp event too, let's just check it there
+        // Actually MouseUp event might not have shiftKey reliably in all handlers? 
+        // Let's assume it works or we might need to track it.
+        const isShiftDown = (window.event as MouseEvent)?.shiftKey;
+
+        setSelectedArtifactIds(prev => {
+          if (isShiftDown) {
             const next = new Set(prev);
             newlySelected.forEach(id => next.add(id));
             return next;
-          });
-        }
+          }
+          return newlySelected;
+        });
       }
       setSelectionBox(null);
     }

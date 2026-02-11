@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { messages, projectId, is3xMode, websiteUrl, isSilent } = await req.json();
+    const { messages, projectId, is3xMode, websiteUrl, isSilent, selectedScreens } = await req.json();
 
     if (!projectId) {
       return NextResponse.json(
@@ -42,7 +42,8 @@ export async function POST(req: Request) {
         data: {
           projectId: projectId,
           role: "user",
-          content: messageContent
+          content: messageContent,
+          plan: selectedScreens ? { selectedScreens } : undefined
         },
       });
     }

@@ -110,13 +110,27 @@ export default function ProjectPage() {
   const chatError = null;
 
   const sendMessage = useCallback(async (params: { text: string; files?: any[] }, options?: any) => {
-    const { is3xMode, websiteUrl, messages } = useProjectStore.getState();
+    const { is3xMode, websiteUrl, messages, selectedArtifactIds, throttledArtifacts } = useProjectStore.getState();
     const isSilent = options?.body?.isSilent;
+    
+    // Inject context about selected screens if any
+    let contextualText = params.text;
+    const selectedScreens = Array.from(selectedArtifactIds)
+      .map(id => throttledArtifacts.find(a => a.id === id))
+      .filter((a): a is Artifact => !!a);
+
+    if (selectedScreens.length > 0) {
+      const screenTitles = selectedScreens.map(s => `"${s.title}"`).join(", ");
+      contextualText = `[Context: User has selected the following screens: ${screenTitles}. Please refer to or modify these if applicable.]\n\n${params.text}`;
+    }
+
     const newUserMessage = {
       id: `m-${Date.now()}`,
       role: 'user' as const,
-      content: params.text,
-      parts: params.files?.length ? [{ type: 'text', text: params.text }, ...params.files] : [{ type: 'text', text: params.text }],
+      content: params.text, // Keep original text for UI
+      _contextualContent: contextualText, // Context for backend
+      selectedScreens: selectedScreens.map(s => ({ id: s.id, title: s.title, content: s.content })),
+      parts: params.files?.length ? [{ type: 'text', text: contextualText }, ...params.files] : [{ type: 'text', text: contextualText }],
       isSilent
     };
 
@@ -129,8 +143,9 @@ export default function ProjectPage() {
         projectId,
         messages: updatedMessages.map(m => ({
           role: m.role,
-          content: m.content || (m.parts as any[])?.find(p => p.type === 'text')?.text || ""
+          content: (m as any)._contextualContent || m.content || (m.parts as any[])?.find(p => p.type === 'text')?.text || ""
         })),
+        selectedScreens: selectedScreens.map(s => ({ id: s.id, title: s.title, content: s.content })),
         is3xMode,
         websiteUrl,
         ...options?.body
@@ -817,7 +832,7 @@ export default function ProjectPage() {
     try {
       await axios.delete(`/api/projects/${projectId}`);
       toast.success("Project deleted");
-      router.push('/dashboard');
+      router.push('/');
     } catch (err) {
       console.error(err);
       toast.error("Failed to delete project");

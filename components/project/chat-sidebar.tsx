@@ -30,7 +30,12 @@ import {
   ClipboardPaste,
   Settings,
   Command,
-  Zap
+  Zap,
+  Search,
+  MoreVertical,
+  Smartphone,
+  Monitor,
+  Tablet
 } from "lucide-react";
 import { GenerationStatus } from "./generation-status";
 import { Button } from "@/components/ui/button";
@@ -113,7 +118,9 @@ export function ChatSidebar({
     setIs3xMode,
     setWebsiteUrl,
     websiteUrl,
-    setAttachments
+    setAttachments,
+    selectedArtifactIds,
+    setSelectedArtifactIds
   } = useProjectStore();
 
   const { credits, fetchCredits } = useWorkspaceStore();
@@ -124,6 +131,7 @@ export function ChatSidebar({
 
   const [showUrlInput, setShowUrlInput] = React.useState(false);
   const [urlTemp, setUrlTemp] = React.useState("");
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   const handleUrlSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -392,8 +400,48 @@ export function ChatSidebar({
                                           );
                                         })()
                                       ) : (
-                                        <div className="text-foreground/90 leading-relaxed text-[15px]">
-                                          {msg.content || (msg.parts ? (msg.parts as any[]).filter(p => p.type === 'text').map(p => p.text).join('') : "")}
+                                        <div className="flex flex-col gap-4">
+                                          <div className="text-foreground/90 leading-relaxed text-[15px]">
+                                            {msg.content || (msg.parts ? (msg.parts as any[]).filter(p => p.type === 'text').map(p => p.text).join('') : "")}
+                                          </div>
+                                          
+                                          {/* Selected Screens Preview */}
+                                          {(() => {
+                                            const selectedScreens = msg.selectedScreens || msg.plan?.selectedScreens;
+                                            if (!selectedScreens || !Array.isArray(selectedScreens) || selectedScreens.length === 0) return null;
+                                            
+                                            return (
+                                              <div className="flex flex-wrap gap-3">
+                                                {selectedScreens.map((screen: any, sIdx: number) => (
+                                                  <div 
+                                                    key={screen.id || sIdx} 
+                                                    className="relative w-16 h-16 rounded-xl border border-white/10 bg-zinc-900 overflow-hidden shadow-sm"
+                                                  >
+                                                    <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-80">
+                                                      <iframe 
+                                                        title={`msg-history-preview-${screen.id || sIdx}`}
+                                                        className="w-full h-full border-none"
+                                                        srcDoc={`
+                                                          <!DOCTYPE html>
+                                                          <html>
+                                                            <head>
+                                                              <script src="https://cdn.tailwindcss.com"></script>
+                                                              <style>
+                                                                body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
+                                                                ::-webkit-scrollbar { display: none; }
+                                                              </style>
+                                                            </head>
+                                                            <body>${screen.content || ''}</body>
+                                                          </html>
+                                                        `}
+                                                      />
+                                                    </div>
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            );
+                                          })()}
                                         </div>
                                       )}
                                     </div>
@@ -482,23 +530,76 @@ export function ChatSidebar({
 
           <div className="p-4 bg-sidebar">
             <div className="flex flex-col gap-3">
-              <div className="bg-[#0F0F0F] rounded-[8px] p-4 border border-white/5 shadow-2xl transition-all focus-within:border-white/10">
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleCustomSubmit(e);
-                    }
-                  }}
-                  readOnly={false}
-                  placeholder="Describe your design"
-                  className="w-full bg-transparent outline-none resize-none text-[15px] text-foreground placeholder:text-[#525252] min-h-[56px] max-h-[200px] leading-relaxed"
-                />
+              <div className="bg-[#0F0F0F] rounded-[16px] p-4 border border-white/5 shadow-2xl transition-all focus-within:border-white/10 group/input">
+                    {selectedArtifactIds.size > 0 && (
+                      <div className="flex flex-wrap gap-3 mb-5 animate-in fade-in slide-in-from-bottom-1 duration-300">
+                        {Array.from(selectedArtifactIds).map(id => {
+                          const art = throttledArtifacts.find(a => a.id === id);
+                          if (!art) return null;
+                          return (
+                            <div 
+                              key={id} 
+                              className="group relative w-16 h-16 rounded-xl border-2 border-indigo-500/80 bg-zinc-900 overflow-hidden shadow-2xl transition-all hover:border-indigo-500"
+                            >
+                              {/* Scaled Preview */}
+                              <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-90 transition-opacity">
+                                <iframe 
+                                  title={`mini-preview-input-${id}`}
+                                  className="w-full h-full border-none"
+                                  srcDoc={`
+                                    <!DOCTYPE html>
+                                    <html>
+                                      <head>
+                                        <script src="https://cdn.tailwindcss.com"></script>
+                                        <style>
+                                          body { margin: 0; padding: 0; overflow: hidden; background: transparent; height: auto; }
+                                          ::-webkit-scrollbar { display: none; }
+                                        </style>
+                                      </head>
+                                      <body>${art.content}</body>
+                                    </html>
+                                  `}
+                                />
+                              </div>
+
+                              {/* Hover Selection Overlay */}
+                              <div className="absolute inset-0 bg-indigo-500/5 group-hover:bg-transparent transition-colors" />
+
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedArtifactIds(prev => {
+                                    const next = new Set(prev);
+                                    next.delete(id);
+                                    return next;
+                                  });
+                                }}
+                                className="absolute top-1 right-1 h-4 w-4 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 shadow-xl"
+                              >
+                                <X className="size-2.5 flex-shrink-0" />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    <textarea
+                      ref={textareaRef}
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleCustomSubmit(e);
+                        }
+                      }}
+                      placeholder="Describe your design"
+                      className="w-full bg-transparent outline-none resize-none text-[15px] text-foreground placeholder:text-[#525252] min-h-[56px] max-h-[200px] leading-relaxed"
+                    />
 
                 {(attachments.length > 0 || websiteUrl || showUrlInput) && (
-                  <div className="flex flex-wrap gap-2 mb-3 mt-1">
+                  <div className="flex flex-wrap gap-2 mb-3 mt-4">
                     {attachments.map((att, idx) => (
                       <div key={idx} className="relative group size-12 rounded-lg overflow-hidden border border-white/10 bg-zinc-900 flex-shrink-0">
                         <img src={att.url} className="w-full h-full object-cover opacity-60" />

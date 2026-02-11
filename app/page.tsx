@@ -366,117 +366,208 @@ export default function Home() {
           />
         </div>
 
-        {/* Center Workspace */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6 overflow-y-auto pb-20">
-          <div className="w-full max-w-2xl space-y-12 mb-12 pt-10">
-            
-            {/* Main Title Row */}
-            <div className="flex items-center justify-center gap-4 flex-wrap text-center">
-              <h1 className="text-3xl md:text-5xl font-black tracking-tight text-foreground whitespace-nowrap uppercase italic translate-y-2">
-                Start a new design
-              </h1>
-            </div>
-
-            {/* Premium Chat Input */}
-            <div className="relative group w-full">
-              {/* Outer Glow Overlay */}
-              <div className="absolute -inset-[1px] rounded-[32px] opacity-0 group-focus-within:opacity-100 transition-all duration-700 blur-xl pointer-events-none bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20" />
+        {/* Main Content Area */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Center Workspace */}
+          <div className="flex-1 flex flex-col items-center justify-center px-6 overflow-y-auto pb-20 relative">
+            <div className="w-full max-w-2xl space-y-12 mb-12 pt-10">
               
-              <div className="relative bg-card rounded-[32px] p-8 space-y-4 border border-white/5 transition-all duration-500 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] group-focus-within:border-primary/20 group-focus-within:shadow-[0_0_60px_-10px_rgba(var(--primary-rgb),0.2)]">
+              {/* Main Title Row */}
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                  <Sparkles className="size-3" />
+                  AI Powered Canvas
+                </div>
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground uppercase italic leading-none">
+                  Start a new design
+                </h1>
+                <p className="text-sm text-muted-foreground max-w-md font-medium">
+                  Transform your ideas into high-fidelity prototypes instantly using our neural design engine.
+                </p>
+              </div>
+
+              {/* Premium Chat Input */}
+              <div className="relative group w-full">
+                {/* Outer Glow Overlay */}
+                <div className="absolute -inset-[1px] rounded-[32px] opacity-0 group-focus-within:opacity-100 transition-all duration-700 blur-2xl pointer-events-none bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10" />
                 
-                {/* Image Previews */}
-                <AnimatePresence>
-                  {attachments.length > 0 && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      className="flex flex-wrap gap-3 pb-2"
-                    >
-                      {attachments.map((attr, i) => (
-                        <div key={i} className="relative group/img h-20 w-20 rounded-xl overflow-hidden border border-border bg-secondary shadow-sm">
-                          <img src={attr.url} alt="Attachment" className={cn("h-full w-full object-cover", attr.isUploading && "opacity-40 blur-[2px]")} />
-                          {attr.isUploading && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Loader2 className="h-5 w-5 text-white animate-spin" />
-                            </div>
-                          )}
-                          <button 
-                            onClick={() => removeAttachment(i)}
-                            className="absolute top-1 right-1 h-5 w-5 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover/img:opacity-100 transition-opacity"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </div>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <div className="relative bg-[#0A0A0A] rounded-[32px] p-8 space-y-4 border border-white/5 transition-all duration-500 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] group-focus-within:border-primary/20 group-focus-within:shadow-[0_0_60px_-10px_rgba(var(--primary-rgb),0.2)]">
+                  
+                  {/* Image Previews */}
+                  <AnimatePresence>
+                    {attachments.length > 0 && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="flex flex-wrap gap-3 pb-2"
+                      >
+                        {attachments.map((attr, i) => (
+                          <div key={i} className="relative group/img h-20 w-20 rounded-xl overflow-hidden border border-white/10 bg-zinc-900 shadow-sm">
+                            <img src={attr.url} alt="Attachment" className={cn("h-full w-full object-cover", attr.isUploading && "opacity-40 blur-[2px]")} />
+                            {attr.isUploading && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <Loader2 className="h-5 w-5 text-white animate-spin" />
+                              </div>
+                            )}
+                            <button 
+                              onClick={() => removeAttachment(i)}
+                              className="absolute top-1 right-1 h-5 w-5 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover/img:opacity-100 transition-opacity"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
-                <textarea
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Describe your design"
-                  className="w-full h-32 bg-transparent outline-none resize-none text-lg text-foreground placeholder:text-muted-foreground/50 font-medium leading-relaxed hide-scrollbar"
-                />
-
-                <div className="flex items-center justify-between">
-                  {/* Hidden File Input */}
-                  <input 
-                    type="file" 
-                    multiple 
-                    accept="image/*" 
-                    className="hidden" 
-                    ref={fileInputRef}
-                    onChange={handleFileUpload}
+                  <textarea
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder="Describe your design vision..."
+                    className="w-full h-32 bg-transparent outline-none resize-none text-xl text-foreground placeholder:text-zinc-600 font-medium leading-relaxed hide-scrollbar"
                   />
 
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="h-10 w-10 rounded-full bg-secondary/50 text-muted-foreground hover:text-foreground border border-border/50"
-                  >
-                    <Plus className="h-5 w-5" />
-                  </Button>
-                  
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between pt-2">
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="file" 
+                        multiple 
+                        accept="image/*" 
+                        className="hidden" 
+                        ref={fileInputRef}
+                        onChange={handleFileUpload}
+                      />
+
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => fileInputRef.current?.click()}
+                        className="h-10 w-10 rounded-full bg-zinc-900/50 text-zinc-500 hover:text-white border border-white/5 transition-colors"
+                      >
+                        <Plus className="h-5 w-5" />
+                      </Button>
+                      
+                      <div className="h-4 w-[1px] bg-white/10 mx-1" />
+                      
+                      <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest hidden sm:block">
+                        Press Enter to Generate
+                      </p>
+                    </div>
+                    
                     <Button 
                        onClick={onSubmit}
                        disabled={(!inputValue.trim() && attachments.length === 0) || attachments.some(a => a.isUploading) || isSubmitting}
-                       className="h-10 w-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 p-0 border border-border/10"
+                       className="h-12 px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 border border-white/10 shadow-xl transition-all"
                     >
                       {isSubmitting ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
                       ) : (
-                        <ArrowRight className="h-5 w-5" />
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-sm tracking-tight">Generate</span>
+                          <ArrowRight className="h-4 w-4" />
+                        </div>
                       )}
                     </Button>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Try these prompts */}
-            <div className="space-y-4">
-               <h3 className="text-[11px] font-black text-muted-foreground ml-1 uppercase tracking-widest">Try these prompts</h3>
-               <div className="flex flex-col gap-3">
-                  {shuffledPrompts.map((prompt: string, i: number) => (
-                    <button
-                      key={i}
-                      onClick={() => {
-                        setInputValue(prompt);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="w-full p-4 rounded-xl bg-card border border-border text-left text-sm text-muted-foreground font-medium hover:bg-secondary hover:border-border transition-all leading-snug shadow-sm active:scale-[0.98]"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-               </div>
+              {/* Mobile Only Prompts */}
+              <div className="xl:hidden space-y-4">
+                 <h3 className="text-[10px] font-black text-muted-foreground ml-1 uppercase tracking-widest">Try these prompts</h3>
+                 <div className="flex flex-col gap-2">
+                    {shuffledPrompts.map((prompt: string, i: number) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setInputValue(prompt);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="w-full p-4 rounded-xl bg-card border border-border text-left text-sm text-muted-foreground font-medium hover:bg-secondary hover:border-border transition-all leading-snug shadow-sm active:scale-[0.98]"
+                      >
+                        {prompt}
+                      </button>
+                    ))}
+                 </div>
+              </div>
             </div>
-
           </div>
+
+          {/* Right Sidebar - Minimal & Eye Catching */}
+          <aside className="w-[340px] border-l border-white/5 bg-[#050505]/40 p-8 hidden xl:flex flex-col gap-10 overflow-y-auto scrollbar-hide">
+            
+            {/* Try these prompts Section */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-2 px-1">
+                <div className="size-2 rounded-full bg-primary animate-pulse" />
+                <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">Inspiration</h3>
+              </div>
+              
+              <div className="flex flex-col gap-3">
+                {shuffledPrompts.map((prompt: string, i: number) => (
+                  <button
+                    key={i}
+                    onClick={() => setInputValue(prompt)}
+                    className="group relative w-full p-4 rounded-2xl bg-zinc-900/20 border border-white/5 text-left transition-all hover:bg-zinc-900/40 hover:border-white/10 active:scale-[0.98]"
+                  >
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <ArrowRight className="size-3 text-primary" />
+                    </div>
+                    <p className="text-[13px] text-zinc-400 font-medium leading-relaxed pr-4 group-hover:text-zinc-200 transition-colors">
+                      {prompt}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Design Tips Section */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-2 px-1">
+                <div className="size-2 rounded-full bg-zinc-800" />
+                <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">Quick Tips</h3>
+              </div>
+              
+              <div className="space-y-4">
+                {[
+                  { icon: Zap, title: "Be Specific", text: "Mention layouts, colors, and specific UI elements for better results." },
+                  { icon: Globe, title: "Image Reference", text: "Upload screenshots of designs you like to guide the AI's vision." },
+                  { icon: Zap, title: "Iterative Design", text: "Start simple and refine with detailed follow-up prompts." }
+                ].map((tip, i) => (
+                  <div key={i} className="flex gap-4 group">
+                    <div className="size-10 rounded-xl bg-zinc-900/50 border border-white/5 flex items-center justify-center shrink-0 group-hover:border-primary/20 transition-colors">
+                      <tip.icon className="size-4 text-zinc-500 group-hover:text-primary transition-colors" />
+                    </div>
+                    <div className="space-y-1 pt-0.5">
+                      <h4 className="text-[12px] font-bold text-zinc-300 tracking-tight">{tip.title}</h4>
+                      <p className="text-[11px] text-zinc-500 leading-normal font-medium">{tip.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Pro Badge */}
+            <div className="mt-auto pt-10">
+              <div className="relative p-6 rounded-[24px] bg-gradient-to-br from-zinc-900 to-black border border-white/5 overflow-hidden group">
+                <div className="absolute -top-10 -right-10 size-40 bg-primary/5 blur-3xl rounded-full" />
+                <div className="relative space-y-3">
+                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary text-[10px] font-black uppercase tracking-wider text-black">
+                    Pro
+                  </div>
+                  <h4 className="text-sm font-bold text-white tracking-tight">Unlimited Vision</h4>
+                  <p className="text-[11px] text-zinc-500 font-medium leading-relaxed">
+                    Upgrade to Pro to unlock advanced modeling and unlimited design exports.
+                  </p>
+                  <Button className="w-full h-8 rounded-lg bg-white text-black text-[11px] font-black uppercase tracking-tighter hover:bg-zinc-200 transition-colors mt-2">
+                    Upgrade Now
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
       </main>
     </div>
