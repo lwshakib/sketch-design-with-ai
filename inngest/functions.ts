@@ -8,7 +8,7 @@ import {
   PlanningPrompt, 
   ScreenGenerationPrompt,
 } from "../llm/prompts";
-import { getAllExamples } from "../llm/tools";
+import { getAllExamples } from "../llm/helpers";
 import prisma from "../lib/prisma";
 import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
 import { extractArtifacts } from "../lib/artifact-renderer";
@@ -47,7 +47,7 @@ export const generateDesign = inngest.createFunction(
   { id: "generate-design", retries: 5 },
   { event: "app/design.generate" },
   async ({ event, step, publish }) => {
-    const { messages, projectId } = event.data;
+    const { messages, projectId, is3xMode, websiteUrl } = event.data;
     
     // Normalize messages to always be an array with at least one message
     let safeMessages = Array.isArray(messages) ? messages : [];
@@ -59,6 +59,36 @@ export const generateDesign = inngest.createFunction(
     if (safeMessages.length === 0) {
       console.warn('[generateDesign] No messages received, using fallback');
       safeMessages = [{ role: 'user', content: 'Create a modern design' }];
+    }
+
+    // --- STEP 0: FETCH WEBSITE REFERENCE ---
+    let websiteReferenceContext = "";
+    if (websiteUrl) {
+      websiteReferenceContext = await step.run("fetch-website-reference", async () => {
+        try {
+          const response = await fetch(websiteUrl);
+          if (!response.ok) return `Failed to fetch website context from ${websiteUrl}`;
+          const html = await response.text();
+          // Extract title if exists
+          const titleMatch = html.match(/<title>(.*?)<\/title>/i);
+          const title = titleMatch ? titleMatch[1] : "";
+          // Extract body text (very stripped down to save tokens)
+          const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+          let body = bodyMatch ? bodyMatch[1] : html;
+          // Strip tags and excessive whitespace
+          body = body.replace(/<script[\s\S]*?<\/script>/gi, '')
+                     .replace(/<style[\s\S]*?<\/style>/gi, '')
+                     .replace(/<[^>]+>/g, ' ')
+                     .replace(/\s+/g, ' ')
+                     .trim()
+                     .slice(0, 4000); // Take first 4000 chars
+
+          return `Reference Website Context (${websiteUrl}):\nTitle: ${title}\nContent Summary: ${body}`;
+        } catch (error) {
+          console.error("Failed to fetch website reference:", error);
+          return `Error fetching website reference from ${websiteUrl}`;
+        }
+      });
     }
 
     // --- STEP 1 & 2: VISION & PLANNING ---
@@ -77,11 +107,14 @@ export const generateDesign = inngest.createFunction(
       
       const inspiration = getAllExamples();
 
-
-
+      let systemPrompt = PlanningPrompt + `\n\nUse these high-fidelity design examples as your primary inspiration for quality and code structure:\n${inspiration}`;
+      
+      if (websiteReferenceContext) {
+        systemPrompt += `\n\nCRITICAL: The user has provided a reference website. Study its content, structure, and style to inform your design plan:\n${websiteReferenceContext}`;
+      }
 
       const { object } = await generateObject({
-        system: PlanningPrompt + `\n\nUse these high-fidelity design examples as your primary inspiration for quality and code structure:\n${inspiration}`,
+        system: systemPrompt,
         messages: stepMessages as any,
         schema: z.object({
           vision: z.string().describe("A single, high-fidelity sentence describing the core visual style and design philosophy."),
@@ -118,8 +151,17 @@ export const generateDesign = inngest.createFunction(
           suggestion: z.string().describe("A single, specific suggestion for the next potential design step or feature (e.g., 'Add a collaborative group trip feature to the planner' or 'Design the booking confirmation screen'). Aim for around 10 words.")
         })
       });
+      let finalScreens = object.screens;
+      if (is3xMode) {
+        finalScreens = object.screens.flatMap((screen: any) => [
+          { ...screen, title: `${screen.title} (v1)`, prompt: `${screen.prompt}\n\nVariation 1: Focus on extreme clarity, airy layouts, and minimal whitespace.` },
+          { ...screen, title: `${screen.title} (v2)`, prompt: `${screen.prompt}\n\nVariation 2: Focus on high-density information, sophisticated borders, and structural depth.` },
+          { ...screen, title: `${screen.title} (v3)`, prompt: `${screen.prompt}\n\nVariation 3: Focus on unique creative expression, organic shapes, and experimental typography.` }
+        ]);
+      }
+
       const planJson = { 
-        screens: object.screens, 
+        screens: finalScreens, 
         themes: object.themes,
         conclusionText: object.conclusionText,
         suggestion: object.suggestion
@@ -262,9 +304,14 @@ export const generateDesign = inngest.createFunction(
             }
           });
           
-          // Fetch relevant inspiration
           const inspiration = getAllExamples();
           
+          let systemPrompt = ScreenGenerationPrompt + "\n\nCRITICAL: You are generating a highly detailed, production-ready screen. Do not use placeholders. Ensure all content is realistic and high-fidelity.";
+
+          if (websiteReferenceContext) {
+            systemPrompt += `\n\nREFERENCE WEBSITE CONTEXT: The user provided a reference website. Use its structure, content style, and information hierarchy as a guide for this screen:\n${websiteReferenceContext}`;
+          }
+
           // Contextual messages: Vision + Plan + Previous Screens
           const themes = (plan as any).themes || [];
           const selectedTheme = themes.length > 0 ? themes[0] : null;
@@ -279,17 +326,20 @@ export const generateDesign = inngest.createFunction(
             }
           });
 
+          const contextMessagesSize = 2; // Last 2 screens for context to avoid token bloat
+          const recentContext = screensContext.slice(-contextMessagesSize);
+
           const contextMessages = [
              { role: 'assistant', content: vision || '' },
              { role: 'assistant', content: `Design Plan: ${JSON.stringify({ screens: plan.screens })}` }, // Pass FULL plan for context
-             ...screensContext.map(s => ({
+             ...recentContext.map(s => ({
                 role: 'assistant',
                 content: `Earlier, I generated the "${s.title}" screen. Here is its code:\n\n${s.content}`
              }))
           ];
 
           const { text } = await generateText({
-            system: ScreenGenerationPrompt + "\n\nCRITICAL: You are generating a highly detailed, production-ready screen. Do not use placeholders. Ensure all content is realistic and high-fidelity.",
+            system: systemPrompt,
             messages: [
               ...safeMessages,
               ...contextMessages,
@@ -306,7 +356,6 @@ CRITICAL INSTRUCTIONS:
 3. THEME: Ensure the theme is consistent. If previous screens used a specific background gradient, YOU MUST USE IT TOO.
 4. CONTENT: Use realistic data. No 'Lorem Ipsum'.` }
             ] as any,
-            stopWhen: stepCountIs(5) as any,
             maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
             temperature: 0.7,
           });

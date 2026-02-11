@@ -176,9 +176,6 @@ export function ElementSettings({ selectedEl, setSelectedEl, clearSelection, onU
             <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-0.5">Properties</span>
             <span className="text-[13px] font-bold text-zinc-100 truncate max-w-[180px]">{label}</span>
         </div>
-        <Button onClick={clearSelection} variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-zinc-500 hover:text-white hover:bg-white/5">
-            <X className="size-4" />
-        </Button>
       </div>
 
       <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-6">

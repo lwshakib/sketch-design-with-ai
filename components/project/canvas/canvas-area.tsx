@@ -110,6 +110,9 @@ export function CanvasArea({
     hasUnsavedChanges,
     leftSidebarMode,
     setLeftSidebarMode,
+    isPanning,
+    secondarySidebarMode,
+    setSecondarySidebarMode,
     activeTool,
     setActiveTool,
     appliedTheme,
@@ -117,7 +120,7 @@ export function CanvasArea({
     setIsSidebarVisible
   } = useProjectStore();
 
-  const isEditMode = leftSidebarMode === 'properties';
+  const isEditMode = secondarySidebarMode === 'properties';
   const status = isGenerating ? 'streaming' : 'ready'; // Simplification for UI checks
 
   return (
@@ -132,7 +135,7 @@ export function CanvasArea({
       }}
       className={cn(
         "flex-1 flex flex-col bg-muted relative overflow-hidden",
-        activeTool === 'hand' ? "cursor-grab active:cursor-grabbing" : 
+        activeTool === 'hand' ? (isPanning ? "cursor-grabbing" : "cursor-grab") : 
         activeTool === 'select' ? "cursor-default" : "cursor-crosshair"
       )}
     >
@@ -182,10 +185,11 @@ export function CanvasArea({
         className={cn(
           "absolute inset-0 flex select-none",
           throttledArtifacts.length === 0 ? "items-center justify-center pb-20" : "items-start justify-center pt-36",
-          !isDraggingFrame && !isResizing && "transition-transform duration-75 ease-out"
+          !isDraggingFrame && !isResizing && !isPanning && "transition-transform duration-75 ease-out"
         )}
         style={{
-          transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom})`
+          transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom})`,
+          transformOrigin: '0 0'
         }}
       >
         {throttledArtifacts.length > 0 ? (
@@ -206,7 +210,7 @@ export function CanvasArea({
                 }}
                 className={cn(
                   "group absolute top-0 left-0 select-none",
-                  activeTool === 'hand' ? "cursor-grab" : "cursor-default"
+                  activeTool === 'hand' ? (isPanning ? "cursor-grabbing" : "cursor-grab") : (isDraggingFrame ? "cursor-grabbing" : "cursor-default")
                 )}
                 style={{
                   transform: `translate(${artifact.x || 0}px, ${artifact.y || 0}px)`,
@@ -275,16 +279,16 @@ export function CanvasArea({
                         size="icon" 
                         disabled={status !== 'ready'}
                         onClick={() => {
-                          if (leftSidebarMode === 'properties') {
-                            setLeftSidebarMode('chat');
+                          if (secondarySidebarMode === 'properties') {
+                            setSecondarySidebarMode('none');
                           } else {
-                            setLeftSidebarMode('properties');
+                            setSecondarySidebarMode('properties');
                             setActiveTool('select');
                           }
                         }}
                         className={cn(
                           "h-9 w-9 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-lg flex items-center justify-center transition-all disabled:opacity-30",
-                          leftSidebarMode === 'properties' && "bg-primary/10 text-primary shadow-lg shadow-primary/5"
+                          secondarySidebarMode === 'properties' && "bg-primary/20 text-primary shadow-lg shadow-primary/5 border border-primary/30"
                         )}
                         title="Edit Mode"
                       >
@@ -296,15 +300,15 @@ export function CanvasArea({
                         size="icon" 
                         disabled={status !== 'ready'}
                         onClick={() => {
-                          if (leftSidebarMode === 'theme') {
-                            setLeftSidebarMode('chat');
+                          if (secondarySidebarMode === 'theme') {
+                            setSecondarySidebarMode('none');
                           } else {
-                            setLeftSidebarMode('theme');
+                            setSecondarySidebarMode('theme');
                           }
                         }}
                         className={cn(
                           "h-9 w-9 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-lg flex items-center justify-center transition-all disabled:opacity-30",
-                          leftSidebarMode === 'theme' && "bg-primary/10 text-primary shadow-lg shadow-primary/5"
+                          secondarySidebarMode === 'theme' && "bg-primary/20 text-primary shadow-lg shadow-primary/5 border border-primary/30"
                         )}
                         title="Theme Settings"
                       >

@@ -2,10 +2,12 @@
 "use client";
 
 import React from "react";
-import { Check, Palette, Sparkles, Layout, Type, Box } from "lucide-react";
+import { Check, Palette, Sparkles, Layout, Type, Box, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { THEMES, ThemeKey, THEME_NAME_LIST } from "@/llm/prompts";
+import { useProjectStore } from "@/hooks/use-project-store";
 
 type Theme = {
   id: string;
@@ -16,34 +18,14 @@ type Theme = {
   isGenerated?: boolean;
 };
 
-const themes: Theme[] = (THEME_NAME_LIST as unknown as string[]).map((key) => {
+const defaultThemes: Theme[] = (THEME_NAME_LIST as unknown as string[]).map((key) => {
     const value = THEMES[key as ThemeKey];
     return {
         id: key,
         name: key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' '),
         colors: [value.primary, value.secondary, value.accent, value.background],
-        cssVars: {
-            background: value.background,
-            foreground: value.foreground,
-            card: value.card,
-            cardForeground: value.cardForeground,
-            popover: value.popover,
-            popoverForeground: value.popoverForeground,
-            primary: value.primary,
-            primaryForeground: value.primaryForeground,
-            secondary: value.secondary,
-            secondaryForeground: value.secondaryForeground,
-            muted: value.muted,
-            mutedForeground: value.mutedForeground,
-            accent: value.accent,
-            accentForeground: value.accentForeground,
-            destructive: value.destructive,
-            border: value.border,
-            input: value.input,
-            ring: value.ring,
-            radius: value.radius,
-        },
-        description: `A beautiful ${key.toLowerCase().replace('_', ' ')} theme with ${value.primary} accents.`
+        cssVars: { ...value },
+        description: `A professional ${key.toLowerCase().replace('_', ' ')} design system.`
     };
 });
 
@@ -54,13 +36,22 @@ type Props = {
 };
 
 export function ThemeSettings({ activeThemeId, onApplyTheme, appliedTheme }: Props) {
+  const { project } = useProjectStore();
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [themePrompt, setThemePrompt] = React.useState("");
   const [showInput, setShowInput] = React.useState(false);
 
-  // If no theme is active, the first theme (generated one) is the default
-  const defaultThemeId = themes[0].id;
-  const activeTheme = themes.find(t => t.id === (activeThemeId || defaultThemeId));
+  // Normalize project themes
+  const projectThemes: Theme[] = (project?.themes || []).map((t: any, i: number) => ({
+    id: `project-theme-${i}`,
+    name: t.name,
+    description: "AI-generated design system tailored for this project.",
+    colors: [t.colors.primary, t.colors.secondary, t.colors.accent, t.colors.background],
+    cssVars: t.colors,
+    isGenerated: true
+  }));
+
+  const combinedThemes = [...defaultThemes, ...projectThemes];
 
   const handleGenerateTheme = async () => {
     if (!themePrompt.trim()) return;
@@ -77,7 +68,6 @@ export function ThemeSettings({ activeThemeId, onApplyTheme, appliedTheme }: Pro
       
       const themeData = await res.json();
       
-      // Create a temporary theme object to apply
       const generatedTheme: Theme = {
         id: `ai-gen-${Date.now()}`,
         name: themeData.name,
@@ -102,6 +92,55 @@ export function ThemeSettings({ activeThemeId, onApplyTheme, appliedTheme }: Pro
     }
   };
 
+  const renderThemeCard = (theme: Theme) => {
+    const isActive = activeThemeId === theme.id || appliedTheme?.name === theme.name;
+    return (
+        <button
+            key={theme.id}
+            onClick={() => onApplyTheme(theme)}
+            className={cn(
+                "group relative flex flex-col items-start p-4 border rounded-2xl transition-all text-left overflow-hidden active:scale-[0.98]",
+                isActive 
+                    ? "bg-indigo-600/10 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.1)]" 
+                    : "bg-zinc-900/40 border-white/5 hover:bg-zinc-900/80 hover:border-indigo-500/30"
+            )}
+        >
+            <div className="flex items-center justify-between w-full mb-3">
+                <div className="flex items-center gap-2">
+                    <span className={cn(
+                        "text-[13px] font-bold transition-colors",
+                        isActive ? "text-white" : "text-zinc-200 group-hover:text-white"
+                    )}>
+                        {theme.name}
+                    </span>
+                    {isActive && (
+                        <div className="size-1.5 rounded-full bg-indigo-500 shadow-[0_0_5px_rgba(99,102,241,0.5)]" />
+                    )}
+                </div>
+                <div className="flex gap-1.5 transform group-hover:scale-110 transition-transform">
+                    {theme.colors.map((color, i) => (
+                        <div 
+                            key={i} 
+                            className="size-3 rounded-full border border-white/10 shadow-sm" 
+                            style={{ backgroundColor: color }}
+                        />
+                    ))}
+                </div>
+            </div>
+            
+            <p className={cn(
+                "text-[11px] transition-colors leading-relaxed",
+                isActive ? "text-indigo-200/60" : "text-zinc-500 group-hover:text-zinc-400"
+            )}>
+                {theme.description}
+            </p>
+
+            {/* Hover Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 via-transparent to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </button>
+    );
+  };
+
   return (
     <div className="h-full flex flex-col bg-zinc-950 animate-in fade-in duration-300">
       {/* Header */}
@@ -110,161 +149,205 @@ export function ThemeSettings({ activeThemeId, onApplyTheme, appliedTheme }: Pro
             <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mb-0.5">Customization</span>
             <span className="text-[13px] font-bold text-zinc-100">Theme Library</span>
         </div>
-        <div className="h-8 w-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-            <Palette className="size-4 text-indigo-500" />
-        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-8">
-        {/* Active Theme Display */}
-        {appliedTheme && (
-            <div className="space-y-4">
-                <div className="flex items-center justify-between px-1">
-                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Currently Applied</span>
-                    <div className="size-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
+      <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+        <Tabs defaultValue="presets" className="flex-1 min-h-0 flex flex-col">
+            <div className="px-4 pt-4 flex-shrink-0">
+                <TabsList className="w-full bg-zinc-900/50 border border-white/5 p-1 rounded-xl h-10">
+                    <TabsTrigger 
+                        value="presets" 
+                        className="flex-1 rounded-lg text-[11px] font-bold data-[state=active]:bg-indigo-600 data-[state=active]:text-white transition-all"
+                    >
+                        PRESETS
+                    </TabsTrigger>
+                    <TabsTrigger 
+                        value="ai" 
+                        className="flex-1 rounded-lg text-[11px] font-bold data-[state=active]:bg-indigo-600 data-[state=active]:text-white transition-all flex items-center gap-2"
+                    >
+                        AI DESIGNER
+                        {projectThemes.length > 0 && (
+                            <span className="bg-white/20 px-1.5 py-0.5 rounded-md text-[9px]">{projectThemes.length}</span>
+                        )}
+                    </TabsTrigger>
+                </TabsList>
+            </div>
+
+            <TabsContent value="presets" className="flex-1 overflow-y-auto mt-0 p-4 min-h-0">
+                <div className="space-y-4">
+                    <div className="space-y-1 px-1">
+                        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Global Presets</p>
+                        <p className="text-[10px] text-zinc-600">Hand-crafted industrial design systems.</p>
+                    </div>
+                    <div className="grid gap-3">
+                        {defaultThemes.map(renderThemeCard)}
+                    </div>
                 </div>
-                <div className="p-4 bg-indigo-600/10 border border-indigo-500/30 rounded-2xl relative overflow-hidden group">
-                    <div className="flex items-center justify-between mb-3 relative z-10">
-                        <span className="text-sm font-bold text-white tracking-tight">{appliedTheme.name}</span>
-                        <div className="flex gap-1.5">
-                            {(appliedTheme.colors || []).map((color, i) => (
-                                <div 
-                                    key={i} 
-                                    className="size-3.5 rounded-full border border-white/20 shadow-sm" 
-                                    style={{ backgroundColor: color }}
-                                />
-                            ))}
+            </TabsContent>
+
+            <TabsContent value="ai" className="flex-1 overflow-y-auto mt-0 p-4 min-h-0 space-y-8">
+                {projectThemes.length > 0 ? (
+                    <div className="space-y-4">
+                        <div className="space-y-1 px-1 flex items-center justify-between">
+                            <div>
+                                <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Architected Themes</p>
+                                <p className="text-[10px] text-zinc-600">Generated specifically for this project.</p>
+                            </div>
+                            <Zap className="size-3 text-indigo-500 animate-pulse" />
+                        </div>
+                        <div className="grid gap-3">
+                            {projectThemes.map(renderThemeCard)}
                         </div>
                     </div>
-                    <p className="text-xs text-indigo-200/70 leading-relaxed relative z-10">
-                        {appliedTheme.description}
-                    </p>
-                    <div className="absolute top-0 right-0 p-2 opacity-20 pointer-events-none">
-                        <Check className="size-16 -mr-4 -mt-4" />
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-8 px-4 text-center border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
+                        <div className="h-10 w-10 rounded-full bg-indigo-500/10 flex items-center justify-center mb-3">
+                            <Sparkles className="size-5 text-indigo-400" />
+                        </div>
+                        <p className="text-[11px] font-bold text-zinc-300 mb-1">No AI themes yet</p>
+                        <p className="text-[10px] text-zinc-500 max-w-[180px]">Describe your brand below to generate custom tokens.</p>
                     </div>
+                )}
+
+                {/* Theme Generator Section */}
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-600/10 to-purple-600/10 border border-indigo-500/20 space-y-4 shadow-xl">
+                    <div className="flex items-center gap-2">
+                        <Sparkles className="size-4 text-indigo-400" />
+                        <span className="text-xs font-bold text-indigo-100 uppercase tracking-wide">Custom Token Engine</span>
+                    </div>
+                    
+                    {!showInput ? (
+                        <>
+                            <p className="text-[11px] text-zinc-300 leading-relaxed italic">
+                                "Describe a mood or brand identity and Sketch will generate a custom color palette for you."
+                            </p>
+                            <button 
+                                onClick={() => setShowInput(true)}
+                                className="w-full h-9 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2"
+                            >
+                                GENERATE NEW SYSTEM
+                            </button>
+                        </>
+                    ) : (
+                        <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                            <textarea 
+                                value={themePrompt}
+                                onChange={(e) => setThemePrompt(e.target.value)}
+                                placeholder="e.g. 'Cyberpunk financial dashboard' or 'Minimalist organic skincare'..."
+                                className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-3 text-[11px] text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-indigo-500/50 min-h-[80px] resize-none"
+                            />
+                            <div className="flex gap-2">
+                                <button 
+                                    disabled={isGenerating}
+                                    onClick={() => setShowInput(false)}
+                                    className="flex-1 h-8 bg-zinc-900 text-zinc-400 text-[10px] font-bold rounded-lg hover:text-white transition-colors"
+                                >
+                                    CANCEL
+                                </button>
+                                <button 
+                                    disabled={isGenerating || !themePrompt.trim()}
+                                    onClick={handleGenerateTheme}
+                                    className="flex-[2] h-8 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-2"
+                                >
+                                    {isGenerating ? "GENERATING..." : "BUILD SYSTEM"}
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            </div>
-        )}
+            </TabsContent>
+        </Tabs>
+      </div>
 
-        {/* Global Presets */}
-        <div className="space-y-4">
-            <div className="space-y-1 px-1">
-                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Explore Presets</p>
-                <p className="text-[10px] text-zinc-600">Switch between different visual styles instantly.</p>
-            </div>
-
-            <div className="grid gap-3">
-                {themes.map((theme) => {
-                    const isActive = activeTheme?.id === theme.id;
-                    return (
+      {/* Global Tokens Section (Bottom Sticky) */}
+      <div className="p-4 border-t border-white/5 bg-zinc-900/30">
+        <div className="grid grid-cols-2 gap-3">
+            <Popover>
+                <PopoverTrigger asChild>
+                    <button className="p-3 bg-zinc-900/40 border border-white/5 rounded-xl flex items-center gap-3 hover:bg-zinc-900 transition-colors group">
+                        <Type className="size-3.5 text-indigo-500 group-hover:scale-110 transition-transform" />
+                        <div className="flex flex-col items-start translate-y-[1px]">
+                            <span className="text-[9px] font-black text-zinc-600 uppercase tracking-tighter">Font</span>
+                            <span className="text-[11px] font-bold text-zinc-300 leading-none">{appliedTheme?.cssVars.fontSans?.split(',')[0] || "Inter"}</span>
+                        </div>
+                    </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 bg-zinc-950 border-white/10 p-1 rounded-xl shadow-2xl z-50 overflow-hidden">
+                    <div className="p-2 border-b border-white/5 bg-zinc-900/40">
+                        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Select Font</span>
+                    </div>
+                    {[
+                        { name: "Inter", value: "'Inter', sans-serif" },
+                        { name: "Outfit", value: "'Outfit', sans-serif" },
+                        { name: "Plus Jakarta", value: "'Plus Jakarta Sans', sans-serif" },
+                        { name: "JetBrains Mono", value: "'JetBrains Mono', monospace" }
+                    ].map((font) => (
                         <button
-                            key={theme.id}
-                            onClick={() => onApplyTheme(theme)}
+                            key={font.name}
+                            onClick={() => {
+                                if (appliedTheme) {
+                                    onApplyTheme({
+                                        ...appliedTheme,
+                                        cssVars: { ...appliedTheme.cssVars, fontSans: font.value }
+                                    });
+                                }
+                            }}
                             className={cn(
-                                "group relative flex flex-col items-start p-4 border rounded-2xl transition-all text-left overflow-hidden active:scale-[0.98]",
-                                isActive 
-                                    ? "bg-indigo-600/10 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.1)]" 
-                                    : "bg-zinc-900/40 border-white/5 hover:bg-zinc-900/80 hover:border-indigo-500/30"
+                                "w-full text-left px-3 py-2 text-[11px] rounded-lg transition-all",
+                                appliedTheme?.cssVars.fontSans === font.value 
+                                    ? "bg-indigo-600 text-white font-bold" 
+                                    : "text-zinc-400 hover:bg-white/5 hover:text-white"
                             )}
                         >
-                            <div className="flex items-center justify-between w-full mb-3">
-                                <div className="flex items-center gap-2">
-                                    <span className={cn(
-                                        "text-[13px] font-bold transition-colors",
-                                        isActive ? "text-white" : "text-zinc-200 group-hover:text-white"
-                                    )}>
-                                        {theme.name}
-                                    </span>
-                                    {isActive && (
-                                        <div className="size-1.5 rounded-full bg-indigo-500 shadow-[0_0_5px_rgba(99,102,241,0.5)]" />
-                                    )}
-                                </div>
-                                <div className="flex gap-1.5 transform group-hover:scale-110 transition-transform">
-                                    {theme.colors.map((color, i) => (
-                                        <div 
-                                            key={i} 
-                                            className="size-3 rounded-full border border-white/10 shadow-sm" 
-                                            style={{ backgroundColor: color }}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                            
-                            <p className={cn(
-                                "text-[11px] transition-colors leading-relaxed",
-                                isActive ? "text-indigo-200/60" : "text-zinc-500 group-hover:text-zinc-400"
-                            )}>
-                                {theme.description}
-                            </p>
-
-                            {/* Hover Gradient Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 via-transparent to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            {font.name}
                         </button>
-                    );
-                })}
-            </div>
-        </div>
+                    ))}
+                </PopoverContent>
+            </Popover>
 
-        {/* AI Theme Suggestion */}
-        <div className="mt-8 p-4 rounded-2xl bg-gradient-to-br from-indigo-600/10 to-purple-600/10 border border-indigo-500/20 space-y-4">
-            <div className="flex items-center gap-2">
-                <Sparkles className="size-4 text-indigo-400" />
-                <span className="text-xs font-bold text-indigo-100 uppercase tracking-wide">AI Designer</span>
-            </div>
-            
-            {!showInput ? (
-                <>
-                    <p className="text-[11px] text-zinc-300 leading-relaxed italic">
-                        "Describe a mood or brand identity and Sketch will generate a custom color palette and typography system for you."
-                    </p>
-                    <button 
-                        onClick={() => setShowInput(true)}
-                        className="w-full h-9 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2"
-                    >
-                        LAUNCH THEME GENERATOR
+            <Popover>
+                <PopoverTrigger asChild>
+                    <button className="p-3 bg-zinc-900/40 border border-white/5 rounded-xl flex items-center gap-3 hover:bg-zinc-900 transition-colors group">
+                        <Box className="size-3.5 text-indigo-500 group-hover:scale-110 transition-transform" />
+                        <div className="flex flex-col items-start translate-y-[1px]">
+                            <span className="text-[9px] font-black text-zinc-600 uppercase tracking-tighter">Radius</span>
+                            <span className="text-[11px] font-bold text-zinc-300 leading-none">{appliedTheme?.cssVars.radius || "0.5rem"}</span>
+                        </div>
                     </button>
-                </>
-            ) : (
-                <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <textarea 
-                        value={themePrompt}
-                        onChange={(e) => setThemePrompt(e.target.value)}
-                        placeholder="e.g. 'Cyberpunk financial dashboard with neon highlights' or 'Minimalist organic skincare brand'..."
-                        className="w-full bg-zinc-950/50 border border-white/10 rounded-xl p-3 text-[11px] text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-indigo-500/50 min-h-[80px] resize-none"
-                    />
-                    <div className="flex gap-2">
-                        <button 
-                            disabled={isGenerating}
-                            onClick={() => setShowInput(false)}
-                            className="flex-1 h-8 bg-zinc-900 text-zinc-400 text-[10px] font-bold rounded-lg hover:text-white transition-colors"
-                        >
-                            CANCEL
-                        </button>
-                        <button 
-                            disabled={isGenerating || !themePrompt.trim()}
-                            onClick={handleGenerateTheme}
-                            className="flex-[2] h-8 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-[10px] font-bold rounded-lg transition-all flex items-center justify-center gap-2"
-                        >
-                            {isGenerating ? "GENERATING..." : "BUILD THEME"}
-                        </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 bg-zinc-950 border-white/10 p-1 rounded-xl shadow-2xl z-50 overflow-hidden">
+                    <div className="p-2 border-b border-white/5 bg-zinc-900/40">
+                        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Select Radius</span>
                     </div>
-                </div>
-            )}
-        </div>
-
-        {/* Global Tokens Section (Placeholder) */}
-        <div className="pt-4 space-y-4">
-            <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest block ml-1">Global Tokens</span>
-            <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-zinc-900/40 border border-white/5 rounded-xl flex items-center gap-3">
-                    <Type className="size-3.5 text-zinc-500" />
-                    <span className="text-[11px] font-bold text-zinc-400">Typography</span>
-                </div>
-                <div className="p-3 bg-zinc-900/40 border border-white/5 rounded-xl flex items-center gap-3">
-                    <Box className="size-3.5 text-zinc-500" />
-                    <span className="text-[11px] font-bold text-zinc-400">Radius</span>
-                </div>
-            </div>
+                    {[
+                        { name: "None", value: "0rem" },
+                        { name: "Sharp", value: "0.25rem" },
+                        { name: "Modern", value: "0.5rem" },
+                        { name: "Curvy", value: "0.9rem" },
+                        { name: "Round", value: "1.5rem" }
+                    ].map((rad) => (
+                        <button
+                            key={rad.name}
+                            onClick={() => {
+                                if (appliedTheme) {
+                                    onApplyTheme({
+                                        ...appliedTheme,
+                                        cssVars: { ...appliedTheme.cssVars, radius: rad.value }
+                                    });
+                                }
+                            }}
+                            className={cn(
+                                "w-full text-left px-3 py-2 text-[11px] rounded-lg transition-all",
+                                appliedTheme?.cssVars.radius === rad.value 
+                                    ? "bg-indigo-600 text-white font-bold" 
+                                    : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                            )}
+                        >
+                            {rad.name}
+                        </button>
+                    ))}
+                </PopoverContent>
+            </Popover>
         </div>
       </div>
     </div>

@@ -10,6 +10,7 @@ import { useInngestSubscription } from "@inngest/realtime/hooks";
 import { fetchInngestToken } from "@/app/actions/inngest";
 import { extractArtifacts, type Artifact } from "@/lib/artifact-renderer";
 import { ChatSidebar } from "@/components/project/chat-sidebar";
+import { SecondarySidebar } from "@/components/project/secondary-sidebar";
 import { CanvasArea } from "@/components/project/canvas/canvas-area";
 import { useCanvas } from "@/components/project/canvas/use-canvas";
 import { sanitizeDocumentHtml } from "@/components/project/utils";
@@ -43,6 +44,7 @@ export default function ProjectPage() {
     artifactPreviewModes, setArtifactPreviewModes,
     selectedArtifactIndex, setSelectedArtifactIndex,
     leftSidebarMode, setLeftSidebarMode,
+    secondarySidebarMode, setSecondarySidebarMode,
     activeThemeId, setActiveThemeId,
     appliedTheme, setAppliedTheme,
     selectedEl, setSelectedEl,
@@ -60,12 +62,14 @@ export default function ProjectPage() {
     isExportSheetOpen, setIsExportSheetOpen,
     exportArtifactIndex, setExportArtifactIndex,
     isSidebarVisible, setIsSidebarVisible,
+    is3xMode,
     hasCopied, setHasCopied,
     designPlan, setDesignPlan,
     realtimeStatus, setRealtimeStatus,
     isPlanDialogOpen, setIsPlanDialogOpen,
     isPromptDialogOpen, setIsPromptDialogOpen,
     viewingPrompt, setViewingPrompt,
+    websiteUrl, setWebsiteUrl,
     updateState, setActiveTool
   } = useProjectStore();
 
@@ -105,7 +109,7 @@ export default function ProjectPage() {
   } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
-      body: { projectId },
+      body: { projectId, is3xMode },
     }),
     onError: (err) => {
       console.error(err);
@@ -377,7 +381,7 @@ export default function ProjectPage() {
     return () => window.removeEventListener('message', handleMessage);
   }, [setDynamicFrameHeights, setSelectedArtifactIndex, setSelectedEl]);
 
-  const isEditMode = leftSidebarMode === 'properties';
+  const isEditMode = secondarySidebarMode === 'properties';
   useEffect(() => {
     const iframes = document.querySelectorAll('iframe');
     iframes.forEach(iframe => iframe.contentWindow?.postMessage({ type: 'SET_EDIT_MODE', enabled: isEditMode }, '*'));
@@ -545,25 +549,6 @@ export default function ProjectPage() {
 
   useEffect(() => { if (!loading) debouncedSave(); }, [zoom, canvasOffset, framePos, artifacts, dynamicFrameHeights, artifactPreviewModes, appliedTheme, loading, debouncedSave]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isInput = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName || '');
-      if (e.code === 'Space' && !isInput && !e.repeat) { e.preventDefault(); setActiveTool('hand'); }
-      if (!isInput) {
-        if (e.key === 'v') setActiveTool('select');
-        if (e.key === 'h') setActiveTool('hand');
-      }
-      if ((e.ctrlKey || e.metaKey) && !isInput) {
-        if (e.key === '=' || e.key === '+') { e.preventDefault(); setZoom(prev => Math.min(prev * 1.2, 5)); }
-        else if (e.key === '-') { e.preventDefault(); setZoom(prev => Math.max(prev / 1.2, 0.1)); }
-        else if (e.key === '0') { e.preventDefault(); setZoom(1); setCanvasOffset({ x: 0, y: 0 }); setFramePos({ x: 0, y: 0 }); }
-      }
-    };
-    const handleKeyUp = (e: KeyboardEvent) => { if (e.code === 'Space') setActiveTool('select'); };
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    return () => { window.removeEventListener('keydown', handleKeyDown); window.removeEventListener('keyup', handleKeyUp); };
-  }, [setActiveTool, setZoom, setCanvasOffset, setFramePos]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files; if (!files) return;
@@ -594,10 +579,12 @@ export default function ProjectPage() {
   const handleCustomSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (status === 'streaming' || status === 'submitted') { stop(); return; }
-    if (!input.trim() && attachments?.length === 0) return;
-    setIsGenerating(true); setDesignPlan({ screens: [] }); setRealtimeStatus(null);
-    sendMessage({ text: input.trim(), files: attachments?.map(a => ({ type: "file" as const, url: a.url, mediaType: "image/*" })) });
-    setAttachments([]); setInput("");
+    sendMessage({ 
+      text: input.trim(), 
+      files: attachments?.map(a => ({ type: "file" as const, url: a.url, mediaType: "image/*" })),
+      websiteUrl
+    });
+    setAttachments([]); setInput(""); setWebsiteUrl(null);
   };
 
   const handleArtifactAction = (action: 'more' | 'regenerate' | 'variations', artifact: Artifact) => {
@@ -682,18 +669,24 @@ export default function ProjectPage() {
   return (
     <div className="flex h-screen w-full bg-background text-foreground overflow-hidden font-sans">
       {isSidebarVisible && (
-        <ChatSidebar
-          handleCustomSubmit={handleCustomSubmit}
-          handleRetry={handleRetry}
-          handleFileUpload={handleFileUpload}
-          fileInputRef={fileInputRef}
-          commitEdits={commitEdits}
-          applyTheme={applyTheme}
-          session={session}
-          status={status}
-          messages={messages}
-          error={error}
-        />
+        <div className="relative w-[380px] flex-shrink-0 border-r">
+          <ChatSidebar
+            handleCustomSubmit={handleCustomSubmit}
+            handleRetry={handleRetry}
+            handleFileUpload={handleFileUpload}
+            fileInputRef={fileInputRef}
+            commitEdits={commitEdits}
+            applyTheme={applyTheme}
+            session={session}
+            status={status}
+            messages={messages}
+            error={error}
+          />
+          <SecondarySidebar 
+            commitEdits={commitEdits}
+            applyTheme={applyTheme}
+          />
+        </div>
       )}
 
       <CanvasArea

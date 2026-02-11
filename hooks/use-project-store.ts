@@ -6,6 +6,7 @@ export interface Project {
   title: string;
   messages: any[];
   canvasData?: any;
+  themes?: any[];
 }
 
 interface ProjectState {
@@ -21,6 +22,7 @@ interface ProjectState {
   designPlan: { screens: any[], _markdown?: string };
   realtimeStatus: { message: string; status: string; currentScreen?: string } | null;
   loading: boolean;
+  websiteUrl: string | null;
 
   // Canvas State
   zoom: number;
@@ -38,7 +40,8 @@ interface ProjectState {
   resizingHandle: string | null;
 
   // UI State
-  leftSidebarMode: 'chat' | 'properties' | 'theme';
+  leftSidebarMode: 'chat';
+  secondarySidebarMode: 'none' | 'properties' | 'theme';
   isCodeViewerOpen: boolean;
   isGenerating: boolean;
   viewingCode: string;
@@ -58,6 +61,7 @@ interface ProjectState {
   isPromptDialogOpen: boolean;
   viewingPrompt: string;
   isSidebarVisible: boolean;
+  is3xMode: boolean;
 
   // Theme & Selection
   activeThemeId: string | null;
@@ -74,6 +78,7 @@ interface ProjectState {
   setDesignPlan: (designPlan: { screens: any[], _markdown?: string }) => void;
   setRealtimeStatus: (status: { message: string; status: string; currentScreen?: string } | null) => void;
   setLoading: (loading: boolean) => void;
+  setIs3xMode: (mode: boolean) => void;
 
   setZoom: (val: number | ((prev: number) => number)) => void;
   setCanvasOffset: (val: { x: number; y: number } | ((prev: { x: number; y: number }) => { x: number; y: number })) => void;
@@ -88,7 +93,8 @@ interface ProjectState {
   setIsResizing: (isResizing: boolean) => void;
   setResizingHandle: (handle: string | null) => void;
 
-  setLeftSidebarMode: (mode: 'chat' | 'properties' | 'theme') => void;
+  setLeftSidebarMode: (mode: 'chat') => void;
+  setSecondarySidebarMode: (mode: 'none' | 'properties' | 'theme') => void;
   setIsCodeViewerOpen: (open: boolean) => void;
   setIsGenerating: (generating: boolean) => void;
   setViewingCode: (code: string) => void;
@@ -108,6 +114,7 @@ interface ProjectState {
   setIsPromptDialogOpen: (open: boolean) => void;
   setViewingPrompt: (prompt: string) => void;
   setIsSidebarVisible: (visible: boolean) => void;
+  setWebsiteUrl: (url: string | null) => void;
 
   setActiveThemeId: (id: string | null) => void;
   setAppliedTheme: (theme: any | null) => void;
@@ -127,6 +134,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   designPlan: { screens: [] },
   realtimeStatus: null,
   loading: true,
+  websiteUrl: null,
 
   zoom: 1,
   canvasOffset: { x: 0, y: 0 },
@@ -142,6 +150,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   resizingHandle: null,
 
   leftSidebarMode: 'chat',
+  secondarySidebarMode: 'none',
   isCodeViewerOpen: false,
   isGenerating: false,
   viewingCode: "",
@@ -161,6 +170,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   isPromptDialogOpen: false,
   viewingPrompt: "",
   isSidebarVisible: true,
+  is3xMode: false,
 
   activeThemeId: null,
   appliedTheme: null,
@@ -176,6 +186,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setDesignPlan: (designPlan) => set({ designPlan }),
   setRealtimeStatus: (realtimeStatus) => set({ realtimeStatus }),
   setLoading: (loading) => set({ loading }),
+  setIs3xMode: (is3xMode) => set({ is3xMode }),
 
   setZoom: (val) => set((state) => ({ zoom: typeof val === 'function' ? val(state.zoom) : val })),
   setCanvasOffset: (val) => set((state) => ({ canvasOffset: typeof val === 'function' ? val(state.canvasOffset) : val })),
@@ -191,6 +202,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setResizingHandle: (resizingHandle) => set({ resizingHandle }),
 
   setLeftSidebarMode: (leftSidebarMode) => set({ leftSidebarMode }),
+  setSecondarySidebarMode: (secondarySidebarMode) => set({ secondarySidebarMode }),
   setIsCodeViewerOpen: (isCodeViewerOpen) => set({ isCodeViewerOpen }),
   setIsGenerating: (isGenerating) => set({ isGenerating }),
   setViewingCode: (viewingCode) => set({ viewingCode }),
@@ -210,6 +222,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setIsPromptDialogOpen: (isPromptDialogOpen) => set({ isPromptDialogOpen }),
   setViewingPrompt: (viewingPrompt) => set({ viewingPrompt }),
   setIsSidebarVisible: (isSidebarVisible) => set({ isSidebarVisible }),
+  setWebsiteUrl: (websiteUrl) => set({ websiteUrl }),
 
   setActiveThemeId: (activeThemeId) => set({ activeThemeId }),
   setAppliedTheme: (appliedTheme) => set({ appliedTheme }),

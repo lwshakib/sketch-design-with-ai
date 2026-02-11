@@ -15,6 +15,11 @@ import {
   ArrowRight,
   Menu,
   Lightbulb,
+  Palette,
+  CopyPlus,
+  Link,
+  Globe,
+  ImageIcon
 } from "lucide-react";
 import { GenerationStatus } from "./generation-status";
 import { Button } from "@/components/ui/button";
@@ -35,8 +40,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ElementSettings } from "./element-settings";
-import { ThemeSettings } from "./theme-settings";
 import { extractArtifacts, stripArtifact } from "@/lib/artifact-renderer";
 import { useProjectStore } from "@/hooks/use-project-store";
 
@@ -70,6 +73,8 @@ export function ChatSidebar({
   const {
     leftSidebarMode,
     setLeftSidebarMode,
+    secondarySidebarMode,
+    setSecondarySidebarMode,
     project,
     input,
     setInput,
@@ -84,28 +89,36 @@ export function ChatSidebar({
     setIsEditTitleDialogOpen,
     setEditingTitle,
     isSidebarVisible,
-    throttledArtifacts
+    throttledArtifacts,
+    is3xMode,
+    setIs3xMode,
+    setWebsiteUrl,
+    websiteUrl,
+    setAttachments
   } = useProjectStore();
+
+  const [showUrlInput, setShowUrlInput] = React.useState(false);
+  const [urlTemp, setUrlTemp] = React.useState("");
+
+  const handleUrlSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!urlTemp.trim()) return;
+    
+    // Simple validation
+    try {
+      new URL(urlTemp);
+      setWebsiteUrl(urlTemp.trim());
+      setUrlTemp("");
+      setShowUrlInput(false);
+    } catch (e) {
+      alert("Please enter a valid URL (e.g., https://google.com)");
+    }
+  };
 
   if (!project) return null;
 
   return (
-    <aside className="w-[380px] flex flex-col border-r bg-card z-20 transition-all duration-300">
-      {leftSidebarMode === 'properties' ? (
-        <ElementSettings 
-          selectedEl={selectedEl} 
-          setSelectedEl={setSelectedEl}
-          clearSelection={() => setSelectedEl(null)}
-          onUpdate={commitEdits}
-        />
-      ) : leftSidebarMode === 'theme' ? (
-        <ThemeSettings 
-          activeThemeId={activeThemeId}
-          onApplyTheme={applyTheme}
-          appliedTheme={appliedTheme}
-        />
-      ) : (
-        <>
+    <aside className="w-full h-full flex flex-col bg-card z-20 transition-all duration-300">
           <header className="flex items-center justify-between px-4 py-2 h-14 border-b bg-sidebar transition-all">
             <div className="flex items-center gap-2">
               <DropdownMenu>
@@ -321,8 +334,8 @@ export function ChatSidebar({
           </div>
 
           <div className="p-4 bg-sidebar">
-            <div className="relative">
-              <div className="bg-muted/50 rounded-2xl p-4 border border-border shadow-2xl transition-all focus-within:border-primary/50">
+            <div className="flex flex-col gap-3">
+              <div className="bg-[#0F0F0F] rounded-[24px] p-4 border border-white/5 shadow-2xl transition-all focus-within:border-white/10">
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -333,51 +346,146 @@ export function ChatSidebar({
                     }
                   }}
                   readOnly={status !== 'ready'}
-                  placeholder={status === 'ready' ? "Describe your design" : "Processing vision..."}
-                  className="w-full bg-transparent outline-none resize-none text-[14px] text-foreground placeholder:text-muted-foreground min-h-[40px] max-h-[200px]"
+                  placeholder="Describe your design"
+                  className="w-full bg-transparent outline-none resize-none text-[15px] text-foreground placeholder:text-[#525252] min-h-[56px] max-h-[200px] leading-relaxed"
                 />
 
-                <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-800/50">
-                  <div className="flex items-center gap-1.5">
+                {(attachments.length > 0 || websiteUrl || showUrlInput) && (
+                  <div className="flex flex-wrap gap-2 mb-3 mt-1">
+                    {attachments.map((att, idx) => (
+                      <div key={idx} className="relative group size-12 rounded-lg overflow-hidden border border-white/10 bg-zinc-900 flex-shrink-0">
+                        <img src={att.url} className="w-full h-full object-cover opacity-60" />
+                        <button 
+                          onClick={() => setAttachments(prev => prev.filter((_, i) => i !== idx))}
+                          className="absolute top-0.5 right-0.5 size-4 bg-black/60 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="size-2 text-white" />
+                        </button>
+                        {att.isUploading && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                            <div className="size-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    {websiteUrl && !showUrlInput && (
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 max-w-[200px] group">
+                        <Globe className="size-3 shrink-0" />
+                        <span className="text-[11px] font-bold truncate">{websiteUrl}</span>
+                        <button 
+                          onClick={() => setWebsiteUrl(null)}
+                          className="size-4 shrink-0 hover:bg-white/10 rounded flex items-center justify-center"
+                        >
+                          <X className="size-2" />
+                        </button>
+                      </div>
+                    )}
+
+                    {showUrlInput && (
+                      <form onSubmit={handleUrlSubmit} className="flex-1 min-w-[200px] flex items-center gap-2 px-2 py-1.5 rounded-xl bg-[#1A1A1A] border border-white/10 animate-in fade-in zoom-in duration-200">
+                        <Link className="size-3 text-zinc-500" />
+                        <input 
+                          autoFocus
+                          value={urlTemp}
+                          onChange={(e) => setUrlTemp(e.target.value)}
+                          placeholder="Paste URL (e.g. google.com)"
+                          className="flex-1 bg-transparent outline-none text-[11px] text-zinc-200 placeholder:text-zinc-600"
+                        />
+                        <button type="submit" className="hidden" />
+                        <button 
+                          type="button"
+                          onClick={() => { setShowUrlInput(false); setUrlTemp(""); }}
+                          className="size-4 shrink-0 hover:bg-white/10 rounded flex items-center justify-center"
+                        >
+                          <X className="size-2 text-zinc-500" />
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between mt-1">
+                  <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          disabled={status !== 'ready'}
+                          className="h-9 w-9 rounded-full bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525] border border-white/5"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-48 bg-[#0F0F0F] border-white/10 rounded-xl shadow-2xl p-1.5">
+                        <DropdownMenuItem 
+                          onClick={() => fileInputRef.current?.click()}
+                          className="flex items-center gap-2 p-2 hover:bg-white/5 rounded-lg text-zinc-300 transition-colors"
+                        >
+                          <ImageIcon className="h-4 w-4" />
+                          <span className="text-[13px] font-medium">Upload Images</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => setShowUrlInput(true)}
+                          className="flex items-center gap-2 p-2 hover:bg-white/5 rounded-lg text-zinc-300 transition-colors"
+                        >
+                          <Link className="h-4 w-4" />
+                          <span className="text-[13px] font-medium">Website URL</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <input type="file" multiple accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
+                    
+                    <button 
+                      onClick={() => setIs3xMode(!is3xMode)}
+                      className={cn(
+                        "flex items-center gap-2 h-9 px-3 rounded-full border transition-all duration-200",
+                        is3xMode 
+                          ? "bg-primary/20 border-primary/30 text-primary shadow-[0_0_15px_rgba(var(--primary),0.1)]" 
+                          : "bg-[#1A1A1A] border-white/5 text-zinc-400 hover:text-white hover:bg-[#252525]"
+                      )}
+                    >
+                      <CopyPlus className="h-4 w-4" />
+                      <span className="text-[13px] font-bold tracking-tight mt-0.5">3x</span>
+                    </button>
+
                     <Button 
-                      onClick={() => fileInputRef.current?.click()} 
+                      onClick={() => setSecondarySidebarMode(secondarySidebarMode === 'theme' ? 'none' : 'theme')}
                       variant="ghost" 
                       size="icon" 
-                      disabled={status !== 'ready'}
-                      className="h-8 w-8 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800"
+                      className={cn(
+                        "h-9 w-9 rounded-full bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525] border border-white/5",
+                        secondarySidebarMode === 'theme' && "bg-primary/20 text-primary border-primary/30 shadow-[0_0_15px_rgba(var(--primary),0.1)]"
+                      )}
                     >
-                      <Plus className="h-5 w-5" />
+                      <Palette className="h-4 w-4" />
                     </Button>
-                    <input type="file" multiple accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
                   </div>
                   
-                  <div className="flex items-center gap-2">
-                    <Button 
-                      onClick={handleCustomSubmit}
-                      disabled={status === 'ready' && (!input.trim() && attachments.length === 0)}
-                      className={cn(
-                        "h-8 w-8 rounded-lg p-0 shadow-lg transition-all",
-                        (status === 'streaming' || status === 'submitted') 
-                          ? "bg-red-500 hover:bg-red-600 text-white" 
-                          : "bg-white hover:bg-zinc-200 text-black"
-                      )}
-                    >
-                      {(status === 'streaming' || status === 'submitted') ? (
-                        <Square className="h-3 w-3 fill-current" />
-                      ) : (
-                        <ArrowRight className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+                  <Button 
+                    onClick={handleCustomSubmit}
+                    disabled={status === 'ready' && (!input.trim() && attachments.length === 0)}
+                    className={cn(
+                      "h-9 w-9 rounded-full p-0 shadow-lg transition-all border border-white/5",
+                      (status === 'streaming' || status === 'submitted') 
+                        ? "bg-red-500/20 text-red-500 hover:bg-red-500/30" 
+                        : "bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525]"
+                    )}
+                  >
+                    {(status === 'streaming' || status === 'submitted') ? (
+                      <Square className="h-3 w-3 fill-current" />
+                    ) : (
+                      <ArrowRight className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
               </div>
+              <p className="text-[12px] text-center text-[#4F4F4F] font-medium leading-relaxed">
+                Sketch can make mistakes. Please check its work.
+              </p>
             </div>
-            <p className="text-[10px] text-center mt-3 text-zinc-600 font-medium tracking-wide uppercase">
-              Sketch can make mistakes. Please check its work.
-            </p>
           </div>
-        </>
-      )}
     </aside>
   );
 }

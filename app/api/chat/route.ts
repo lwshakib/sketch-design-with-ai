@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { messages, projectId } = await req.json();
+    const { messages, projectId, is3xMode, websiteUrl } = await req.json();
 
     if (!projectId) {
       return NextResponse.json(
@@ -62,6 +62,8 @@ export async function POST(req: Request) {
       data: {
         messages: normalizedMessages,
         projectId,
+        is3xMode,
+        websiteUrl
       },
     });
 
