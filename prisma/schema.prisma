@@ -19,14 +19,28 @@ model User {
   email         String
   emailVerified Boolean   @default(false)
   image         String?
+  credits       Int       @default(50000)
+  lastReset     DateTime  @default(now())
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
   projects      Project[]
+  creditUsage   CreditUsage[]
   
   @@unique([email])
   @@map("user")
+}
+
+model CreditUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int
+  date      DateTime @default(now()) @db.Date // Store only the date for easier aggregation
+  
+  @@unique([userId, date])
+  @@map("credit_usage")
 }
 
 model Session {

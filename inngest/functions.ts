@@ -12,6 +12,7 @@ import { getAllExamples } from "../llm/helpers";
 import prisma from "../lib/prisma";
 import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
 import { extractArtifacts } from "../lib/artifact-renderer";
+import { recordCreditUsage } from "../lib/credits";
 
 
 
@@ -91,6 +92,18 @@ export const generateDesign = inngest.createFunction(
     });
 
     const { plan, vision, conclusionText, suggestion } = await step.run("generate-design-manifest", async () => {
+      // Check credits (1000)
+      const proj = await prisma.project.findUnique({
+          where: { id: projectId },
+          select: { userId: true }
+      });
+      if (!proj) throw new Error("Project not found");
+      const user = await prisma.user.findUnique({
+          where: { id: proj.userId },
+          select: { credits: true }
+      });
+      if (!user || user.credits < 1000) throw new Error("Insufficient credits for planning");
+
       // Normalize messages
       let stepMessages = Array.isArray(messages) ? messages : [];
       if (stepMessages.length === 0) {
@@ -194,6 +207,15 @@ export const generateDesign = inngest.createFunction(
         conclusionText: finalConclusion,
         suggestion: object.suggestion
       };
+    });
+
+    // Deduct planning credits
+    await step.run("deduct-planning-credits", async () => {
+      const proj = await prisma.project.findUnique({
+          where: { id: projectId },
+          select: { userId: true }
+      });
+      if (proj) await recordCreditUsage(proj.userId, 1000);
     });
 
     // 2. Initial Publication & Persistence
@@ -443,6 +465,15 @@ CRITICAL INSTRUCTIONS:
           }
         });
 
+        // Deduct screen credits
+        await step.run(`deduct-screen-credits-${i}`, async () => {
+          const proj = await prisma.project.findUnique({
+              where: { id: projectId },
+              select: { userId: true }
+          });
+          if (proj) await recordCreditUsage(proj.userId, 2000);
+        });
+
         // Notify UI: screen complete with database record
         await publish({
           channel: `project:${projectId}`,
@@ -513,6 +544,15 @@ export const regenerateScreen = inngest.createFunction(
 
     if (!screen) return { error: "Screen not found" };
 
+    // --- STEP 1.5: CHECK CREDITS ---
+    await step.run("check-regeneration-credits", async () => {
+      const user = await prisma.user.findUnique({
+        where: { id: (screen as any).project.userId },
+        select: { credits: true }
+      });
+      if (!user || user.credits < 2000) throw new Error("Insufficient credits for screen regeneration");
+    });
+
     // Update screen status to generating
     await step.run("set-screen-status-generating", async () => {
       await prisma.screen.update({
@@ -534,6 +574,13 @@ export const regenerateScreen = inngest.createFunction(
 
     // --- STEP 2: GENERATE NEW CODE ---
     const generatedScreen = await step.run("generate-new-code", async () => {
+      // Check for regeneration credits (2000)
+      const user = await prisma.user.findUnique({
+        where: { id: (screen as any).project.userId },
+        select: { credits: true }
+      });
+      if (!user || user.credits < 2000) throw new Error("Insufficient credits for screen regeneration");
+
       const inspiration = getAllExamples();
       let systemPrompt = ScreenGenerationPrompt + "\n\nCRITICAL: You are REGENERATING an existing screen. Rethink the layout and visual rhythm entirely while maintaining the core functionality.";
       
@@ -561,6 +608,11 @@ CRITICAL INSTRUCTIONS:
 
       const artifacts = extractArtifacts(text);
       return artifacts[0] || { title: screen.title, content: text, type: screen.type };
+    });
+
+    // Deduct regeneration credits
+    await step.run("deduct-regeneration-credits", async () => {
+      await recordCreditUsage((screen as any).project.userId, 2000);
     });
 
     // --- STEP 3: PERSIST & NOTIFY ---
@@ -601,3 +653,19 @@ CRITICAL INSTRUCTIONS:
 );
 
 
+
+// --- Daily Credit Reset ---
+export const dailyCreditReset = inngest.createFunction(
+  { id: "daily-credit-reset" },
+  { cron: "0 0 * * *" }, // Midnight every day
+  async ({ step }) => {
+    await step.run("reset-all-credits", async () => {
+      await prisma.user.updateMany({
+        data: {
+          credits: 50000,
+          lastReset: new Date(),
+        },
+      });
+    });
+  }
+);

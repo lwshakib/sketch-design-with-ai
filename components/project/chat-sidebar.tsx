@@ -29,7 +29,8 @@ import {
   Copy,
   ClipboardPaste,
   Settings,
-  Command
+  Command,
+  Zap
 } from "lucide-react";
 import { GenerationStatus } from "./generation-status";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { extractArtifacts, stripArtifact } from "@/lib/artifact-renderer";
 import { useProjectStore } from "@/hooks/use-project-store";
+import { useWorkspaceStore } from "@/hooks/use-workspace-store";
+import NumberFlow from "@number-flow/react";
 
 interface ChatSidebarProps {
   // Logic Handlers (passed from page.tsx)
@@ -112,6 +115,12 @@ export function ChatSidebar({
     websiteUrl,
     setAttachments
   } = useProjectStore();
+
+  const { credits, fetchCredits } = useWorkspaceStore();
+
+  React.useEffect(() => {
+    fetchCredits();
+  }, [fetchCredits]);
 
   const [showUrlInput, setShowUrlInput] = React.useState(false);
   const [urlTemp, setUrlTemp] = React.useState("");
@@ -220,11 +229,11 @@ export function ChatSidebar({
                   </DropdownMenuSub>
 
                   <DropdownMenuItem 
-                    onClick={() => useProjectStore.getState().setIsSettingsDialogOpen(true)}
+                    onClick={() => router.push('/settings')}
                     className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer text-[13px]"
                   >
                     <Settings className="h-4 w-4 text-muted-foreground" />
-                    Settings
+                    System Settings
                   </DropdownMenuItem>
 
                   <DropdownMenuItem 
@@ -601,13 +610,25 @@ export function ChatSidebar({
                     </Button>
                   </div>
                   
-                  <Button 
-                    onClick={handleCustomSubmit}
-                    disabled={status === 'ready' && (!input.trim() && attachments.length === 0)}
-                    className="h-9 w-9 rounded-full p-0 shadow-lg transition-all border border-white/5 bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525]"
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-3">
+                    <div className="px-3 py-1.5 rounded-full bg-zinc-900/40 border border-white/5 flex items-center shadow-sm">
+                      <span className="text-[11px] font-medium text-zinc-400 flex items-center gap-1.5">
+                        <NumberFlow 
+                          value={(credits || 0) / 1000} 
+                          format={{ minimumFractionDigits: 1, maximumFractionDigits: 1 }}
+                        />
+                        <span className="text-zinc-500">k credits remaining</span>
+                      </span>
+                    </div>
+
+                    <Button 
+                      onClick={handleCustomSubmit}
+                      disabled={status === 'ready' && (!input.trim() && attachments.length === 0)}
+                      className="h-9 w-9 rounded-full p-0 shadow-lg transition-all border border-white/5 bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525]"
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
               <p className="text-[12px] text-center text-[#4F4F4F] font-medium leading-relaxed">

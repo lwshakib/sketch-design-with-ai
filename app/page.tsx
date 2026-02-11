@@ -15,7 +15,10 @@ import {
   Globe,
   X,
   Loader2,
+  Zap
 } from "lucide-react";
+import NumberFlow from "@number-flow/react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sidebar } from "@/components/custom-sidebar";
@@ -143,7 +146,10 @@ interface Attachment {
   isUploading: boolean;
 }
 
+import { useWorkspaceStore } from "@/hooks/use-workspace-store";
+
 export default function Home() {
+  const { credits, fetchCredits } = useWorkspaceStore();
   const [inputValue, setInputValue] = useState("");
   const [isMounted, setIsMounted] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -194,6 +200,7 @@ export default function Home() {
   useEffect(() => {
     setIsMounted(true);
     fetchProjects();
+    fetchCredits();
   }, []);
 
   useEffect(() => {
@@ -333,9 +340,15 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground transition-colors">
-              <MoreVertical className="h-5 w-5" />
-            </Button>
+            <Link href="/settings" className="flex items-center px-4 py-2 rounded-2xl bg-zinc-900/40 border border-white/5 transition-all hover:bg-zinc-900/80 shadow-sm group">
+              <span className="text-[11px] font-medium text-zinc-400 flex items-center gap-1.5">
+                <NumberFlow 
+                  value={(credits || 0) / 1000} 
+                  format={{ minimumFractionDigits: 1, maximumFractionDigits: 1 }}
+                />
+                <span className="text-zinc-500">k credits remaining</span>
+              </span>
+            </Link>
             <UserMenu />
           </div>
         </header>

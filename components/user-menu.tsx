@@ -16,7 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import { LogOut, Monitor, Moon, Palette, Sun, User } from "lucide-react";
+import { Coins, LogOut, Monitor, Moon, Palette, Sun, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function UserMenu() {
@@ -60,6 +60,15 @@ export function UserMenu() {
             </p>
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => router.push("/account")}>
+          <User className="mr-2 h-4 w-4" />
+          <span>Account</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/settings")}>
+          <Coins className="mr-2 h-4 w-4" />
+          <span>Usage & Credits</span>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>

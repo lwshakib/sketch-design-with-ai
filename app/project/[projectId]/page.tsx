@@ -20,6 +20,7 @@ import { ShareDialog } from "@/components/project/share-dialog";
 import { ProjectDialogs } from "@/components/project/project-dialogs";
 import { CodeViewerModal } from "@/components/project/code-viewer-modal";
 import { useProjectStore } from "@/hooks/use-project-store";
+import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 
 export default function ProjectPage() {
   const params = useParams();
@@ -74,6 +75,8 @@ export default function ProjectPage() {
     messages, setMessages,
     updateState, setActiveTool, resetProjectState
   } = useProjectStore();
+
+  const { fetchCredits } = useWorkspaceStore();
 
   const handlePersistArtifacts = async (indices: number[]) => {
     for (const index of indices) {
@@ -228,6 +231,7 @@ export default function ProjectPage() {
           } else {
             toast.success("Design generation complete!");
           }
+          fetchCredits();
         }
         if (event.data.status === 'partial_complete' && event.data.screen) {
           setIsGenerating(true);
@@ -256,6 +260,7 @@ export default function ProjectPage() {
           };
           setArtifacts(updateFn);
           setThrottledArtifacts(updateFn);
+          fetchCredits();
         }
       }
     });
@@ -362,7 +367,8 @@ export default function ProjectPage() {
       }
     };
     if (projectId) fetchProjectAndInitialize();
-  }, [projectId, sendMessage, setMessages, router, setLoading, setProject, setZoom, setCanvasOffset, setFramePos, setArtifacts, setThrottledArtifacts, setAppliedTheme, setActiveThemeId, setDesignPlan, setIsGenerating]);
+    fetchCredits();
+  }, [projectId, sendMessage, setMessages, router, setLoading, setProject, setZoom, setCanvasOffset, setFramePos, setArtifacts, setThrottledArtifacts, setAppliedTheme, setActiveThemeId, setDesignPlan, setIsGenerating, fetchCredits]);
 
   useEffect(() => {
     const lastAssistantMessage = messages.filter(m => m.role === 'assistant').at(-1);
