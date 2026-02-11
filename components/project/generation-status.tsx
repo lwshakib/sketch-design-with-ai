@@ -179,7 +179,11 @@ export function GenerationStatus({
         })}
         
         {planScreens.length === 0 && (
-           <div className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg animate-pulse" />
+          <div className="flex gap-4">
+            <div className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg animate-pulse" />
+            <div className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg animate-pulse delay-150" />
+            <div className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg animate-pulse delay-300" />
+          </div>
         )}
       </div>
 

@@ -295,7 +295,7 @@ export function ChatSidebar({
                         );
                       })}
 
-                      {isGenerating && !messages.some(m => m.role === 'assistant') && (
+                      {isGenerating && messages[messages.length - 1]?.role === 'user' && (
                         <div className="flex flex-col gap-4 px-5 py-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                           <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full flex items-center justify-center bg-primary/10 border border-primary/20 flex-shrink-0">

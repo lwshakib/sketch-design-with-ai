@@ -12,22 +12,8 @@ import { getAllExamples } from "../llm/helpers";
 import prisma from "../lib/prisma";
 import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
 import { extractArtifacts } from "../lib/artifact-renderer";
-import fs from "fs";
-import path from "path";
 
-const saveResponse = (data: any) => {
-  try {
-    const dir = path.join(process.cwd(), 'responses');
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
-    const nextIndex = (files.length + 1).toString().padStart(2, '0');
-    fs.writeFileSync(path.join(dir, `${nextIndex}.json`), JSON.stringify(data, null, 2));
-  } catch (err) {
-    console.error('Failed to save response log:', err);
-  }
-};
+
 
 interface PlanScreen {
   title: string;
@@ -49,17 +35,21 @@ export const generateDesign = inngest.createFunction(
   async ({ event, step, publish }) => {
     const { messages, projectId, is3xMode, websiteUrl } = event.data;
     
-    // Normalize messages to always be an array with at least one message
-    let safeMessages = Array.isArray(messages) ? messages : [];
-    
-    // Debug logging
-    console.log('[generateDesign] Received messages:', JSON.stringify(safeMessages, null, 2));
-    
-    // If no messages, create a fallback
-    if (safeMessages.length === 0) {
-      console.warn('[generateDesign] No messages received, using fallback');
-      safeMessages = [{ role: 'user', content: 'Create a modern design' }];
-    }
+    // Normalize messages
+    const safeMessages = (Array.isArray(messages) ? messages : []).filter(m => m.content);
+
+    // --- STEP PRE-0: INITIAL PERSISTENCE ---
+    // Create the assistant message immediately so it shows up on UI
+    const messageId = await step.run("save-initial-assistant-message", async () => {
+      const msg = await prisma.message.create({
+        data: {
+          projectId: projectId,
+          role: "assistant",
+          content: "*Analyzing your request and architecting project manifest...*",
+        },
+      });
+      return msg.id;
+    });
 
     // --- STEP 0: FETCH WEBSITE REFERENCE ---
     let websiteReferenceContext = "";
@@ -148,7 +138,7 @@ export const generateDesign = inngest.createFunction(
             prompt: z.string().describe("Extremely detailed, technical prompt for generating this specific screen's code, including layout, components, and interaction states.")
           })),
           conclusionText: z.string().describe("A detailed Markdown summary. Format: 'The [Screen Title] screens have been architected:', followed by a bulleted list '* **[Title]**: [Description]', ending with a follow-up question."),
-          suggestion: z.string().describe("A single, specific suggestion for the next potential design step or feature (e.g., 'Add a collaborative group trip feature to the planner' or 'Design the booking confirmation screen'). Aim for around 10 words.")
+          suggestion: z.string().describe("A single, proactive suggestion for an additional full SCREEN (not just a modal, component, or dialog) that would complement the current design plan. Format as a question.")
         })
       });
       let finalScreens = object.screens;
@@ -175,25 +165,6 @@ export const generateDesign = inngest.createFunction(
         });
       }
 
-      // Stream the plan and vision to the UI
-      await publish({
-        channel: `project:${projectId}`,
-        topic: "status",
-        data: { message: object.vision, status: "vision" }
-      });
-
-      await publish({
-        channel: `project:${projectId}`,
-        topic: "plan",
-        data: { 
-          plan: planJson, 
-          markdown: `Vision: ${object.vision}\n\nConclusion: ${object.conclusionText}\n\nSuggestion: ${object.suggestion}` 
-        }
-      });
-
-      // Log to file
-      saveResponse({ type: "manifest", projectId, ...planJson });
-
       return { 
         plan: planJson, 
         vision: object.vision,
@@ -202,34 +173,35 @@ export const generateDesign = inngest.createFunction(
       };
     });
 
-    // Save vision message to database
-    const messageId = await step.run("save-vision-message", async () => {
-      const msg = await prisma.message.create({
+    // 2. Initial Publication & Persistence
+    // Publish the plan immediately so UI shows squares
+    await publish({
+      channel: `project:${projectId}`,
+      topic: "plan",
+      data: { 
+        plan: plan, 
+        markdown: vision 
+      }
+    });
+
+    // Update the assistant message with the vision and plan
+    await step.run("update-assistant-message-with-plan", async () => {
+      await prisma.message.update({
+        where: { id: messageId },
         data: {
-          projectId: projectId,
-          role: "assistant",
           content: vision,
           plan: JSON.parse(JSON.stringify(plan))
         },
       });
-      return msg.id;
     });
 
+    // Update status to planning
     await publish({
       channel: `project:${projectId}`,
       topic: "status",
-      data: { message: "Architecting project manifest...", status: "planning" }
+      data: { message: vision, status: "vision" }
     });
 
-    // Update previously created assistant message with plan JSON
-    await step.run("update-message-with-plan", async () => {
-      await prisma.message.update({
-        where: { id: messageId },
-        data: {
-          plan: JSON.parse(JSON.stringify(plan))
-        },
-      });
-    });
 
     // Create placeholder screens in DB so they appear on UI immediately
     await step.run("init-placeholder-screens", async () => {
@@ -376,8 +348,6 @@ CRITICAL INSTRUCTIONS:
             type
           };
 
-          // Log to file
-          saveResponse({ step: `screen_${i}`, projectId, ...result });
 
           return result;
         });
@@ -443,13 +413,35 @@ CRITICAL INSTRUCTIONS:
         });
       }
 
+      // --- FINAL STEPS: UPDATE MESSAGE & CONCLUDE ---
+
+      // Update the assistant message with final plan and markdown
+      await step.run("update-final-assistant-message", async () => {
+        await prisma.message.update({
+          where: { id: messageId },
+          data: {
+            content: `Vision: ${vision}\n\nConclusion: ${conclusionText}\n\nSuggestion: ${suggestion}`,
+            plan: JSON.parse(JSON.stringify(plan))
+          },
+        });
+      });
+
+      // Stream the final plan and conclusion to the UI
+      await publish({
+        channel: `project:${projectId}`,
+        topic: "plan",
+        data: { 
+          plan: plan, 
+          markdown: `Vision: ${vision}\n\nConclusion: ${conclusionText}\n\nSuggestion: ${suggestion}` 
+        }
+      });
+
       // Final completion signal
-      const finalMessage = plan.conclusionText || "";
       await publish({
         channel: `project:${projectId}`,
         topic: "status",
         data: { 
-          message: finalMessage, 
+          message: conclusionText, 
           status: "complete" 
         }
       });

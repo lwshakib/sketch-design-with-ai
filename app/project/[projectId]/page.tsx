@@ -109,7 +109,7 @@ export default function ProjectPage() {
   } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
-      body: { projectId, is3xMode },
+      body: { projectId, is3xMode, websiteUrl },
     }),
     onError: (err) => {
       console.error(err);
@@ -157,10 +157,10 @@ export default function ProjectPage() {
             const last = prev[prev.length - 1] as any;
             if (last && last.role === 'assistant') {
               const updated = [...prev];
-              updated[updated.length - 1] = { ...last, plan: { ...plan, _markdown: markdown || plan._markdown } } as any;
+              updated[updated.length - 1] = { ...last, content: markdown, plan: { ...plan, _markdown: markdown || plan._markdown } } as any;
               return updated;
             }
-            return prev;
+            return [...prev, { role: 'assistant', content: markdown, plan: { ...plan, _markdown: markdown || plan._markdown } } as any];
           });
         }
       } else if (event.topic === 'status') {
@@ -220,23 +220,16 @@ export default function ProjectPage() {
         const res = await fetch(`/api/projects/${projectId}`);
         if (!res.ok) return;
         const data = await res.json();
+        // Update project metadata only.
+        // Artifacts and Messages are handled by Real-time Events for the active session.
         setProject(data);
-        if (data.screens && data.screens.length > 0) {
-          const fetchedArtifacts = data.screens.map((s: any) => ({ ...s, isComplete: !!s.content }));
-          setArtifacts(fetchedArtifacts);
-          setThrottledArtifacts(fetchedArtifacts);
-        }
-        const planCount = designPlan.screens.length;
-        const screensCount = data.screens?.length || 0;
-        if (planCount > 0 && screensCount >= planCount) setIsGenerating(false);
-        if (data.messages && data.messages.length > 0) setMessages(data.messages);
       } catch (err) {
         console.error("Polling error:", err);
       }
     };
-    if (isGenerating) pollInterval = setInterval(pollProject, 3000);
+    if (isGenerating) pollInterval = setInterval(pollProject, 10000); // 10s fallback sync
     return () => { if (pollInterval) clearInterval(pollInterval); };
-  }, [isGenerating, projectId, setMessages, designPlan.screens.length, setProject, setArtifacts, setThrottledArtifacts, setIsGenerating]);
+  }, [isGenerating, projectId, setProject]);
 
   useEffect(() => {
     const fetchProjectAndInitialize = async () => {
@@ -579,6 +572,8 @@ export default function ProjectPage() {
   const handleCustomSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (status === 'streaming' || status === 'submitted') { stop(); return; }
+    if (!input.trim() && attachments?.length === 0) return;
+    setIsGenerating(true); setDesignPlan({ screens: [] }); setRealtimeStatus(null);
     sendMessage({ 
       text: input.trim(), 
       files: attachments?.map(a => ({ type: "file" as const, url: a.url, mediaType: "image/*" })),
