@@ -372,11 +372,12 @@ CRITICAL INSTRUCTIONS:
       }
 
       // Final completion signal
+      const finalMessage = plan.conclusionText || "";
       await publish({
         channel: `project:${projectId}`,
         topic: "status",
         data: { 
-          message: plan.conclusionText || "All screens architected successfully!", 
+          message: finalMessage, 
           status: "complete" 
         }
       });

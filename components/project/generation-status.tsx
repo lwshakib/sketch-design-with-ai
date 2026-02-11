@@ -26,6 +26,9 @@ interface GenerationStatusProps {
   status?: string;
   isComplete?: boolean;
   conclusionText?: string;
+  planScreens?: any[];
+  projectArtifacts?: any[];
+  currentScreenTitle?: string;
   className?: string;
 }
 
@@ -33,6 +36,9 @@ export function GenerationStatus({
   status, 
   isComplete, 
   conclusionText,
+  planScreens = [],
+  projectArtifacts = [],
+  currentScreenTitle,
   className 
 }: GenerationStatusProps) {
   const [dummyStatus, setDummyStatus] = useState(DUMMY_STATUSES[0]);
@@ -63,11 +69,51 @@ export function GenerationStatus({
   }, [isComplete]);
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
-      {/* Second Row: Small square skeleton UI */}
-      <div className="h-20 w-20 rounded-2xl bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0">
-        {!isComplete && (
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
+    <div className={cn("flex flex-col gap-6", className)}>
+      {/* Second Row: Skeleton Squares with Previews */}
+      <div className="flex flex-wrap gap-4">
+        {planScreens.map((screen, idx) => {
+          const artifact = projectArtifacts.find(a => a.title === screen.title);
+          const isCurrentlyGenerating = currentScreenTitle === screen.title;
+          const hasContent = !!artifact?.content;
+
+          return (
+            <div 
+              key={idx}
+              className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg group"
+            >
+              {/* Preview Content (scaled iframe) */}
+              {hasContent ? (
+                <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity translate-z-0">
+                   <iframe 
+                     title={`mini-preview-${idx}`}
+                     className="w-full h-full border-none"
+                     srcDoc={`
+                       <!DOCTYPE html>
+                       <html>
+                         <head>
+                           <script src="https://cdn.tailwindcss.com"></script>
+                           <style>
+                             body { margin: 0; padding: 0; overflow: hidden; background: transparent; height: auto; }
+                             ::-webkit-scrollbar { display: none; }
+                           </style>
+                         </head>
+                         <body>${artifact.content}</body>
+                       </html>
+                     `}
+                   />
+                </div>
+              ) : isCurrentlyGenerating ? (
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
+              ) : (
+                <div className="absolute inset-0 bg-white/[0.02]" />
+              )}
+            </div>
+          );
+        })}
+        
+        {planScreens.length === 0 && (
+           <div className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg animate-pulse" />
         )}
       </div>
 

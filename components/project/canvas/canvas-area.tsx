@@ -25,7 +25,10 @@ import {
   MousePointer2,
   Hand,
   ZoomIn,
-  ZoomOut
+  ZoomOut,
+  Menu,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -109,7 +112,9 @@ export function CanvasArea({
     setLeftSidebarMode,
     activeTool,
     setActiveTool,
-    appliedTheme
+    appliedTheme,
+    isSidebarVisible,
+    setIsSidebarVisible
   } = useProjectStore();
 
   const isEditMode = leftSidebarMode === 'properties';
@@ -144,11 +149,15 @@ export function CanvasArea({
       {/* Preview Header */}
       <header className="absolute top-0 left-0 right-0 h-16 flex items-center justify-between px-6 z-30 pointer-events-none">
         <div className="flex items-center gap-2 pointer-events-auto">
-          <div className="bg-background/80 backdrop-blur-md px-3 py-1.5 rounded-full border shadow-sm flex items-center gap-2 text-[11px] font-bold text-muted-foreground">
-            <span className="flex items-center gap-1">
-              {Math.round(zoom * 100)}%
-            </span>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsSidebarVisible(!isSidebarVisible)}
+            className="h-10 w-10 rounded-xl bg-background/80 backdrop-blur-md border shadow-sm text-muted-foreground hover:text-foreground transition-all"
+            title={isSidebarVisible ? "Collapse Sidebar" : "Expand Sidebar"}
+          >
+            {isSidebarVisible ? <ChevronLeft className="h-6 w-6" /> : <ChevronRight className="h-6 w-6" />}
+          </Button>
         </div>
         
         <div className="flex items-center gap-4 pointer-events-auto">

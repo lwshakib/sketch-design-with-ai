@@ -59,6 +59,7 @@ export default function ProjectPage() {
     isDeleteDialogOpen, setIsDeleteDialogOpen,
     isExportSheetOpen, setIsExportSheetOpen,
     exportArtifactIndex, setExportArtifactIndex,
+    isSidebarVisible, setIsSidebarVisible,
     hasCopied, setHasCopied,
     designPlan, setDesignPlan,
     realtimeStatus, setRealtimeStatus,
@@ -116,7 +117,11 @@ export default function ProjectPage() {
     const lastUserMessage = messages.filter(m => m.role === 'user').at(-1);
     if (lastUserMessage) {
       setIsGenerating(true);
-      sendMessage({ text: lastUserMessage.content, files: [] });
+      const textContent = lastUserMessage.parts
+        .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+        .map(p => p.text)
+        .join('');
+      sendMessage({ text: textContent, files: [] });
     }
   }, [messages, sendMessage, setIsGenerating]);
 
@@ -676,18 +681,20 @@ export default function ProjectPage() {
 
   return (
     <div className="flex h-screen w-full bg-background text-foreground overflow-hidden font-sans">
-      <ChatSidebar
-        handleCustomSubmit={handleCustomSubmit}
-        handleRetry={handleRetry}
-        handleFileUpload={handleFileUpload}
-        fileInputRef={fileInputRef}
-        commitEdits={commitEdits}
-        applyTheme={applyTheme}
-        session={session}
-        status={status}
-        messages={messages}
-        error={error}
-      />
+      {isSidebarVisible && (
+        <ChatSidebar
+          handleCustomSubmit={handleCustomSubmit}
+          handleRetry={handleRetry}
+          handleFileUpload={handleFileUpload}
+          fileInputRef={fileInputRef}
+          commitEdits={commitEdits}
+          applyTheme={applyTheme}
+          session={session}
+          status={status}
+          messages={messages}
+          error={error}
+        />
+      )}
 
       <CanvasArea
         previewRef={previewRef}

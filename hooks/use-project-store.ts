@@ -57,6 +57,7 @@ interface ProjectState {
   viewingPlan: any;
   isPromptDialogOpen: boolean;
   viewingPrompt: string;
+  isSidebarVisible: boolean;
 
   // Theme & Selection
   activeThemeId: string | null;
@@ -106,6 +107,7 @@ interface ProjectState {
   setViewingPlan: (plan: any) => void;
   setIsPromptDialogOpen: (open: boolean) => void;
   setViewingPrompt: (prompt: string) => void;
+  setIsSidebarVisible: (visible: boolean) => void;
 
   setActiveThemeId: (id: string | null) => void;
   setAppliedTheme: (theme: any | null) => void;
@@ -158,6 +160,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   viewingPlan: null,
   isPromptDialogOpen: false,
   viewingPrompt: "",
+  isSidebarVisible: true,
 
   activeThemeId: null,
   appliedTheme: null,
@@ -206,6 +209,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setViewingPlan: (viewingPlan) => set({ viewingPlan }),
   setIsPromptDialogOpen: (isPromptDialogOpen) => set({ isPromptDialogOpen }),
   setViewingPrompt: (viewingPrompt) => set({ viewingPrompt }),
+  setIsSidebarVisible: (isSidebarVisible) => set({ isSidebarVisible }),
 
   setActiveThemeId: (activeThemeId) => set({ activeThemeId }),
   setAppliedTheme: (appliedTheme) => set({ appliedTheme }),

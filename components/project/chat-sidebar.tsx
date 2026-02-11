@@ -232,10 +232,13 @@ export function ChatSidebar({
                                                     isComplete={isComplete}
                                                     conclusionText={plan?.conclusionText}
                                                     status={realtimeStatus?.status}
+                                                    planScreens={plan?.screens}
+                                                    projectArtifacts={useProjectStore.getState().throttledArtifacts}
+                                                    currentScreenTitle={realtimeStatus?.currentScreen}
                                                   />
 
                                                   {isComplete && plan?.suggestion && (
-                                                    <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-700 delay-300">
+                                                    <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-700 delay-300">
                                                       <div className="flex items-center gap-3">
                                                         <div className="h-[1px] flex-1 bg-border" />
                                                         <span className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em] shrink-0">Suggested Reply</span>
@@ -243,9 +246,9 @@ export function ChatSidebar({
                                                       
                                                       <button 
                                                         onClick={() => setInput(plan.suggestion)}
-                                                        className="group px-4 py-2 rounded-xl bg-muted/50 border border-border hover:bg-muted hover:border-primary/20 transition-all duration-200 text-left w-fit shadow-sm hover:shadow-md"
+                                                        className="group px-3 py-1.5 rounded-lg bg-muted/50 border border-border hover:bg-muted hover:border-primary/20 transition-all duration-200 text-left w-fit max-w-[240px] shadow-sm hover:shadow-md"
                                                       >
-                                                        <span className="text-[13px] font-medium text-foreground/80 group-hover:text-foreground transition-colors">
+                                                        <span className="text-[12px] font-medium text-foreground/80 group-hover:text-foreground transition-colors">
                                                           {plan.suggestion}
                                                         </span>
                                                       </button>
