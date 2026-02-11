@@ -119,7 +119,11 @@ export function GenerationStatus({
       {/* First Row: Skeleton Squares with Previews */}
       <div className="flex flex-wrap gap-4">
         {projectArtifacts
-          .filter(a => !!a.content || currentScreenTitle === a.title)
+          .filter(a => {
+            const isRelevant = !planScreens || planScreens.some(p => p.title === a.title);
+            const isDiscovered = !!a.content || currentScreenTitle === a.title;
+            return isRelevant && isDiscovered;
+          })
           .map((artifact, idx) => {
             const isCurrentlyGenerating = currentScreenTitle === artifact.title;
             const hasContent = !!artifact.content;
@@ -177,8 +181,8 @@ export function GenerationStatus({
             );
           })}
         
-        {/* Only show the pulse square if nothing is being generated yet or nothing is discovered */}
-        {(projectArtifacts.length === 0 || !projectArtifacts.some(a => !!a.content || currentScreenTitle === a.title)) && (
+        {/* Only show the pulse square if nothing is being generated yet OR the artifacts we have don't match the current screen/content filter */}
+        {!projectArtifacts.some(a => !!a.content || currentScreenTitle === a.title) && (
           <div className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg animate-pulse" />
         )}
       </div>

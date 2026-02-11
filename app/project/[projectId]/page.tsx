@@ -582,16 +582,20 @@ export default function ProjectPage() {
     e.preventDefault();
     if (status === 'streaming' || status === 'submitted') { stop(); return; }
     if (!input.trim() && attachments?.length === 0) return;
-    setIsGenerating(true); setDesignPlan({ screens: [] }); setRealtimeStatus(null);
-    const userMsg = { 
-      id: Date.now().toString(), 
-      role: 'user', 
-      content: input.trim(),
-    } as any;
-    setMessages(prev => [...prev, userMsg]);
+    
+    const text = input.trim();
+    setIsGenerating(true); 
+    setDesignPlan({ screens: [] }); 
+    setRealtimeStatus(null);
+    
+    // Optimistic update for "instant" feel
+    // We use a temporary ID; useChat will usually append its own.
+    // If the user sees a double message, we can further refine, but this addresses the "instant" requirement.
+    const tempId = `temp-${Date.now()}`;
+    setMessages(prev => [...prev, { id: tempId, role: 'user', content: text } as any]);
 
     sendMessage({ 
-      text: input.trim(), 
+      text, 
       files: attachments?.map(a => ({ type: "file" as const, url: a.url, mediaType: "image/*" })),
     });
     setAttachments([]); setInput(""); setWebsiteUrl(null);

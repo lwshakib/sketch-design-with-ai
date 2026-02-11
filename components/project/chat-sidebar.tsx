@@ -178,8 +178,21 @@ export function ChatSidebar({
                     </div>
                   ) : (
                     <div className="">
-                      {messages.map((message, idx) => {
-                        const msg = message as any;
+                      {messages
+                        .filter((m, i, self) => {
+                          if (m.role !== 'user' || !m.id.toString().startsWith('temp-')) return true;
+                          // It's a temp message. Check if a stable user message with same content exists.
+                          const text = m.content || "";
+                          const hasStable = self.some((other, j) => 
+                            j !== i && 
+                            other.role === 'user' && 
+                            !other.id.toString().startsWith('temp-') && 
+                            (other.content === text || (other.parts && (other.parts as any[]).some(p => p.type === 'text' && p.text === text)))
+                          );
+                          return !hasStable;
+                        })
+                        .map((message, idx) => {
+                          const msg = message as any;
                         return (
                           <React.Fragment key={message.id}>
                             <div className="group transition-colors duration-300">
@@ -212,7 +225,7 @@ export function ChatSidebar({
                                     <div className="whitespace-pre-wrap">
                                       {message.role === 'assistant' ? (
                                         (() => {
-                                          const textContent = msg.content || "";
+                                          const textContent = msg.content || (msg.parts ? (msg.parts as any[]).filter(p => p.type === 'text').map(p => p.text).join('') : "");
                                           const isRawHtml = textContent.toLowerCase().includes('<!doctype') || textContent.toLowerCase().includes('<html');
                                           
                                           if (isRawHtml && extractArtifacts(textContent).length === 0) {
@@ -254,23 +267,6 @@ export function ChatSidebar({
                                                     currentScreenTitle={realtimeStatus?.currentScreen}
                                                   />
 
-                                                  {isComplete && plan?.suggestion && (
-                                                    <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-700 delay-300">
-                                                      <div className="flex items-center gap-3">
-                                                        <div className="h-[1px] flex-1 bg-border" />
-                                                        <span className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em] shrink-0">Suggested Reply</span>
-                                                      </div>
-                                                      
-                                                      <button 
-                                                        onClick={() => setInput(plan.suggestion)}
-                                                        className="group px-3 py-1.5 rounded-lg bg-muted/50 border border-border hover:bg-muted hover:border-primary/20 transition-all duration-200 text-left w-fit max-w-[240px] shadow-sm hover:shadow-md"
-                                                      >
-                                                        <span className="text-[12px] font-medium text-foreground/80 group-hover:text-foreground transition-colors">
-                                                          {plan.suggestion}
-                                                        </span>
-                                                      </button>
-                                                    </div>
-                                                  )}
                                                 </div>
                                               )}
                                             </div>
@@ -278,7 +274,7 @@ export function ChatSidebar({
                                         })()
                                       ) : (
                                         <div className="text-foreground/90 leading-relaxed text-[15px]">
-                                          {msg.content}
+                                          {msg.content || (msg.parts ? (msg.parts as any[]).filter(p => p.type === 'text').map(p => p.text).join('') : "")}
                                         </div>
                                       )}
                                     </div>
@@ -303,12 +299,40 @@ export function ChatSidebar({
                             </div>
                             <span className="text-sm font-bold text-foreground tracking-tight">Sketch AI</span>
                           </div>
-                          <GenerationStatus 
+                           <GenerationStatus 
                             isComplete={false}
                             status={realtimeStatus?.status}
                           />
                         </div>
                       )}
+
+                      {/* Suggested Reply at the absolute bottom */}
+                      {(() => {
+                        const lastAssistantWithPlan = [...messages].reverse().find(m => (m as any).plan);
+                        const plan = (lastAssistantWithPlan as any)?.plan;
+                        const isComplete = !isGenerating;
+                        
+                        if (isComplete && plan?.suggestion) {
+                          return (
+                            <div className="px-5 py-4 flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-700 delay-300">
+                              <div className="flex items-center gap-3">
+                                <div className="h-[1px] flex-1 bg-border" />
+                                <span className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em] shrink-0">Suggested Reply</span>
+                              </div>
+                              
+                              <button 
+                                onClick={() => setInput(plan.suggestion)}
+                                className="group px-3 py-1.5 rounded-lg bg-muted/50 border border-border hover:bg-muted hover:border-primary/20 transition-all duration-200 text-left w-fit max-w-[240px] shadow-sm hover:shadow-md"
+                              >
+                                <span className="text-[12px] font-medium text-foreground/80 group-hover:text-foreground transition-colors">
+                                  {plan.suggestion}
+                                </span>
+                              </button>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
                       
                       {error && (
                         <div className="flex justify-center p-6 border-t border-destructive/10 bg-destructive/5 rounded-2xl mx-4 my-2 animate-in fade-in slide-in-from-bottom-2">
@@ -335,7 +359,7 @@ export function ChatSidebar({
 
           <div className="p-4 bg-sidebar">
             <div className="flex flex-col gap-3">
-              <div className="bg-[#0F0F0F] rounded-[24px] p-4 border border-white/5 shadow-2xl transition-all focus-within:border-white/10">
+              <div className="bg-[#0F0F0F] rounded-[8px] p-4 border border-white/5 shadow-2xl transition-all focus-within:border-white/10">
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
