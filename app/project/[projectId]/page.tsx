@@ -407,11 +407,11 @@ export default function ProjectPage() {
               updated.push({ ...newArt, content: "", x: getNewX(updated, newArt.type), y: 0, isComplete: false });
               changed = true;
             } else {
-              if (status === 'streaming' && updated[existingIndex].isComplete) {
+              if (chatStatus === 'streaming' && updated[existingIndex].isComplete) {
                 updated[existingIndex] = { ...updated[existingIndex], isComplete: false };
                 changed = true;
               }
-              if (status === 'ready' && !updated[existingIndex].isComplete && newArt.isComplete) {
+              if (chatStatus === 'ready' && !updated[existingIndex].isComplete && newArt.isComplete) {
                 updated[existingIndex] = { ...updated[existingIndex], content: newArt.content, isComplete: true };
                 changed = true;
               }
@@ -421,7 +421,7 @@ export default function ProjectPage() {
         });
       }
     }
-  }, [messages, status, setArtifacts, setThrottledArtifacts]);
+  }, [messages, chatStatus, setArtifacts, setThrottledArtifacts]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
