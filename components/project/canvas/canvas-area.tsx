@@ -440,7 +440,7 @@ export function CanvasArea({
                 {(selectedArtifactIndex === index || isDraggingFrame || artifact.isComplete) && (
                   <div className="absolute -top-7 left-0 right-0 flex items-center justify-between px-1 pointer-events-none select-none">
                      <span 
-                       className="text-[11px] font-black uppercase tracking-widest"
+                       className="text-[12px] font-bold"
                        style={{ color: appliedTheme?.cssVars.primary || 'var(--primary)' }}
                      >
                        {artifact.title || "Untitled Screen"}

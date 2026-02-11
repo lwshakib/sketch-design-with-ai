@@ -12,6 +12,22 @@ import { getAllExamples } from "../llm/tools";
 import prisma from "../lib/prisma";
 import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
 import { extractArtifacts } from "../lib/artifact-renderer";
+import fs from "fs";
+import path from "path";
+
+const saveResponse = (data: any) => {
+  try {
+    const dir = path.join(process.cwd(), 'responses');
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+    const nextIndex = (files.length + 1).toString().padStart(2, '0');
+    fs.writeFileSync(path.join(dir, `${nextIndex}.json`), JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.error('Failed to save response log:', err);
+  }
+};
 
 interface PlanScreen {
   title: string;
@@ -98,11 +114,10 @@ export const generateDesign = inngest.createFunction(
             description: z.string(),
             prompt: z.string().describe("Extremely detailed, technical prompt for generating this specific screen's code, including layout, components, and interaction states.")
           })),
-          conclusionText: z.string().describe("A short sentence confirm that all requested screens have been generated successfully."),
-          suggestion: z.string().describe("A single brief suggestion for the next potential design step (e.g., 'Design a community leaderboard screen').")
+          conclusionText: z.string().describe("A detailed Markdown summary. Format: 'The [Screen Title] screens have been architected:', followed by a bulleted list '* **[Title]**: [Description]', ending with a follow-up question."),
+          suggestion: z.string().describe("A single, specific suggestion for the next potential design step or feature (e.g., 'Add a collaborative group trip feature to the planner' or 'Design the booking confirmation screen'). Aim for around 10 words.")
         })
       });
-
       const planJson = { 
         screens: object.screens, 
         themes: object.themes,
@@ -133,6 +148,9 @@ export const generateDesign = inngest.createFunction(
           markdown: `Vision: ${object.vision}\n\nConclusion: ${object.conclusionText}\n\nSuggestion: ${object.suggestion}` 
         }
       });
+
+      // Log to file
+      saveResponse({ type: "manifest", projectId, ...planJson });
 
       return { 
         plan: planJson, 
@@ -303,11 +321,16 @@ CRITICAL INSTRUCTIONS:
           // Use type from artifact extraction (already normalized) or fall back to plan type
           const type: 'web' | 'app' = artifact.type === 'app' ? 'app' : screen.type === 'app' ? 'app' : 'web';
 
-          return {
+          const result = {
             title: artifact.title || screen.title,
             content: artifact.content,
             type
           };
+
+          // Log to file
+          saveResponse({ step: `screen_${i}`, projectId, ...result });
+
+          return result;
         });
         
         // Add to context for next iteration

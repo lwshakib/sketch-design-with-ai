@@ -82,7 +82,9 @@ export function ChatSidebar({
     setSelectedEl,
     setIsDeleteDialogOpen,
     setIsEditTitleDialogOpen,
-    setEditingTitle
+    setEditingTitle,
+    isSidebarVisible,
+    throttledArtifacts
   } = useProjectStore();
 
   if (!project) return null;
@@ -222,9 +224,11 @@ export function ChatSidebar({
 
                                           return (
                                             <div className="flex flex-col gap-5">
-                                              <div className="text-foreground/90 leading-relaxed text-[15px]">
-                                                <MessageResponse>{stripArtifact(textContent)}</MessageResponse>
-                                              </div>
+                                              {!showStatus && (
+                                                <div className="text-foreground/90 leading-relaxed text-[15px]">
+                                                  <MessageResponse>{stripArtifact(textContent)}</MessageResponse>
+                                                </div>
+                                              )}
                                               
                                               {showStatus && (
                                                 <div className="flex flex-col gap-6">
@@ -233,7 +237,7 @@ export function ChatSidebar({
                                                     conclusionText={plan?.conclusionText}
                                                     status={realtimeStatus?.status}
                                                     planScreens={plan?.screens}
-                                                    projectArtifacts={useProjectStore.getState().throttledArtifacts}
+                                                    projectArtifacts={throttledArtifacts}
                                                     currentScreenTitle={realtimeStatus?.currentScreen}
                                                   />
 

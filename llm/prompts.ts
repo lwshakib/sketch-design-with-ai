@@ -99,8 +99,11 @@ Based on the user's request and the creative vision, architect a comprehensive p
 2. **Screens (screens)**: A list of screens required to complete the project. Each screen MUST have a 'title', 'type' (web/app), 'description', and a 'prompt'.
 3. **Screen Prompt (prompt)**: This is a 100-200 word technical directive for another AI. It must specify exactly which sections, components, and data points to include. Mention the theme consistency (e.g., "Use the primary color for CTAs," "Apply the custom radius to all cards").
 4. **Themes (themes)**: Exactly 10 distinct, high-fidelity color palettes.
-
-**MANDATORY**: Each theme MUST have a 'name' and a 'colors' object containing: 'background', 'foreground', 'primary', 'primaryForeground', 'secondary', 'secondaryForeground', 'muted', 'mutedForeground', 'accent', 'accentForeground', 'border', 'input', 'ring', 'radius' (string), 'card', 'cardForeground', 'popover', 'popoverForeground'.
+5. **Conclusion (conclusionText)**: A detailed, enthusiastic summary in MARKDOWN. Follow this EXACT format: 
+   - Start with "The [Screen Title] screen(s) have been architected:"
+   - List each screen: "* **[Screen Title]**: [Specific features and design choices]" 
+   - End with a strategic follow-up question (e.g., "Would you like to refine these further, or should we design the [next feature]?")
+6. **Suggestion (suggestion)**: A single, specific suggestion for the next potential design step or feature (e.g., 'Add a collaborative group trip feature to the planner' or 'Design the booking confirmation screen'). Aim for around 10 words.
 
 **CRITICAL**: IF the user requests a single screen, or gives a very simple prompt, create a plan with ONLY ONE screen.
 `;

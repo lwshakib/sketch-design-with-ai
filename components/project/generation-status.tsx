@@ -1,8 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MessageResponse } from "@/components/ai-elements/message";
+import { useProjectStore } from "@/hooks/use-project-store";
+import { Maximize2 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const DUMMY_STATUSES = [
   "Setting up workspace",
@@ -43,6 +51,14 @@ export function GenerationStatus({
 }: GenerationStatusProps) {
   const [dummyStatus, setDummyStatus] = useState(DUMMY_STATUSES[0]);
   const [dots, setDots] = useState("...");
+  
+  const { 
+    setCanvasOffset, 
+    setZoom, 
+    setSelectedArtifactIndex,
+    framePos,
+    isSidebarVisible
+  } = useProjectStore();
 
   useEffect(() => {
     if (isComplete) return;
@@ -68,9 +84,39 @@ export function GenerationStatus({
     };
   }, [isComplete]);
 
+  const handleFocusScreen = (artifactTitle: string) => {
+    const allArtifacts = useProjectStore.getState().throttledArtifacts;
+    const index = allArtifacts.findIndex(a => a.title === artifactTitle);
+    const artifact = allArtifacts[index];
+    
+    if (!artifact) return;
+
+    // Standard focus zoom
+    const targetZoom = 0.8;
+    setZoom(targetZoom);
+    setSelectedArtifactIndex(index);
+
+    // Calculate center
+    // CanvasArea has 'justify-center' horizontally and 'items-start pt-36' vertically.
+    // pt-36 = 9rem = 144px.
+    const mainHeight = window.innerHeight;
+    const topPadding = 144; 
+
+    const artifactWidth = artifact.width || (artifact.type === 'app' ? 380 : 1024);
+    const artifactHeight = artifact.height || 800;
+
+    // Horizontally centered by justify-center, so we only need the relative offset
+    const targetX = - (framePos.x + (artifact.x || 0) + artifactWidth / 2) * targetZoom;
+    
+    // Vertically centered relative to the pt-36 start
+    const targetY = (mainHeight / 2) - topPadding - (framePos.y + (artifact.y || 0) + artifactHeight / 2) * targetZoom;
+
+    setCanvasOffset({ x: targetX, y: targetY });
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)}>
-      {/* Second Row: Skeleton Squares with Previews */}
+      {/* First Row: Skeleton Squares with Previews */}
       <div className="flex flex-wrap gap-4">
         {planScreens.map((screen, idx) => {
           const artifact = projectArtifacts.find(a => a.title === screen.title);
@@ -78,37 +124,57 @@ export function GenerationStatus({
           const hasContent = !!artifact?.content;
 
           return (
-            <div 
-              key={idx}
-              className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg group"
-            >
-              {/* Preview Content (scaled iframe) */}
-              {hasContent ? (
-                <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity translate-z-0">
-                   <iframe 
-                     title={`mini-preview-${idx}`}
-                     className="w-full h-full border-none"
-                     srcDoc={`
-                       <!DOCTYPE html>
-                       <html>
-                         <head>
-                           <script src="https://cdn.tailwindcss.com"></script>
-                           <style>
-                             body { margin: 0; padding: 0; overflow: hidden; background: transparent; height: auto; }
-                             ::-webkit-scrollbar { display: none; }
-                           </style>
-                         </head>
-                         <body>${artifact.content}</body>
-                       </html>
-                     `}
-                   />
-                </div>
-              ) : isCurrentlyGenerating ? (
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
-              ) : (
-                <div className="absolute inset-0 bg-white/[0.02]" />
-              )}
-            </div>
+            <TooltipProvider key={idx}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div 
+                    onClick={() => hasContent && handleFocusScreen(screen.title)}
+                    className={cn(
+                      "h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg group transition-all",
+                      hasContent ? "cursor-pointer hover:border-primary/50 hover:shadow-primary/10" : "cursor-default"
+                    )}
+                  >
+                    {/* Preview Content (scaled iframe) */}
+                    {hasContent ? (
+                      <>
+                        <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-80 group-hover:opacity-40 transition-all translate-z-0">
+                           <iframe 
+                             title={`mini-preview-${idx}`}
+                             className="w-full h-full border-none"
+                             srcDoc={`
+                               <!DOCTYPE html>
+                               <html>
+                                 <head>
+                                   <script src="https://cdn.tailwindcss.com"></script>
+                                   <style>
+                                     body { margin: 0; padding: 0; overflow: hidden; background: transparent; height: auto; }
+                                     ::-webkit-scrollbar { display: none; }
+                                   </style>
+                                 </head>
+                                 <body>${artifact.content}</body>
+                               </html>
+                             `}
+                           />
+                        </div>
+                        {/* Hover Overlay Icon */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-primary/5">
+                          <Maximize2 className="h-4 w-4 text-primary" />
+                        </div>
+                      </>
+                    ) : isCurrentlyGenerating ? (
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
+                    ) : (
+                      <div className="absolute inset-0 bg-white/[0.02]" />
+                    )}
+                  </div>
+                </TooltipTrigger>
+                {hasContent && (
+                  <TooltipContent side="bottom" className="text-[10px] py-1 px-2 border-primary/20 bg-zinc-950 text-foreground font-medium">
+                    Go to screen
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
           );
         })}
         
@@ -117,17 +183,19 @@ export function GenerationStatus({
         )}
       </div>
 
-      {/* Third Row: Status text with animated dots */}
+      {/* Second Row: Status text or Conclusion markdown */}
       <div className="flex-1 min-w-0">
-        <p className={cn(
-          "text-sm font-medium transition-all duration-500",
-          isComplete ? "text-foreground" : "text-muted-foreground animate-pulse"
-        )}>
-          {isComplete 
-            ? (conclusionText || "") 
-            : `${dummyStatus}${dots}`
-          }
-        </p>
+        {isComplete ? (
+          <div className="animate-in fade-in slide-in-from-top-2 duration-1000">
+            <MessageResponse className="text-foreground/90 text-[13px] leading-relaxed">
+              {conclusionText || ""}
+            </MessageResponse>
+          </div>
+        ) : (
+          <p className="text-sm font-medium text-muted-foreground animate-pulse transition-all duration-500">
+            {`${dummyStatus}${dots}`}
+          </p>
+        )}
       </div>
 
       <style jsx global>{`
