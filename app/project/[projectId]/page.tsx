@@ -147,21 +147,18 @@ export default function ProjectPage() {
     if (newEvents.length === 0) return;
     processedCountRef.current = realtimeData.length;
 
+    let hasPlanUpdate = false;
+    let newPlan: any = null;
+    let newMarkdown: string = "";
+
     newEvents.forEach((event: any) => {
       if (event.topic === 'plan') {
         const { plan, markdown } = event.data;
         if (plan?.screens) {
-          const planObject = { screens: plan.screens, _markdown: markdown || plan._markdown };
-          setDesignPlan(planObject);
-          setMessages(prev => {
-            const last = prev[prev.length - 1] as any;
-            if (last && last.role === 'assistant') {
-              const updated = [...prev];
-              updated[updated.length - 1] = { ...last, content: markdown, plan: { ...plan, _markdown: markdown || plan._markdown } } as any;
-              return updated;
-            }
-            return [...prev, { role: 'assistant', content: markdown, plan: { ...plan, _markdown: markdown || plan._markdown } } as any];
-          });
+          hasPlanUpdate = true;
+          newPlan = plan;
+          newMarkdown = markdown;
+          setDesignPlan({ screens: plan.screens, _markdown: markdown || plan._markdown });
         }
       } else if (event.topic === 'status') {
         setRealtimeStatus(event.data);
@@ -211,6 +208,18 @@ export default function ProjectPage() {
         }
       }
     });
+
+    if (hasPlanUpdate) {
+      setMessages(prev => {
+        const last = prev[prev.length - 1] as any;
+        if (last && last.role === 'assistant') {
+          const updated = [...prev];
+          updated[updated.length - 1] = { ...last, content: newMarkdown, plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } } as any;
+          return updated;
+        }
+        return [...prev, { id: 'assistant-plan', role: 'assistant', content: newMarkdown, plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } } as any];
+      });
+    }
   }, [realtimeData, setMessages, setDesignPlan, setRealtimeStatus, setIsGenerating, setArtifacts, setThrottledArtifacts, projectId]);
 
   useEffect(() => {
@@ -574,10 +583,16 @@ export default function ProjectPage() {
     if (status === 'streaming' || status === 'submitted') { stop(); return; }
     if (!input.trim() && attachments?.length === 0) return;
     setIsGenerating(true); setDesignPlan({ screens: [] }); setRealtimeStatus(null);
+    const userMsg = { 
+      id: Date.now().toString(), 
+      role: 'user', 
+      content: input.trim(),
+    } as any;
+    setMessages(prev => [...prev, userMsg]);
+
     sendMessage({ 
       text: input.trim(), 
       files: attachments?.map(a => ({ type: "file" as const, url: a.url, mediaType: "image/*" })),
-      websiteUrl
     });
     setAttachments([]); setInput(""); setWebsiteUrl(null);
   };

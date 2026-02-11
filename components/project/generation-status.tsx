@@ -118,72 +118,68 @@ export function GenerationStatus({
     <div className={cn("flex flex-col gap-6", className)}>
       {/* First Row: Skeleton Squares with Previews */}
       <div className="flex flex-wrap gap-4">
-        {planScreens.map((screen, idx) => {
-          const artifact = projectArtifacts.find(a => a.title === screen.title);
-          const isCurrentlyGenerating = currentScreenTitle === screen.title;
-          const hasContent = !!artifact?.content;
+        {projectArtifacts
+          .filter(a => !!a.content || currentScreenTitle === a.title)
+          .map((artifact, idx) => {
+            const isCurrentlyGenerating = currentScreenTitle === artifact.title;
+            const hasContent = !!artifact.content;
 
-          return (
-            <TooltipProvider key={idx}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div 
-                    onClick={() => hasContent && handleFocusScreen(screen.title)}
-                    className={cn(
-                      "h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg group transition-all",
-                      hasContent ? "cursor-pointer hover:border-primary/50 hover:shadow-primary/10" : "cursor-default"
-                    )}
-                  >
-                    {/* Preview Content (scaled iframe) */}
-                    {hasContent ? (
-                      <>
-                        <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-80 group-hover:opacity-40 transition-all translate-z-0">
-                           <iframe 
-                             title={`mini-preview-${idx}`}
-                             className="w-full h-full border-none"
-                             srcDoc={`
-                               <!DOCTYPE html>
-                               <html>
-                                 <head>
-                                   <script src="https://cdn.tailwindcss.com"></script>
-                                   <style>
-                                     body { margin: 0; padding: 0; overflow: hidden; background: transparent; height: auto; }
-                                     ::-webkit-scrollbar { display: none; }
-                                   </style>
-                                 </head>
-                                 <body>${artifact.content}</body>
-                               </html>
-                             `}
-                           />
-                        </div>
-                        {/* Hover Overlay Icon */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-primary/5">
-                          <Maximize2 className="h-4 w-4 text-primary" />
-                        </div>
-                      </>
-                    ) : isCurrentlyGenerating ? (
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
-                    ) : (
-                      <div className="absolute inset-0 bg-white/[0.02]" />
-                    )}
-                  </div>
-                </TooltipTrigger>
-                {hasContent && (
-                  <TooltipContent side="bottom" className="text-[10px] py-1 px-2 border-primary/20 bg-zinc-950 text-foreground font-medium">
-                    Go to screen
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            </TooltipProvider>
-          );
-        })}
+            return (
+              <TooltipProvider key={idx}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div 
+                      onClick={() => hasContent && handleFocusScreen(artifact.title)}
+                      className={cn(
+                        "h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg group transition-all",
+                        hasContent ? "cursor-pointer hover:border-primary/50 hover:shadow-primary/10" : "cursor-default"
+                      )}
+                    >
+                      {/* Preview Content (scaled iframe) */}
+                      {hasContent ? (
+                        <>
+                          <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-80 group-hover:opacity-40 transition-all translate-z-0">
+                             <iframe 
+                               title={`mini-preview-${idx}`}
+                               className="w-full h-full border-none"
+                               srcDoc={`
+                                 <!DOCTYPE html>
+                                 <html>
+                                   <head>
+                                     <script src="https://cdn.tailwindcss.com"></script>
+                                     <style>
+                                       body { margin: 0; padding: 0; overflow: hidden; background: transparent; height: auto; }
+                                       ::-webkit-scrollbar { display: none; }
+                                     </style>
+                                   </head>
+                                   <body>${artifact.content}</body>
+                                 </html>
+                               `}
+                             />
+                          </div>
+                          {/* Hover Overlay Icon */}
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-primary/5">
+                            <Maximize2 className="h-4 w-4 text-primary" />
+                          </div>
+                        </>
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
+                      )}
+                    </div>
+                  </TooltipTrigger>
+                  {hasContent && (
+                    <TooltipContent side="bottom" className="text-[10px] py-1 px-2 border-primary/20 bg-zinc-950 text-foreground font-medium">
+                      Go to screen
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
+            );
+          })}
         
-        {planScreens.length === 0 && (
-          <div className="flex gap-4">
-            <div className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg animate-pulse" />
-            <div className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg animate-pulse delay-150" />
-            <div className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg animate-pulse delay-300" />
-          </div>
+        {/* Only show the pulse square if nothing is being generated yet or nothing is discovered */}
+        {(projectArtifacts.length === 0 || !projectArtifacts.some(a => !!a.content || currentScreenTitle === a.title)) && (
+          <div className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg animate-pulse" />
         )}
       </div>
 
