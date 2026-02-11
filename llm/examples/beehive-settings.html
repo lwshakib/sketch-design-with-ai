@@ -73,9 +73,9 @@
         }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-white overflow-hidden h-screen flex">
+<body class="bg-background-light dark:bg-background-dark font-display text-white  min-h-[800px] flex">
 <!-- Sidebar -->
-<aside class="w-72 bg-surface-darker border-r border-border-dark flex-shrink-0 flex flex-col h-full overflow-y-auto hidden md:flex">
+<aside class="w-72 bg-surface-darker border-r border-border-dark flex-shrink-0 flex flex-col h-full  hidden md:flex">
 <div class="p-6">
 <div class="flex gap-3 items-center mb-8">
 <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-primary/20 shadow-[0_0_15px_rgba(19,236,19,0.2)]" data-alt="Abstract green geometric hexagon pattern" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBlYvTMU6UIDk2DqqXYi9Aj2k5YGzHagOXBPH6leHA5w2zhkz5v4jVTKOpEfHdMf0I-qG7XVdVwUcCNvBqYR3Fo57wQ7AoU4_bYo3XgRj4K6AEoCqeSeXGVQPSeKfZ3hWLOBqhu7ww4whLUvW650YX_aJ03v0tdmabP5Jofn6TyxCW5CilRrYdRmfGQC1D2XGEHNdl757C33zdhU0HDLe8BtasELsdT94BN8obiQyTRlENLihRxO0Wb9UCQFY6WVBVK_sHFiiSKPl8");'></div>
@@ -117,7 +117,7 @@
 <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Profile picture of John Doe" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBJEsnpXMj7-M1SKAvBm7BKEofb6nk3Vyl9Pl-oHN0esn64_fEv993gaotNtzHaQ9hJEJmY4FPYJUrkUZ0RYopNzuxi8ri4Zd_D_RpjWKeIxDHdJORsg9zEmO1ZEpm6b6YuAZY_1kU5lpy_wdWEc6PtZcym4rtNmOmDMsdqkeR5eqyROyJSL19L8yET3DvS_LXeHiuQsPXneXA4vKqZUAn998r9uZn-yS4GHWszLnDvvD4a6yBg_gbRBIgcyAhhjZtqhNEgRd2rJHM");'></div>
 <div class="absolute bottom-0 right-0 size-2.5 bg-primary rounded-full border-2 border-[#1c271c]"></div>
 </div>
-<div class="flex flex-col overflow-hidden">
+<div class="flex flex-col ">
 <p class="text-white text-sm font-medium truncate">John Doe</p>
 <p class="text-text-secondary text-xs truncate">Head Beekeeper</p>
 </div>
@@ -125,7 +125,7 @@
 </div>
 </aside>
 <!-- Main Content -->
-<main class="flex-1 overflow-y-auto bg-background-dark relative scroll-smooth">
+<main class="flex-1  bg-background-dark relative scroll-smooth">
 <!-- Header -->
 <header class="sticky top-0 z-20 bg-background-dark/95 backdrop-blur-sm border-b border-border-dark px-8 py-5 flex items-center justify-between">
 <div class="flex flex-col gap-1">
@@ -143,14 +143,14 @@
 </header>
 <div class="max-w-5xl mx-auto p-8 flex flex-col gap-8 pb-20">
 <!-- Profile Header Card -->
-<section class="rounded-xl border border-border-dark bg-surface-dark overflow-hidden relative">
-<div class="h-32 bg-gradient-to-r from-[#1c271c] to-[#283928] relative overflow-hidden">
+<section class="rounded-xl border border-border-dark bg-surface-dark  relative">
+<div class="h-32 bg-gradient-to-r from-[#1c271c] to-[#283928] relative ">
 <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#13ec13_1px,transparent_1px)] [background-size:16px_16px]"></div>
 </div>
 <div class="px-8 pb-8 relative">
 <div class="flex flex-col sm:flex-row gap-6 items-end -mt-12">
 <div class="relative group cursor-pointer">
-<div class="size-32 rounded-full border-4 border-surface-dark bg-surface-dark overflow-hidden relative shadow-lg">
+<div class="size-32 rounded-full border-4 border-surface-dark bg-surface-dark  relative shadow-lg">
 <div class="w-full h-full bg-center bg-no-repeat bg-cover" data-alt="Profile picture of John Doe high resolution" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBKHdOdiU28jXpXmeJCImPPjNinJte9HiOReFci1Iik0dss4QgyRhTFjbIvWdB_Km6yJ4erySHSlWbz6ZvtRRbvBGpQ6J0EFx7YeU5vNssuVUR88z6OgrPac_flIlxJDmfT9DtrJ7ywDvxw7debtEnkkwRoEwpmPUr0N2i6f2nYc1uAS50F9ISidO38sI0w254bGDyPbGYD9Ftqtw4GtElC0Ab84zD9mFSU0xGSMdSJPMnDBMqRr33-pYVFThrl_TW2E1sB5vrDu-Y");'></div>
 <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
 <span class="material-symbols-outlined text-white">photo_camera</span>

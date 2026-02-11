@@ -19,7 +19,17 @@ import {
   CopyPlus,
   Link,
   Globe,
-  ImageIcon
+  ImageIcon,
+  LayoutGrid,
+  Download,
+  Files,
+  Share2,
+  Undo2,
+  Redo2,
+  Copy,
+  ClipboardPaste,
+  Settings,
+  Command
 } from "lucide-react";
 import { GenerationStatus } from "./generation-status";
 import { Button } from "@/components/ui/button";
@@ -39,6 +49,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSubContent
 } from "@/components/ui/dropdown-menu";
 import { extractArtifacts, stripArtifact } from "@/lib/artifact-renderer";
 import { useProjectStore } from "@/hooks/use-project-store";
@@ -131,14 +147,105 @@ export function ChatSidebar({
                     <Menu className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                  <DropdownMenuItem onClick={() => router.push('/')}>
-                    <ChevronLeft className="mr-2 h-4 w-4" />
-                    Go to all projects
+                <DropdownMenuContent align="start" className="w-64 bg-card border-border text-foreground rounded-2xl shadow-2xl p-1.5 z-[1001]">
+                  <DropdownMenuItem 
+                    onClick={() => router.push('/')}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer text-[13px]"
+                  >
+                    <LayoutGrid className="h-4 w-4 text-muted-foreground" />
+                    Go to All Projects
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)} className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                    <Trash2 className="mr-2 h-4 w-4" />
+                  
+                  <DropdownMenuSeparator className="bg-border/50 my-1.5" />
+                  
+                  <DropdownMenuItem 
+                    onClick={() => document.dispatchEvent(new CustomEvent('DOWNLOAD_PROJECT'))}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer text-[13px]"
+                  >
+                    <Download className="h-4 w-4 text-muted-foreground" />
+                    Download Project
+                    <DropdownMenuShortcut>Full ZIP</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem 
+                    onClick={() => document.dispatchEvent(new CustomEvent('DUPLICATE_PROJECT'))}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer text-[13px]"
+                  >
+                    <Files className="h-4 w-4 text-muted-foreground" />
+                    Duplicate Project
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator className="bg-border/50 my-1.5" />
+
+                  <DropdownMenuItem 
+                    onClick={() => useProjectStore.getState().setIsShareDialogOpen(true)}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer text-[13px]"
+                  >
+                    <Share2 className="h-4 w-4 text-muted-foreground" />
+                    Share Project
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator className="bg-border/50 my-1.5" />
+
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer text-[13px]">
+                      <Pencil className="h-4 w-4 text-muted-foreground" />
+                      Edit
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent className="w-48 bg-card border-border text-foreground rounded-2xl shadow-2xl p-1.5 z-[1005]">
+                        <DropdownMenuItem className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer text-[13px]">
+                          <Undo2 className="h-4 w-4 text-muted-foreground" />
+                          Undo
+                          <DropdownMenuShortcut>Ctrl+Z</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer text-[13px]">
+                          <Redo2 className="h-4 w-4 text-muted-foreground" />
+                          Redo
+                          <DropdownMenuShortcut>Ctrl+Y</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-border/50 my-1.5" />
+                        <DropdownMenuItem className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer text-[13px]">
+                          <Copy className="h-4 w-4 text-muted-foreground" />
+                          Copy
+                          <DropdownMenuShortcut>Ctrl+C</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer text-[13px]">
+                          <ClipboardPaste className="h-4 w-4 text-muted-foreground" />
+                          Paste
+                          <DropdownMenuShortcut>Ctrl+V</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+
+                  <DropdownMenuItem 
+                    onClick={() => useProjectStore.getState().setIsSettingsDialogOpen(true)}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer text-[13px]"
+                  >
+                    <Settings className="h-4 w-4 text-muted-foreground" />
+                    Settings
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem 
+                    onClick={() => setIsDeleteDialogOpen(true)}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-destructive/10 text-destructive cursor-pointer text-[13px]"
+                  >
+                    <Trash2 className="h-4 w-4" />
                     Delete Project
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator className="bg-border/50 my-1.5" />
+
+                  <DropdownMenuItem 
+                    onClick={() => useProjectStore.getState().setIsCommandMenuOpen(true)}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer text-[13px]"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Command className="h-4 w-4 text-muted-foreground" />
+                      Command Menu
+                    </div>
+                    <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

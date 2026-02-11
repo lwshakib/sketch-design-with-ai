@@ -262,7 +262,7 @@ export const generateDesign = inngest.createFunction(
              x: currentX,
              y: 0,
              width: width,
-             height: 800
+             height: null
            }
          });
 
@@ -437,7 +437,7 @@ CRITICAL INSTRUCTIONS:
                  type: generatedScreen.type,
                  status: "completed",
                  x: newX, y: 0,
-                 width: currentWidth, height: 800 
+                 width: currentWidth, height: null 
                }
              });
           }

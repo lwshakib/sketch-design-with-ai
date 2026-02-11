@@ -64,7 +64,7 @@
         }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-text-main-light dark:text-text-main-dark h-screen overflow-hidden flex">
+<body class="bg-background-light dark:bg-background-dark font-display text-text-main-light dark:text-text-main-dark min-h-[800px]  flex">
 <!-- Sidebar -->
 <aside class="w-64 bg-surface-light dark:bg-surface-dark border-r border-[#e7f3e9] dark:border-[#2a452e] flex-col hidden md:flex h-full transition-colors duration-200">
 <div class="h-20 flex items-center px-8 border-b border-transparent">
@@ -75,7 +75,7 @@
 <h1 class="text-xl font-bold tracking-tight">LeafLife</h1>
 </div>
 </div>
-<nav class="flex-1 px-4 py-6 flex flex-col gap-2 overflow-y-auto">
+<nav class="flex-1 px-4 py-6 flex flex-col gap-2 ">
 <a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-[#e7f3e9] dark:bg-primary/20 text-primary-dark dark:text-primary font-medium group transition-colors" href="#">
 <span class="material-symbols-outlined fill">dashboard</span>
                 Dashboard
@@ -104,7 +104,7 @@
                 Settings
             </a>
 <div class="mt-4 flex items-center gap-3 px-4 py-2">
-<div class="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden" data-alt="User profile picture placeholder">
+<div class="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 " data-alt="User profile picture placeholder">
 <img alt="User Avatar" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8Tt2iiajNsJdCQY921LGcp9KTzpYJdG2XXR81oOllA0IiK8hNz90KsyEsJEtbJ1nWoWtzaZAyV2dQ3sRZKhUD4fnxlypH2b0NkcAUv099UlkvMa_pHYMVf22BjMTSvCEwrF7T0_P6nXJAx5zzmapE03MsDmBdcljhl_7XPB1XvL-ya0imDkniz1HegS45Ksvpx7BfpLAjrET4or7Lrz_XQs1oISs842VNR2_NkWh4zXjfsilx8HAN13O-7VfqBqDVQm1oxV6jzD4"/>
 </div>
 <div class="flex flex-col">
@@ -115,7 +115,7 @@
 </div>
 </aside>
 <!-- Main Content -->
-<main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f8fcf9] dark:bg-[#102213] relative">
+<main class="flex-1 flex flex-col h-full  bg-[#f8fcf9] dark:bg-[#102213] relative">
 <!-- Top Bar -->
 <header class="h-20 px-8 flex items-center justify-between bg-surface-light/50 dark:bg-surface-dark/50 backdrop-blur-sm sticky top-0 z-10 border-b border-[#e7f3e9] dark:border-[#2a452e]">
 <div class="flex flex-col">
@@ -138,7 +138,7 @@
 </div>
 </header>
 <!-- Scrollable Content Area -->
-<div class="flex-1 overflow-y-auto p-8 scroll-smooth">
+<div class="flex-1  p-8 scroll-smooth">
 <div class="max-w-7xl mx-auto space-y-8">
 <!-- Welcome Section -->
 <div class="flex flex-col md:flex-row justify-between items-end gap-4">
@@ -186,7 +186,7 @@
 <!-- Task Item 1 -->
 <label class="flex items-center gap-4 p-4 rounded-xl bg-background-light dark:bg-background-dark border border-transparent hover:border-[#cfe7d3] dark:hover:border-[#2a452e] transition-all cursor-pointer group">
 <input class="h-6 w-6 rounded-md border-2 border-gray-300 dark:border-gray-600 text-primary focus:ring-offset-0 focus:ring-0 checked:bg-primary checked:border-primary transition-colors" type="checkbox"/>
-<div class="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-700 overflow-hidden flex-shrink-0" data-alt="Monstera Deliciosa leaf close-up">
+<div class="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-700  flex-shrink-0" data-alt="Monstera Deliciosa leaf close-up">
 <img class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzxb6POgrNx2mv3sFBPNf9v7d9fiAExfUoly4ON4DeaUc5tLqs_dVUCbQ_c-TC-E2JuLB5fXMwoI3cCKbDvN9nOSG6vwT02Okj9yqoWKYBG_x1yrAMp8ioAgVUsFaaaxxJzkEFeIVmoUm79g7QBkU7Ps7DjK0wd4qMG88kqIZsKNtW8vUmUnBCO-dhps4ynWt3TRcZY8zIcuKmeC9LRlRm-FyTI5-T3zkPsDisb-gsfIKcnyr5M3j1duvXGNu5cO82ZmBgcasXQ8k"/>
 </div>
 <div class="flex-1">
@@ -200,7 +200,7 @@
 <!-- Task Item 2 -->
 <label class="flex items-center gap-4 p-4 rounded-xl bg-background-light dark:bg-background-dark border border-transparent hover:border-[#cfe7d3] dark:hover:border-[#2a452e] transition-all cursor-pointer group">
 <input class="h-6 w-6 rounded-md border-2 border-gray-300 dark:border-gray-600 text-primary focus:ring-offset-0 focus:ring-0 checked:bg-primary checked:border-primary transition-colors" type="checkbox"/>
-<div class="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-700 overflow-hidden flex-shrink-0" data-alt="Pothos plant trailing down">
+<div class="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-700  flex-shrink-0" data-alt="Pothos plant trailing down">
 <img class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-Hk0Pe485kxM_0N87OYWNCXZBcMYwjyon3tS9biokhtJUzlhAWj73TBC9KVDwVexZjvln95tzTlrnoz69qSgjlbt4BJA98cVmy9bfnu31JJ8MBF-YiC82mbAa_gDzMqdDJLVjeZJpNXJB_xgy1H8zSYm1hr_MPxTjELoD2xejZt0TBmrMB2JSerO2rIcQBvhkzJW67FmpmM6v5KnE5PdOjB1Xpe3ocgBu6AKWbMeQnRorqZ19WZYsH3J3GIehQXWBLyiCb6rBGIc"/>
 </div>
 <div class="flex-1">
@@ -214,7 +214,7 @@
 <!-- Task Item 3 -->
 <label class="flex items-center gap-4 p-4 rounded-xl bg-background-light dark:bg-background-dark border border-transparent hover:border-[#cfe7d3] dark:hover:border-[#2a452e] transition-all cursor-pointer group">
 <input class="h-6 w-6 rounded-md border-2 border-gray-300 dark:border-gray-600 text-primary focus:ring-offset-0 focus:ring-0 checked:bg-primary checked:border-primary transition-colors" type="checkbox"/>
-<div class="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-700 overflow-hidden flex-shrink-0" data-alt="Fiddle Leaf Fig leaves">
+<div class="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-700  flex-shrink-0" data-alt="Fiddle Leaf Fig leaves">
 <img class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7l5llU4PpRkRfaYYrY1gqvA9fn-F9P8YKMZG3ghSXl6kdUm7rgoFgTuvGNUKDyWLkoaBDYw7ioq4cPfNQL968UlAayqo6MQthEqCxtU1gr0E28qtxIz6FzV4khK90zwxWpkRTGtDbozbPhxQnW88ht4biBGvSBAqwC_JHRkuHo4M7AE8KGQo3KZLTkHgqmwCS4x7yFmoor7omAALZ7tnt2hrumdUE0JkceHhuV1qOwbnW-I0WevXquOSmVy84UN4WikzUwjfrmUs"/>
 </div>
 <div class="flex-1">
@@ -245,7 +245,7 @@
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 <!-- Plant Card 1 -->
-<div class="bg-white dark:bg-surface-dark rounded-2xl overflow-hidden border border-[#e7f3e9] dark:border-[#2a452e] shadow-sm hover:shadow-md transition-shadow group">
+<div class="bg-white dark:bg-surface-dark rounded-2xl  border border-[#e7f3e9] dark:border-[#2a452e] shadow-sm hover:shadow-md transition-shadow group">
 <div class="h-48 w-full bg-gray-100 dark:bg-gray-800 relative" data-alt="Monstera Deliciosa plant in a white pot">
 <img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0K7jSB-9gJkjiLDKsu2-X9_OOyP6klp5WAiPzLfSW5-aWHY_riDqkbNd03y0p-WV65fEMAgycFDLK9rWr3qnyNL5RzZ2wi4QiD2woFKdFf-uQVanDsOEmzkUiJpeT0jpAUeHBde0wM6lMXPoSSwyerifYD4LlVdhwmoDGzh5HcwBWcl2qTZolOgx7STue99DzTBxrLHy4SfjGibxewByPR-u_6rT1lpmQq_309_QzB8gAamySAGlPwP7tmxgIq87AmdbrSG8zpZo"/>
 <div class="absolute top-4 right-4 bg-white/90 dark:bg-black/70 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-green-700 dark:text-green-400 flex items-center gap-1 shadow-sm">
@@ -266,7 +266,7 @@
 <div class="mt-4 space-y-3">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-yellow-500 text-[20px]">sunny</span>
-<div class="flex-1 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="flex-1 h-2 bg-gray-100 dark:bg-gray-700 rounded-full ">
 <div class="h-full w-3/4 bg-yellow-400 rounded-full"></div>
 </div>
 <span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">High</span>
@@ -285,7 +285,7 @@
 </div>
 </div>
 <!-- Plant Card 2 -->
-<div class="bg-white dark:bg-surface-dark rounded-2xl overflow-hidden border border-[#e7f3e9] dark:border-[#2a452e] shadow-sm hover:shadow-md transition-shadow group">
+<div class="bg-white dark:bg-surface-dark rounded-2xl  border border-[#e7f3e9] dark:border-[#2a452e] shadow-sm hover:shadow-md transition-shadow group">
 <div class="h-48 w-full bg-gray-100 dark:bg-gray-800 relative" data-alt="Snake Plant in a terracotta pot">
 <img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuHOF_4sYZ8tu1bXF30cnn7mwp7trkwph-TmDYFio2IQZn9Z0M9_NWFoUgujP7qo51mQRtUPDsVyR2RMoYfZyCZkKvWgSYZebl_tkjDF06tZ-e-lSOul5D5ENzwK4CSCybjokeXryXGeIGUxTcJ1qF5zuQ3kCQ8sy37XYsNGZz4OrQwXD_mWXhDrYPQyLytP-DoNyntc3gfiiq4rjwKk_P3Suio0lgu1-47QiW5P5z5v3de39IyAYPQlu_CQwNOib4JThXzuWrWCs"/>
 <div class="absolute top-4 right-4 bg-white/90 dark:bg-black/70 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-green-700 dark:text-green-400 flex items-center gap-1 shadow-sm">
@@ -306,7 +306,7 @@
 <div class="mt-4 space-y-3">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-yellow-500 text-[20px]">sunny</span>
-<div class="flex-1 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="flex-1 h-2 bg-gray-100 dark:bg-gray-700 rounded-full ">
 <div class="h-full w-1/4 bg-yellow-400 rounded-full"></div>
 </div>
 <span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">Low</span>
@@ -341,7 +341,7 @@
 <div class="absolute -left-[23px] top-1 h-3 w-3 rounded-full bg-primary border-2 border-white dark:border-surface-dark"></div>
 <p class="text-xs font-bold text-primary mb-1">TOMORROW</p>
 <div class="flex items-center gap-3 bg-background-light dark:bg-background-dark p-3 rounded-lg">
-<div class="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden" data-alt="Spider plant leaves">
+<div class="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-md " data-alt="Spider plant leaves">
 <img class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeZ3WMXpvwynEAyX0zCMOxFt2PLf2PPwjpbVrPfC2G4iOtXJeJa--V4l_V9Wsu1DQMNjBwc-BmAIFQ8wT3DbjjhcmVVpAzhZJWriHcjLepDDJJuxixIjlqzcE-RLR87sOA3VKX19vXY_I5xxbMvfZnjjwDGe9R44yNWgVPl0dw-M_cHXODpcLCjVGBkiTKiXiWlfO-JRKk29Ith5EK3mTs-5kv7LxZUwcYnFowhTTf-C--Fj6UEkGarrE58Z4OpeCDDUwM3BGaBKM"/>
 </div>
 <div>
@@ -354,7 +354,7 @@
 <div class="absolute -left-[23px] top-1 h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600 border-2 border-white dark:border-surface-dark"></div>
 <p class="text-xs font-bold text-text-sub-light dark:text-text-sub-dark mb-1">OCT 26</p>
 <div class="flex items-center gap-3 bg-background-light dark:bg-background-dark p-3 rounded-lg opacity-80">
-<div class="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden" data-alt="Aloe Vera plant">
+<div class="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-md " data-alt="Aloe Vera plant">
 <img class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEzJ_idrkrTysVKDQFUTBFVq-ksF2GeN_AVZWviqB3hGytw4D2wNF5RdnNR5eLcifzkDiCmer9M6xifrgPJ4V9n6hDPqyz5cMhNljTX-kiwGDh-K5f7eo1O7VARk0pPecHcj1jfjLAYEruGc97PRasYMlnZGIZ_DxnMDshNWyrtFrvjmTJzUVKbQpHymkfENmhCgOIzkPJEC5TESwTnO79hAdA32C_VTs4xRGCdLyvtU6PSrgjusJ6FX-6YZmHzLmzzT_TkcccFPM"/>
 </div>
 <div>
@@ -367,7 +367,7 @@
 <div class="absolute -left-[23px] top-1 h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600 border-2 border-white dark:border-surface-dark"></div>
 <p class="text-xs font-bold text-text-sub-light dark:text-text-sub-dark mb-1">OCT 28</p>
 <div class="flex items-center gap-3 bg-background-light dark:bg-background-dark p-3 rounded-lg opacity-80">
-<div class="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden" data-alt="Ficus Elastica leaves">
+<div class="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-md " data-alt="Ficus Elastica leaves">
 <img class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-4ZPyxxZjNeX1Y5UGb5eBB_nucfEy_MXhZHwO2Wf-dvhObF4oGivr8BHs8CxFWrnanibQFUPFdewF8OsfxFT7Id2IvruoZYLzmKS8C4H3SKQzVFSv4K91OdDf4iWb8dIUMdsRhLcPn9Bl5NunSrZW2N2U2tKSNas1Yo3PtMDA37L8GUFToJKGsFmkK0qaZX4aEwFzSqkTqApdMfk74ELb7tkG7pwyjW7cO9sxB_XGE1DcMr9pmlHDSnWVOW01QSGVy7proyJwsgM"/>
 </div>
 <div>
@@ -378,7 +378,7 @@
 </div>
 </section>
 <!-- Seasonal Tips Card -->
-<section class="bg-gradient-to-br from-primary/20 to-[#cfe7d3] dark:from-[#1a331d] dark:to-[#102213] rounded-2xl p-6 border border-primary/20 relative overflow-hidden">
+<section class="bg-gradient-to-br from-primary/20 to-[#cfe7d3] dark:from-[#1a331d] dark:to-[#102213] rounded-2xl p-6 border border-primary/20 relative ">
 <!-- Background decoration -->
 <div class="absolute -right-4 -top-4 text-primary/10 dark:text-primary/5 pointer-events-none">
 <span class="material-symbols-outlined" style="font-size: 150px;">light_mode</span>

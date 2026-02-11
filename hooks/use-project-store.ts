@@ -7,6 +7,7 @@ export interface Project {
   messages: any[];
   canvasData?: any;
   themes?: any[];
+  shareToken?: string | null;
 }
 
 interface ProjectState {
@@ -65,6 +66,9 @@ interface ProjectState {
   isSidebarVisible: boolean;
   is3xMode: boolean;
   regeneratingArtifactIds: Set<string>;
+  isCommandMenuOpen: boolean;
+  isSettingsDialogOpen: boolean;
+  isShareDialogOpen: boolean;
 
   // Theme & Selection
   activeThemeId: string | null;
@@ -121,6 +125,9 @@ interface ProjectState {
   setWebsiteUrl: (url: string | null) => void;
   setRegeneratingArtifactIds: (val: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
   setMessages: (val: any[] | ((prev: any[]) => any[])) => void;
+  setIsCommandMenuOpen: (open: boolean) => void;
+  setIsSettingsDialogOpen: (open: boolean) => void;
+  setIsShareDialogOpen: (open: boolean) => void;
 
   setActiveThemeId: (id: string | null) => void;
   setAppliedTheme: (theme: any | null) => void;
@@ -181,6 +188,9 @@ export const useProjectStore = create<ProjectState>((set) => ({
   isSidebarVisible: true,
   is3xMode: false,
   regeneratingArtifactIds: new Set(),
+  isCommandMenuOpen: false,
+  isSettingsDialogOpen: false,
+  isShareDialogOpen: false,
 
   activeThemeId: null,
   appliedTheme: null,
@@ -236,6 +246,9 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setWebsiteUrl: (websiteUrl) => set({ websiteUrl }),
   setRegeneratingArtifactIds: (val) => set((state) => ({ regeneratingArtifactIds: typeof val === 'function' ? val(state.regeneratingArtifactIds) : val })),
   setMessages: (val) => set((state) => ({ messages: typeof val === 'function' ? val(state.messages) : val })),
+  setIsCommandMenuOpen: (isCommandMenuOpen) => set({ isCommandMenuOpen }),
+  setIsSettingsDialogOpen: (isSettingsDialogOpen) => set({ isSettingsDialogOpen }),
+  setIsShareDialogOpen: (isShareDialogOpen) => set({ isShareDialogOpen }),
 
   setActiveThemeId: (activeThemeId) => set({ activeThemeId }),
   setAppliedTheme: (appliedTheme) => set({ appliedTheme }),

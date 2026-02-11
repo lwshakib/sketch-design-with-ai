@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -35,8 +35,35 @@ import {
   Share2, 
   Download, 
   Check, 
-  Clipboard 
+  Clipboard,
+  Search,
+  Command,
+  Settings,
+  LayoutGrid,
+  Undo2,
+  Redo2,
+  Files,
+  Pencil,
+  Trash2
 } from "lucide-react";
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "@/components/ui/command";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
@@ -48,13 +75,17 @@ interface ProjectDialogsProps {
   updateProjectTitle: (title: string) => void;
   handleDeleteProject: () => void;
   handleExportZip: (index: number) => void;
+  handleDownloadFullProject: () => void;
+  handleDuplicateProject: () => void;
 }
 
 export function ProjectDialogs({
   handleRegenerateSubmit,
   updateProjectTitle,
   handleDeleteProject,
-  handleExportZip
+  handleExportZip,
+  handleDownloadFullProject,
+  handleDuplicateProject
 }: ProjectDialogsProps) {
   const {
     isRegenerateDialogOpen,
@@ -75,8 +106,28 @@ export function ProjectDialogs({
     exportArtifactIndex,
     throttledArtifacts,
     hasCopied,
-    setHasCopied
+    setHasCopied,
+    isCommandMenuOpen,
+    setIsCommandMenuOpen,
+    isSettingsDialogOpen,
+    setIsSettingsDialogOpen,
+    isSidebarVisible,
+    setIsSidebarVisible,
+    secondarySidebarMode,
+    setSecondarySidebarMode,
+    project
   } = useProjectStore();
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setIsCommandMenuOpen(!isCommandMenuOpen);
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, [isCommandMenuOpen, setIsCommandMenuOpen]);
   
   const handleCopyCode = () => {
     if (exportArtifactIndex !== null) {
@@ -308,6 +359,157 @@ export function ProjectDialogs({
           </div>
         </SheetContent>
       </Sheet>
+      {/* Command Menu */}
+      <CommandDialog open={isCommandMenuOpen} onOpenChange={setIsCommandMenuOpen}>
+        <CommandInput placeholder="Type a command or search..." />
+        <CommandList className="max-h-[400px]">
+          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandGroup heading="Project Actions">
+            <CommandItem onSelect={() => { handleDuplicateProject(); setIsCommandMenuOpen(false); }}>
+              <Files className="mr-2 h-4 w-4" />
+              <span>Duplicate Project</span>
+              <CommandShortcut>⌘D</CommandShortcut>
+            </CommandItem>
+            <CommandItem onSelect={() => { handleDownloadFullProject(); setIsCommandMenuOpen(false); }}>
+              <Download className="mr-2 h-4 w-4" />
+              <span>Download Full Package</span>
+              <CommandShortcut>⌘S</CommandShortcut>
+            </CommandItem>
+            <CommandItem onSelect={() => { setIsEditTitleDialogOpen(true); setIsCommandMenuOpen(false); }}>
+              <Pencil className="mr-2 h-4 w-4" />
+              <span>Rename Project</span>
+            </CommandItem>
+            <CommandItem onSelect={() => { setIsDeleteDialogOpen(true); setIsCommandMenuOpen(false); }} className="text-destructive">
+              <Trash2 className="mr-2 h-4 w-4" />
+              <span>Delete Project</span>
+            </CommandItem>
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Navigation">
+            <CommandItem onSelect={() => { window.location.href = '/dashboard'; }}>
+              <LayoutGrid className="mr-2 h-4 w-4" />
+              <span>Go to Dashboard</span>
+            </CommandItem>
+            <CommandItem onSelect={() => { setIsSidebarVisible(!isSidebarVisible); setIsCommandMenuOpen(false); }}>
+              <Layout className="mr-2 h-4 w-4" />
+              <span>Toggle Sidebar</span>
+              <CommandShortcut>⌘B</CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Edit">
+            <CommandItem disabled>
+              <Undo2 className="mr-2 h-4 w-4" />
+              <span>Undo</span>
+              <CommandShortcut>⌘Z</CommandShortcut>
+            </CommandItem>
+            <CommandItem disabled>
+              <Redo2 className="mr-2 h-4 w-4" />
+              <span>Redo</span>
+              <CommandShortcut>⌘Y</CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+
+      {/* Improved Delete Alert */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="bg-zinc-950 border-zinc-800 text-white rounded-3xl p-8 max-w-md">
+          <AlertDialogHeader className="items-center text-center">
+            <div className="size-16 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center justify-center mb-4">
+              <Trash2 className="size-8 text-destructive" />
+            </div>
+            <AlertDialogTitle className="text-2xl font-black uppercase tracking-tight">Delete Project?</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-500 text-sm font-medium leading-relaxed mt-2">
+              This will permanently remove <span className="text-white font-bold">"{project?.title}"</span> and all its screens. This action cannot be reversed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex flex-col gap-3 mt-8">
+            <AlertDialogAction 
+              onClick={handleDeleteProject}
+              className="w-full h-12 rounded-xl bg-destructive text-white hover:bg-destructive/90 font-bold uppercase tracking-widest text-xs"
+            >
+              Confirm Deletion
+            </AlertDialogAction>
+            <AlertDialogCancel className="w-full h-12 rounded-xl bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800 font-bold uppercase tracking-widest text-xs">
+              Keep Project
+            </AlertDialogCancel>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Settings Dialog */}
+      <Dialog open={isSettingsDialogOpen} onOpenChange={setIsSettingsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] bg-zinc-950 border-zinc-800 text-white p-0 overflow-hidden rounded-3xl">
+          <DialogHeader className="p-8 pb-0 flex flex-row items-center gap-4">
+            <div className="size-12 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+              <Settings className="size-6 text-zinc-400" />
+            </div>
+            <div>
+              <DialogTitle className="text-2xl font-black uppercase tracking-tight">Settings</DialogTitle>
+              <DialogDescription className="text-zinc-500 text-sm font-medium">Configure your project workspace.</DialogDescription>
+            </div>
+          </DialogHeader>
+
+          <div className="p-8">
+            <Tabs defaultValue="general" className="w-full">
+              <TabsList className="bg-zinc-900 border border-zinc-800 p-1 rounded-xl mb-8">
+                <TabsTrigger value="general" className="rounded-lg data-[state=active]:bg-zinc-800 data-[state=active]:text-white">General</TabsTrigger>
+                <TabsTrigger value="appearance" className="rounded-lg data-[state=active]:bg-zinc-800 data-[state=active]:text-white">Appearance</TabsTrigger>
+                <TabsTrigger value="shortcuts" className="rounded-lg data-[state=active]:bg-zinc-800 data-[state=active]:text-white">Shortcuts</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="general" className="space-y-6">
+                <div className="flex items-center justify-between p-4 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl">
+                  <div className="space-y-0.5">
+                    <Label className="text-sm font-bold">Show Grid</Label>
+                    <p className="text-[11px] text-zinc-500">Show a subtle dot grid background on the canvas.</p>
+                  </div>
+                  <Switch checked={true} />
+                </div>
+                <div className="flex items-center justify-between p-4 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl">
+                  <div className="space-y-0.5">
+                    <Label className="text-sm font-bold">Auto-Save</Label>
+                    <p className="text-[11px] text-zinc-500">Automatically persist changes as you edit.</p>
+                  </div>
+                  <Switch checked={true} />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="appearance" className="space-y-6">
+                <div className="p-12 text-center rounded-2xl bg-zinc-900/50 border border-dashed border-zinc-800">
+                  <p className="text-sm text-zinc-500 font-medium">Appearance settings coming soon.</p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="shortcuts" className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { label: "Command Menu", key: "⌘ K" },
+                    { label: "Toggle Sidebar", key: "⌘ B" },
+                    { label: "Undo", key: "⌘ Z" },
+                    { label: "Duplicate Screen", key: "Alt + D" },
+                  ].map((s) => (
+                    <div key={s.label} className="flex items-center justify-between p-3 bg-zinc-900/50 border border-zinc-800/50 rounded-xl">
+                      <span className="text-[11px] font-bold text-zinc-400">{s.label}</span>
+                      <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-[10px] font-mono text-zinc-500">{s.key}</kbd>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          <DialogFooter className="p-6 bg-zinc-900/30 border-t border-zinc-800/50">
+            <Button 
+                onClick={() => setIsSettingsDialogOpen(false)}
+                className="w-full h-11 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-bold uppercase tracking-widest text-[11px]"
+              >
+                Done
+              </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

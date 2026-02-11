@@ -43,7 +43,7 @@
         }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-[800px] flex flex-col">
 <!-- Top Navigation -->
 <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-surface-light dark:bg-surface-dark px-10 py-3 sticky top-0 z-50">
 <div class="flex items-center gap-8">
@@ -66,7 +66,7 @@
 <div class="text-slate-500 dark:text-slate-400 flex border-none items-center justify-center pl-4 rounded-l-lg border-r-0">
 <span class="material-symbols-outlined text-[20px]">search</span>
 </div>
-<input class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 border-none bg-transparent focus:border-none h-full placeholder:text-slate-400 px-4 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal" placeholder="Search plants..." value=""/>
+<input class="flex w-full min-w-0 flex-1 resize-none  rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 border-none bg-transparent focus:border-none h-full placeholder:text-slate-400 px-4 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal" placeholder="Search plants..." value=""/>
 </div>
 </label>
 <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white dark:border-slate-700 shadow-sm cursor-pointer" data-alt="User profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCQPFbfxvDqnFd235256bpTsX7IQef5Q32cH9_BOvspAVoBxXSoxTsGvWY9rm-e3P0Yvce7IU6PDoO_Xkd8x_peBjT8vMY5Gsx7CneJbZwG_U_DgNXCIKt7Ybn8zuVRNV4Wm4fscXWM57wRigURNa7dwK8YH5DSNrFEo4YAzIeQl16Y5wNtOM8LHgvT8z57ckeDQaMbETxFpIHGiRdFHsxHPBXLGyeGDWT9uJt_PlEffgPEnGfEh2btsaaGABWt08AiA72h8P_pGO8");'></div>
@@ -102,7 +102,7 @@
 <div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-6">
 <!-- Hero Image Card -->
 <div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-3 shadow-sm border border-slate-100 dark:border-slate-800">
-<div class="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 group">
+<div class="relative w-full aspect-[4/5] rounded-xl  bg-slate-100 dark:bg-slate-800 group">
 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Monstera Deliciosa large leaves close up" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCPdfYcBenWmm0Fb0Cu5-0F7B5YUD9_BLYtpC-aDaPSwCXlpWvMmjUm2t3mmkypOO7_AwwfD9BgHa9JilCN8HZb70V9DkQ5FaUAD67EkoTTTCnuxnkmF0N9AVn0UIfHy240pdY8EStIELmjsmo6sg3QipsZre5o39oUjAqiIp7Y8mEr_ewD1axy33-ml0QEzHNIeigKulZgwzVw-YJGc1SoSdvMDEyudSW__3J38kpMEy3o3X2FyOT6_SsUAGgluWN2RMsJO3sZfuU");'></div>
 <div class="absolute top-4 right-4 bg-white/90 dark:bg-black/60 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
 <span class="material-symbols-outlined text-primary text-[18px] icon-filled">favorite</span>
@@ -162,7 +162,7 @@
 <!-- Care Stats Grid -->
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 <!-- Watering -->
-<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-2xl border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
+<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-2xl border border-slate-100 dark:border-slate-800 relative  group">
 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
 <span class="material-symbols-outlined text-6xl text-blue-500">water_drop</span>
 </div>
@@ -172,12 +172,12 @@
 </div>
 <p class="text-2xl font-bold text-slate-900 dark:text-white">Every 7 days</p>
 <p class="text-sm text-slate-500 mt-1">Next: <span class="text-primary font-bold">Tomorrow</span></p>
-<div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-4 overflow-hidden">
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-4 ">
 <div class="bg-blue-500 h-full rounded-full" style="width: 85%"></div>
 </div>
 </div>
 <!-- Light -->
-<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-2xl border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
+<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-2xl border border-slate-100 dark:border-slate-800 relative  group">
 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
 <span class="material-symbols-outlined text-6xl text-orange-500">light_mode</span>
 </div>
@@ -187,12 +187,12 @@
 </div>
 <p class="text-2xl font-bold text-slate-900 dark:text-white">Bright Indirect</p>
 <p class="text-sm text-slate-500 mt-1">Avoid harsh sun</p>
-<div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-4 overflow-hidden">
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-4 ">
 <div class="bg-orange-500 h-full rounded-full" style="width: 70%"></div>
 </div>
 </div>
 <!-- Humidity -->
-<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-2xl border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
+<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-2xl border border-slate-100 dark:border-slate-800 relative  group">
 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
 <span class="material-symbols-outlined text-6xl text-teal-500">humidity_percentage</span>
 </div>
@@ -204,7 +204,7 @@
 <p class="text-sm text-slate-500 mt-1">Mist occasionally</p>
 </div>
 <!-- Temperature -->
-<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-2xl border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
+<div class="bg-surface-light dark:bg-surface-dark p-5 rounded-2xl border border-slate-100 dark:border-slate-800 relative  group">
 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
 <span class="material-symbols-outlined text-6xl text-rose-500">thermostat</span>
 </div>
@@ -217,7 +217,7 @@
 </div>
 </div>
 <!-- Tabs & Content -->
-<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 ">
 <div class="border-b border-slate-100 dark:border-slate-800 px-6 pt-2">
 <nav aria-label="Tabs" class="-mb-px flex space-x-8">
 <a class="border-primary text-primary whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2" href="#">

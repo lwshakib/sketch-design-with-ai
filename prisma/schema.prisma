@@ -86,6 +86,7 @@ model Project {
   screens    Screen[]
   canvasData Json?
   themes     Json?
+  shareToken String?   @unique
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 

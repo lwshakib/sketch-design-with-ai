@@ -29,22 +29,43 @@ import {
   ZoomOut,
   Menu,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Settings,
+  Command,
+  Search,
+  LayoutGrid,
+  Undo2,
+  Redo2,
+  Copy,
+  ClipboardPaste,
+  ArrowUpRight,
+  Files,
+  ExternalLink,
+  QrCode
 } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
+  DropdownMenuShortcut
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { UserMenu } from "@/components/user-menu";
 import { type Artifact } from "@/lib/artifact-renderer";
 import { ArtifactFrame } from "./artifact-frame";
 import { ModernShimmer } from "./modern-shimmer";
-import { Badge } from "@/components/ui/badge";
 import { LogoIcon } from "@/components/logo";
+import { toast } from "sonner";
 import { useProjectStore } from "@/hooks/use-project-store";
 
 const SELECTION_BLUE = '#3b82f6';
@@ -68,6 +89,9 @@ interface CanvasAreaProps {
   deleteArtifact: (index: number) => void;
   setIsExportSheetOpen: (open: boolean) => void;
   setExportArtifactIndex: (index: number | null) => void;
+  handleDownloadFullProject: () => void;
+  handleDuplicateProject: () => void;
+  handleDeleteProject: () => void;
 }
 
 export function CanvasArea({
@@ -84,7 +108,10 @@ export function CanvasArea({
   handleExportZip,
   deleteArtifact,
   setIsExportSheetOpen,
-  setExportArtifactIndex
+  setExportArtifactIndex,
+  handleDownloadFullProject,
+  handleDuplicateProject,
+  handleDeleteProject
 }: CanvasAreaProps) {
   const {
     zoom,
@@ -120,11 +147,18 @@ export function CanvasArea({
     appliedTheme,
     isSidebarVisible,
     setIsSidebarVisible,
-    regeneratingArtifactIds
+    regeneratingArtifactIds,
+    setIsCommandMenuOpen,
+    setIsSettingsDialogOpen,
+    setIsShareDialogOpen,
+    project
   } = useProjectStore();
 
   const isEditMode = secondarySidebarMode === 'properties';
   const status = isGenerating ? 'streaming' : 'ready'; // Simplification for UI checks
+  
+  const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = React.useState("");
 
   return (
     <main 
@@ -377,6 +411,32 @@ export function CanvasArea({
                             </div>
                             <span className="text-[10px] text-muted-foreground">768px</span>
                           </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                             onClick={() => {
+                                if (project?.shareToken && artifact.id) {
+                                   window.open(`/preview/screen/${artifact.id}/${project.shareToken}`, '_blank');
+                                } else {
+                                   toast.error("Project must be shared first");
+                                }
+                             }}
+                            className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
+                          >
+                            <ExternalLink className="h-4 w-4" /> New Tab
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => {
+                                if (project?.shareToken && artifact.id) {
+                                   setQrCodeUrl(`${window.location.origin}/preview/screen/${artifact.id}/${project.shareToken}`);
+                                   setIsQrDialogOpen(true);
+                               } else {
+                                  toast.error("Project must be shared first");
+                               }
+                            }}
+                            className="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-muted cursor-pointer text-[13px]"
+                          >
+                            <QrCode className="h-4 w-4" /> Show QR Code
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                       
@@ -489,8 +549,14 @@ export function CanvasArea({
                       return artifact.width ? `${artifact.width}px` : (artifact.type === 'app' ? "380px" : "1024px");
                     })(),
                     height: (() => {
-                      const heightFallback = dynamicFrameHeights[artifact.title] || (artifact.type === 'app' ? 800 : 700);
-                      return artifact.height ? `${artifact.height}px` : `${heightFallback}px`;
+                      // Manual resize takes absolute priority
+                      if (artifact.height) return `${artifact.height}px`;
+                      
+                      const dynamicHeight = dynamicFrameHeights[artifact.title];
+                      // Prefer dynamic height if detected and no manual height is set
+                      if (dynamicHeight && dynamicHeight > 100) return `${dynamicHeight}px`;
+                      
+                      return artifact.type === 'app' ? "800px" : "700px";
                     })(),
                     minHeight: (artifactPreviewModes[artifact.title] === 'app' || (artifact.type === 'app' && !artifactPreviewModes[artifact.title])) ? '800px' : '400px',
                     transition: isResizing ? 'none' : 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -526,25 +592,40 @@ export function CanvasArea({
                   <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 80 }}>
                     {selectedArtifactIds.size === 1 && (
                       <>
+                        {/* Edge Handles */}
+                        <div 
+                          onMouseDown={(e) => startResizing(e, index, 'left')}
+                          className="absolute top-4 bottom-4 left-0 w-1.5 cursor-ew-resize -translate-x-1/2 pointer-events-auto z-50"
+                        />
+                        <div 
+                          onMouseDown={(e) => startResizing(e, index, 'right')}
+                          className="absolute top-4 bottom-4 right-0 w-1.5 cursor-ew-resize translate-x-1/2 pointer-events-auto z-50"
+                        />
+                        <div 
+                          onMouseDown={(e) => startResizing(e, index, 'top')}
+                          className="absolute top-0 left-4 right-4 h-1.5 cursor-ns-resize -translate-y-1/2 pointer-events-auto z-50"
+                        />
+                        <div 
+                          onMouseDown={(e) => startResizing(e, index, 'bottom')}
+                          className="absolute bottom-0 left-4 right-4 h-1.5 cursor-ns-resize translate-y-1/2 pointer-events-auto z-50"
+                        />
+
+                        {/* Corner Handles */}
                         <div 
                           onMouseDown={(e) => startResizing(e, index, 'top-left')}
-                          className="absolute top-0 left-0 w-2 h-2 border border-white pointer-events-auto cursor-nwse-resize -translate-x-1/2 -translate-y-1/2" 
-                          style={{ backgroundColor: SELECTION_BLUE }}
+                          className="absolute top-0 left-0 w-2.5 h-2.5 bg-white border-2 border-[#3b82f6] rounded-full pointer-events-auto cursor-nwse-resize -translate-x-1/2 -translate-y-1/2 z-50 shadow-sm" 
                         />
                         <div 
                           onMouseDown={(e) => startResizing(e, index, 'top-right')}
-                          className="absolute top-0 right-0 w-2 h-2 border border-white pointer-events-auto cursor-nesw-resize translate-x-1/2 -translate-y-1/2" 
-                          style={{ backgroundColor: SELECTION_BLUE }}
+                          className="absolute top-0 right-0 w-2.5 h-2.5 bg-white border-2 border-[#3b82f6] rounded-full pointer-events-auto cursor-nesw-resize translate-x-1/2 -translate-y-1/2 z-50 shadow-sm" 
                         />
                         <div 
                           onMouseDown={(e) => startResizing(e, index, 'bottom-left')}
-                          className="absolute bottom-0 left-0 w-2 h-2 border border-white pointer-events-auto cursor-nesw-resize -translate-x-1/2 translate-y-1/2" 
-                          style={{ backgroundColor: SELECTION_BLUE }}
+                          className="absolute bottom-0 left-0 w-2.5 h-2.5 bg-white border-2 border-[#3b82f6] rounded-full pointer-events-auto cursor-nesw-resize -translate-x-1/2 translate-y-1/2 z-50 shadow-sm" 
                         />
                         <div 
                           onMouseDown={(e) => startResizing(e, index, 'bottom-right')}
-                          className="absolute bottom-0 right-0 w-2 h-2 border border-white pointer-events-auto cursor-nwse-resize translate-x-1/2 translate-y-1/2" 
-                          style={{ backgroundColor: SELECTION_BLUE }}
+                          className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-white border-2 border-[#3b82f6] rounded-full pointer-events-auto cursor-nwse-resize translate-x-1/2 translate-y-1/2 z-50 shadow-sm" 
                         />
                       </>
                     )}
@@ -650,6 +731,39 @@ export function CanvasArea({
           <RotateCcw className="h-5 w-5" />
         </Button>
       </div>
+
+      {/* QR Code Dialog */}
+      <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
+        <DialogContent className="bg-zinc-950 border-zinc-800 text-white sm:max-w-sm p-0 overflow-hidden">
+          <div className="flex flex-col items-center justify-center p-8 gap-8">
+            <div className="flex flex-col items-center gap-2">
+              <h2 className="text-lg font-semibold tracking-tight">Scan for mobile</h2>
+              <p className="text-xs text-zinc-500">Open this screen on your device</p>
+            </div>
+
+            <div className="p-4 bg-white rounded-2xl shadow-2xl">
+               <QRCodeSVG value={qrCodeUrl} size={180} />
+            </div>
+            
+            <div className="flex flex-col gap-3 w-full">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-3 text-[11px] text-zinc-400 font-mono break-all leading-relaxed">
+                {qrCodeUrl}
+              </div>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  navigator.clipboard.writeText(qrCodeUrl);
+                  toast.success("Link copied to clipboard");
+                }} 
+                className="w-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800 hover:text-white rounded-xl h-11 text-xs font-medium gap-2"
+              >
+                <Copy className="h-3.5 w-3.5" />
+                Copy Link
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }

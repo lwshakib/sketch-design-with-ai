@@ -249,9 +249,9 @@ export const CORE_DESIGN_PRINCIPLES = `### 💎 Elite Design Principles (VIBRANT
    - **Navigation**: Desktop uses a glass-morphism top-nav. App (mobile layout) uses a floating bottom navigation bar (h-20, bg-background/90, backdrop-blur-3xl, border-t).
    - **Empty States**: Never leave a section empty. If there is no data, use an icon + a premium gradient "placeholder" block.
 6. **Expansive Canvas & Full Responsiveness (STRICT HEIGHT CONTROL)**: 
-   - **ABSOLUTE BAN ON VH/VW UNITS**: NEVER use 'vh' or 'vw' units for heights or widths. These cause infinite re-render loops in resizing iframes.
+   - **ABSOLUTE BAN ON VH/VW UNITS & min-h-screen**: NEVER use 'vh', 'vw' units, or 'min-h-screen'/'h-screen' for heights or widths. These cause infinite re-render loops in resizing iframes.
    - **MANDATORY**: Use specific pixel heights (e.g., 'min-h-[800px]', 'h-[600px]') or aggressive vertical padding ('py-24', 'p-32') to define the vertical scale of sections.
-   - **Scrollable Flow**: Ensure the design naturally flows vertically without being constrained by the screen height.
+   - **Scrollable Flow**: Ensure the design naturally flows vertically without being constrained by the viewport height.
 7. **📱 Premium App Architecture**:
     - **Native Feel**: 9:19 Aspect Ratio is primary. Ensure the UI feels like a high-end app.
     - **Signature Bottom Bar**: Every App design MUST have a high-fidelity fixed bottom nav bar with an "Action" center button.
@@ -334,9 +334,10 @@ ${CORE_DESIGN_PRINCIPLES}
 3. **Self-Contained**: Ensure the code is fully self-contained (CSS, Fonts, Tailwind).
 4. **No Placeholders**: Never use text placeholders. Use high-fidelity copy.
 5. **FULL PAGE DESIGN (CRITICAL)**: You are generating a COMPLETE SCREEN. 
-   - The root container must fill the viewport height (\`min-h-screen\`).
+   - The root container must have a significant vertical presence (e.g., 'min-h-[800px]').
    - Include standard page elements (Headers, Footers, Sidebars) if relevant.
    - NEVER output a single isolated card or button. Always present it within a full page context.
+   - **NEVER use 'min-h-screen'**; it causes the preview to grow infinitely.
 
 **NO** animated libraries (GSAP, Framer Motion). **NO** VH/VW units. 
 **NEVER** hardcode hex values for main surfaces; use the CSS variables.
@@ -357,11 +358,9 @@ ${CORE_DESIGN_PRINCIPLES}
         }
     </style>
 </head>
-<body class="bg-[var(--background)] text-[var(--foreground)] min-h-screen">
+<body class="bg-[var(--background)] text-[var(--foreground)]">
     <!-- Full page layout here -->
 </body>
 </html>
 </artifact>
 `;
-
-

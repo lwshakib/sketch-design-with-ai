@@ -125,39 +125,75 @@ export const getInjectedHTML = (html: string) => {
         var selectedEl = null;
         var hoveredEl = null;
 
-        var fixVHUnits = function() {
-          var elements = document.querySelectorAll('*');
-          elements.forEach(function(el) {
-            var heightAttr = el.getAttribute('class') || '';
-            if (heightAttr.includes('h-[') && heightAttr.includes('vh]')) {
-               var match = heightAttr.match(/h-\\[(\\d+)vh\\]/);
-               if (match) {
-                 var vhValue = parseInt(match[1]);
-                 el.style.height = (vhValue * 8) + 'px';
-                 el.style.minHeight = '0';
-               }
-            }
-          });
-        };
+
 
         var heightTimeout = null;
+        var updateHistory = [];
         var sendHeight = function() {
           if (heightTimeout) return;
           heightTimeout = setTimeout(function() {
             heightTimeout = null;
-            fixVHUnits();
+            
+            var body = document.body;
+            var html = document.documentElement;
+            
+            if (!body) return;
+
+            // Get the absolute content height by looking at all elements
+            var allElements = body.getElementsByTagName('*');
+            var maxBottom = 0;
+            var len = allElements.length;
+            var checkLimit = Math.min(len, 2000); 
+            
+            for (var i = 0; i < checkLimit; i++) {
+              var el = allElements[i];
+              // Skip invisible or extremely large elements that might be background decorations
+              if (el.offsetWidth === 0 && el.offsetHeight === 0) continue;
+              
+              var rect = el.getBoundingClientRect();
+              var bottom = rect.top + rect.height + window.pageYOffset;
+              
+              // Ignore elements that are likely fixed or absolute background blurs (often have very high or low top)
+              if (rect.height > 2000 && rect.top < -500) continue; 
+
+              if (bottom > maxBottom) maxBottom = bottom;
+            }
+
+            // Fallback to standard measurements but prioritize maxBottom
             var height = Math.max(
-              document.body.scrollHeight,
-              document.documentElement.scrollHeight,
-              document.body.offsetHeight,
-              document.documentElement.offsetHeight
+              maxBottom,
+              body.scrollHeight,
+              html.scrollHeight
             );
-            var cappedHeight = Math.min(height, 5000);
-            if (Math.abs(cappedHeight - lastHeight) > 10) {
+
+            // Sanity check: don't let it grow infinitely if it's just a few pixels
+            var cappedHeight = Math.min(Math.ceil(height), 10000); 
+            
+            // LOOP PREVENTION: 
+            // 1. Minimum delta
+            if (Math.abs(cappedHeight - lastHeight) < 4) return;
+
+            // 2. Rapid update detection
+            var now = Date.now();
+            updateHistory.push({ h: cappedHeight, t: now });
+            if (updateHistory.length > 5) updateHistory.shift();
+            
+            if (updateHistory.length >= 5) {
+              var timeSpan = updateHistory[updateHistory.length-1].t - updateHistory[0].t;
+              var heightDiff = updateHistory[updateHistory.length-1].h - updateHistory[0].h;
+              
+              // If we've updated 5 times in 2 seconds and height is still growing
+              if (timeSpan < 2000 && heightDiff > 0) {
+                // Stop the loop - we already updated recently
+                return;
+              }
+            }
+
+            if (cappedHeight !== lastHeight) {
               lastHeight = cappedHeight;
               window.parent.postMessage({ type: 'HEIGHT_UPDATE', height: cappedHeight }, '*');
             }
-          }, 100);
+          }, 150);
         };
 
         var clearHover = function() {
@@ -331,7 +367,7 @@ export const getInjectedHTML = (html: string) => {
                 }
             }
 
-            fixVHUnits();
+
             sendHeight();
           }
           if (event.data.type === 'SET_EDIT_MODE') {
@@ -348,8 +384,9 @@ export const getInjectedHTML = (html: string) => {
         });
 
         var observer = new MutationObserver(sendHeight);
-        window.onload = function() {
-          fixVHUnits();
+        var resizeObserver = window.ResizeObserver ? new ResizeObserver(function() { sendHeight(); }) : null;
+
+        var initObserver = function() {
           sendHeight();
           observer.observe(document.body, { 
             childList: true, 
@@ -357,9 +394,18 @@ export const getInjectedHTML = (html: string) => {
             attributes: true,
             characterData: true
           });
+          if (resizeObserver) {
+            resizeObserver.observe(document.body);
+            if (document.documentElement) resizeObserver.observe(document.documentElement);
+          }
           [100, 300, 600, 1000, 2000, 4000].forEach(function(delay) { setTimeout(sendHeight, delay); });
         };
-        window.addEventListener('load', sendHeight);
+
+        if (document.readyState === 'complete') {
+          initObserver();
+        } else {
+          window.addEventListener('load', initObserver);
+        }
       })();
     </script>
   `;

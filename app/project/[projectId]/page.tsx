@@ -16,6 +16,7 @@ import { sanitizeDocumentHtml } from "@/components/project/utils";
 import JSZip from "jszip";
 import html2canvas from "html2canvas";
 import { authClient } from "@/lib/auth-client";
+import { ShareDialog } from "@/components/project/share-dialog";
 import { ProjectDialogs } from "@/components/project/project-dialogs";
 import { CodeViewerModal } from "@/components/project/code-viewer-modal";
 import { useProjectStore } from "@/hooks/use-project-store";
@@ -609,35 +610,6 @@ export default function ProjectPage() {
     saveTimeoutRef.current = setTimeout(() => handleSave(false), 5000);
   }, [handleSave, setHasUnsavedChanges]);
 
-  const updateProjectTitle = async (newTitle: string) => {
-    if (!project || !newTitle.trim()) return;
-    try {
-      const response = await fetch(`/api/projects/${projectId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newTitle.trim() })
-      });
-      if (!response.ok) throw new Error('Failed to update title');
-      setProject({ ...project, title: newTitle.trim() });
-      toast.success("Project title updated!");
-      setIsEditTitleDialogOpen(false);
-    } catch (error) {
-      console.error('Update title error:', error);
-      toast.error("Failed to update project title");
-    }
-  };
-
-  const handleDeleteProject = async () => {
-    try {
-      const response = await fetch(`/api/projects/${projectId}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Failed to delete project');
-      toast.success("Project deleted");
-      router.push("/");
-    } catch (error) {
-      console.error('Delete project error:', error);
-      toast.error("Failed to delete project");
-    }
-  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -787,6 +759,65 @@ export default function ProjectPage() {
 
   const session = authClient.useSession();
 
+  const handleDownloadFullProject = async () => {
+    toast.info("Preparing full project export...");
+    const zip = new JSZip();
+    
+    for (let i = 0; i < throttledArtifacts.length; i++) {
+      const artifact = throttledArtifacts[i];
+      const folderName = artifact.title.replace(/\s+/g, '_');
+      const folder = zip.folder(folderName);
+      if (folder) {
+        folder.file("code.html", artifact.content);
+        const dataUrl = await captureFrameImage(i);
+        if (dataUrl) {
+          folder.file("screen.png", dataUrl.split(',')[1], { base64: true });
+        }
+      }
+    }
+    
+    const content = await zip.generateAsync({ type: "blob" });
+    const link = document.createElement('a');
+    link.download = `${project?.title.replace(/\s+/g, '_') || 'Project'}_Full_Package.zip`;
+    link.href = URL.createObjectURL(content);
+    link.click();
+    toast.success("Full project downloaded");
+  };
+
+  const handleDuplicateProject = async () => {
+    try {
+      const res = await axios.post(`/api/projects/${projectId}/duplicate`);
+      toast.success("Project duplicated!");
+      router.push(`/project/${res.data.id}`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to duplicate project");
+    }
+  };
+
+  const updateProjectTitle = async (title: string) => {
+    try {
+      await axios.patch(`/api/projects/${projectId}`, { title });
+      setProject({ ...project!, title });
+      setIsEditTitleDialogOpen(false);
+      toast.success("Title updated");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update title");
+    }
+  };
+
+  const confirmDeleteProject = async () => {
+    try {
+      await axios.delete(`/api/projects/${projectId}`);
+      toast.success("Project deleted");
+      router.push('/dashboard');
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete project");
+    }
+  };
+
   if (loading || !project) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-background">
@@ -836,6 +867,9 @@ export default function ProjectPage() {
         deleteArtifact={deleteArtifact}
         setIsExportSheetOpen={setIsExportSheetOpen}
         setExportArtifactIndex={setExportArtifactIndex}
+        handleDownloadFullProject={handleDownloadFullProject}
+        handleDuplicateProject={handleDuplicateProject}
+        handleDeleteProject={() => setIsDeleteDialogOpen(true)}
       />
 
       <CodeViewerModal
@@ -848,9 +882,13 @@ export default function ProjectPage() {
       <ProjectDialogs
         handleRegenerateSubmit={handleRegenerateSubmit}
         updateProjectTitle={updateProjectTitle}
-        handleDeleteProject={handleDeleteProject}
+        handleDeleteProject={confirmDeleteProject}
         handleExportZip={handleExportZip}
+        handleDownloadFullProject={handleDownloadFullProject}
+        handleDuplicateProject={handleDuplicateProject}
       />
+
+      <ShareDialog />
     </div>
   );
 }

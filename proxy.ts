@@ -8,7 +8,7 @@ import { headers } from "next/headers";
  * These routes do not require authentication
  * @type {string[]}
  */
-export const publicRoutes = ["/api/inngest"];
+export const publicRoutes = ["/api/inngest", "/preview"];
 
 /**
  * An array of routes that are used for authentication
@@ -44,7 +44,7 @@ export default async function proxy(request: NextRequest) {
   const isLoggedIn = !!session;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  const isPublicRoute = publicRoutes.some(route => nextUrl.pathname.startsWith(route));
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
   // 1. Allow all API auth routes

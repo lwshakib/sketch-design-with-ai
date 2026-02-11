@@ -28,7 +28,10 @@ export const ArtifactFrame = React.memo(({
   const [initialSrcDoc] = useState(() => getInjectedHTML(artifact.content));
   const lastContentRef = useRef(artifact.content);
 
-  const getThemeCSS = useCallback((theme: any) => `
+  const getThemeCSS = useCallback((theme: any) => {
+    if (!theme?.cssVars) return '';
+    
+    return `
     :root {
       --background: ${theme.cssVars.background} !important;
       --foreground: ${theme.cssVars.foreground} !important;
@@ -56,19 +59,22 @@ export const ArtifactFrame = React.memo(({
       color: var(--foreground) !important;
       ${theme.cssVars.fontSans ? `font-family: var(--font-sans) !important;` : ''}
     }
-  `, []);
+  `}, []);
 
   const applyThemeToIframe = useCallback(() => {
-    if (!appliedTheme || !iframeRef.current?.contentDocument) return;
+    if (!appliedTheme?.cssVars || !iframeRef.current?.contentDocument) return;
+    
     const doc = iframeRef.current.contentDocument;
     let styleEl = doc.getElementById('theme-overrides') as HTMLStyleElement;
+    
     if (!styleEl) {
       styleEl = doc.createElement('style');
       styleEl.id = 'theme-overrides';
       doc.head.appendChild(styleEl);
     }
+    
     const css = getThemeCSS(appliedTheme);
-    if (styleEl.textContent !== css) {
+    if (css && styleEl.textContent !== css) {
       styleEl.textContent = css;
     }
   }, [appliedTheme, getThemeCSS]);
