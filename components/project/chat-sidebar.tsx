@@ -35,8 +35,13 @@ import {
   MoreVertical,
   Smartphone,
   Monitor,
-  Tablet
+  Tablet,
+  ArrowUp,
+  Loader2,
+  Paperclip,
+  Send
 } from "lucide-react";
+import { uploadFileToCloudinary } from "@/lib/cloudinary-client";
 import { GenerationStatus } from "./generation-status";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -66,6 +71,7 @@ import { extractArtifacts, stripArtifact } from "@/lib/artifact-renderer";
 import { useProjectStore } from "@/hooks/use-project-store";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 import NumberFlow from "@number-flow/react";
+import { toast } from "sonner";
 
 interface ChatSidebarProps {
   // Logic Handlers (passed from page.tsx)
@@ -84,7 +90,7 @@ interface ChatSidebarProps {
 export function ChatSidebar({
   handleCustomSubmit,
   handleRetry,
-  handleFileUpload,
+  handleFileUpload: propHandleFileUpload, // Renamed to avoid conflict
   fileInputRef,
   commitEdits,
   applyTheme,
@@ -120,7 +126,9 @@ export function ChatSidebar({
     websiteUrl,
     setAttachments,
     selectedArtifactIds,
-    setSelectedArtifactIds
+    setSelectedArtifactIds,
+    messageParts,
+    setMessageParts
   } = useProjectStore();
 
   const { credits, fetchCredits } = useWorkspaceStore();
@@ -149,6 +157,42 @@ export function ChatSidebar({
     } catch (e) {
       setIsUrlValid(false);
     }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const newAttachments = Array.from(files).map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+      type: file.type.startsWith("image/") ? "image" : "file",
+      name: file.name,
+      isUploading: true
+    }));
+
+    setMessageParts((prev) => [...prev, ...newAttachments]);
+
+    for (let i = 0; i < newAttachments.length; i++) {
+        const attachment = newAttachments[i];
+        try {
+            const result = await uploadFileToCloudinary(attachment.file);
+            setMessageParts(prev => prev.map(p => 
+                p.url === attachment.url 
+                ? { ...p, url: result.secureUrl, isUploading: false }
+                : p
+            ));
+        } catch (error) {
+            console.error("Upload failed", error);
+            toast.error(`Failed to upload ${attachment.name}`);
+            setMessageParts(prev => prev.filter(p => p.url !== attachment.url));
+        }
+    }
+    
+    if (textareaRef.current) {
+        textareaRef.current.focus();
+    }
+    e.target.value = "";
   };
 
   if (!project) return null;
@@ -411,37 +455,50 @@ export function ChatSidebar({
                                           {/* Selected Screens Preview */}
                                           {(() => {
                                             const selectedScreens = msg.selectedScreens || msg.plan?.selectedScreens;
-                                            if (!selectedScreens || !Array.isArray(selectedScreens) || selectedScreens.length === 0) return null;
+                                            const websiteUrl = msg.websiteUrl || msg.plan?.websiteUrl;
+                                            
+                                            if ((!selectedScreens || selectedScreens.length === 0) && !websiteUrl) return null;
                                             
                                             return (
-                                              <div className="flex flex-wrap gap-3">
-                                                {selectedScreens.map((screen: any, sIdx: number) => (
-                                                  <div 
-                                                    key={screen.id || sIdx} 
-                                                    className="relative w-16 h-16 rounded-xl border border-white/10 bg-zinc-900 overflow-hidden shadow-sm"
-                                                  >
-                                                    <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-80">
-                                                      <iframe 
-                                                        title={`msg-history-preview-${screen.id || sIdx}`}
-                                                        className="w-full h-full border-none"
-                                                        srcDoc={`
-                                                          <!DOCTYPE html>
-                                                          <html>
-                                                            <head>
-                                                              <script src="https://cdn.tailwindcss.com"></script>
-                                                              <style>
-                                                                body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
-                                                                ::-webkit-scrollbar { display: none; }
-                                                              </style>
-                                                            </head>
-                                                            <body>${screen.content || ''}</body>
-                                                          </html>
-                                                        `}
-                                                      />
-                                                    </div>
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                                              <div className="flex flex-col gap-3">
+                                                {websiteUrl && (
+                                                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/5 border border-primary/10 text-primary w-fit max-w-full">
+                                                     <Globe className="size-3 shrink-0" />
+                                                     <span className="text-[11px] font-bold truncate">{websiteUrl}</span>
+                                                   </div>
+                                                )}
+
+                                                {selectedScreens && selectedScreens.length > 0 && (
+                                                  <div className="flex flex-wrap gap-3">
+                                                    {selectedScreens.map((screen: any, sIdx: number) => (
+                                                      <div 
+                                                        key={screen.id || sIdx} 
+                                                        className="relative w-16 h-16 rounded-xl border border-white/10 bg-zinc-900 overflow-hidden shadow-sm"
+                                                      >
+                                                        <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-80">
+                                                          <iframe 
+                                                            title={`msg-history-preview-${screen.id || sIdx}`}
+                                                            className="w-full h-full border-none"
+                                                            srcDoc={`
+                                                              <!DOCTYPE html>
+                                                              <html>
+                                                                <head>
+                                                                  <script src="https://cdn.tailwindcss.com"></script>
+                                                                  <style>
+                                                                    body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
+                                                                    ::-webkit-scrollbar { display: none; }
+                                                                  </style>
+                                                                </head>
+                                                                <body>${screen.content || ''}</body>
+                                                              </html>
+                                                            `}
+                                                          />
+                                                        </div>
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                                                      </div>
+                                                    ))}
                                                   </div>
-                                                ))}
+                                                )}
                                               </div>
                                             );
                                           })()}
@@ -695,7 +752,14 @@ export function ChatSidebar({
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <input type="file" multiple accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
+                    <input 
+                      type="file" 
+                      multiple 
+                      accept="image/*" 
+                      className="hidden" 
+                      ref={fileInputRef} 
+                      onChange={handleFileUpload} 
+                    />
                     
                     <button 
                       onClick={() => setIs3xMode(!is3xMode)}

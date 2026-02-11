@@ -1,10 +1,11 @@
+
 import { cloudinaryClient } from "@/lib/cloudinary";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
     const timestamp = Math.floor(Date.now() / 1000);
-    const folder = "sketch-design-with-ai"; // Adjusted folder name
+    const folder = "sketch-design-with-ai";
     const signature = cloudinaryClient.utils.api_sign_request(
       { timestamp, folder },
       process.env.CLOUDINARY_API_SECRET!

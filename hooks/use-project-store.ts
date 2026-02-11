@@ -25,6 +25,7 @@ interface ProjectState {
   loading: boolean;
   websiteUrl: string | null;
   messages: any[];
+  messageParts: any[];
 
   // Canvas State
   zoom: number;
@@ -125,6 +126,7 @@ interface ProjectState {
   setWebsiteUrl: (url: string | null) => void;
   setRegeneratingArtifactIds: (val: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
   setMessages: (val: any[] | ((prev: any[]) => any[])) => void;
+  setMessageParts: (val: any[] | ((prev: any[]) => any[])) => void;
   setIsCommandMenuOpen: (open: boolean) => void;
   setIsSettingsDialogOpen: (open: boolean) => void;
   setIsShareDialogOpen: (open: boolean) => void;
@@ -150,6 +152,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   loading: true,
   websiteUrl: null,
   messages: [],
+  messageParts: [],
 
   zoom: 1,
   canvasOffset: { x: 0, y: 0 },
@@ -246,6 +249,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setWebsiteUrl: (websiteUrl) => set({ websiteUrl }),
   setRegeneratingArtifactIds: (val) => set((state) => ({ regeneratingArtifactIds: typeof val === 'function' ? val(state.regeneratingArtifactIds) : val })),
   setMessages: (val) => set((state) => ({ messages: typeof val === 'function' ? val(state.messages) : val })),
+  setMessageParts: (val) => set((state) => ({ messageParts: typeof val === 'function' ? val(state.messageParts) : val })),
   setIsCommandMenuOpen: (isCommandMenuOpen) => set({ isCommandMenuOpen }),
   setIsSettingsDialogOpen: (isSettingsDialogOpen) => set({ isSettingsDialogOpen }),
   setIsShareDialogOpen: (isShareDialogOpen) => set({ isShareDialogOpen }),
@@ -267,6 +271,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
     loading: true,
     websiteUrl: null,
     messages: [],
+    messageParts: [],
     zoom: 1,
     canvasOffset: { x: 0, y: 0 },
     framePos: { x: 0, y: 0 },

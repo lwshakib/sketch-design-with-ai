@@ -130,6 +130,7 @@ export default function ProjectPage() {
       content: params.text, // Keep original text for UI
       _contextualContent: contextualText, // Context for backend
       selectedScreens: selectedScreens.map(s => ({ id: s.id, title: s.title, content: s.content })),
+      websiteUrl: websiteUrl,
       parts: params.files?.length ? [{ type: 'text', text: contextualText }, ...params.files] : [{ type: 'text', text: contextualText }],
       isSilent
     };
@@ -368,9 +369,10 @@ export default function ProjectPage() {
         }
         const pendingPromptRaw = sessionStorage.getItem(`pending_prompt_${projectId}`);
         if (pendingPromptRaw) {
-          const { content, attachments: initialAttachments } = JSON.parse(pendingPromptRaw);
+          const { content, attachments: initialAttachments, websiteUrl: initialWebsiteUrl } = JSON.parse(pendingPromptRaw);
           sessionStorage.removeItem(`pending_prompt_${projectId}`);
           setIsGenerating(true);
+          if (initialWebsiteUrl) setWebsiteUrl(initialWebsiteUrl);
           sendMessage({ text: content, files: initialAttachments.map((url: string) => ({ type: "file" as const, url, mediaType: "image/*" })) });
         }
       } catch (error) {

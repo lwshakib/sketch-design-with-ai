@@ -40,6 +40,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Link as LucideLink, ImageIcon } from "lucide-react";
+import { uploadFileToCloudinary } from "@/lib/cloudinary-client";
 import { toast } from "sonner";
 
 const PROMPTS = {
@@ -151,6 +152,8 @@ import { useRouter } from "next/navigation";
 interface Attachment {
   url: string;
   isUploading: boolean;
+  file?: File; // Add file property for the actual File object
+  type?: string; // Add type property for file type
 }
 
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
@@ -286,53 +289,35 @@ export default function Home() {
     const files = e.target.files;
     if (!files) return;
 
-    const fileList = Array.from(files);
-    
-    // Add temporary uploading placeholders
-    const newPlaceholders = fileList.map(file => ({
+    if (attachments.length + files.length > 3) {
+      toast.error("Maximum 3 images allowed");
+      return;
+    }
+
+    const newAttachments = Array.from(files).map(file => ({
+      file,
       url: URL.createObjectURL(file),
+      type: file.type,
       isUploading: true
     }));
-    
-    setAttachments(prev => [...prev, ...newPlaceholders]);
 
-    for (let i = 0; i < fileList.length; i++) {
-      const file = fileList[i];
-      const placeholderUrl = newPlaceholders[i].url;
+    setAttachments(prev => [...prev, ...newAttachments]);
 
-      try {
-        const sigRes = await fetch("/api/cloudinary-signature");
-        if (!sigRes.ok) throw new Error("Failed to get upload signature");
-        
-        const sigData = await sigRes.json();
-        const uploadApi = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/upload`;
-
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("api_key", sigData.apiKey);
-        formData.append("timestamp", sigData.timestamp.toString());
-        formData.append("signature", sigData.signature);
-        formData.append("folder", sigData.folder || "sketch-design-with-ai");
-
-        const uploadRes = await fetch(uploadApi, {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!uploadRes.ok) throw new Error("Cloudinary upload failed");
-
-        const uploadData = await uploadRes.json();
-        
-        setAttachments(prev => prev.map(attr => 
-          attr.url === placeholderUrl 
-            ? { url: uploadData.secure_url, isUploading: false } 
-            : attr
-        ));
-      } catch (error) {
-        console.error("Upload error:", error);
-        toast.error(`Failed to upload ${file.name}`);
-        setAttachments(prev => prev.filter(attr => attr.url !== placeholderUrl));
-      }
+    // Process uploads
+    for (let i = 0; i < newAttachments.length; i++) {
+        const attachment = newAttachments[i];
+        try {
+            const result = await uploadFileToCloudinary(attachment.file);
+            setAttachments(prev => prev.map(a => 
+                a.url === attachment.url 
+                ? { ...a, url: result.secureUrl, isUploading: false }
+                : a
+            ));
+        } catch (error) {
+            console.error("Upload failed", error);
+            toast.error(`Failed to upload ${attachment.file.name}`);
+            setAttachments(prev => prev.filter(a => a.url !== attachment.url));
+        }
     }
 
     if (fileInputRef.current) fileInputRef.current.value = "";
