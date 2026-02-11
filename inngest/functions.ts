@@ -46,6 +46,7 @@ export const generateDesign = inngest.createFunction(
           projectId: projectId,
           role: "assistant",
           content: "*Analyzing your request and architecting project manifest...*",
+          status: "generating",
         },
       });
       return msg.id;
@@ -326,7 +327,11 @@ CRITICAL INSTRUCTIONS:
 1. CONSTISTENCY: You MUST use the exact same color palette, typography, and corner variations as the previous screens.
 2. DETAIL: The code must be extremely detailed. Use strict Tailwind classes for everything.
 3. THEME: Ensure the theme is consistent. If previous screens used a specific background gradient, YOU MUST USE IT TOO.
-4. CONTENT: Use realistic data. No 'Lorem Ipsum'.` }
+4. CONTENT: Use realistic data. No 'Lorem Ipsum'.
+5. FORMAT: You MUST wrap the code in a single artifact block exactly like this:
+<artifact type="${screen.type === 'app' ? 'app' : 'web'}" title="${screen.title}">
+... code here ...
+</artifact>` }
             ] as any,
             maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
             temperature: 0.7,
@@ -415,13 +420,14 @@ CRITICAL INSTRUCTIONS:
 
       // --- FINAL STEPS: UPDATE MESSAGE & CONCLUDE ---
 
-      // Update the assistant message with final plan and markdown
+      // Update the assistant message with final plan and markdown, mark as completed
       await step.run("update-final-assistant-message", async () => {
         await prisma.message.update({
           where: { id: messageId },
           data: {
             content: `Vision: ${vision}\n\nConclusion: ${conclusionText}\n\nSuggestion: ${suggestion}`,
-            plan: JSON.parse(JSON.stringify(plan))
+            plan: JSON.parse(JSON.stringify(plan)),
+            status: "completed"
           },
         });
       });

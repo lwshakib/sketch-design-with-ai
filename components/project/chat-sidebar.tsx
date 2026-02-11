@@ -242,7 +242,8 @@ export function ChatSidebar({
 
                                           const hasPlan = !!msg.plan;
                                           const isLastMessage = idx === messages.length - 1;
-                                          const isComplete = !isGenerating || !isLastMessage;
+                                                                                     const isComplete = msg.status === 'completed' || (!isGenerating && !isLastMessage);
+
                                           const plan = msg.plan;
                                           
                                           // Show status if it has a plan OR if it's the latest and still generating

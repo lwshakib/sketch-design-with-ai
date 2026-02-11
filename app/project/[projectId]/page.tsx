@@ -211,12 +211,27 @@ export default function ProjectPage() {
 
     if (hasPlanUpdate) {
       setMessages(prev => {
+        const existingPlanMsgIndex = prev.findIndex(m => m.id === 'assistant-plan');
+        
+        if (existingPlanMsgIndex !== -1) {
+          const updated = [...prev];
+          const existing = updated[existingPlanMsgIndex] as any;
+          updated[existingPlanMsgIndex] = { 
+            ...existing, 
+            content: newMarkdown, 
+            plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } 
+          };
+          return updated;
+        }
+
         const last = prev[prev.length - 1] as any;
         if (last && last.role === 'assistant') {
           const updated = [...prev];
           updated[updated.length - 1] = { ...last, content: newMarkdown, plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } } as any;
           return updated;
         }
+        
+        // Only append if we really don't have a place to put it
         return [...prev, { id: 'assistant-plan', role: 'assistant', content: newMarkdown, plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } } as any];
       });
     }
@@ -247,7 +262,7 @@ export default function ProjectPage() {
         if (!res.ok) throw new Error("Project not found");
         const data = await res.json();
         setProject(data);
-        if (data.messages) setMessages(data.messages);
+        if (data.messages && data.messages.length > 0) setMessages(data.messages);
         if (data.canvasData) {
           if (data.canvasData.zoom) setZoom(data.canvasData.zoom);
           if (data.canvasData.canvasOffset) setCanvasOffset(data.canvasData.canvasOffset);
@@ -261,11 +276,19 @@ export default function ProjectPage() {
             setAppliedTheme(data.canvasData.appliedTheme);
             setActiveThemeId(data.canvasData.appliedTheme.id);
           }
+        } else {
+          // New project or no canvas data: Reset to defaults
+          setZoom(1);
+          setCanvasOffset({ x: 0, y: 0 });
+          setFramePos({ x: 0, y: 0 });
         }
         if (data.messages && data.messages.length > 0) {
-          const lastAssistant = [...data.messages].reverse().find(m => m.role === 'assistant');
+          const lastAssistant = [...data.messages].reverse().find((m: any) => m.role === 'assistant');
           if (lastAssistant?.plan?.screens) {
             setDesignPlan({ screens: lastAssistant.plan.screens, _markdown: lastAssistant.plan._markdown });
+            if (lastAssistant.plan.status === 'generating') {
+              setIsGenerating(true);
+            }
           }
         }
         const pendingPromptRaw = sessionStorage.getItem(`pending_prompt_${projectId}`);

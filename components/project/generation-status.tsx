@@ -120,9 +120,8 @@ export function GenerationStatus({
       <div className="flex flex-wrap gap-4">
         {projectArtifacts
           .filter(a => {
-            const isRelevant = !planScreens || planScreens.some(p => p.title === a.title);
-            const isDiscovered = !!a.content || currentScreenTitle === a.title;
-            return isRelevant && isDiscovered;
+            // Show all artifacts that are part of the current plan
+            return !planScreens || planScreens.some(p => p.title === a.title);
           })
           .map((artifact, idx) => {
             const isCurrentlyGenerating = currentScreenTitle === artifact.title;
@@ -181,25 +180,24 @@ export function GenerationStatus({
             );
           })}
         
-        {/* Only show the pulse square if nothing is being generated yet OR the artifacts we have don't match the current screen/content filter */}
-        {!projectArtifacts.some(a => !!a.content || currentScreenTitle === a.title) && (
+        {/* Only show the pulse square if we truly have no artifacts (e.g. initial planning) */}
+        {projectArtifacts.length === 0 && (
           <div className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg animate-pulse" />
         )}
       </div>
 
-      {/* Second Row: Status text or Conclusion markdown */}
       <div className="flex-1 min-w-0">
-        {isComplete ? (
+        {isComplete && conclusionText ? (
           <div className="animate-in fade-in slide-in-from-top-2 duration-1000">
             <MessageResponse className="text-foreground/90 text-[13px] leading-relaxed">
-              {conclusionText || ""}
+              {conclusionText}
             </MessageResponse>
           </div>
-        ) : (
+        ) : !isComplete ? (
           <p className="text-sm font-medium text-muted-foreground animate-pulse transition-all duration-500">
             {`${dummyStatus}${dots}`}
           </p>
-        )}
+        ) : null}
       </div>
 
       <style jsx global>{`

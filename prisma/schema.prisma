@@ -98,11 +98,17 @@ enum MESSAGE_ROLE {
   assistant
 }
 
+enum MESSAGE_STATUS {
+  generating
+  completed
+}
+
 model Message {
   id          String   @id @default(cuid())
   role        MESSAGE_ROLE @default(user)
   content     String   @db.Text
   plan        Json?
+  status      MESSAGE_STATUS @default(completed)
   projectId   String
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())

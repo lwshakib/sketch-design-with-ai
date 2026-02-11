@@ -21,7 +21,7 @@ export function extractArtifacts(text: string): Artifact[] {
   
   // Regex to find any of the opening tags and their content
   // Matches <web_artifact title="..."> or <web_artifact>
-  const tagPattern = /<(web_artifact|app_artifact|artifact)([^>]*)>([\s\S]*?)(?:<\/\1>|$)/gi;
+  const tagPattern = /<(web_artifact|app_artifact|artifact)([^>]*)>([\s\S]*?)(?:<\/\1\s*>|$)/gi;
   let match;
 
   while ((match = tagPattern.exec(text)) !== null) {
@@ -79,7 +79,7 @@ export function extractArtifacts(text: string): Artifact[] {
  */
 export function stripArtifact(text: string): string {
   return text
-    .replace(/<(web_artifact|app_artifact|artifact)[^>]*>([\s\S]*?)<\/\1>/gi, '')
+    .replace(/<(web_artifact|app_artifact|artifact)[^>]*>([\s\S]*?)<\/\1\s*>/gi, '')
     // Also remove partial tags at the end
     .replace(/<(web_artifact|app_artifact|artifact)[^>]*>[\s\S]*$/gi, '')
     .trim();
