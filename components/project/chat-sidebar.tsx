@@ -131,6 +131,7 @@ export function ChatSidebar({
 
   const [showUrlInput, setShowUrlInput] = React.useState(false);
   const [urlTemp, setUrlTemp] = React.useState("");
+  const [isUrlValid, setIsUrlValid] = React.useState(true);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   const handleUrlSubmit = (e: React.FormEvent) => {
@@ -139,12 +140,14 @@ export function ChatSidebar({
     
     // Simple validation
     try {
-      new URL(urlTemp);
-      setWebsiteUrl(urlTemp.trim());
+      const urlToTest = urlTemp.startsWith('http') ? urlTemp : `https://${urlTemp}`;
+      new URL(urlToTest);
+      setWebsiteUrl(urlToTest.trim());
       setUrlTemp("");
       setShowUrlInput(false);
+      setIsUrlValid(true);
     } catch (e) {
-      alert("Please enter a valid URL (e.g., https://google.com)");
+      setIsUrlValid(false);
     }
   };
 
@@ -631,12 +634,21 @@ export function ChatSidebar({
                     )}
 
                     {showUrlInput && (
-                      <form onSubmit={handleUrlSubmit} className="flex-1 min-w-[200px] flex items-center gap-2 px-2 py-1.5 rounded-xl bg-[#1A1A1A] border border-white/10 animate-in fade-in zoom-in duration-200">
-                        <Link className="size-3 text-zinc-500" />
+                      <form 
+                        onSubmit={handleUrlSubmit} 
+                        className={cn(
+                          "flex-1 min-w-[200px] flex items-center gap-2 px-2 py-1.5 rounded-xl bg-[#1A1A1A] border transition-all duration-200 animate-in fade-in zoom-in",
+                          isUrlValid ? "border-white/10" : "border-red-500/50 ring-1 ring-red-500/20"
+                        )}
+                      >
+                        <Link className={cn("size-3", isUrlValid ? "text-zinc-500" : "text-red-400")} />
                         <input 
                           autoFocus
                           value={urlTemp}
-                          onChange={(e) => setUrlTemp(e.target.value)}
+                          onChange={(e) => {
+                            setUrlTemp(e.target.value);
+                            if (!isUrlValid) setIsUrlValid(true);
+                          }}
                           placeholder="Paste URL (e.g. google.com)"
                           className="flex-1 bg-transparent outline-none text-[11px] text-zinc-200 placeholder:text-zinc-600"
                         />

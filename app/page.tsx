@@ -31,8 +31,15 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Link as LucideLink, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
 const PROMPTS = {
@@ -161,6 +168,10 @@ export default function Home() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState<string | null>(null);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [urlTemp, setUrlTemp] = useState("");
+  const [isUrlValid, setIsUrlValid] = useState(true);
   const router = useRouter();
 
   const fetchProjects = async (isLoadMore = false) => {
@@ -213,8 +224,25 @@ export default function Home() {
     }
   }, [isMounted]);
 
+  const handleUrlSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!urlTemp.trim()) return;
+    
+    // Simple validation
+    try {
+      const urlToTest = urlTemp.startsWith('http') ? urlTemp : `https://${urlTemp}`;
+      new URL(urlToTest);
+      setWebsiteUrl(urlToTest.trim());
+      setUrlTemp("");
+      setShowUrlInput(false);
+      setIsUrlValid(true);
+    } catch (e) {
+      setIsUrlValid(false);
+    }
+  };
+
   const onSubmit = async () => {
-    if (!inputValue.trim() && attachments.length === 0) return;
+    if (!inputValue.trim() && attachments.length === 0 && !websiteUrl) return;
     if (attachments.some(a => a.isUploading)) {
       toast.error("Please wait for images to finish uploading");
       return;
@@ -225,7 +253,8 @@ export default function Home() {
       const response = await fetch("/api/projects", {
         method: "POST",
         body: JSON.stringify({
-          title: inputValue.slice(0, 30) || "Untitled Design",
+          title: inputValue.slice(0, 30) || (websiteUrl ? websiteUrl.replace(/https?:\/\//, '') : "Untitled Design"),
+          websiteUrl: websiteUrl
         })
       });
 
@@ -236,10 +265,11 @@ export default function Home() {
       const project = await response.json();
       
       // Store initial prompt for the project page to pick up
-      if (inputValue.trim() || attachments.length > 0) {
+      if (inputValue.trim() || attachments.length > 0 || websiteUrl) {
         sessionStorage.setItem(`pending_prompt_${project.id}`, JSON.stringify({
           content: inputValue,
-          attachments: attachments.map(a => a.url)
+          attachments: attachments.map(a => a.url),
+          websiteUrl: websiteUrl
         }));
       }
 
@@ -390,27 +420,36 @@ export default function Home() {
               <div className="relative group w-full">
                 {/* Outer Glow Overlay */}
                 <div className="absolute -inset-[1px] rounded-[32px] opacity-0 group-focus-within:opacity-100 transition-all duration-700 blur-2xl pointer-events-none bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10" />
-                
+
                 <div className="relative bg-[#0A0A0A] rounded-[32px] p-8 space-y-4 border border-white/5 transition-all duration-500 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] group-focus-within:border-primary/20 group-focus-within:shadow-[0_0_60px_-10px_rgba(var(--primary-rgb),0.2)]">
-                  
-                  {/* Image Previews */}
+                  {/* Image Previews & Website URL */}
                   <AnimatePresence>
-                    {attachments.length > 0 && (
-                      <motion.div 
+                    {(attachments.length > 0 || websiteUrl || showUrlInput) && (
+                      <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         className="flex flex-wrap gap-3 pb-2"
                       >
                         {attachments.map((attr, i) => (
-                          <div key={i} className="relative group/img h-20 w-20 rounded-xl overflow-hidden border border-white/10 bg-zinc-900 shadow-sm">
-                            <img src={attr.url} alt="Attachment" className={cn("h-full w-full object-cover", attr.isUploading && "opacity-40 blur-[2px]")} />
+                          <div
+                            key={i}
+                            className="relative group/img h-20 w-20 rounded-xl overflow-hidden border border-white/10 bg-zinc-900 shadow-sm"
+                          >
+                            <img
+                              src={attr.url}
+                              alt="Attachment"
+                              className={cn(
+                                "h-full w-full object-cover",
+                                attr.isUploading && "opacity-40 blur-[2px]"
+                              )}
+                            />
                             {attr.isUploading && (
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <Loader2 className="h-5 w-5 text-white animate-spin" />
                               </div>
                             )}
-                            <button 
+                            <button
                               onClick={() => removeAttachment(i)}
                               className="absolute top-1 right-1 h-5 w-5 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover/img:opacity-100 transition-opacity"
                             >
@@ -418,6 +457,61 @@ export default function Home() {
                             </button>
                           </div>
                         ))}
+
+                        {websiteUrl && !showUrlInput && (
+                          <div className="flex items-center gap-2 px-3 h-10 rounded-xl bg-primary/10 border border-primary/20 text-primary group">
+                            <LucideLink className="size-3 shrink-0" />
+                            <span className="text-xs font-bold truncate max-w-[200px]">
+                              {websiteUrl}
+                            </span>
+                            <button
+                              onClick={() => setWebsiteUrl(null)}
+                              className="size-4 shrink-0 hover:bg-white/10 rounded flex items-center justify-center"
+                            >
+                              <X className="size-2" />
+                            </button>
+                          </div>
+                        )}
+
+                        {showUrlInput && (
+                          <form
+                            onSubmit={handleUrlSubmit}
+                            className={cn(
+                              "flex-1 min-w-[240px] flex items-center gap-2 px-3 h-10 rounded-xl bg-zinc-900 border transition-all duration-200",
+                              isUrlValid
+                                ? "border-white/10"
+                                : "border-red-500/50 ring-1 ring-red-500/20"
+                            )}
+                          >
+                            <LucideLink
+                              className={cn(
+                                "size-3",
+                                isUrlValid ? "text-zinc-500" : "text-red-400"
+                              )}
+                            />
+                            <input
+                              autoFocus
+                              value={urlTemp}
+                              onChange={(e) => {
+                                setUrlTemp(e.target.value);
+                                if (!isUrlValid) setIsUrlValid(true);
+                              }}
+                              placeholder="Paste URL (e.g. google.com)"
+                              className="flex-1 bg-transparent outline-none text-xs text-zinc-200 placeholder:text-zinc-600"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowUrlInput(false);
+                                setUrlTemp("");
+                                setIsUrlValid(true);
+                              }}
+                              className="size-4 shrink-0 hover:bg-white/10 rounded flex items-center justify-center"
+                            >
+                              <X className="size-2 text-zinc-500" />
+                            </button>
+                          </form>
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -431,26 +525,52 @@ export default function Home() {
 
                   <div className="flex items-center justify-between pt-2">
                     <div className="flex items-center gap-2">
-                      <input 
-                        type="file" 
-                        multiple 
-                        accept="image/*" 
-                        className="hidden" 
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        className="hidden"
                         ref={fileInputRef}
                         onChange={handleFileUpload}
                       />
 
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => fileInputRef.current?.click()}
-                        className="h-10 w-10 rounded-full bg-zinc-900/50 text-zinc-500 hover:text-white border border-white/5 transition-colors"
-                      >
-                        <Plus className="h-5 w-5" />
-                      </Button>
-                      
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-10 w-10 rounded-full bg-zinc-900/50 text-zinc-500 hover:text-white border border-white/5 transition-colors"
+                          >
+                            <Plus className="h-5 w-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="start"
+                          className="w-48 bg-[#0F0F0F] border-white/10 rounded-xl shadow-2xl p-1.5 z-[100]"
+                        >
+                          <DropdownMenuItem
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex items-center gap-2 p-2 hover:bg-white/5 rounded-lg text-zinc-300 transition-colors cursor-pointer"
+                          >
+                            <ImageIcon className="h-4 w-4" />
+                            <span className="text-[13px] font-medium">
+                              Upload Images
+                            </span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setShowUrlInput(true)}
+                            className="flex items-center gap-2 p-2 hover:bg-white/5 rounded-lg text-zinc-300 transition-colors cursor-pointer"
+                          >
+                            <LucideLink className="h-4 w-4" />
+                            <span className="text-[13px] font-medium">
+                              Website URL
+                            </span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
                       <div className="h-4 w-[1px] bg-white/10 mx-1" />
-                      
+
                       <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest hidden sm:block">
                         Press Enter to Generate
                       </p>
@@ -458,7 +578,7 @@ export default function Home() {
                     
                     <Button 
                        onClick={onSubmit}
-                       disabled={(!inputValue.trim() && attachments.length === 0) || attachments.some(a => a.isUploading) || isSubmitting}
+                       disabled={(!inputValue.trim() && attachments.length === 0 && !websiteUrl) || attachments.some(a => a.isUploading) || isSubmitting}
                        className="h-12 px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 border border-white/10 shadow-xl transition-all"
                     >
                       {isSubmitting ? (

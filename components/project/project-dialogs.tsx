@@ -223,18 +223,20 @@ export function ProjectDialogs({
 
       {/* Delete Project Alert */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent className="bg-card border-border">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-foreground">Delete Project</AlertDialogTitle>
-            <AlertDialogDescription className="text-muted-foreground">
-              Are you sure you want to delete this project? This action cannot be undone.
+        <AlertDialogContent className="bg-[#0A0A0A] border border-white/5 text-white rounded-[32px] p-8 max-w-[400px] shadow-2xl">
+          <AlertDialogHeader className="space-y-3">
+            <AlertDialogTitle className="text-xl font-bold tracking-tight">Delete Project</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-500 text-sm font-medium leading-relaxed">
+              Are you sure you want to permanently delete <span className="text-white font-bold">"{project?.title}"</span>? All screens and history will be lost.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-muted text-foreground hover:bg-muted/80">Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="mt-8 flex flex-row items-center gap-3">
+            <AlertDialogCancel className="flex-1 h-11 rounded-2xl bg-zinc-900 border-white/5 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-all text-[11px] font-black uppercase tracking-widest mt-0">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeleteProject}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="flex-1 h-11 rounded-2xl bg-destructive text-white hover:bg-destructive/90 transition-all text-[11px] font-black uppercase tracking-widest"
             >
               Delete
             </AlertDialogAction>
@@ -412,31 +414,6 @@ export function ProjectDialogs({
         </CommandList>
       </CommandDialog>
 
-      {/* Improved Delete Alert */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent className="bg-zinc-950 border-zinc-800 text-white rounded-3xl p-8 max-w-md">
-          <AlertDialogHeader className="items-center text-center">
-            <div className="size-16 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center justify-center mb-4">
-              <Trash2 className="size-8 text-destructive" />
-            </div>
-            <AlertDialogTitle className="text-2xl font-black uppercase tracking-tight">Delete Project?</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-500 text-sm font-medium leading-relaxed mt-2">
-              This will permanently remove <span className="text-white font-bold">"{project?.title}"</span> and all its screens. This action cannot be reversed.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="flex flex-col gap-3 mt-8">
-            <AlertDialogAction 
-              onClick={handleDeleteProject}
-              className="w-full h-12 rounded-xl bg-destructive text-white hover:bg-destructive/90 font-bold uppercase tracking-widest text-xs"
-            >
-              Confirm Deletion
-            </AlertDialogAction>
-            <AlertDialogCancel className="w-full h-12 rounded-xl bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800 font-bold uppercase tracking-widest text-xs">
-              Keep Project
-            </AlertDialogCancel>
-          </div>
-        </AlertDialogContent>
-      </AlertDialog>
 
       {/* Settings Dialog */}
       <Dialog open={isSettingsDialogOpen} onOpenChange={setIsSettingsDialogOpen}>
