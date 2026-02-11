@@ -46,12 +46,17 @@ export default async function ProjectPreviewPage({
     isComplete: true
   }));
 
+  // Extract applied theme from canvas data if it exists
+  const canvasData = project.canvasData as any;
+  const appliedTheme = canvasData?.appliedTheme || null;
+
   return (
     <ProjectShareView 
       project={{
         title: project.title,
         shareToken: project.shareToken || "",
-        themes: project.themes as any
+        themes: project.themes as any,
+        appliedTheme
       }}
       artifacts={artifacts}
     />

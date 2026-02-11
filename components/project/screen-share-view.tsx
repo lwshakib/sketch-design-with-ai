@@ -30,6 +30,7 @@ interface ScreenShareViewProps {
     title: string;
     shareToken: string;
     themes?: any[];
+    appliedTheme?: any;
   };
   artifact: Artifact;
 }
@@ -37,7 +38,7 @@ interface ScreenShareViewProps {
 export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
   const [zoom, setZoom] = useState(1);
   const [viewportMode, setViewportMode] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
-  const [appliedTheme, setAppliedTheme] = useState<any>(null);
+  const [appliedTheme, setAppliedTheme] = useState<any>(project.appliedTheme || project.themes?.[0] || null);
   const [showQrDialog, setShowQrDialog] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
   const [dynamicHeight, setDynamicHeight] = useState<number | null>(null);

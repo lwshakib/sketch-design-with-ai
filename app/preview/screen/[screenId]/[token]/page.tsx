@@ -47,12 +47,17 @@ export default async function SingleScreenPreviewPage({
     isComplete: true
   };
 
+  // Extract applied theme from canvas data if it exists
+  const canvasData = project.canvasData as any;
+  const appliedTheme = canvasData?.appliedTheme || null;
+
   return (
     <ScreenShareView 
       project={{
         title: project.title,
         shareToken: project.shareToken || "",
-        themes: project.themes as any
+        themes: project.themes as any,
+        appliedTheme
       }}
       artifact={artifact}
     />

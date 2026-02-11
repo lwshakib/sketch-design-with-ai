@@ -24,15 +24,15 @@ interface ProjectShareViewProps {
     title: string;
     shareToken: string;
     themes?: any[];
+    appliedTheme?: any;
   };
   artifacts: Artifact[];
 }
 
 export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) {
-  const [viewportMode, setViewportMode] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   const [showQrDialog, setShowQrDialog] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
-  const [appliedTheme] = useState<any>(project.themes?.[0] || null);
+  const [appliedTheme] = useState<any>(project.appliedTheme || project.themes?.[0] || null);
   const [dynamicHeights, setDynamicHeights] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -70,77 +70,34 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
   };
 
   const getWidth = (type: string) => {
-    if (viewportMode === 'mobile') return 380;
-    if (viewportMode === 'tablet') return 768;
     return type === 'app' ? 380 : 1280;
   };
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-zinc-950 text-white overflow-x-hidden font-sans">
+    <div className="flex flex-col min-h-screen w-full bg-zinc-950 text-white font-sans">
       {/* Header */}
       <header className="h-16 border-b border-zinc-800 flex items-center justify-between px-6 bg-zinc-950/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <Logo showBadge={false} textSize="1.2rem" iconSize={28} className="text-white" />
           <div className="h-4 w-[1px] bg-zinc-800" />
-          <h1 className="text-sm font-medium text-zinc-400 truncate max-w-[200px]">
+          <h1 className="text-lg font-bold text-white truncate max-w-[400px] tracking-tight">
             {project.title}
           </h1>
         </div>
 
-        {/* Center Controls */}
-        <div className="flex items-center gap-1 bg-zinc-900/50 p-1 rounded-xl border border-zinc-800/50">
+        <div className="flex items-center gap-4">
            <Button
-             variant={viewportMode === 'mobile' ? "secondary" : "ghost"}
-             size="icon"
-             className="h-9 w-9 rounded-lg"
-             onClick={() => setViewportMode('mobile')}
-             title="Mobile View"
-           >
-             <Smartphone className="h-4 w-4" />
-           </Button>
-           <Button
-             variant={viewportMode === 'tablet' ? "secondary" : "ghost"}
-             size="icon"
-             className="h-9 w-9 rounded-lg"
-             onClick={() => setViewportMode('tablet')}
-             title="Tablet View"
-           >
-             <Tablet className="h-4 w-4" />
-           </Button>
-           <Button
-             variant={viewportMode === 'desktop' ? "secondary" : "ghost"}
-             size="icon"
-             className="h-9 w-9 rounded-lg"
-             onClick={() => setViewportMode('desktop')}
-             title="Desktop View"
-           >
-             <Monitor className="h-4 w-4" />
-           </Button>
-           <div className="w-[1px] h-4 bg-zinc-800 mx-1" />
-           <Button
-             variant="ghost"
-             size="icon"
-             className="h-9 w-9 rounded-lg text-zinc-400 hover:text-white"
-             onClick={() => window.open(window.location.href, '_blank')}
-             title="Open in New Tab"
-           >
-             <ExternalLink className="h-4 w-4" />
-           </Button>
-           <Button
-             variant="ghost"
-             size="icon"
-             className="h-9 w-9 rounded-lg text-zinc-400 hover:text-white"
-             onClick={() => setShowQrDialog(true)}
-             title="Show QR Code"
-           >
-             <QrCode className="h-4 w-4" />
-           </Button>
-        </div>
-
-         <div className="flex items-center gap-3 w-[200px] justify-end">
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 rounded-lg text-zinc-400 hover:text-white"
+              onClick={() => setShowQrDialog(true)}
+              title="Show QR Code"
+            >
+              <QrCode className="h-4 w-4" />
+            </Button>
             <Button 
                 onClick={handleCopyLink}
-                className="bg-white text-black hover:bg-zinc-200 rounded-full px-4 h-9 text-xs font-semibold gap-2"
+                className="bg-zinc-100 text-black hover:bg-white rounded-full px-6 h-9 text-xs font-semibold gap-2 transition-all shadow-lg"
             >
                 {hasCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                 {hasCopied ? "Copied" : "Copy Link"}
@@ -148,35 +105,28 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
          </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 relative bg-[#09090b] p-8 md:p-12 lg:p-16">
+      {/* Main Content Area - Horizontal Scroll + Vertical Flow */}
+      <main className="flex-1 relative bg-[#09090b] overflow-x-auto custom-scrollbar">
         {/* Grid Background */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-[0.05]"
           style={{
             backgroundImage: `radial-gradient(circle, #fff 1px, transparent 1px)`,
-            backgroundSize: `20px 20px`
+            backgroundSize: `20px 20px`,
+            backgroundAttachment: 'fixed'
           }}
         />
 
-        <div className="max-w-[1600px] mx-auto flex flex-col gap-24 items-center">
+        <div className="inline-flex items-start gap-12 px-[10vw] py-24 min-w-full min-h-full">
             {artifacts.map((artifact, index) => (
-                <div key={artifact.id || index} className="flex flex-col gap-6 w-full items-center">
-                    <div className="flex flex-col items-center gap-2">
-                        <h2 className="text-2xl font-bold tracking-tight">{artifact.title}</h2>
-                        <div className="bg-zinc-900 border border-zinc-800 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                            {artifact.type} screen
-                        </div>
-                    </div>
-                    
+                <div key={artifact.id || index} className="flex flex-col shrink-0">
                     <div 
-                        className="relative transition-all duration-500 ease-in-out shadow-[0_40px_100px_rgba(0,0,0,0.5)] flex flex-col"
+                        className="relative transition-all duration-700 ease-out shadow-[0_60px_120px_-20px_rgba(0,0,0,0.8)] border flex flex-col group"
                         style={{ 
                             width: getWidth(artifact.type),
-                            height: dynamicHeights[artifact.title] || (artifact.type === 'app' || viewportMode === 'mobile' ? 800 : 800),
-                            maxHeight: 'none',
-                            maxWidth: '100%',
-                            border: `1px solid ${appliedTheme?.cssVars?.border || '#27272a'}`,
+                            height: dynamicHeights[artifact.title] || 800,
+                            maxWidth: '90vw',
+                            borderColor: appliedTheme?.cssVars?.border || '#27272a',
                             borderRadius: 12,
                             overflow: 'hidden',
                             backgroundColor: appliedTheme?.cssVars?.background || '#09090b',
