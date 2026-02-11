@@ -179,6 +179,7 @@ export function ChatSidebar({
                   ) : (
                     <div className="">
                       {messages
+                        .filter((m: any) => !m.isSilent)
                         .filter((m, i, self) => {
                           if (m.role !== 'user' || !m.id.toString().startsWith('temp-')) return true;
                           // It's a temp message. Check if a stable user message with same content exists.
@@ -266,6 +267,7 @@ export function ChatSidebar({
                                                     planScreens={plan?.screens}
                                                     projectArtifacts={throttledArtifacts}
                                                     currentScreenTitle={realtimeStatus?.currentScreen}
+                                                    statusMessage={realtimeStatus?.message}
                                                   />
 
                                                 </div>
@@ -292,7 +294,7 @@ export function ChatSidebar({
                         );
                       })}
 
-                      {isGenerating && messages[messages.length - 1]?.role === 'user' && (
+                      {isGenerating && messages[messages.length - 1]?.role === 'user' && !(messages[messages.length - 1] as any).isSilent && (
                         <div className="flex flex-col gap-4 px-5 py-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                           <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full flex items-center justify-center bg-primary/10 border border-primary/20 flex-shrink-0">
@@ -303,6 +305,7 @@ export function ChatSidebar({
                            <GenerationStatus 
                             isComplete={false}
                             status={realtimeStatus?.status}
+                            statusMessage={realtimeStatus?.message}
                           />
                         </div>
                       )}
@@ -311,14 +314,17 @@ export function ChatSidebar({
                       {(() => {
                         const lastAssistantWithPlan = [...messages].reverse().find(m => (m as any).plan);
                         const plan = (lastAssistantWithPlan as any)?.plan;
-                        const isComplete = !isGenerating;
                         
-                        if (isComplete && plan?.suggestion) {
+                        // Show suggestion if not generating, or if it's a silent generation (like regeneration)
+                        const isSilentRegen = isGenerating && (messages[messages.length - 1] as any)?.isSilent;
+                        const shouldShow = !isGenerating || isSilentRegen;
+                        
+                        if (shouldShow && plan?.suggestion) {
                           return (
                             <div className="px-5 py-4 flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-700 delay-300">
                               <div className="flex items-center gap-3">
                                 <div className="h-[1px] flex-1 bg-border" />
-                                <span className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em] shrink-0">Suggested Reply</span>
+                                <span className="text-[10px] font-bold text-zinc-500 shrink-0">Suggested Reply</span>
                               </div>
                               
                               <button 
@@ -370,7 +376,7 @@ export function ChatSidebar({
                       handleCustomSubmit(e);
                     }
                   }}
-                  readOnly={status !== 'ready'}
+                  readOnly={false}
                   placeholder="Describe your design"
                   className="w-full bg-transparent outline-none resize-none text-[15px] text-foreground placeholder:text-[#525252] min-h-[56px] max-h-[200px] leading-relaxed"
                 />
@@ -437,7 +443,7 @@ export function ChatSidebar({
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          disabled={status !== 'ready'}
+                          disabled={false}
                           className="h-9 w-9 rounded-full bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525] border border-white/5"
                         >
                           <Plus className="h-4 w-4" />
@@ -491,18 +497,9 @@ export function ChatSidebar({
                   <Button 
                     onClick={handleCustomSubmit}
                     disabled={status === 'ready' && (!input.trim() && attachments.length === 0)}
-                    className={cn(
-                      "h-9 w-9 rounded-full p-0 shadow-lg transition-all border border-white/5",
-                      (status === 'streaming' || status === 'submitted') 
-                        ? "bg-red-500/20 text-red-500 hover:bg-red-500/30" 
-                        : "bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525]"
-                    )}
+                    className="h-9 w-9 rounded-full p-0 shadow-lg transition-all border border-white/5 bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525]"
                   >
-                    {(status === 'streaming' || status === 'submitted') ? (
-                      <Square className="h-3 w-3 fill-current" />
-                    ) : (
-                      <ArrowRight className="h-4 w-4" />
-                    )}
+                    <ArrowRight className="h-4 w-4" />
                   </Button>
                 </div>
               </div>

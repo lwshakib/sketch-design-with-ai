@@ -33,7 +33,7 @@ export const generateDesign = inngest.createFunction(
   { id: "generate-design", retries: 5 },
   { event: "app/design.generate" },
   async ({ event, step, publish }) => {
-    const { messages, projectId, is3xMode, websiteUrl } = event.data;
+    const { messages, projectId, is3xMode, websiteUrl, isSilent } = event.data;
     
     // Normalize messages
     const safeMessages = (Array.isArray(messages) ? messages : []).filter(m => m.content);
@@ -41,6 +41,7 @@ export const generateDesign = inngest.createFunction(
     // --- STEP PRE-0: INITIAL PERSISTENCE ---
     // Create the assistant message immediately so it shows up on UI
     const messageId = await step.run("save-initial-assistant-message", async () => {
+      if (isSilent) return null;
       const msg = await prisma.message.create({
         data: {
           projectId: projectId,
@@ -100,6 +101,8 @@ export const generateDesign = inngest.createFunction(
 
       let systemPrompt = PlanningPrompt + `\n\nUse these high-fidelity design examples as your primary inspiration for quality and code structure:\n${inspiration}`;
       
+      systemPrompt += `\n\nCRITICAL ON REGENERATION: If the user explicitly asks to 'Regenerate' a specific screen (especially if no other instructions are provided), you MUST provide a fundamentally different layout, structural composition, and visual rhythm for that screen. Avoid repeating the previous design structure. Rethink the wireframe from scratch while maintaining the core feature set and the selected theme.`;
+      
       if (websiteReferenceContext) {
         systemPrompt += `\n\nCRITICAL: The user has provided a reference website. Study its content, structure, and style to inform your design plan:\n${websiteReferenceContext}`;
       }
@@ -143,18 +146,37 @@ export const generateDesign = inngest.createFunction(
         })
       });
       let finalScreens = object.screens;
+      let finalConclusion = object.conclusionText;
+
       if (is3xMode) {
         finalScreens = object.screens.flatMap((screen: any) => [
-          { ...screen, title: `${screen.title} (v1)`, prompt: `${screen.prompt}\n\nVariation 1: Focus on extreme clarity, airy layouts, and minimal whitespace.` },
-          { ...screen, title: `${screen.title} (v2)`, prompt: `${screen.prompt}\n\nVariation 2: Focus on high-density information, sophisticated borders, and structural depth.` },
-          { ...screen, title: `${screen.title} (v3)`, prompt: `${screen.prompt}\n\nVariation 3: Focus on unique creative expression, organic shapes, and experimental typography.` }
+          { 
+            ...screen, 
+            title: `${screen.title} (Variation A)`, 
+            prompt: `${screen.prompt}\n\n[VARIATION A: MINIMALIST & CONVENTIONAL]\nLAYOUT: Use a standard, highly intuitive industry-standard layout (e.g., classic top-navigation or centered content). \nSTYLE: Focus on extreme clarity, airy whitespace, and 'Apple-style' minimalism. Avoid complex decorations. Use light accents and generous padding. This should be the 'Safest' and most 'Clean' version.` 
+          },
+          { 
+            ...screen, 
+            title: `${screen.title} (Variation B)`, 
+            prompt: `${screen.prompt}\n\n[VARIATION B: BENTO & INFORMATION DENSITY]\nLAYOUT: Use a sophisticated 'Bento-Box' grid system. Organize information into distinct, multi-layered card modules of varying sizes. \nSTYLE: Focus on structural depth, thin sophisticated borders, and high information density. Use subtle shadows and layered components. This should feel like a 'Professional Tool' or 'Power-User' dashboard.` 
+          },
+          { 
+            ...screen, 
+            title: `${screen.title} (Variation C)`, 
+            prompt: `${screen.prompt}\n\n[VARIATION C: EXPERIMENTAL & BRAND-LED]\nLAYOUT: Break the standard grid. Use asymmetric placements, organic overlapping elements, and dynamic vertical rhythms. \nSTYLE: Focus on bold creative expression, vibrant gradients, and experimental visual rhythm. Use unique brand shapes, large expressive typography, and a memorable, 'Award-Winning' creative aesthetic.` 
+          }
         ]);
+
+        // Create a custom conclusion that summarizes the variations
+        finalConclusion = `### Multi-Variation Design Manifest\n\nI have architected 3 distinct visual variations (A, B, and C) for each of your requested screens. This allows you to explore different aesthetic directions for the same core features:\n\n` + 
+          object.screens.map((s: any) => `* **${s.title}**: Expanding into 3 visual concepts.`).join('\n') +
+          `\n\nI am now generating all ${finalScreens.length} variations on your canvas. Which direction feels most aligned with your brand?`;
       }
 
       const planJson = { 
         screens: finalScreens, 
         themes: object.themes,
-        conclusionText: object.conclusionText,
+        conclusionText: finalConclusion,
         suggestion: object.suggestion
       };
       
@@ -169,7 +191,7 @@ export const generateDesign = inngest.createFunction(
       return { 
         plan: planJson, 
         vision: object.vision,
-        conclusionText: object.conclusionText,
+        conclusionText: finalConclusion,
         suggestion: object.suggestion
       };
     });
@@ -187,6 +209,7 @@ export const generateDesign = inngest.createFunction(
 
     // Update the assistant message with the vision and plan
     await step.run("update-assistant-message-with-plan", async () => {
+      if (!messageId) return;
       await prisma.message.update({
         where: { id: messageId },
         data: {
@@ -235,6 +258,7 @@ export const generateDesign = inngest.createFunction(
              title: screen.title,
              content: "", // Empty content = placeholder
              type: screen.type,
+             status: "generating",
              x: currentX,
              y: 0,
              width: width,
@@ -299,8 +323,19 @@ export const generateDesign = inngest.createFunction(
             }
           });
 
-          const contextMessagesSize = 2; // Last 2 screens for context to avoid token bloat
-          const recentContext = screensContext.slice(-contextMessagesSize);
+          const getVariation = (t: string) => {
+            const match = t.match(/\(Variation ([ABC])\)/);
+            return match ? match[1] : null;
+          };
+          const currentVariation = getVariation(screen.title);
+          
+          const compatibleContext = screensContext.filter(s => {
+            const v = getVariation(s.title);
+            return v === currentVariation;
+          });
+
+          const contextMessagesSize = 2; // Last 2 COMPATIBLE screens for context
+          const recentContext = compatibleContext.slice(-contextMessagesSize);
 
           const contextMessages = [
              { role: 'assistant', content: vision || '' },
@@ -378,6 +413,7 @@ CRITICAL INSTRUCTIONS:
                data: {
                  content: generatedScreen.content,
                  type: generatedScreen.type,
+                 status: "completed",
                  updatedAt: new Date()
                }
              });
@@ -399,6 +435,7 @@ CRITICAL INSTRUCTIONS:
                  title: generatedScreen.title,
                  content: generatedScreen.content,
                  type: generatedScreen.type,
+                 status: "completed",
                  x: newX, y: 0,
                  width: currentWidth, height: 800 
                }
@@ -422,6 +459,7 @@ CRITICAL INSTRUCTIONS:
 
       // Update the assistant message with final plan and markdown, mark as completed
       await step.run("update-final-assistant-message", async () => {
+        if (!messageId) return;
         await prisma.message.update({
           where: { id: messageId },
           data: {
@@ -448,10 +486,115 @@ CRITICAL INSTRUCTIONS:
         topic: "status",
         data: { 
           message: conclusionText, 
-          status: "complete" 
+          status: "complete",
+          isSilent
         }
       });
     }
+
+    return { success: true };
+  }
+);
+
+// --- worker: regenerate specific screen ---
+export const regenerateScreen = inngest.createFunction(
+  { id: "regenerate-screen", retries: 5 },
+  { event: "app/screen.regenerate" },
+  async ({ event, step, publish }) => {
+    const { messages, projectId, screenId, instructions } = event.data;
+
+    // --- STEP 1: FETCH DATA ---
+    const screen = await step.run("fetch-screen", async () => {
+      return await prisma.screen.findUnique({
+        where: { id: screenId },
+        include: { project: true }
+      });
+    });
+
+    if (!screen) return { error: "Screen not found" };
+
+    // Update screen status to generating
+    await step.run("set-screen-status-generating", async () => {
+      await prisma.screen.update({
+        where: { id: screenId },
+        data: { status: "generating" }
+      });
+    });
+
+    // Notify UI: regeneration started for this screen
+    await publish({
+      channel: `project:${projectId}`,
+      topic: "status",
+      data: { 
+        message: `Regenerating "${screen.title}"...`, 
+        status: "regenerating", 
+        screenId: screenId 
+      }
+    });
+
+    // --- STEP 2: GENERATE NEW CODE ---
+    const generatedScreen = await step.run("generate-new-code", async () => {
+      const inspiration = getAllExamples();
+      let systemPrompt = ScreenGenerationPrompt + "\n\nCRITICAL: You are REGENERATING an existing screen. Rethink the layout and visual rhythm entirely while maintaining the core functionality.";
+      
+      const project = screen.project;
+      const themes = project.themes as any || [];
+      const selectedTheme = themes.length > 0 ? themes[0] : null;
+
+      const { text } = await generateText({
+        system: systemPrompt,
+        messages: [
+          ...messages,
+          { role: 'user', content: `Regenerate the "${screen.title}" (${screen.type}) screen.
+Instructions: ${instructions || "Rethink the UI structure entirely while keeping the same theme and core functionality."}
+
+${selectedTheme ? `IMPORTANT: Use this theme for the color palette:\n${JSON.stringify(selectedTheme, null, 2)}` : ''}
+
+CRITICAL INSTRUCTIONS:
+1. CONSTISTENCY: You MUST use the exact same color palette and typography as the project.
+2. NEW LAYOUT: Do NOT repeat the previous layout. Rethink the component placement.
+3. FORMAT: You MUST wrap the code in a single artifact block with title="${screen.title}".` }
+        ] as any,
+        maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
+        temperature: 0.8, // Slightly higher for more variety
+      });
+
+      const artifacts = extractArtifacts(text);
+      return artifacts[0] || { title: screen.title, content: text, type: screen.type };
+    });
+
+    // --- STEP 3: PERSIST & NOTIFY ---
+    const updatedScreen = await step.run("update-screen-db", async () => {
+      return await prisma.screen.update({
+        where: { id: screenId },
+        data: {
+          content: generatedScreen.content,
+          status: "completed",
+          updatedAt: new Date()
+        }
+      });
+    });
+
+    await publish({
+      channel: `project:${projectId}`,
+      topic: "status",
+      data: { 
+        message: `"${screen.title}" regenerated.`, 
+        status: "partial_complete",
+        screen: updatedScreen,
+        isSilent: true
+      }
+    });
+
+    await publish({
+       channel: `project:${projectId}`,
+       topic: "status",
+       data: {
+          message: `Regeneration of "${screen.title}" complete.`,
+          status: "complete",
+          isSilent: true
+       }
+    });
 
     return { success: true };
   }

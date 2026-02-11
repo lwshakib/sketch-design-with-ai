@@ -2,10 +2,9 @@
 
 import React, { useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useChat } from "@ai-sdk/react";
+import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { DefaultChatTransport } from "ai";
 import { useInngestSubscription } from "@inngest/realtime/hooks";
 import { fetchInngestToken } from "@/app/actions/inngest";
 import { extractArtifacts, type Artifact } from "@/lib/artifact-renderer";
@@ -42,7 +41,7 @@ export default function ProjectPage() {
     framePos, setFramePos,
     dynamicFrameHeights, setDynamicFrameHeights,
     artifactPreviewModes, setArtifactPreviewModes,
-    selectedArtifactIndex, setSelectedArtifactIndex,
+    selectedArtifactIds, setSelectedArtifactIds,
     leftSidebarMode, setLeftSidebarMode,
     secondarySidebarMode, setSecondarySidebarMode,
     activeThemeId, setActiveThemeId,
@@ -70,20 +69,24 @@ export default function ProjectPage() {
     isPromptDialogOpen, setIsPromptDialogOpen,
     viewingPrompt, setViewingPrompt,
     websiteUrl, setWebsiteUrl,
-    updateState, setActiveTool
+    regeneratingArtifactIds, setRegeneratingArtifactIds,
+    messages, setMessages,
+    updateState, setActiveTool, resetProjectState
   } = useProjectStore();
 
-  const handlePersistFrame = async (index: number) => {
-    const artifact = artifacts[index];
-    if (!artifact || !artifact.id) return;
-    try {
-      await fetch(`/api/screens/${artifact.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ x: artifact.x, y: artifact.y, width: artifact.width, height: artifact.height })
-      });
-    } catch (error) {
-      console.error('Failed to persist frame:', error);
+  const handlePersistArtifacts = async (indices: number[]) => {
+    for (const index of indices) {
+      const artifact = artifacts[index];
+      if (!artifact || !artifact.id) continue;
+      try {
+        await fetch(`/api/screens/${artifact.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ x: artifact.x, y: artifact.y, width: artifact.width, height: artifact.height })
+        });
+      } catch (error) {
+        console.error('Failed to persist frame:', error);
+      }
     }
   };
 
@@ -94,40 +97,62 @@ export default function ProjectPage() {
     startResizing,
     startDraggingFrame,
   } = useCanvas({
-    onPersistFrame: (index) => handlePersistFrame(index),
+    onPersistFrame: (indices) => handlePersistArtifacts(indices),
     onSave: () => debouncedSave(),
     previewRef
   });
 
-  const {
-    messages,
-    sendMessage,
-    setMessages,
-    status,
-    stop,
-    error,
-  } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/chat",
-      body: { projectId, is3xMode, websiteUrl },
-    }),
-    onError: (err) => {
-      console.error(err);
+  const chatStatus = isGenerating ? 'streaming' : 'ready';
+  const chatError = null;
+
+  const sendMessage = useCallback(async (params: { text: string; files?: any[] }, options?: any) => {
+    const { is3xMode, websiteUrl, messages } = useProjectStore.getState();
+    const isSilent = options?.body?.isSilent;
+    const newUserMessage = {
+      id: `m-${Date.now()}`,
+      role: 'user' as const,
+      content: params.text,
+      parts: params.files?.length ? [{ type: 'text', text: params.text }, ...params.files] : [{ type: 'text', text: params.text }],
+      isSilent
+    };
+
+    const updatedMessages = [...messages, newUserMessage];
+    setMessages(updatedMessages);
+    setIsGenerating(true);
+
+    try {
+      const body = {
+        projectId,
+        messages: updatedMessages.map(m => ({
+          role: m.role,
+          content: m.content || (m.parts as any[])?.find(p => p.type === 'text')?.text || ""
+        })),
+        is3xMode,
+        websiteUrl,
+        ...options?.body
+      };
+
+      console.log('DEBUG: Custom sendMessage sending body:', body);
+      await axios.post('/api/chat', body);
+    } catch (err) {
+      console.error('Chat error:', err);
       toast.error("Engine encountered an error.");
-    },
-  });
+      setIsGenerating(false);
+    }
+  }, [projectId, setMessages, setIsGenerating]);
 
   const handleRetry = useCallback(() => {
-    const lastUserMessage = messages.filter(m => m.role === 'user').at(-1);
+    const { messages } = useProjectStore.getState();
+    const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
     if (lastUserMessage) {
-      setIsGenerating(true);
-      const textContent = lastUserMessage.parts
-        .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
-        .map(p => p.text)
+      const textContent = lastUserMessage.content || (lastUserMessage.parts as any[])
+        ?.filter((p: any) => p.type === 'text')
+        .map((p: any) => p.text)
         .join('');
-      sendMessage({ text: textContent, files: [] });
+      
+      sendMessage({ text: textContent });
     }
-  }, [messages, sendMessage, setIsGenerating]);
+  }, [sendMessage]);
 
   // Initial waiting state is handled by the generation block in ChatSidebar.
   // Vision and Plan will be merged into the assistant message once the manifest is generated.
@@ -163,6 +188,10 @@ export default function ProjectPage() {
       } else if (event.topic === 'status') {
         setRealtimeStatus(event.data);
         if (event.data.status === 'vision' || event.data.status === 'planning') setIsGenerating(true);
+        if (event.data.status === 'regenerating' && event.data.screenId) {
+          setIsGenerating(true);
+          setRegeneratingArtifactIds(prev => new Set(prev).add(event.data.screenId));
+        }
         if (event.data.status === 'generating' && event.data.currentScreen) {
           setIsGenerating(true);
           const title = event.data.currentScreen;
@@ -183,7 +212,21 @@ export default function ProjectPage() {
         }
         if (event.data.status === 'complete') {
           setIsGenerating(false);
-          toast.success("Design generation complete!");
+          setMessages(prev => {
+            const updated = [...prev];
+            const lastAssistantIndex = [...updated].reverse().findIndex(m => m.role === 'assistant');
+            if (lastAssistantIndex !== -1) {
+              const actualIndex = updated.length - 1 - lastAssistantIndex;
+              (updated[actualIndex] as any).status = 'completed';
+            }
+            return updated;
+          });
+          if (event.data.isSilent) {
+            toast.success("Screen updated successfully!");
+            setRegeneratingArtifactIds(new Set()); // Clear all if silent complete
+          } else {
+            toast.success("Design generation complete!");
+          }
         }
         if (event.data.status === 'partial_complete' && event.data.screen) {
           setIsGenerating(true);
@@ -193,6 +236,13 @@ export default function ProjectPage() {
             const idx = updated.findIndex(a => a.title === newScreen.title);
             if (idx >= 0) {
               updated[idx] = { ...updated[idx], ...newScreen, x: updated[idx].x, y: updated[idx].y, isComplete: true };
+              if (newScreen.id) {
+                setRegeneratingArtifactIds(prev => {
+                  const next = new Set(prev);
+                  next.delete(newScreen.id);
+                  return next;
+                });
+              }
             } else {
               const getNewX = (existing: any[], type: string) => {
                 const last = existing[existing.length - 1];
@@ -256,6 +306,7 @@ export default function ProjectPage() {
   }, [isGenerating, projectId, setProject]);
 
   useEffect(() => {
+    resetProjectState();
     const fetchProjectAndInitialize = async () => {
       try {
         const res = await fetch(`/api/projects/${projectId}`);
@@ -268,7 +319,10 @@ export default function ProjectPage() {
           if (data.canvasData.canvasOffset) setCanvasOffset(data.canvasData.canvasOffset);
           if (data.canvasData.framePos) setFramePos(data.canvasData.framePos);
           if (data.screens) {
-            const fetchedArtifacts = data.screens.map((s: any) => ({ ...s, isComplete: true }));
+            const fetchedArtifacts = data.screens.map((s: any) => ({ 
+              ...s, 
+              isComplete: s.status === 'completed' 
+            }));
             setArtifacts(fetchedArtifacts);
             setThrottledArtifacts(fetchedArtifacts);
           }
@@ -286,7 +340,7 @@ export default function ProjectPage() {
           const lastAssistant = [...data.messages].reverse().find((m: any) => m.role === 'assistant');
           if (lastAssistant?.plan?.screens) {
             setDesignPlan({ screens: lastAssistant.plan.screens, _markdown: lastAssistant.plan._markdown });
-            if (lastAssistant.plan.status === 'generating') {
+            if (lastAssistant.status === 'generating') {
               setIsGenerating(true);
             }
           }
@@ -391,7 +445,8 @@ export default function ProjectPage() {
         const iframes = document.querySelectorAll('iframe');
         iframes.forEach((iframe, index) => {
           if (iframe.contentWindow === sourceWindow) {
-            setSelectedArtifactIndex(index);
+            const art = artifacts[index];
+            if (art?.id) setSelectedArtifactIds(new Set([art.id]));
             const doc = iframe.contentDocument;
             if (doc) {
               const el = doc.querySelector('.edit-selected-highlight') as HTMLElement;
@@ -404,7 +459,7 @@ export default function ProjectPage() {
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [setDynamicFrameHeights, setSelectedArtifactIndex, setSelectedEl]);
+  }, [setDynamicFrameHeights, setSelectedArtifactIds, setSelectedEl, artifacts]);
 
   const isEditMode = secondarySidebarMode === 'properties';
   useEffect(() => {
@@ -420,17 +475,16 @@ export default function ProjectPage() {
   }, [selectedEl]);
 
   const commitEdits = useCallback(() => {
-    if (selectedArtifactIndex === null) return;
-    const selectedArtifact = throttledArtifacts[selectedArtifactIndex];
+    const selectedId = Array.from(selectedArtifactIds)[0];
+    const selectedArtifact = throttledArtifacts.find(a => a.id === selectedId);
     if (!selectedArtifact) return;
     const iframe = iframeRefs.current[selectedArtifact.title];
     if (!iframe?.contentDocument) return;
     const cleanHtml = sanitizeDocumentHtml(iframe.contentDocument, selectedArtifact.content);
-    const updatedArtifacts = [...throttledArtifacts];
-    updatedArtifacts[selectedArtifactIndex] = { ...selectedArtifact, content: cleanHtml };
+    const updatedArtifacts = throttledArtifacts.map(a => a.id === selectedId ? { ...a, content: cleanHtml } : a);
     setThrottledArtifacts(updatedArtifacts);
     setArtifacts(updatedArtifacts);
-  }, [selectedArtifactIndex, throttledArtifacts, setThrottledArtifacts, setArtifacts]);
+  }, [selectedArtifactIds, throttledArtifacts, setThrottledArtifacts, setArtifacts]);
 
   const commitEditsRef = useRef(commitEdits);
   useEffect(() => { commitEditsRef.current = commitEdits; }, [commitEdits]);
@@ -447,8 +501,8 @@ export default function ProjectPage() {
   useEffect(() => { selectedElRef.current = selectedEl; }, [selectedEl]);
 
   useEffect(() => {
-    if (selectedArtifactIndex === null) return;
-    const currentArtifact = throttledArtifacts[selectedArtifactIndex];
+    const selectedId = Array.from(selectedArtifactIds)[0];
+    const currentArtifact = throttledArtifacts.find(a => a.id === selectedId);
     if (!currentArtifact) return;
     const iframe = iframeRefs.current[currentArtifact.title];
     if (!iframe || !isEditMode) {
@@ -505,7 +559,7 @@ export default function ProjectPage() {
       if (hoveredElRef.current) hoveredElRef.current.classList.remove('edit-hover-highlight');
       if (selectedElRef.current) selectedElRef.current.classList.remove('edit-selected-highlight');
     };
-  }, [isEditMode, selectedArtifactIndex, throttledArtifacts, setSelectedEl]);
+  }, [isEditMode, selectedArtifactIds, throttledArtifacts, setSelectedEl]);
 
   const handleSave = useCallback(async (showToast = true) => {
     if (!project) return;
@@ -603,7 +657,6 @@ export default function ProjectPage() {
 
   const handleCustomSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (status === 'streaming' || status === 'submitted') { stop(); return; }
     if (!input.trim() && attachments?.length === 0) return;
     
     const text = input.trim();
@@ -611,12 +664,6 @@ export default function ProjectPage() {
     setDesignPlan({ screens: [] }); 
     setRealtimeStatus(null);
     
-    // Optimistic update for "instant" feel
-    // We use a temporary ID; useChat will usually append its own.
-    // If the user sees a double message, we can further refine, but this addresses the "instant" requirement.
-    const tempId = `temp-${Date.now()}`;
-    setMessages(prev => [...prev, { id: tempId, role: 'user', content: text } as any]);
-
     sendMessage({ 
       text, 
       files: attachments?.map(a => ({ type: "file" as const, url: a.url, mediaType: "image/*" })),
@@ -625,28 +672,55 @@ export default function ProjectPage() {
   };
 
   const handleArtifactAction = (action: 'more' | 'regenerate' | 'variations', artifact: Artifact) => {
-    if (status !== 'ready') { toast.warning("Sketch is busy."); return; }
     let prompt = "";
-    if (action === 'more') prompt = `Based on the design of the "${artifact.title}" screen, create 2-3 additional screens...`;
+    if (action === 'more') prompt = `Analyze the project based on the "${artifact.title}" screen and architect additional screens (you decide how many, e.g., 2-3 or more) to complete the full user journey and application logic. Generate them now.`;
     else if (action === 'regenerate') { setRegenerateInstructions(""); setIsRegenerateDialogOpen(true); return; }
     else if (action === 'variations') prompt = `Generate 3 distinct layout variations of the "${artifact.title}" screen...`;
-    if (prompt) { setIsGenerating(true); sendMessage({ text: prompt }); }
+    if (prompt) { 
+      setIsGenerating(true); 
+      sendMessage({ text: prompt }, { body: { isSilent: false } }); 
+    }
   };
 
-  const handleRegenerateSubmit = () => {
-    const artifact = artifacts[selectedArtifactIndex ?? -1];
-    if (!artifact) return;
-    const prompt = regenerateInstructions.trim() 
-      ? `Regenerate "${artifact.title}" with instructions: ${regenerateInstructions}. Use EXACT title.` 
-      : `Regenerate and improve "${artifact.title}". Use EXACT title.`;
-    setIsGenerating(true); sendMessage({ text: prompt });
-    setIsRegenerateDialogOpen(false); setRegenerateInstructions("");
+  const handleRegenerateSubmit = async () => {
+    const selectedId = Array.from(selectedArtifactIds)[0];
+    const artifact = artifacts.find(a => a.id === selectedId);
+    if (!artifact || !artifact.id) return;
+    
+    const instructions = regenerateInstructions.trim();
+    setIsGenerating(true); 
+    setRegeneratingArtifactIds(prev => new Set(prev).add(artifact.id!));
+    toast.info(`Regenerating "${artifact.title}"...`);
+    
+    try {
+      await axios.post('/api/regenerate', {
+        projectId,
+        screenId: artifact.id,
+        messages: messages.map(m => ({
+          role: m.role,
+          content: m.content || (m.parts as any[])?.find(p => p.type === 'text')?.text || ""
+        })),
+        instructions
+      });
+    } catch (err) {
+      console.error('Regeneration error:', err);
+      toast.error("Failed to start regeneration.");
+      setIsGenerating(false);
+      setRegeneratingArtifactIds(prev => {
+        const next = new Set(prev);
+        next.delete(artifact.id!);
+        return next;
+      });
+    }
+
+    setIsRegenerateDialogOpen(false); 
+    setRegenerateInstructions("");
   };
 
   const deleteArtifact = (index: number) => {
     const updateFn = (prev: Artifact[]) => prev.filter((_, i) => i !== index);
     setThrottledArtifacts(updateFn); setArtifacts(updateFn);
-    setSelectedArtifactIndex(null); toast.success("Screen removed");
+    setSelectedArtifactIds(new Set()); toast.success("Screen removed");
   };
 
   const captureFrameImage = async (index: number): Promise<string | null> => {
@@ -715,9 +789,9 @@ export default function ProjectPage() {
             commitEdits={commitEdits}
             applyTheme={applyTheme}
             session={session}
-            status={status}
+            status={chatStatus}
             messages={messages}
-            error={error}
+            error={chatError}
           />
           <SecondarySidebar 
             commitEdits={commitEdits}

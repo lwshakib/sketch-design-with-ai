@@ -5,7 +5,7 @@ import { type Artifact } from "@/lib/artifact-renderer";
 import { useProjectStore } from "@/hooks/use-project-store";
 
 interface UseCanvasProps {
-  onPersistFrame: (index: number) => void;
+  onPersistFrame: (indices: number[]) => void;
   onSave: () => void;
   previewRef: React.RefObject<HTMLDivElement | null>;
 }
@@ -26,8 +26,10 @@ export function useCanvas({
     artifactPreviewModes,
     setArtifactPreviewModes,
     dynamicFrameHeights,
-    selectedArtifactIndex,
-    setSelectedArtifactIndex,
+    selectedArtifactIds,
+    setSelectedArtifactIds,
+    selectionBox,
+    setSelectionBox,
     loading,
     activeTool,
     setActiveTool,
@@ -43,6 +45,8 @@ export function useCanvas({
   } = useProjectStore();
   
   const dragStart = useRef({ x: 0, y: 0 });
+  const selectionStartPos = useRef({ x: 0, y: 0 });
+  const initialArtifactPositions = useRef<Record<string, { x: number, y: number }>>({});
   const resizingStartSize = useRef({ width: 0, height: 0 });
   const resizingStartPos = useRef({ x: 0, y: 0 });
   const resizingStartFramePos = useRef({ x: 0, y: 0 });
@@ -57,39 +61,67 @@ export function useCanvas({
   }, [zoom, canvasOffset]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    const rect = previewRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
     if (activeTool === 'hand') {
       setIsPanning(true);
       dragStart.current = { x: e.clientX - canvasOffset.x, y: e.clientY - canvasOffset.y };
+    } else if (activeTool === 'select') {
+      // Start selection box on background
+      selectionStartPos.current = { x: mx, y: my };
+      setSelectionBox({ x1: mx, y1: my, x2: mx, y2: my });
+      if (!(e.shiftKey || e.metaKey)) {
+        setSelectedArtifactIds(new Set());
+      }
     }
-  }, [activeTool, canvasOffset, setIsPanning]);
+  }, [activeTool, canvasOffset, setIsPanning, setSelectionBox, setSelectedArtifactIds, previewRef]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
+    const rect = previewRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
     if (isPanning && activeTool === 'hand') {
       setCanvasOffset({
         x: e.clientX - dragStart.current.x,
         y: e.clientY - dragStart.current.y
       });
-    } else if (isDraggingFrame && activeTool === 'select' && selectedArtifactIndex !== null) {
-      const newX = (e.clientX - dragStart.current.x) / zoom;
-      const newY = (e.clientY - dragStart.current.y) / zoom;
-      
+    } else if (selectionBox && activeTool === 'select') {
+      setSelectionBox({ ...selectionBox, x2: mx, y2: my });
+    } else if (isDraggingFrame && activeTool === 'select' && selectedArtifactIds.size > 0) {
+      const dx = (e.clientX - dragStart.current.x) / zoom;
+      const dy = (e.clientY - dragStart.current.y) / zoom;
+
       const update = (prev: Artifact[]) => {
-        const next = [...prev];
-        if (next[selectedArtifactIndex]) {
-          next[selectedArtifactIndex] = { ...next[selectedArtifactIndex], x: newX, y: newY };
-        }
-        return next;
+        return prev.map(art => {
+          if (art.id && selectedArtifactIds.has(art.id)) {
+            const initial = initialArtifactPositions.current[art.id];
+            if (initial) {
+              return { ...art, x: initial.x + dx, y: initial.y + dy };
+            }
+          }
+          return art;
+        });
       };
       setThrottledArtifacts(update);
       setArtifacts(update);
-    } else if (isResizing && selectedArtifactIndex !== null && resizingHandle) {
+    } else if (isResizing && selectedArtifactIds.size === 1 && resizingHandle) {
+      const selectedId = Array.from(selectedArtifactIds)[0];
+      const selectedIndex = artifacts.findIndex(a => a.id === selectedId);
+      if (selectedIndex === -1) return;
+
       const dx = (e.clientX - resizingStartPos.current.x) / zoom;
       const dy = (e.clientY - resizingStartPos.current.y) / zoom;
       
       const updateArtifact = (prev: Artifact[]) => {
         const next = [...prev];
-        const art = next[selectedArtifactIndex];
+        const art = next[selectedIndex];
         if (!art) return prev;
         
         let newWidth = resizingStartSize.current.width;
@@ -118,7 +150,7 @@ export function useCanvas({
           }
         }
         
-        next[selectedArtifactIndex] = { ...art, width: newWidth, height: newHeight, x: newX, y: newY };
+        next[selectedIndex] = { ...art, width: newWidth, height: newHeight, x: newX, y: newY };
         
         if (artifactPreviewModes[art.title]) {
           setArtifactPreviewModes(prevModes => {
@@ -133,11 +165,55 @@ export function useCanvas({
       setThrottledArtifacts(updateArtifact);
       setArtifacts(updateArtifact);
     }
-  }, [isPanning, activeTool, isDraggingFrame, selectedArtifactIndex, zoom, isResizing, resizingHandle, artifactPreviewModes, setArtifactPreviewModes, setArtifacts, setThrottledArtifacts, setCanvasOffset]);
+  }, [isPanning, activeTool, isDraggingFrame, selectedArtifactIds, zoom, isResizing, resizingHandle, artifactPreviewModes, selectionBox, setArtifactPreviewModes, setArtifacts, setThrottledArtifacts, setCanvasOffset, artifacts, previewRef, setSelectionBox]);
 
   const handleMouseUp = useCallback(() => {
-    if ((isDraggingFrame || isResizing) && selectedArtifactIndex !== null) {
-      onPersistFrame(selectedArtifactIndex);
+    if (selectionBox) {
+      // Calculate selected artifacts
+      const rect = previewRef.current?.getBoundingClientRect();
+      if (rect) {
+        const x1 = Math.min(selectionBox.x1, selectionBox.x2);
+        const y1 = Math.min(selectionBox.y1, selectionBox.y2);
+        const x2 = Math.max(selectionBox.x1, selectionBox.x2);
+        const y2 = Math.max(selectionBox.y1, selectionBox.y2);
+
+        const newlySelected = new Set<string>();
+        artifacts.forEach(art => {
+           if (!art.id) return;
+           const mode = artifactPreviewModes[art.title];
+           const width = art.width || (mode === 'app' ? 380 : mode === 'web' ? 1280 : (art.type === 'app' ? 380 : 1024));
+           const height = art.height || dynamicFrameHeights[art.title] || 800;
+           
+           // Artifact world to screen coordinates
+           const ax1 = (art.x || 0) * zoom + canvasOffset.x;
+           const ay1 = (art.y || 0) * zoom + canvasOffset.y;
+           const ax2 = ax1 + width * zoom;
+           const ay2 = ay1 + height * zoom;
+
+           const overlaps = !(x2 < ax1 || x1 > ax2 || y2 < ay1 || y1 > ay2);
+           if (overlaps) {
+             newlySelected.add(art.id);
+           }
+        });
+
+        if (newlySelected.size > 0) {
+          setSelectedArtifactIds(prev => {
+            const next = new Set(prev);
+            newlySelected.forEach(id => next.add(id));
+            return next;
+          });
+        }
+      }
+      setSelectionBox(null);
+    }
+
+    if ((isDraggingFrame || isResizing) && selectedArtifactIds.size > 0) {
+      const indices = Array.from(selectedArtifactIds)
+        .map(id => artifacts.findIndex(a => a.id === id))
+        .filter(i => i !== -1);
+      if (indices.length > 0) {
+        onPersistFrame(indices);
+      }
     }
     if (isPanning || isDraggingFrame || isResizing) {
       onSave();
@@ -146,18 +222,18 @@ export function useCanvas({
     setIsDraggingFrame(false);
     setIsResizing(false);
     setResizingHandle(null);
-  }, [isDraggingFrame, isResizing, selectedArtifactIndex, isPanning, onPersistFrame, onSave, setIsPanning, setIsDraggingFrame, setIsResizing, setResizingHandle]);
+  }, [isDraggingFrame, isResizing, selectedArtifactIds, isPanning, onPersistFrame, onSave, setIsPanning, setIsDraggingFrame, setIsResizing, setResizingHandle, selectionBox, artifacts, artifactPreviewModes, dynamicFrameHeights, zoom, canvasOffset, setSelectedArtifactIds, previewRef, setSelectionBox]);
 
   const startResizing = useCallback((e: React.MouseEvent, index: number, handle: string) => {
     e.stopPropagation();
     e.preventDefault();
+    const art = artifacts[index];
+    if (!art || !art.id) return;
+
     setIsResizing(true);
     setResizingHandle(handle);
-    setSelectedArtifactIndex(index);
+    setSelectedArtifactIds(new Set([art.id]));
     
-    const art = artifacts[index];
-    if (!art) return;
-
     const mode = artifactPreviewModes[art.title];
     const defaultWidth = mode === 'app' ? 380 : mode === 'web' ? 1280 : (art.type === 'app' ? 380 : 1024);
     const defaultHeight = dynamicFrameHeights[art.title] || 800;
@@ -168,19 +244,45 @@ export function useCanvas({
     };
     resizingStartPos.current = { x: e.clientX, y: e.clientY };
     resizingStartFramePos.current = { x: art.x || 0, y: art.y || 0 };
-  }, [artifacts, artifactPreviewModes, dynamicFrameHeights, setSelectedArtifactIndex, setIsResizing, setResizingHandle]);
+  }, [artifacts, artifactPreviewModes, dynamicFrameHeights, setSelectedArtifactIds, setIsResizing, setResizingHandle]);
 
   const startDraggingFrame = useCallback((e: React.MouseEvent, index: number) => {
     if (activeTool === 'select') {
       e.stopPropagation();
-      setIsDraggingFrame(true);
-      setSelectedArtifactIndex(index);
       const artifact = artifacts[index];
-      const posX = artifact?.x || 0;
-      const posY = artifact?.y || 0;
-      dragStart.current = { x: e.clientX - posX * zoomRef.current, y: e.clientY - posY * zoomRef.current };
+      if (!artifact || !artifact.id) return;
+
+      const isAlreadySelected = selectedArtifactIds.has(artifact.id);
+      
+      if (e.shiftKey || e.metaKey) {
+        setSelectedArtifactIds(prev => {
+          const next = new Set(prev);
+          if (isAlreadySelected) next.delete(artifact.id!);
+          else next.add(artifact.id!);
+          return next;
+        });
+        return;
+      }
+
+      let currentSelection = selectedArtifactIds;
+      if (!isAlreadySelected) {
+        currentSelection = new Set([artifact.id]);
+        setSelectedArtifactIds(currentSelection);
+      }
+
+      setIsDraggingFrame(true);
+      dragStart.current = { x: e.clientX, y: e.clientY };
+      
+      // Store initial positions of all selected artifacts
+      const positions: Record<string, { x: number, y: number }> = {};
+      artifacts.forEach(art => {
+        if (art.id && currentSelection.has(art.id)) {
+          positions[art.id] = { x: art.x || 0, y: art.y || 0 };
+        }
+      });
+      initialArtifactPositions.current = positions;
     }
-  }, [activeTool, artifacts, setSelectedArtifactIndex, setIsDraggingFrame]);
+  }, [activeTool, artifacts, setSelectedArtifactIds, setIsDraggingFrame, selectedArtifactIds]);
 
   const handleZoom = useCallback((newScale: number, mx: number, my: number) => {
     const prevZoom = zoomRef.current;

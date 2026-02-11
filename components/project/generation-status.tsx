@@ -37,6 +37,7 @@ interface GenerationStatusProps {
   planScreens?: any[];
   projectArtifacts?: any[];
   currentScreenTitle?: string;
+  statusMessage?: string;
   className?: string;
 }
 
@@ -47,6 +48,7 @@ export function GenerationStatus({
   planScreens = [],
   projectArtifacts = [],
   currentScreenTitle,
+  statusMessage,
   className 
 }: GenerationStatusProps) {
   const [dummyStatus, setDummyStatus] = useState(DUMMY_STATUSES[0]);
@@ -55,7 +57,7 @@ export function GenerationStatus({
   const { 
     setCanvasOffset, 
     setZoom, 
-    setSelectedArtifactIndex,
+    setSelectedArtifactIds,
     framePos,
     isSidebarVisible
   } = useProjectStore();
@@ -94,7 +96,7 @@ export function GenerationStatus({
     // Standard focus zoom
     const targetZoom = 0.8;
     setZoom(targetZoom);
-    setSelectedArtifactIndex(index);
+    if (artifact.id) setSelectedArtifactIds(new Set([artifact.id]));
 
     // Calculate center
     // CanvasArea has 'justify-center' horizontally and 'items-start pt-36' vertically.
@@ -113,6 +115,8 @@ export function GenerationStatus({
 
     setCanvasOffset({ x: targetX, y: targetY });
   };
+
+  const finalConclusionText = conclusionText || (status === 'complete' ? statusMessage : null);
 
   return (
     <div className={cn("flex flex-col gap-6", className)}>
@@ -187,10 +191,10 @@ export function GenerationStatus({
       </div>
 
       <div className="flex-1 min-w-0">
-        {isComplete && conclusionText ? (
+        {isComplete && finalConclusionText ? (
           <div className="animate-in fade-in slide-in-from-top-2 duration-1000">
             <MessageResponse className="text-foreground/90 text-[13px] leading-relaxed">
-              {conclusionText}
+              {finalConclusionText}
             </MessageResponse>
           </div>
         ) : !isComplete ? (

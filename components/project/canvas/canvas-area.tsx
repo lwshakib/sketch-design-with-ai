@@ -96,8 +96,9 @@ export function CanvasArea({
     setThrottledArtifacts,
     artifacts,
     setArtifacts,
-    selectedArtifactIndex,
-    setSelectedArtifactIndex,
+    selectedArtifactIds,
+    setSelectedArtifactIds,
+    selectionBox,
     isDraggingFrame,
     isResizing,
     isGenerating,
@@ -117,7 +118,8 @@ export function CanvasArea({
     setActiveTool,
     appliedTheme,
     isSidebarVisible,
-    setIsSidebarVisible
+    setIsSidebarVisible,
+    regeneratingArtifactIds
   } = useProjectStore();
 
   const isEditMode = secondarySidebarMode === 'properties';
@@ -131,7 +133,7 @@ export function CanvasArea({
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onClick={(e) => {
-        if (e.target === e.currentTarget) setSelectedArtifactIndex(null);
+        if (e.target === e.currentTarget) setSelectedArtifactIds(new Set());
       }}
       className={cn(
         "flex-1 flex flex-col bg-muted relative overflow-hidden",
@@ -203,7 +205,6 @@ export function CanvasArea({
               <div 
                 key={index}
                 onMouseDown={(e) => {
-                  setSelectedArtifactIndex(index);
                   if (activeTool === 'select') {
                     startDraggingFrame(e, index);
                   }
@@ -214,15 +215,15 @@ export function CanvasArea({
                 )}
                 style={{
                   transform: `translate(${artifact.x || 0}px, ${artifact.y || 0}px)`,
-                  transition: isDraggingFrame && selectedArtifactIndex === index ? 'none' : isResizing ? 'none' : 'transform 0.2s ease-out'
+                  transition: isDraggingFrame && artifact.id && selectedArtifactIds.has(artifact.id) ? 'none' : isResizing ? 'none' : 'transform 0.2s ease-out'
                 }}
               >
                 {/* Modern Floating Toolbar */}
-                {activeTool === 'select' && (selectedArtifactIndex === index || (artifact.isComplete && selectedArtifactIndex === index)) && (
+                {activeTool === 'select' && artifact.id && selectedArtifactIds.has(artifact.id) && selectedArtifactIds.size === 1 && (
                   <div 
                     className={cn(
                       "absolute left-1/2 flex items-center gap-3 z-[70] animate-in fade-in slide-in-from-bottom-2 duration-300 pointer-events-auto",
-                      selectedArtifactIndex !== index && "opacity-0 group-hover:opacity-100"
+                      (!artifact.id || !selectedArtifactIds.has(artifact.id)) && "opacity-0 group-hover:opacity-100"
                     )} 
                     onMouseDown={(e) => e.stopPropagation()}
                     style={{
@@ -441,7 +442,7 @@ export function CanvasArea({
                 )}
 
                 {/* Frame Info Overlay */}
-                {(selectedArtifactIndex === index || isDraggingFrame || artifact.isComplete) && (
+                {(artifact.id && (selectedArtifactIds.has(artifact.id) || isDraggingFrame || artifact.isComplete)) && (
                   <div className="absolute -top-7 left-0 right-0 flex items-center justify-between px-1 pointer-events-none select-none">
                      <span 
                        className="text-[12px] font-bold"
@@ -461,7 +462,7 @@ export function CanvasArea({
                 <div 
                   className={cn(
                     "transition-shadow duration-300 ease-in-out shadow-[0_40px_100px_rgba(0,0,0,0.4)] overflow-hidden border relative flex-shrink-0",
-                    isDraggingFrame && selectedArtifactIndex === index && "shadow-[0_60px_120px_rgba(0,0,0,0.5)]"
+                    isDraggingFrame && artifact.id && selectedArtifactIds.has(artifact.id) && "shadow-[0_60px_120px_rgba(0,0,0,0.5)]"
                   )}
                   style={{
                     width: (() => {
@@ -477,87 +478,59 @@ export function CanvasArea({
                     minHeight: (artifactPreviewModes[artifact.title] === 'app' || (artifact.type === 'app' && !artifactPreviewModes[artifact.title])) ? '800px' : '400px',
                     transition: isResizing ? 'none' : 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     backgroundColor: appliedTheme?.cssVars.background || 'var(--background)',
-                    borderColor: selectedArtifactIndex === index ? SELECTION_BLUE : (appliedTheme?.cssVars.border || 'var(--border)'),
-                    boxShadow: selectedArtifactIndex === index ? `0 0 0 2px ${SELECTION_BLUE}40, 0 40px 100px rgba(0,0,0,0.4)` : undefined
+                    borderColor: artifact.id && selectedArtifactIds.has(artifact.id) ? SELECTION_BLUE : (appliedTheme?.cssVars.border || 'var(--border)'),
+                    boxShadow: artifact.id && selectedArtifactIds.has(artifact.id) ? `0 0 0 2px ${SELECTION_BLUE}40, 0 40px 100px rgba(0,0,0,0.4)` : undefined
                   }}
                 >
-                  {(!artifact.isComplete && !artifact.content) && <ModernShimmer type={artifact.type} appliedTheme={appliedTheme} />}
+                  {((!artifact.isComplete && !artifact.content) || (artifact.id && regeneratingArtifactIds.has(artifact.id))) && (
+                    <ModernShimmer type={artifact.type} appliedTheme={appliedTheme} />
+                  )}
                   
-                  <ArtifactFrame 
-                    artifact={artifact}
-                    index={index}
-                    isEditMode={isEditMode}
-                    activeTool={activeTool}
-                    isDraggingFrame={isDraggingFrame}
-                    appliedTheme={appliedTheme}
-                    onRef={(idx, el) => { 
-                      if (el) (el as any).dataset.artifactTitle = artifact.title;
-                      iframeRefs.current[artifact.title] = el; 
-                    }}
-                  />
+                  <div className={cn(
+                    "w-full h-full transition-opacity duration-500",
+                    artifact.id && regeneratingArtifactIds.has(artifact.id) ? "opacity-30" : "opacity-100"
+                  )}>
+                    <ArtifactFrame 
+                      artifact={artifact}
+                      index={index}
+                      isEditMode={isEditMode}
+                      activeTool={activeTool}
+                      isDraggingFrame={isDraggingFrame}
+                      appliedTheme={appliedTheme}
+                      onRef={(idx, el) => { 
+                        if (el) (el as any).dataset.artifactTitle = artifact.title;
+                        iframeRefs.current[artifact.title] = el; 
+                      }}
+                    />
+                  </div>
                 </div>
 
-                {/* Selection Overlays & Handles */}
-                {selectedArtifactIndex === index && (
+                {artifact.id && selectedArtifactIds.has(artifact.id) && (
                   <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 80 }}>
-                    <div 
-                      onMouseDown={(e) => startResizing(e, index, 'top-left')}
-                      className="absolute top-0 left-0 w-2 h-2 border border-white pointer-events-auto cursor-nwse-resize -translate-x-1/2 -translate-y-1/2" 
-                      style={{ backgroundColor: SELECTION_BLUE }}
-                    />
-                    <div 
-                      onMouseDown={(e) => startResizing(e, index, 'top-right')}
-                      className="absolute top-0 right-0 w-2 h-2 border border-white pointer-events-auto cursor-nesw-resize translate-x-1/2 -translate-y-1/2" 
-                      style={{ backgroundColor: SELECTION_BLUE }}
-                    />
-                    <div 
-                      onMouseDown={(e) => startResizing(e, index, 'bottom-left')}
-                      className="absolute bottom-0 left-0 w-2 h-2 border border-white pointer-events-auto cursor-nesw-resize -translate-x-1/2 translate-y-1/2" 
-                      style={{ backgroundColor: SELECTION_BLUE }}
-                    />
-                    <div 
-                      onMouseDown={(e) => startResizing(e, index, 'bottom-right')}
-                      className="absolute bottom-0 right-0 w-2 h-2 border border-white pointer-events-auto cursor-nwse-resize translate-x-1/2 translate-y-1/2" 
-                      style={{ backgroundColor: SELECTION_BLUE }}
-                    />
-
-                    <div 
-                      onMouseDown={(e) => startResizing(e, index, 'top')}
-                      className="absolute top-0 left-0 right-0 h-2 -translate-y-1/2 pointer-events-auto cursor-ns-resize hover:bg-blue-500/10"
-                    />
-                    <div 
-                      onMouseDown={(e) => startResizing(e, index, 'bottom')}
-                      className="absolute bottom-0 left-0 right-0 h-2 translate-y-1/2 pointer-events-auto cursor-ns-resize hover:bg-blue-500/10"
-                    />
-                    <div 
-                      onMouseDown={(e) => startResizing(e, index, 'left')}
-                      className="absolute top-0 bottom-0 w-2 -translate-x-1/2 pointer-events-auto cursor-ew-resize hover:bg-blue-500/10"
-                    />
-                    <div 
-                      onMouseDown={(e) => startResizing(e, index, 'right')}
-                      className="absolute top-0 bottom-0 w-2 translate-x-1/2 pointer-events-auto cursor-ew-resize hover:bg-blue-500/10"
-                    />
-
-                    <div 
-                      onMouseDown={(e) => startResizing(e, index, 'top')}
-                      className="absolute top-0 left-1/2 w-3 h-1.5 border border-white pointer-events-auto cursor-ns-resize -translate-x-1/2 -translate-y-1/2 rounded-[1px]" 
-                      style={{ backgroundColor: SELECTION_BLUE }}
-                    />
-                    <div 
-                      onMouseDown={(e) => startResizing(e, index, 'bottom')}
-                      className="absolute bottom-0 left-1/2 w-3 h-1.5 border border-white pointer-events-auto cursor-ns-resize -translate-x-1/2 translate-y-1/2 rounded-[1px]" 
-                      style={{ backgroundColor: SELECTION_BLUE }}
-                    />
-                    <div 
-                      onMouseDown={(e) => startResizing(e, index, 'left')}
-                      className="absolute left-0 top-1/2 w-1.5 h-3 border border-white pointer-events-auto cursor-ew-resize -translate-x-1/2 -translate-y-1/2 rounded-[1px]" 
-                      style={{ backgroundColor: SELECTION_BLUE }}
-                    />
-                    <div 
-                      onMouseDown={(e) => startResizing(e, index, 'right')}
-                      className="absolute right-0 top-1/2 w-1.5 h-3 border border-white pointer-events-auto cursor-ew-resize translate-x-1/2 -translate-y-1/2 rounded-[1px]" 
-                      style={{ backgroundColor: SELECTION_BLUE }}
-                    />
+                    {selectedArtifactIds.size === 1 && (
+                      <>
+                        <div 
+                          onMouseDown={(e) => startResizing(e, index, 'top-left')}
+                          className="absolute top-0 left-0 w-2 h-2 border border-white pointer-events-auto cursor-nwse-resize -translate-x-1/2 -translate-y-1/2" 
+                          style={{ backgroundColor: SELECTION_BLUE }}
+                        />
+                        <div 
+                          onMouseDown={(e) => startResizing(e, index, 'top-right')}
+                          className="absolute top-0 right-0 w-2 h-2 border border-white pointer-events-auto cursor-nesw-resize translate-x-1/2 -translate-y-1/2" 
+                          style={{ backgroundColor: SELECTION_BLUE }}
+                        />
+                        <div 
+                          onMouseDown={(e) => startResizing(e, index, 'bottom-left')}
+                          className="absolute bottom-0 left-0 w-2 h-2 border border-white pointer-events-auto cursor-nesw-resize -translate-x-1/2 translate-y-1/2" 
+                          style={{ backgroundColor: SELECTION_BLUE }}
+                        />
+                        <div 
+                          onMouseDown={(e) => startResizing(e, index, 'bottom-right')}
+                          className="absolute bottom-0 right-0 w-2 h-2 border border-white pointer-events-auto cursor-nwse-resize translate-x-1/2 translate-y-1/2" 
+                          style={{ backgroundColor: SELECTION_BLUE }}
+                        />
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -574,6 +547,19 @@ export function CanvasArea({
           </div>
         )}
       </div>
+
+      {/* Selection Box Overlay */}
+      {selectionBox && (
+        <div 
+          className="absolute border border-primary/60 bg-primary/10 pointer-events-none z-[1000] rounded-sm"
+          style={{
+            left: Math.min(selectionBox.x1, selectionBox.x2),
+            top: Math.min(selectionBox.y1, selectionBox.y2),
+            width: Math.abs(selectionBox.x2 - selectionBox.x1),
+            height: Math.abs(selectionBox.y2 - selectionBox.y1)
+          }}
+        />
+      )}
 
       {/* Bottom Toolbar */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">

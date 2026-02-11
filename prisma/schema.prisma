@@ -129,6 +129,8 @@ model Screen {
   isLiked   Boolean  @default(false)
   isDisliked Boolean  @default(false)
   
+  status    MESSAGE_STATUS @default(completed)
+  
   projectId String
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   

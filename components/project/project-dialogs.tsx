@@ -93,55 +93,39 @@ export function ProjectDialogs({
     <>
       {/* Regenerate Dialog */}
       <Dialog open={isRegenerateDialogOpen} onOpenChange={setIsRegenerateDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-zinc-950 border-zinc-800 text-white p-0 overflow-hidden rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-            <DialogHeader className="p-6 pb-0">
-                <div className="flex items-center gap-3 mb-2">
-                    <div className="size-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                        <RotateCcw className="size-5 text-emerald-400" />
-                    </div>
-                    <div>
-                        <DialogTitle className="text-xl font-bold tracking-tight">Regenerate Screen</DialogTitle>
-                        <DialogDescription className="text-zinc-500 text-sm">
-                          Provide specific instructions or leave blank for a general improvement.
-                        </DialogDescription>
-                    </div>
-                </div>
-            </DialogHeader>
-            
-            <div className="p-6 space-y-4">
-                <div className="space-y-2">
-                    <label className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Regeneration Instructions</label>
-                    <Textarea 
-                        placeholder="e.g., Change the hero section to use a mesh gradient, or focus on making the data tables more compact..."
-                        className="min-h-[120px] bg-zinc-900/50 border-zinc-800 rounded-2xl resize-none text-sm focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all placeholder:text-zinc-600"
-                        value={regenerateInstructions}
-                        onChange={(e) => setRegenerateInstructions(e.target.value)}
-                    />
-                </div>
-                
-                <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-4 flex items-start gap-3">
-                    <Sparkles className="size-4 text-emerald-400 mt-0.5" />
-                    <p className="text-[12px] text-zinc-400 leading-relaxed">
-                        The AI will focus on your instructions while maintaining visual consistency with the rest of your project.
-                    </p>
-                </div>
-            </div>
+        <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white rounded-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold tracking-tight">Regenerate Screen</DialogTitle>
+            <DialogDescription className="text-zinc-500 text-sm">
+              Provide instructions or leave blank for a general layout rethink.
+            </DialogDescription>
+          </DialogHeader>
 
-            <DialogFooter className="p-6 bg-zinc-900/30 border-t border-zinc-800/50 flex flex-row items-center justify-end gap-3">
-                <Button 
-                    variant="ghost" 
-                    onClick={() => setIsRegenerateDialogOpen(false)}
-                    className="rounded-xl hover:bg-zinc-800 text-zinc-400 font-bold text-xs uppercase tracking-widest"
-                >
-                    Cancel
-                </Button>
-                <Button 
-                    onClick={handleRegenerateSubmit}
-                    className="rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-[0.1em] px-6 shadow-[0_10px_20px_rgba(16,185,129,0.2)]"
-                >
-                    Regenerate
-                </Button>
-            </DialogFooter>
+          <div className="py-4">
+            <Textarea 
+              placeholder="e.g., Make the background a mesh gradient..."
+              className="min-h-[140px] bg-zinc-900 border-zinc-800 rounded-xl resize-none text-sm focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-600"
+              value={regenerateInstructions}
+              onChange={(e) => setRegenerateInstructions(e.target.value)}
+              autoFocus
+            />
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button 
+              variant="ghost" 
+              onClick={() => setIsRegenerateDialogOpen(false)}
+              className="rounded-xl hover:bg-zinc-900 text-zinc-400 text-sm"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleRegenerateSubmit}
+              className="rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm px-6"
+            >
+              Regenerate
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

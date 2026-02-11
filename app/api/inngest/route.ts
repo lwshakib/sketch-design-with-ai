@@ -1,10 +1,11 @@
 import { serve } from "inngest/next";
 import { inngest } from "@/inngest/client";
-import { generateDesign } from "@/inngest/functions";
+import { generateDesign, regenerateScreen } from "@/inngest/functions";
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
   functions: [
     generateDesign,
+    regenerateScreen,
   ],
 });

@@ -23,6 +23,7 @@ interface ProjectState {
   realtimeStatus: { message: string; status: string; currentScreen?: string } | null;
   loading: boolean;
   websiteUrl: string | null;
+  messages: any[];
 
   // Canvas State
   zoom: number;
@@ -30,7 +31,8 @@ interface ProjectState {
   framePos: { x: number; y: number };
   dynamicFrameHeights: Record<string, number>;
   artifactPreviewModes: Record<string, 'app' | 'web' | null>;
-  selectedArtifactIndex: number | null;
+  selectedArtifactIds: Set<string>;
+  selectionBox: { x1: number; y1: number; x2: number; y2: number } | null;
 
   // Interaction State
   activeTool: 'select' | 'hand' | 'interact';
@@ -62,6 +64,7 @@ interface ProjectState {
   viewingPrompt: string;
   isSidebarVisible: boolean;
   is3xMode: boolean;
+  regeneratingArtifactIds: Set<string>;
 
   // Theme & Selection
   activeThemeId: string | null;
@@ -85,7 +88,8 @@ interface ProjectState {
   setFramePos: (val: { x: number; y: number } | ((prev: { x: number; y: number }) => { x: number; y: number })) => void;
   setDynamicFrameHeights: (val: Record<string, number> | ((prev: Record<string, number>) => Record<string, number>)) => void;
   setArtifactPreviewModes: (val: Record<string, 'app' | 'web' | null> | ((prev: Record<string, 'app' | 'web' | null>) => Record<string, 'app' | 'web' | null>)) => void;
-  setSelectedArtifactIndex: (index: number | null) => void;
+  setSelectedArtifactIds: (val: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
+  setSelectionBox: (box: { x1: number; y1: number; x2: number; y2: number } | null) => void;
 
   setActiveTool: (tool: 'select' | 'hand' | 'interact') => void;
   setIsPanning: (isPanning: boolean) => void;
@@ -115,12 +119,15 @@ interface ProjectState {
   setViewingPrompt: (prompt: string) => void;
   setIsSidebarVisible: (visible: boolean) => void;
   setWebsiteUrl: (url: string | null) => void;
+  setRegeneratingArtifactIds: (val: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
+  setMessages: (val: any[] | ((prev: any[]) => any[])) => void;
 
   setActiveThemeId: (id: string | null) => void;
   setAppliedTheme: (theme: any | null) => void;
   setSelectedEl: (el: HTMLElement | null | ((prev: HTMLElement | null) => HTMLElement | null)) => void;
   
   updateState: (updates: Partial<ProjectState>) => void;
+  resetProjectState: () => void;
 }
 
 export const useProjectStore = create<ProjectState>((set) => ({
@@ -135,13 +142,15 @@ export const useProjectStore = create<ProjectState>((set) => ({
   realtimeStatus: null,
   loading: true,
   websiteUrl: null,
+  messages: [],
 
   zoom: 1,
   canvasOffset: { x: 0, y: 0 },
   framePos: { x: 0, y: 0 },
   dynamicFrameHeights: {},
   artifactPreviewModes: {},
-  selectedArtifactIndex: null,
+  selectedArtifactIds: new Set(),
+  selectionBox: null,
 
   activeTool: 'select',
   isPanning: false,
@@ -171,6 +180,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   viewingPrompt: "",
   isSidebarVisible: true,
   is3xMode: false,
+  regeneratingArtifactIds: new Set(),
 
   activeThemeId: null,
   appliedTheme: null,
@@ -193,7 +203,8 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setFramePos: (val) => set((state) => ({ framePos: typeof val === 'function' ? val(state.framePos) : val })),
   setDynamicFrameHeights: (val) => set((state) => ({ dynamicFrameHeights: typeof val === 'function' ? val(state.dynamicFrameHeights) : val })),
   setArtifactPreviewModes: (val) => set((state) => ({ artifactPreviewModes: typeof val === 'function' ? val(state.artifactPreviewModes) : val })),
-  setSelectedArtifactIndex: (selectedArtifactIndex) => set({ selectedArtifactIndex }),
+  setSelectedArtifactIds: (val) => set((state) => ({ selectedArtifactIds: typeof val === 'function' ? val(state.selectedArtifactIds) : val })),
+  setSelectionBox: (selectionBox) => set({ selectionBox }),
 
   setActiveTool: (activeTool) => set({ activeTool }),
   setIsPanning: (isPanning) => set({ isPanning }),
@@ -223,10 +234,63 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setViewingPrompt: (viewingPrompt) => set({ viewingPrompt }),
   setIsSidebarVisible: (isSidebarVisible) => set({ isSidebarVisible }),
   setWebsiteUrl: (websiteUrl) => set({ websiteUrl }),
+  setRegeneratingArtifactIds: (val) => set((state) => ({ regeneratingArtifactIds: typeof val === 'function' ? val(state.regeneratingArtifactIds) : val })),
+  setMessages: (val) => set((state) => ({ messages: typeof val === 'function' ? val(state.messages) : val })),
 
   setActiveThemeId: (activeThemeId) => set({ activeThemeId }),
   setAppliedTheme: (appliedTheme) => set({ appliedTheme }),
   setSelectedEl: (val) => set((state) => ({ selectedEl: typeof val === 'function' ? val(state.selectedEl) : val })),
   
   updateState: (updates) => set((state) => ({ ...state, ...updates })),
+  resetProjectState: () => set({
+    projectId: null,
+    project: null,
+    artifacts: [],
+    throttledArtifacts: [],
+    attachments: [],
+    input: "",
+    designPlan: { screens: [] },
+    realtimeStatus: null,
+    loading: true,
+    websiteUrl: null,
+    messages: [],
+    zoom: 1,
+    canvasOffset: { x: 0, y: 0 },
+    framePos: { x: 0, y: 0 },
+    dynamicFrameHeights: {},
+    artifactPreviewModes: {},
+    selectedArtifactIds: new Set(),
+    selectionBox: null,
+    activeTool: 'select',
+    isPanning: false,
+    isDraggingFrame: false,
+    isResizing: false,
+    resizingHandle: null,
+    leftSidebarMode: 'chat',
+    secondarySidebarMode: 'none',
+    isCodeViewerOpen: false,
+    isGenerating: false,
+    viewingCode: "",
+    viewingTitle: "",
+    isRegenerateDialogOpen: false,
+    regenerateInstructions: "",
+    isSaving: false,
+    hasUnsavedChanges: false,
+    isEditTitleDialogOpen: false,
+    editingTitle: "",
+    isDeleteDialogOpen: false,
+    isExportSheetOpen: false,
+    exportArtifactIndex: null,
+    hasCopied: false,
+    isPlanDialogOpen: false,
+    viewingPlan: null,
+    isPromptDialogOpen: false,
+    viewingPrompt: "",
+    isSidebarVisible: true,
+    is3xMode: false,
+    activeThemeId: null,
+    appliedTheme: null,
+    selectedEl: null,
+    regeneratingArtifactIds: new Set(),
+  }),
 }));

@@ -10,6 +10,7 @@ export interface Artifact {
   height?: number;
   isLiked?: boolean;
   isDisliked?: boolean;
+  status?: 'generating' | 'completed';
 }
 
 /**

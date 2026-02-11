@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { messages, projectId, is3xMode, websiteUrl } = await req.json();
+    const { messages, projectId, is3xMode, websiteUrl, isSilent } = await req.json();
 
     if (!projectId) {
       return NextResponse.json(
@@ -32,18 +32,20 @@ export async function POST(req: Request) {
       );
     }
 
-    // Save user message - extract text from either content or parts
-    const messageContent = typeof lastMessage.content === 'string' 
-      ? lastMessage.content 
-      : lastMessage.parts?.find((p: any) => p.type === 'text')?.text || "";
-    
-    await prisma.message.create({
-      data: {
-        projectId: projectId,
-        role: "user",
-        content: messageContent
-      },
-    });
+    // Save user message only if NOT silent
+    if (!isSilent) {
+      const messageContent = typeof lastMessage.content === 'string' 
+        ? lastMessage.content 
+        : lastMessage.parts?.find((p: any) => p.type === 'text')?.text || "";
+      
+      await prisma.message.create({
+        data: {
+          projectId: projectId,
+          role: "user",
+          content: messageContent
+        },
+      });
+    }
 
     // Normalize messages for Inngest - convertToModelMessages expects { role, content } format
     const normalizedMessages = (messages || []).map((msg: any) => {
@@ -56,6 +58,9 @@ export async function POST(req: Request) {
       };
     }).filter((msg: any) => msg.content); // Remove empty messages
 
+    console.log('is3xMode',is3xMode);
+    
+
     // Trigger Inngest function
     await inngest.send({
       name: "app/design.generate",
@@ -63,7 +68,8 @@ export async function POST(req: Request) {
         messages: normalizedMessages,
         projectId,
         is3xMode,
-        websiteUrl
+        websiteUrl,
+        isSilent
       },
     });
 
