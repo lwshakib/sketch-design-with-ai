@@ -242,12 +242,14 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
             "absolute inset-0 flex items-start justify-center pt-36",
             !isPanning && "transition-transform duration-75 ease-out"
           )}
-          style={{
-            transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom * 0.5})`,
-            transformOrigin: '0 0'
-          }}
         >
-          <div className="relative">
+          <div 
+            className="relative"
+            style={{
+              transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom * 0.5})`,
+              transformOrigin: '0 0'
+            }}
+          >
             {artifacts.map((artifact, index) => (
                 <div 
                   key={artifact.id || index} 
