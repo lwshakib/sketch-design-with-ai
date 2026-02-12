@@ -52,6 +52,11 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
   const zoomRef = React.useRef(zoom);
   const canvasOffsetRef = React.useRef(canvasOffset);
 
+  // Calculate centering offset so the first artifact is centered at (0,0)
+  const firstArtifact = artifacts[0];
+  const firstWidth = firstArtifact ? (firstArtifact.width || (firstArtifact.type === 'app' ? 380 : 1280)) : 0;
+  const centeringOffset = firstArtifact ? -(firstArtifact.x || 0) - (firstWidth / 2) : 0;
+
   useEffect(() => {
     zoomRef.current = zoom;
     canvasOffsetRef.current = canvasOffset;
@@ -238,7 +243,7 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
             !isPanning && "transition-transform duration-75 ease-out"
           )}
           style={{
-            transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom})`,
+            transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom * 0.5})`,
             transformOrigin: '0 0'
           }}
         >
@@ -248,7 +253,7 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
                   key={artifact.id || index} 
                   className="absolute top-0 left-0 group"
                   style={{
-                    transform: `translate(${artifact.x || 0}px, ${artifact.y || 0}px)`,
+                    transform: `translate(${(artifact.x || 0) + centeringOffset}px, ${artifact.y || 0}px)`,
                   }}
                   onMouseDown={(e) => {
                     if (activeTool === 'select') {

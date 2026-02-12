@@ -283,7 +283,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
             !isPanning && "transition-transform duration-75 ease-out"
           )}
           style={{
-            transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom})`,
+            transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom * 0.5})`,
             transformOrigin: '0 0'
           }}
         >
@@ -293,6 +293,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
               isSelected && "ring-2 ring-blue-500 ring-offset-4 ring-offset-zinc-950 shadow-[0_60px_120px_rgba(0,0,0,0.6)]"
             )}
             style={{ 
+              transform: `translateX(-${getWidth() / 2}px)`,
               width: getWidth(),
               height: dynamicHeight || (viewportMode === 'mobile' ? 800 : (viewportMode === 'tablet' ? 900 : 800)),
               border: `1px solid ${appliedTheme?.cssVars?.border || '#27272a'}`,
