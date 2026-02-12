@@ -281,18 +281,18 @@ export function CanvasArea({
                     onMouseDown={(e) => e.stopPropagation()}
                     style={{
                       bottom: `calc(100% + ${28 + 20 / zoom}px)`,
-                      transform: `translateX(-50%) scale(${1 / zoom})`,
+                      transform: `translateX(-50%) scale(${1.8 / zoom})`,
                       transformOrigin: 'bottom center'
                     }}
                   >
-                    <div className="flex items-center gap-1 px-2 py-1.5 bg-card/95 backdrop-blur-md border border-border/50 rounded-xl shadow-2xl">
+                    <div className="flex items-center gap-1 px-2 py-1.5 bg-card/95 backdrop-blur-md border border-border/50 rounded-lg shadow-2xl">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button 
                             variant="ghost" 
                             size="sm" 
                             disabled={status !== 'ready'}
-                            className="h-9 px-3 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-lg flex items-center gap-2 text-[13px] font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="h-9 px-3 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-md flex items-center gap-2 text-[13px] font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >
                             {status !== 'ready' ? (
                               <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -341,7 +341,7 @@ export function CanvasArea({
                           }
                         }}
                         className={cn(
-                          "h-9 w-9 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-lg flex items-center justify-center transition-all disabled:opacity-30",
+                          "h-9 w-9 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-md flex items-center justify-center transition-all disabled:opacity-30",
                           secondarySidebarMode === 'properties' && "bg-primary/20 text-primary shadow-lg shadow-primary/5 border border-primary/30"
                         )}
                         title="Edit Mode"
@@ -361,7 +361,7 @@ export function CanvasArea({
                           }
                         }}
                         className={cn(
-                          "h-9 w-9 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-lg flex items-center justify-center transition-all disabled:opacity-30",
+                          "h-9 w-9 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-md flex items-center justify-center transition-all disabled:opacity-30",
                           secondarySidebarMode === 'theme' && "bg-primary/20 text-primary shadow-lg shadow-primary/5 border border-primary/30"
                         )}
                         title="Theme Settings"
@@ -374,7 +374,7 @@ export function CanvasArea({
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="h-9 px-3 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-lg flex items-center gap-2 text-[13px] font-medium transition-colors"
+                            className="h-9 px-3 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-md flex items-center gap-2 text-[13px] font-medium transition-colors"
                           >
                             {(() => {
                               const mode = artifactPreviewModes[artifact.title] || artifact.type;
@@ -465,7 +465,7 @@ export function CanvasArea({
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="h-9 w-9 p-0 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-lg flex items-center justify-center font-medium transition-colors"
+                            className="h-9 px-3 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-md flex items-center gap-2 text-[13px] font-medium transition-colors"
                           >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
@@ -508,13 +508,13 @@ export function CanvasArea({
                     </div>
 
                     {/* Feedback Container */}
-                    <div className="flex items-center gap-0.5 px-1.5 py-1.5 bg-card/95 backdrop-blur-md border border-border/50 rounded-xl shadow-2xl">
+                    <div className="flex items-center gap-0.5 px-1.5 py-1.5 bg-card/95 backdrop-blur-md border border-border/50 rounded-lg shadow-2xl">
                       <Button 
                         variant="ghost" 
                         size="sm" 
                         onClick={() => handleFeedback(index, artifact.isLiked ? 'none' : 'like')}
                         className={cn(
-                          "h-9 w-9 p-0 rounded-lg transition-all",
+                          "h-9 w-9 p-0 rounded-md transition-all",
                           artifact.isLiked ? "text-primary bg-primary/10" : "text-foreground/80 hover:text-foreground hover:bg-transparent"
                         )}
                       >
@@ -525,7 +525,7 @@ export function CanvasArea({
                         size="sm" 
                         onClick={() => handleFeedback(index, artifact.isDisliked ? 'none' : 'dislike')}
                         className={cn(
-                          "h-9 w-9 p-0 rounded-lg transition-all",
+                          "h-9 w-9 p-0 rounded-md transition-all",
                           artifact.isDisliked ? "text-red-500 bg-red-500/10" : "text-foreground/80 hover:text-foreground hover:bg-transparent"
                         )}
                       >
