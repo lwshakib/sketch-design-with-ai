@@ -52,6 +52,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
   const dragStart = useRef({ x: 0, y: 0 });
   const zoomRef = useRef(zoom);
   const canvasOffsetRef = useRef(canvasOffset);
+  const currentOffset = useRef(canvasOffset);
 
   useEffect(() => {
     zoomRef.current = zoom;
@@ -59,6 +60,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
   }, [zoom, canvasOffset]);
   
   const previewRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // Initialize
@@ -101,6 +103,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
 
     setZoom(nextZoom);
     setCanvasOffset({ x: newOffsetX, y: newOffsetY });
+    currentOffset.current = { x: newOffsetX, y: newOffsetY }; // Sync ref
   };
 
   useEffect(() => {
@@ -121,10 +124,13 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
 
         handleZoom(zoomRef.current * scaleFactor, mx, my);
       } else {
-        setCanvasOffset(prev => ({
-          x: prev.x - e.deltaX,
-          y: prev.y - e.deltaY
-        }));
+        const prevOffset = canvasOffsetRef.current;
+        const newOffset = {
+          x: prevOffset.x - e.deltaX,
+          y: prevOffset.y - e.deltaY
+        };
+        setCanvasOffset(newOffset);
+        currentOffset.current = newOffset; // Sync ref
       }
     };
 
@@ -150,6 +156,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
           e.preventDefault();
           setZoom(1);
           setCanvasOffset({ x: 0, y: 0 });
+          currentOffset.current = { x: 0, y: 0 };
         }
       }
     };
@@ -173,16 +180,26 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (isPanning) {
-      setCanvasOffset({
-        x: e.clientX - dragStart.current.x,
-        y: e.clientY - dragStart.current.y
+    if (isPanning && contentRef.current) {
+      e.preventDefault(); // Prevent text selection
+      const dx = e.clientX - dragStart.current.x;
+      const dy = e.clientY - dragStart.current.y;
+      
+      currentOffset.current = { x: dx, y: dy };
+
+      requestAnimationFrame(() => {
+        if (contentRef.current) {
+          contentRef.current.style.transform = `translate(${dx}px, ${dy}px) scale(${zoomRef.current * 0.5})`;
+        }
       });
     }
   };
 
   const handleMouseUp = () => {
-    setIsPanning(false);
+    if (isPanning) {
+      setIsPanning(false);
+      setCanvasOffset(currentOffset.current); // Persist final position
+    }
   };
 
   const getWidth = () => {
@@ -304,8 +321,9 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
           )}
         >
           <div 
+            ref={contentRef}
             className={cn(
-              "relative transition-all duration-500 ease-in-out shadow-[0_40px_100px_rgba(0,0,0,0.5)] flex flex-col group",
+              "relative shadow-[0_40px_100px_rgba(0,0,0,0.5)] flex flex-col group",
               isSelected && "ring-2 ring-blue-500 ring-offset-4 ring-offset-zinc-950 shadow-[0_60px_120px_rgba(0,0,0,0.6)]"
             )}
             style={{ 

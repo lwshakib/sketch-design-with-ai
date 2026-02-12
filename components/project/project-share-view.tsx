@@ -48,9 +48,11 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
   const [selectedArtifactId, setSelectedArtifactId] = useState<string | null>(null);
 
   const previewRef = React.useRef<HTMLDivElement>(null);
+  const contentRef = React.useRef<HTMLDivElement>(null);
   const dragStart = React.useRef({ x: 0, y: 0 });
   const zoomRef = React.useRef(zoom);
   const canvasOffsetRef = React.useRef(canvasOffset);
+  const currentOffset = React.useRef(canvasOffset);
 
   // Calculate centering offset so the first artifact is centered at (0,0)
   const firstArtifact = artifacts[0];
@@ -104,6 +106,7 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
 
     setZoom(nextZoom);
     setCanvasOffset({ x: newOffsetX, y: newOffsetY });
+    currentOffset.current = { x: newOffsetX, y: newOffsetY }; // Sync ref
   };
 
   useEffect(() => {
@@ -124,10 +127,13 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
 
         handleZoom(zoomRef.current * scaleFactor, mx, my);
       } else {
-        setCanvasOffset(prev => ({
-          x: prev.x - e.deltaX,
-          y: prev.y - e.deltaY
-        }));
+        const prevOffset = canvasOffsetRef.current;
+        const newOffset = {
+          x: prevOffset.x - e.deltaX,
+          y: prevOffset.y - e.deltaY
+        };
+        setCanvasOffset(newOffset);
+        currentOffset.current = newOffset; // Sync ref
       }
     };
 
@@ -153,6 +159,7 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
           e.preventDefault();
           setZoom(1);
           setCanvasOffset({ x: 0, y: 0 });
+          currentOffset.current = { x: 0, y: 0 };
         }
       }
     };
@@ -176,16 +183,26 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (isPanning) {
-      setCanvasOffset({
-        x: e.clientX - dragStart.current.x,
-        y: e.clientY - dragStart.current.y
+    if (isPanning && contentRef.current) {
+      e.preventDefault(); // Prevent text selection
+      const dx = e.clientX - dragStart.current.x;
+      const dy = e.clientY - dragStart.current.y;
+      
+      currentOffset.current = { x: dx, y: dy };
+
+      requestAnimationFrame(() => {
+        if (contentRef.current) {
+          contentRef.current.style.transform = `translate(${dx}px, ${dy}px) scale(${zoomRef.current * 0.5})`;
+        }
       });
     }
   };
 
   const handleMouseUp = () => {
-    setIsPanning(false);
+    if (isPanning) {
+      setIsPanning(false);
+      setCanvasOffset(currentOffset.current); // Persist final position
+    }
   };
 
   const handleCopyLink = () => {
@@ -264,6 +281,7 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
           )}
         >
           <div 
+            ref={contentRef}
             className="relative"
             style={{
               transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom * 0.5})`,
