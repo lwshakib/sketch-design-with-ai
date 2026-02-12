@@ -232,12 +232,22 @@ export default function ProjectPage() {
         }
         if (event.data.status === 'complete') {
           setIsGenerating(false);
+          const eventMessageId = event.data.messageId;
           setMessages(prev => {
             const updated = [...prev];
-            const lastAssistantIndex = [...updated].reverse().findIndex(m => m.role === 'assistant');
-            if (lastAssistantIndex !== -1) {
-              const actualIndex = updated.length - 1 - lastAssistantIndex;
-              (updated[actualIndex] as any).status = 'completed';
+            // Try to find by messageId first
+            let targetIndex = eventMessageId ? updated.findIndex(m => m.id === eventMessageId) : -1;
+            
+            // Fallback to last assistant message if not found
+            if (targetIndex === -1) {
+              const lastAssistantIndex = [...updated].reverse().findIndex(m => m.role === 'assistant');
+              if (lastAssistantIndex !== -1) {
+                targetIndex = updated.length - 1 - lastAssistantIndex;
+              }
+            }
+
+            if (targetIndex !== -1) {
+              (updated[targetIndex] as any).status = 'completed';
             }
             return updated;
           });
@@ -282,13 +292,18 @@ export default function ProjectPage() {
     });
 
     if (hasPlanUpdate) {
+      const planEvent = newEvents.find((e: any) => e.topic === 'plan');
+      const eventMessageId = planEvent?.data.messageId;
+
       setMessages(prev => {
-        const existingPlanMsgIndex = prev.findIndex(m => m.id === 'assistant-plan');
+        const existingIndex = eventMessageId 
+          ? prev.findIndex(m => m.id === eventMessageId)
+          : prev.findIndex(m => m.id === 'assistant-plan');
         
-        if (existingPlanMsgIndex !== -1) {
+        if (existingIndex !== -1) {
           const updated = [...prev];
-          const existing = updated[existingPlanMsgIndex] as any;
-          updated[existingPlanMsgIndex] = { 
+          const existing = updated[existingIndex] as any;
+          updated[existingIndex] = { 
             ...existing, 
             content: newMarkdown, 
             plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } 
@@ -299,12 +314,21 @@ export default function ProjectPage() {
         const last = prev[prev.length - 1] as any;
         if (last && last.role === 'assistant') {
           const updated = [...prev];
-          updated[updated.length - 1] = { ...last, content: newMarkdown, plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } } as any;
+          updated[updated.length - 1] = { 
+            ...last, 
+            id: eventMessageId || last.id,
+            content: newMarkdown, 
+            plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } 
+          } as any;
           return updated;
         }
         
-        // Only append if we really don't have a place to put it
-        return [...prev, { id: 'assistant-plan', role: 'assistant', content: newMarkdown, plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } } as any];
+        return [...prev, { 
+          id: eventMessageId || 'assistant-plan', 
+          role: 'assistant', 
+          content: newMarkdown, 
+          plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } 
+        } as any];
       });
     }
   }, [realtimeData, setMessages, setDesignPlan, setRealtimeStatus, setIsGenerating, setArtifacts, setThrottledArtifacts, projectId]);

@@ -257,7 +257,8 @@ export const generateDesign = inngest.createFunction(
       topic: "plan",
       data: { 
         plan: plan, 
-        markdown: vision 
+        markdown: vision,
+        messageId: messageId
       }
     });
 
@@ -542,7 +543,8 @@ CRITICAL INSTRUCTIONS:
         topic: "plan",
         data: { 
           plan: plan, 
-          markdown: `Vision: ${vision}\n\nConclusion: ${conclusionText}\n\nSuggestion: ${suggestion}` 
+          markdown: `Vision: ${vision}\n\nConclusion: ${conclusionText}\n\nSuggestion: ${suggestion}`,
+          messageId: messageId
         }
       });
 
@@ -553,7 +555,8 @@ CRITICAL INSTRUCTIONS:
         data: { 
           message: conclusionText, 
           status: "complete",
-          isSilent
+          isSilent,
+          messageId: messageId
         }
       });
     }
