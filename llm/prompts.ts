@@ -318,7 +318,6 @@ export const ScreenGenerationPrompt = `YOU ARE AN ELITE UI/UX DEVELOPER.
 Your task is to generate the production-ready HTML and Tailwind CSS code for a SPECIFIC screen based on the project vision and plan.
 
 ### 🛠️ DESIGN TOOLS:
-- **getAllExamples**: You have access to high-fidelity blueprints. Use them for structural reference.
 - **googleSearch**: You have access to real-time search. Use it to find high-fidelity copy, specific technical documentation (e.g., Chart.js options), or UI inspiration.
 
 ${CORE_DESIGN_PRINCIPLES}
