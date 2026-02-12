@@ -304,7 +304,7 @@ export const generateDesign = inngest.createFunction(
     // Publish the plan immediately so UI shows squares (including IDs)
     const planWithIds = {
       ...plan,
-      screens: plan.screens.map((s, i) => ({ ...s, id: dbScreens[i].id }))
+      screens: plan.screens.map((s: PlanScreen, i: number) => ({ ...s, id: dbScreens[i].id }))
     };
 
     await publish({

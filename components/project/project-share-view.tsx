@@ -11,7 +11,12 @@ import {
   ExternalLink,
   QrCode,
   Copy,
-  Check
+  Check,
+  ZoomIn,
+  ZoomOut,
+  Hand,
+  MousePointer2,
+  RotateCcw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ArtifactFrame } from "@/components/project/canvas/artifact-frame";
@@ -34,6 +39,23 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
   const [hasCopied, setHasCopied] = useState(false);
   const [appliedTheme] = useState<any>(project.appliedTheme || project.themes?.[0] || null);
   const [dynamicHeights, setDynamicHeights] = useState<Record<string, number>>({});
+  
+  // Canvas State
+  const [zoom, setZoom] = useState(1);
+  const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 });
+  const [activeTool, setActiveTool] = useState<'select' | 'hand'>('select');
+  const [isPanning, setIsPanning] = useState(false);
+  const [selectedArtifactId, setSelectedArtifactId] = useState<string | null>(null);
+
+  const previewRef = React.useRef<HTMLDivElement>(null);
+  const dragStart = React.useRef({ x: 0, y: 0 });
+  const zoomRef = React.useRef(zoom);
+  const canvasOffsetRef = React.useRef(canvasOffset);
+
+  useEffect(() => {
+    zoomRef.current = zoom;
+    canvasOffsetRef.current = canvasOffset;
+  }, [zoom, canvasOffset]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -46,7 +68,6 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
             if (artifactTitle) {
               setDynamicHeights(prev => {
                 const currentHeight = prev[artifactTitle] || 0;
-                // Avoid small fluctuations to prevent jitter and loops
                 if (Math.abs(currentHeight - event.data.height) < 10) return prev;
                 return {
                   ...prev,
@@ -61,6 +82,86 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, []);
+
+  // Zoom and Pan Handlers
+  const handleZoom = (newScale: number, mx: number, my: number) => {
+    const prevZoom = zoomRef.current;
+    const prevOffset = canvasOffsetRef.current;
+    const nextZoom = Math.min(Math.max(newScale, 0.1), 5);
+    
+    if (nextZoom === prevZoom) return;
+
+    const dx = (mx - prevOffset.x) / prevZoom;
+    const dy = (my - prevOffset.y) / prevZoom;
+
+    const newOffsetX = mx - dx * nextZoom;
+    const newOffsetY = my - dy * nextZoom;
+
+    setZoom(nextZoom);
+    setCanvasOffset({ x: newOffsetX, y: newOffsetY });
+  };
+
+  useEffect(() => {
+    const element = previewRef.current;
+    if (!element) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const scaleFactor = Math.pow(1.2, -e.deltaY / 120);
+        const rect = element.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        handleZoom(zoomRef.current * scaleFactor, mx, my);
+      } else {
+        setCanvasOffset(prev => ({
+          x: prev.x - e.deltaX,
+          y: prev.y - e.deltaY
+        }));
+      }
+    };
+
+    element.addEventListener('wheel', handleWheel, { passive: false });
+    return () => element.removeEventListener('wheel', handleWheel);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === ' ' && activeTool !== 'hand') setActiveTool('hand');
+      if (e.key.toLowerCase() === 'v') setActiveTool('select');
+      if (e.key.toLowerCase() === 'h') setActiveTool('hand');
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === ' ') setActiveTool('select');
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [activeTool]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (activeTool === 'hand' || e.button === 1) {
+      setIsPanning(true);
+      dragStart.current = { x: e.clientX - canvasOffset.x, y: e.clientY - canvasOffset.y };
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isPanning) {
+      setCanvasOffset({
+        x: e.clientX - dragStart.current.x,
+        y: e.clientY - dragStart.current.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsPanning(false);
+  };
 
   const handleCopyLink = () => {
     const url = window.location.href;
@@ -105,30 +206,67 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
          </div>
       </header>
 
-      {/* Main Content Area - Horizontal Scroll + Vertical Flow */}
-      <main className="flex-1 relative bg-[#09090b] overflow-x-auto custom-scrollbar">
+      {/* Main Content Area */}
+      <main 
+        ref={previewRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setSelectedArtifactId(null);
+        }}
+        className={cn(
+          "flex-1 relative bg-[#09090b] overflow-hidden select-none",
+          activeTool === 'hand' ? (isPanning ? "cursor-grabbing" : "cursor-grab") : "cursor-default"
+        )}
+      >
         {/* Grid Background */}
         <div 
-          className="absolute inset-0 pointer-events-none opacity-[0.05]"
+          className="absolute inset-0 pointer-events-none opacity-[0.03]"
           style={{
             backgroundImage: `radial-gradient(circle, #fff 1px, transparent 1px)`,
-            backgroundSize: `20px 20px`,
-            backgroundAttachment: 'fixed'
+            backgroundSize: `${20 * zoom}px ${20 * zoom}px`,
+            backgroundAttachment: 'fixed',
+            transform: `translate(${canvasOffset.x % (20 * zoom)}px, ${canvasOffset.y % (20 * zoom)}px)`
           }}
         />
 
-        <div className="inline-flex items-start gap-12 px-[10vw] py-24 min-w-full min-h-full">
+        <div 
+          className={cn(
+            "absolute inset-0 flex items-start justify-center pt-36",
+            !isPanning && "transition-transform duration-75 ease-out"
+          )}
+          style={{
+            transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom})`,
+            transformOrigin: '0 0'
+          }}
+        >
+          <div className="relative">
             {artifacts.map((artifact, index) => (
-                <div key={artifact.id || index} className="flex flex-col shrink-0">
+                <div 
+                  key={artifact.id || index} 
+                  className="absolute top-0 left-0 group"
+                  style={{
+                    transform: `translate(${artifact.x || 0}px, ${artifact.y || 0}px)`,
+                  }}
+                  onMouseDown={(e) => {
+                    if (activeTool === 'select') {
+                      e.stopPropagation();
+                      setSelectedArtifactId(artifact.id || null);
+                    }
+                  }}
+                >
                     <div 
-                        className="relative transition-all duration-700 ease-out shadow-[0_60px_120px_-20px_rgba(0,0,0,0.8)] border flex flex-col group"
+                        className={cn(
+                          "relative transition-all duration-300 ease-out shadow-[0_40px_100px_rgba(0,0,0,0.4)] border flex flex-col group overflow-hidden",
+                          selectedArtifactId === artifact.id && "ring-2 ring-blue-500 ring-offset-4 ring-offset-zinc-950 shadow-[0_60px_120px_rgba(0,0,0,0.6)]"
+                        )}
                         style={{ 
                             width: getWidth(artifact.type),
                             height: dynamicHeights[artifact.title] || 800,
-                            maxWidth: '90vw',
                             borderColor: appliedTheme?.cssVars?.border || '#27272a',
                             borderRadius: 12,
-                            overflow: 'hidden',
                             backgroundColor: appliedTheme?.cssVars?.background || '#09090b',
                         }}
                     >
@@ -136,7 +274,7 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
                             artifact={{...artifact, width: getWidth(artifact.type), height: undefined}}
                             index={index}
                             isEditMode={false}
-                            activeTool="select"
+                            activeTool={activeTool}
                             isDraggingFrame={false}
                             appliedTheme={appliedTheme}
                             onRef={(idx, el) => {
@@ -146,8 +284,81 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
                     </div>
                 </div>
             ))}
+          </div>
         </div>
       </main>
+
+      {/* Bottom Toolbar */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto flex items-center gap-4">
+        <div className="flex items-center gap-1 p-1 bg-zinc-900/80 backdrop-blur-xl border border-zinc-800 rounded-2xl shadow-2xl">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setActiveTool('select')}
+            className={cn(
+              "h-10 w-10 rounded-xl transition-all",
+              activeTool === 'select' 
+                ? "bg-white/10 text-white shadow-inner" 
+                : "text-zinc-500 hover:text-white hover:bg-transparent"
+            )}
+            title="Select (V)"
+          >
+            <MousePointer2 className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setActiveTool('hand')}
+            className={cn(
+              "h-10 w-10 rounded-xl transition-all",
+              activeTool === 'hand' 
+                ? "bg-white/10 text-white shadow-inner" 
+                : "text-zinc-500 hover:text-white hover:bg-transparent"
+            )}
+            title="Hand (H / Space)"
+          >
+            <Hand className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Bottom Right Controls */}
+      <div className="absolute bottom-6 right-6 z-50 flex items-center gap-1 p-1 bg-zinc-900/80 backdrop-blur-xl border border-zinc-800 rounded-2xl shadow-2xl pointer-events-auto">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setZoom(prev => Math.max(0.1, prev - 0.1))}
+          className="h-10 w-10 rounded-xl text-zinc-500 hover:text-white hover:bg-transparent transition-all"
+          title="Zoom Out"
+        >
+          <ZoomOut className="h-5 w-5" />
+        </Button>
+        <div className="min-w-[40px] text-center text-[11px] font-bold text-zinc-400">
+          {Math.round(zoom * 100)}%
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setZoom(prev => Math.min(5, prev + 0.1))}
+          className="h-10 w-10 rounded-xl text-zinc-500 hover:text-white hover:bg-transparent transition-all"
+          title="Zoom In"
+        >
+          <ZoomIn className="h-5 w-5" />
+        </Button>
+        <div className="w-[1px] h-4 bg-zinc-800 mx-1" />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => {
+            setZoom(1);
+            setCanvasOffset({ x: 0, y: 0 });
+          }}
+          className="h-10 w-10 rounded-xl text-zinc-500 hover:text-white hover:bg-transparent transition-all"
+          title="Reset View"
+        >
+          <RotateCcw className="h-5 w-5" />
+        </Button>
+      </div>
 
       {/* QR Code Dialog */}
       <Dialog open={showQrDialog} onOpenChange={setShowQrDialog}>
