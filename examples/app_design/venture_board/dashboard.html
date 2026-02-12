@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Executive Dashboard - VentureBoard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#136dec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#0a0f16",
+                        "surface-dark": "#161f2c",
+                        "border-dark": "#242f3e",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            min-height: 100dvh;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+        }
+        .nav-active .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased selection:bg-primary/30">
+<main class="max-w-md mx-auto min-h-screen pb-20 px-4 pt-2">
+<header class="flex items-center justify-between py-3 mb-1">
+<div>
+<h1 class="text-lg font-bold tracking-tight">Executive Dashboard</h1>
+<p class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-widest">VentureBoard Engine</p>
+</div>
+<div class="flex gap-1.5">
+<button class="p-1.5 rounded-lg bg-surface-dark/40 border border-border-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px] text-slate-400">notifications</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-dark/40 border border-border-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px] text-slate-400">tune</span>
+</button>
+</div>
+</header>
+<div class="flex items-center justify-between bg-surface-dark/50 border border-border-dark rounded-lg px-3 py-2 mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">calendar_today</span>
+<span class="text-xs font-semibold">Last 30 Days</span>
+</div>
+<span class="material-symbols-outlined text-slate-500 text-sm">expand_more</span>
+</div>
+<section class="mb-3">
+<div class="bg-surface-dark border border-border-dark rounded-xl p-4 shadow-xl">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Total Revenue</h3>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold tracking-tight">$128,430</span>
+<span class="text-[10px] font-bold text-emerald-500 flex items-center">
+<span class="material-symbols-outlined text-[12px] font-bold">trending_up</span> 12.5%
+                            </span>
+</div>
+</div>
+<div class="flex gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary/20"></div>
+</div>
+</div>
+<div class="relative h-28 w-full mt-2 flex items-end gap-1">
+<div class="flex-1 bg-primary/10 rounded-t-sm h-[40%]"></div>
+<div class="flex-1 bg-primary/10 rounded-t-sm h-[55%]"></div>
+<div class="flex-1 bg-primary/10 rounded-t-sm h-[45%]"></div>
+<div class="flex-1 bg-primary/10 rounded-t-sm h-[70%]"></div>
+<div class="flex-1 bg-primary/10 rounded-t-sm h-[60%]"></div>
+<div class="flex-1 bg-primary/10 rounded-t-sm h-[85%]"></div>
+<div class="flex-1 bg-primary/10 rounded-t-sm h-[75%]"></div>
+<div class="flex-1 bg-primary rounded-t-sm relative h-[100%] shadow-[0_-4px_10px_rgba(19,109,236,0.3)]">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-primary text-white text-[9px] px-1.5 py-0.5 rounded font-bold">Now</div>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-[1px] bg-border-dark"></div>
+</div>
+<div class="flex justify-between mt-1.5 px-0.5">
+<span class="text-[9px] text-slate-500 font-bold">01 JUL</span>
+<span class="text-[9px] text-slate-500 font-bold">15 JUL</span>
+<span class="text-[9px] text-slate-500 font-bold">TODAY</span>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-2 gap-2.5 mb-3">
+<div class="bg-surface-dark border border-border-dark rounded-xl p-3 flex flex-col justify-between min-h-[86px]">
+<div class="flex justify-between items-start">
+<div class="w-6 h-6 rounded bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-base">account_balance_wallet</span>
+</div>
+<div class="flex items-center gap-0.5 px-1 py-0.5 rounded">
+<span class="material-symbols-outlined text-emerald-500 text-[10px] font-bold">north_east</span>
+<span class="text-[9px] font-bold text-emerald-500">4.2%</span>
+</div>
+</div>
+<div class="mt-1">
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">MRR</span>
+<div class="text-xl font-bold tracking-tight">$84.2k</div>
+</div>
+</div>
+<div class="bg-surface-dark border border-border-dark rounded-xl p-3 flex flex-col justify-between min-h-[86px]">
+<div class="flex justify-between items-start">
+<div class="w-6 h-6 rounded bg-rose-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-rose-500 text-base">person_remove</span>
+</div>
+<div class="flex items-center gap-0.5 px-1 py-0.5 rounded">
+<span class="material-symbols-outlined text-emerald-500 text-[10px] font-bold">south_west</span>
+<span class="text-[9px] font-bold text-emerald-500">0.4%</span>
+</div>
+</div>
+<div class="mt-1">
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">Churn</span>
+<div class="text-xl font-bold tracking-tight">1.8%</div>
+</div>
+</div>
+<div class="bg-surface-dark border border-border-dark rounded-xl p-3 flex flex-col justify-between min-h-[86px]">
+<div class="flex justify-between items-start">
+<div class="w-6 h-6 rounded bg-amber-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-amber-500 text-base">group_add</span>
+</div>
+<div class="flex items-center gap-0.5 px-1 py-0.5 rounded">
+<span class="material-symbols-outlined text-rose-500 text-[10px] font-bold">north_east</span>
+<span class="text-[9px] font-bold text-rose-500">+$12</span>
+</div>
+</div>
+<div class="mt-1">
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">CAC</span>
+<div class="text-xl font-bold tracking-tight">$412</div>
+</div>
+</div>
+<div class="bg-surface-dark border border-border-dark rounded-xl p-3 flex flex-col justify-between min-h-[86px]">
+<div class="flex justify-between items-start">
+<div class="w-6 h-6 rounded bg-emerald-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-emerald-500 text-base">monitoring</span>
+</div>
+<div class="bg-slate-800/50 px-1 py-0.5 rounded">
+<span class="text-[9px] font-bold text-slate-400">6x Ratio</span>
+</div>
+</div>
+<div class="mt-1">
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">LTV</span>
+<div class="text-xl font-bold tracking-tight">$2.4k</div>
+</div>
+</div>
+</div>
+<section class="mb-3">
+<div class="bg-surface-dark border border-border-dark rounded-xl p-4">
+<h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Growth Conversion Funnel</h3>
+<div class="space-y-3">
+<div class="relative">
+<div class="flex justify-between text-[10px] mb-1">
+<span class="font-semibold">Leads Generated</span>
+<span class="font-bold">2,400</span>
+</div>
+<div class="w-full bg-slate-800 rounded-full h-1">
+<div class="bg-primary w-full h-full rounded-full"></div>
+</div>
+</div>
+<div class="relative">
+<div class="flex justify-between text-[10px] mb-1">
+<span class="font-semibold text-slate-300">Qualified (MQL)</span>
+<span class="font-bold text-slate-200">1,120 <span class="text-[9px] text-slate-500 font-medium ml-1">46%</span></span>
+</div>
+<div class="w-full bg-slate-800 rounded-full h-1">
+<div class="bg-primary/70 w-[46%] h-full rounded-full"></div>
+</div>
+</div>
+<div class="relative">
+<div class="flex justify-between text-[10px] mb-1">
+<span class="font-semibold text-slate-300">Opportunities</span>
+<span class="font-bold text-slate-200">285 <span class="text-[9px] text-slate-500 font-medium ml-1">11%</span></span>
+</div>
+<div class="w-full bg-slate-800 rounded-full h-1">
+<div class="bg-primary/5 w-[11%] h-full rounded-full"></div>
+</div>
+</div>
+<div class="relative">
+<div class="flex justify-between text-[10px] mb-1">
+<span class="font-semibold text-slate-300">Customers</span>
+<span class="font-bold text-slate-200">82 <span class="text-[9px] text-slate-500 font-medium ml-1">3.4%</span></span>
+</div>
+<div class="w-full bg-slate-800 rounded-full h-1">
+<div class="bg-primary/30 w-[3.4%] h-full rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-border-dark flex justify-between items-center">
+<span class="text-[10px] text-slate-400">Lift: <span class="text-emerald-500 font-bold">+0.8%</span></span>
+<button class="text-primary text-[10px] font-bold flex items-center gap-1 uppercase tracking-widest">
+                        View Pipeline <span class="material-symbols-outlined text-sm">arrow_right_alt</span>
+</button>
+</div>
+</div>
+</section>
+<div class="bg-primary/5 border border-primary/20 rounded-xl p-3.5">
+<div class="flex gap-3">
+<div class="flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-xl">tips_and_updates</span>
+</div>
+<div>
+<h4 class="text-xs font-bold text-primary mb-0.5">Executive Insight</h4>
+<p class="text-[11px] text-slate-400 leading-normal">
+                        Sales velocity up 14%. Recommendation: Accelerate Q3 hiring for Account Management to sustain LTV.
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<nav class="fixed bottom-0 left-0 right-0 bg-background-dark/95 backdrop-blur-xl border-t border-border-dark max-w-md mx-auto z-50">
+<div class="relative flex justify-around items-center h-16 px-2 pb-2">
+<button class="flex flex-col items-center gap-1 flex-1 text-primary nav-active">
+<span class="material-symbols-outlined text-[24px]">grid_view</span>
+<span class="text-[10px] font-bold">Board</span>
+</button>
+<button class="flex flex-col items-center gap-1 flex-1 text-slate-500">
+<span class="material-symbols-outlined text-[24px]">analytics</span>
+<span class="text-[10px] font-medium">Analytics</span>
+</button>
+<button class="flex flex-col items-center gap-1 flex-1 text-slate-500">
+<span class="material-symbols-outlined text-[24px]">query_stats</span>
+<span class="text-[10px] font-medium">Forecast</span>
+</button>
+<button class="flex flex-col items-center gap-1 flex-1 text-slate-500">
+<span class="material-symbols-outlined text-[24px]">group</span>
+<span class="text-[10px] font-medium">Team</span>
+</button>
+</div>
+</nav>
+
+</body></html>
