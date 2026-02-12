@@ -29,43 +29,46 @@ export const ArtifactFrame = React.memo(({
   const lastContentRef = useRef(artifact.content);
 
   const getThemeCSS = useCallback((theme: any) => {
-    if (!theme?.cssVars) return '';
+    if (!theme || !theme.cssVars) return '';
     
     return `
-    :root {
-      --background: ${theme.cssVars.background} !important;
-      --foreground: ${theme.cssVars.foreground} !important;
-      --card: ${theme.cssVars.card} !important;
-      --card-foreground: ${theme.cssVars.cardForeground} !important;
-      --popover: ${theme.cssVars.popover} !important;
-      --popover-foreground: ${theme.cssVars.popoverForeground} !important;
-      --primary: ${theme.cssVars.primary} !important;
-      --primary-foreground: ${theme.cssVars.primaryForeground} !important;
-      --secondary: ${theme.cssVars.secondary} !important;
-      --secondary-foreground: ${theme.cssVars.secondaryForeground} !important;
-      --muted: ${theme.cssVars.muted} !important;
-      --muted-foreground: ${theme.cssVars.mutedForeground} !important;
-      --accent: ${theme.cssVars.accent} !important;
-      --accent-foreground: ${theme.cssVars.accentForeground} !important;
-      --destructive: ${theme.cssVars.destructive} !important;
-      --border: ${theme.cssVars.border} !important;
-      --input: ${theme.cssVars.input} !important;
-      --ring: ${theme.cssVars.ring} !important;
-      --radius: ${theme.cssVars.radius} !important;
-      ${theme.cssVars.fontSans ? `--font-sans: ${theme.cssVars.fontSans} !important;` : ''}
-    }
-    body {
-      background-color: var(--background) !important;
-      color: var(--foreground) !important;
-      ${theme.cssVars.fontSans ? `font-family: var(--font-sans) !important;` : ''}
-    }
-  `}, []);
+      :root {
+        --background: ${theme.cssVars.background} !important;
+        --foreground: ${theme.cssVars.foreground} !important;
+        --card: ${theme.cssVars.card} !important;
+        --card-foreground: ${theme.cssVars.cardForeground} !important;
+        --popover: ${theme.cssVars.popover} !important;
+        --popover-foreground: ${theme.cssVars.popoverForeground} !important;
+        --primary: ${theme.cssVars.primary} !important;
+        --primary-foreground: ${theme.cssVars.primaryForeground} !important;
+        --secondary: ${theme.cssVars.secondary} !important;
+        --secondary-foreground: ${theme.cssVars.secondaryForeground} !important;
+        --muted: ${theme.cssVars.muted} !important;
+        --muted-foreground: ${theme.cssVars.mutedForeground} !important;
+        --accent: ${theme.cssVars.accent} !important;
+        --accent-foreground: ${theme.cssVars.accentForeground} !important;
+        --destructive: ${theme.cssVars.destructive} !important;
+        --border: ${theme.cssVars.border} !important;
+        --input: ${theme.cssVars.input} !important;
+        --ring: ${theme.cssVars.ring} !important;
+        --radius: ${theme.cssVars.radius} !important;
+        ${theme.cssVars.fontSans ? `--font-sans: ${theme.cssVars.fontSans} !important;` : ''}
+      }
+      body {
+        background-color: var(--background) !important;
+        color: var(--foreground) !important;
+        ${theme.cssVars.fontSans ? `font-family: var(--font-sans) !important;` : ''}
+      }
+    `;
+  }, []);
 
   const applyThemeToIframe = useCallback(() => {
-    if (!appliedTheme?.cssVars || !iframeRef.current?.contentDocument) return;
+    if (!appliedTheme || !appliedTheme.cssVars || !iframeRef.current?.contentDocument) return;
     
     const doc = iframeRef.current.contentDocument;
-    let styleEl = doc.getElementById('theme-overrides') as HTMLStyleElement;
+    if (!doc || !doc.head) return;
+
+    let styleEl = doc.getElementById('theme-overrides');
     
     if (!styleEl) {
       styleEl = doc.createElement('style');

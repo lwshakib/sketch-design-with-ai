@@ -206,12 +206,13 @@ export function CanvasArea({
         
         <div className="flex items-center gap-6 pointer-events-auto">
           <div className="flex items-center pointer-events-none">
-             <span className="text-[11px] font-medium text-muted-foreground/60 transition-colors hover:text-muted-foreground flex items-center gap-1">
+             <span className="text-[11px] font-medium text-muted-foreground/60 transition-colors hover:text-muted-foreground flex items-center">
                 <NumberFlow 
-                  value={(credits || 0) / 1000} 
-                  format={{ minimumFractionDigits: 1, maximumFractionDigits: 1 }}
+                  value={(credits || 0) >= 1000 ? (credits || 0) / 1000 : (credits || 0)} 
+                  format={(credits || 0) >= 1000 ? { minimumFractionDigits: 1, maximumFractionDigits: 1 } : {}}
                 />
-                <span>k credits remaining</span>
+                <span className="ml-px">{(credits || 0) >= 1000 ? "k" : ""}</span>
+                <span className="ml-1">credits remaining</span>
              </span>
           </div>
 

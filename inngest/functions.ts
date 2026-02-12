@@ -14,6 +14,36 @@ import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
 import { extractArtifacts } from "../lib/artifact-renderer";
 import { recordCreditUsage } from "../lib/credits";
 
+// Helper: Fetch images and convert to base64 for AI
+async function hydrateImages(messages: any[]) {
+  return await Promise.all(messages.map(async (msg) => {
+    if (msg.role === 'user' && Array.isArray(msg.content)) {
+      const newContent = await Promise.all(msg.content.map(async (part: any) => {
+        if (part.type === 'image' && typeof part.image === 'string' && part.image.startsWith('http')) {
+          try {
+            console.log("Hydrating image:", part.image);
+            const res = await fetch(part.image);
+            const arrayBuffer = await res.arrayBuffer();
+            const base64 = Buffer.from(arrayBuffer).toString('base64');
+            const mime = res.headers.get('content-type') || 'image/jpeg';
+            // Vercel SDK expects base64 data URI or just base64? 
+            // Docs say data URI is safe. 
+            // Actually for `experimental_attachment` it might be different, but for `content` array with `type: image`, usually data URI or URL.
+            // User requested base64. Data URI is standard.
+            return { ...part, image: `data:${mime};base64,${base64}` };
+          } catch (e) {
+            console.error("Failed to fetch image for hydration:", part.image, e);
+            return part; 
+          }
+        }
+        return part;
+      }));
+      return { ...msg, content: newContent };
+    }
+    return msg;
+  }));
+}
+
 
 
 interface PlanScreen {
@@ -108,6 +138,8 @@ export const generateDesign = inngest.createFunction(
       let stepMessages = Array.isArray(messages) ? messages : [];
       if (stepMessages.length === 0) {
         stepMessages = [{ role: 'user', content: 'Create a modern design' }];
+      } else {
+        stepMessages = await hydrateImages(stepMessages);
       }
       
       const inspiration = getAllExamples();
@@ -367,11 +399,14 @@ export const generateDesign = inngest.createFunction(
                 content: `Earlier, I generated the "${s.title}" screen. Here is its code:\n\n${s.content}`
              }))
           ];
+          
+          // Hydrate user messages with base64 images
+          const hydratedSafeMessages = await hydrateImages(safeMessages);
 
           const { text } = await generateText({
             system: systemPrompt,
             messages: [
-              ...safeMessages,
+              ...hydratedSafeMessages,
               ...contextMessages,
               { role: 'user', content: `Here are ALL the high-fidelity design examples available. Use them as references for component structure and quality, regardless of their specific type:\n\n${inspiration}` },
               { role: 'user', content: `Now generate the "${screen.title}" (${screen.type}) screen based on the vision, the full plan, and the previous screens provided above. 
@@ -588,10 +623,12 @@ export const regenerateScreen = inngest.createFunction(
       const themes = project.themes as any || [];
       const selectedTheme = themes.length > 0 ? themes[0] : null;
 
+      const hydratedMessages = await hydrateImages(messages);
+
       const { text } = await generateText({
         system: systemPrompt,
         messages: [
-          ...messages,
+          ...hydratedMessages,
           { role: 'user', content: `Regenerate the "${screen.title}" (${screen.type}) screen.
 Instructions: ${instructions || "Rethink the UI structure entirely while keeping the same theme and core functionality."}
 

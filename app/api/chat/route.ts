@@ -51,15 +51,30 @@ export async function POST(req: Request) {
     }
 
     // Normalize messages for Inngest - convertToModelMessages expects { role, content } format
+    // Normalize messages for Inngest
     const normalizedMessages = (messages || []).map((msg: any) => {
-      const content = typeof msg.content === 'string' 
-        ? msg.content 
-        : msg.parts?.find((p: any) => p.type === 'text')?.text || "";
-      return {
-        role: msg.role,
-        content
-      };
-    }).filter((msg: any) => msg.content); // Remove empty messages
+      // Handle simple string content
+      if (typeof msg.content === 'string' && !msg.parts) {
+        return { role: msg.role, content: msg.content };
+      }
+
+      // Handle multipart content
+      if (msg.parts && Array.isArray(msg.parts)) {
+        const content = msg.parts.map((p: any) => {
+          if (p.type === 'text') return { type: 'text', text: p.text };
+          if (p.type === 'image' || p.type === 'file') return { type: 'image', image: p.url };
+          return null;
+        }).filter(Boolean);
+        
+        return { role: msg.role, content };
+      }
+
+      // Fallback
+      return { role: msg.role, content: msg.content || "" };
+    }).filter((msg: any) => {
+       if (Array.isArray(msg.content)) return msg.content.length > 0;
+       return !!msg.content;
+    });
 
     console.log('is3xMode',is3xMode);
     
