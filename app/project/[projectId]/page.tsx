@@ -215,8 +215,12 @@ export default function ProjectPage() {
         if (event.data.status === 'generating' && event.data.currentScreen) {
           setIsGenerating(true);
           const title = event.data.currentScreen;
+          const screenId = event.data.screenId;
           const updateFn = (prev: Artifact[]) => {
-            if (prev.some(a => a.title === title)) return prev;
+            // Match by ID if available, otherwise fallback to title
+            const existingIdx = prev.findIndex(a => (screenId && a.id === screenId) || a.title === title);
+            if (existingIdx !== -1) return prev;
+
             const planItem = designPlanRef.current.find(p => p.title === title);
             const type = planItem?.type || 'web';
             const getNewX = (existing: any[], scrType: string) => {
@@ -225,7 +229,7 @@ export default function ProjectPage() {
               const currentWidth = getWidth(scrType);
               return last ? (last.x || 0) + (last.width || getWidth(last.type)) + 120 : -(currentWidth / 2);
             };
-            return [...prev, { title, content: "", type: type as 'web' | 'app', isComplete: false, x: getNewX(prev, type), y: 0 }];
+            return [...prev, { id: screenId, title, content: "", type: type as 'web' | 'app', isComplete: false, x: getNewX(prev, type), y: 0 }];
           };
           setArtifacts(updateFn);
           setThrottledArtifacts(updateFn);
@@ -264,7 +268,8 @@ export default function ProjectPage() {
           const newScreen = event.data.screen;
           const updateFn = (prev: Artifact[]) => {
             const updated = [...prev];
-            const idx = updated.findIndex(a => a.title === newScreen.title);
+            // Match by ID
+            const idx = updated.findIndex(a => a.id === newScreen.id);
             if (idx >= 0) {
               updated[idx] = { ...updated[idx], ...newScreen, x: updated[idx].x, y: updated[idx].y, isComplete: true };
               if (newScreen.id) {
@@ -275,12 +280,18 @@ export default function ProjectPage() {
                 });
               }
             } else {
-              const getNewX = (existing: any[], type: string) => {
-                const last = existing[existing.length - 1];
-                const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
-                return last ? (last.x || 0) + (last.width || getWidth(last.type)) + 120 : -(getWidth(type) / 2);
-              };
-              updated.push({ ...newScreen, isComplete: true, x: newScreen.x || getNewX(updated, newScreen.type), y: newScreen.y || 0 });
+              // Fallback to title matching if ID didn't find it (unlikely with new system)
+              const titleIdx = updated.findIndex(a => a.title === newScreen.title);
+              if (titleIdx >= 0) {
+                 updated[titleIdx] = { ...updated[titleIdx], ...newScreen, x: updated[titleIdx].x, y: updated[titleIdx].y, isComplete: true };
+              } else {
+                const getNewX = (existing: any[], type: string) => {
+                  const last = existing[existing.length - 1];
+                  const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
+                  return last ? (last.x || 0) + (last.width || getWidth(last.type)) + 120 : -(getWidth(type) / 2);
+                };
+                updated.push({ ...newScreen, isComplete: true, x: newScreen.x || getNewX(updated, newScreen.type), y: newScreen.y || 0 });
+              }
             }
             return updated;
           };

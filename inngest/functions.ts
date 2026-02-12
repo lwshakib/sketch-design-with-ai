@@ -250,30 +250,6 @@ export const generateDesign = inngest.createFunction(
       if (proj) await recordCreditUsage(proj.userId, 1000);
     });
 
-    // 2. Initial Publication & Persistence
-    // Publish the plan immediately so UI shows squares
-    await publish({
-      channel: `project:${projectId}`,
-      topic: "plan",
-      data: { 
-        plan: plan, 
-        markdown: vision,
-        messageId: messageId
-      }
-    });
-
-    // Update the assistant message with the vision and plan
-    await step.run("update-assistant-message-with-plan", async () => {
-      if (!messageId) return;
-      await prisma.message.update({
-        where: { id: messageId },
-        data: {
-          content: vision,
-          plan: JSON.parse(JSON.stringify(plan))
-        },
-      });
-    });
-
     // Update status to planning
     await publish({
       channel: `project:${projectId}`,
@@ -281,9 +257,8 @@ export const generateDesign = inngest.createFunction(
       data: { message: vision, status: "vision" }
     });
 
-
     // Create placeholder screens in DB so they appear on UI immediately
-    await step.run("init-placeholder-screens", async () => {
+    const dbScreens = await step.run("init-placeholder-screens", async () => {
       // Get the last screen to determine starting X position
       const lastScreen = await prisma.screen.findFirst({
          where: { projectId: projectId },
@@ -300,14 +275,11 @@ export const generateDesign = inngest.createFunction(
          currentX = -(firstWidth / 2);
       }
 
+      const created = [];
       for (const screen of plan.screens) {
          const width = screen.type === 'app' ? 380 : screen.type === 'web' ? 1024 : 800;
          
-         // If there was a previous screen (or loop iteration), add spacing
-         // Actually, the initial currentX is set.
-         // But we need to increment it for subsequent screens in the loop.
-         
-         await prisma.screen.create({
+         const s = await prisma.screen.create({
            data: {
              projectId: projectId,
              title: screen.title,
@@ -320,10 +292,41 @@ export const generateDesign = inngest.createFunction(
              height: null
            }
          });
+         created.push(s);
 
          // Increment X for next screen
          currentX += width + 120;
       }
+      return created;
+    });
+
+    // 2. Initial Publication & Persistence
+    // Publish the plan immediately so UI shows squares (including IDs)
+    const planWithIds = {
+      ...plan,
+      screens: plan.screens.map((s, i) => ({ ...s, id: dbScreens[i].id }))
+    };
+
+    await publish({
+      channel: `project:${projectId}`,
+      topic: "plan",
+      data: { 
+        plan: planWithIds, 
+        markdown: vision,
+        messageId: messageId
+      }
+    });
+
+    // Update the assistant message with the vision and plan
+    await step.run("update-assistant-message-with-plan", async () => {
+      if (!messageId) return;
+      await prisma.message.update({
+        where: { id: messageId },
+        data: {
+          content: vision,
+          plan: JSON.parse(JSON.stringify(planWithIds))
+        },
+      });
     });
 
     // 3. Sequentially generate each screen in the plan
@@ -332,7 +335,8 @@ export const generateDesign = inngest.createFunction(
       for (let i = 0; i < plan.screens.length; i++) {
         const screen = plan.screens[i];
         if (!screen) continue;
-        
+        const screenId = dbScreens[i].id;
+
         // Notify UI: starting screen
         await publish({
           channel: `project:${projectId}`,
@@ -340,7 +344,8 @@ export const generateDesign = inngest.createFunction(
           data: { 
             message: `Designing "${screen.title}"...`, 
             status: "generating", 
-            currentScreen: screen.title 
+            currentScreen: screen.title,
+            screenId: screenId
           }
         });
 
@@ -352,7 +357,8 @@ export const generateDesign = inngest.createFunction(
             data: { 
               message: `Applying theme to "${screen.title}"...`, 
               status: "generating", 
-              currentScreen: screen.title 
+              currentScreen: screen.title,
+              screenId: screenId
             }
           });
           
@@ -374,7 +380,8 @@ export const generateDesign = inngest.createFunction(
             data: { 
               message: `Building components for "${screen.title}"...`, 
               status: "generating", 
-              currentScreen: screen.title 
+              currentScreen: screen.title,
+              screenId: screenId
             }
           });
 
@@ -446,7 +453,6 @@ CRITICAL INSTRUCTIONS:
             type
           };
 
-
           return result;
         });
         
@@ -458,47 +464,16 @@ CRITICAL INSTRUCTIONS:
 
         // Save the screen to database and notify UI
         const savedScreen = await step.run(`save-screen-${i}-db`, async () => {
-          const existingScreen = await prisma.screen.findFirst({
-            where: {
-              projectId: projectId,
-              title: generatedScreen.title
+          return await prisma.screen.update({
+            where: { id: screenId },
+            data: {
+              title: generatedScreen.title || screen.title,
+              content: generatedScreen.content,
+              type: generatedScreen.type,
+              status: "completed",
+              updatedAt: new Date()
             }
           });
-
-          if (existingScreen) {
-             return await prisma.screen.update({
-               where: { id: existingScreen.id },
-               data: {
-                 content: generatedScreen.content,
-                 type: generatedScreen.type,
-                 status: "completed",
-                 updatedAt: new Date()
-               }
-             });
-          } else {
-             const lastScreen = await prisma.screen.findFirst({
-               where: { projectId: projectId },
-               orderBy: { x: 'desc' }
-             });
-
-             const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
-             const currentWidth = getWidth(generatedScreen.type);
-             const newX = lastScreen 
-               ? lastScreen.x + (lastScreen.width || getWidth(lastScreen.type)) + 120 
-               : -(currentWidth / 2);
-
-             return await prisma.screen.create({
-               data: {
-                 projectId: projectId,
-                 title: generatedScreen.title,
-                 content: generatedScreen.content,
-                 type: generatedScreen.type,
-                 status: "completed",
-                 x: newX, y: 0,
-                 width: currentWidth, height: null 
-               }
-             });
-          }
         });
 
         // Deduct screen credits
@@ -531,7 +506,7 @@ CRITICAL INSTRUCTIONS:
           where: { id: messageId },
           data: {
             content: `Vision: ${vision}\n\nConclusion: ${conclusionText}\n\nSuggestion: ${suggestion}`,
-            plan: JSON.parse(JSON.stringify(plan)),
+            plan: JSON.parse(JSON.stringify(planWithIds)),
             status: "completed"
           },
         });
@@ -542,7 +517,7 @@ CRITICAL INSTRUCTIONS:
         channel: `project:${projectId}`,
         topic: "plan",
         data: { 
-          plan: plan, 
+          plan: planWithIds, 
           markdown: `Vision: ${vision}\n\nConclusion: ${conclusionText}\n\nSuggestion: ${suggestion}`,
           messageId: messageId
         }
