@@ -66,6 +66,7 @@ import { UserMenu } from "@/components/user-menu";
 import { type Artifact } from "@/lib/artifact-renderer";
 import { ArtifactFrame } from "./artifact-frame";
 import { ModernShimmer } from "./modern-shimmer";
+import { CanvasToolbar } from "./canvas-toolbar";
 import { LogoIcon } from "@/components/logo";
 import { toast } from "sonner";
 import { useProjectStore } from "@/hooks/use-project-store";
@@ -681,38 +682,7 @@ export function CanvasArea({
       )}
 
       {/* Bottom Toolbar */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
-        <div className="flex items-center gap-1 p-1 bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl shadow-2xl">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setActiveTool('select')}
-            className={cn(
-              "h-10 w-10 rounded-xl transition-all",
-              activeTool === 'select' 
-                ? "bg-primary/10 text-primary shadow-inner hover:bg-primary/10" 
-                : "text-muted-foreground hover:text-foreground hover:bg-transparent"
-            )}
-            title="Select (V)"
-          >
-            <MousePointer2 className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setActiveTool('hand')}
-            className={cn(
-              "h-10 w-10 rounded-xl transition-all",
-              activeTool === 'hand' 
-                ? "bg-primary/10 text-primary shadow-inner hover:bg-primary/10" 
-                : "text-muted-foreground hover:text-foreground hover:bg-transparent"
-            )}
-            title="Hand (H / Space)"
-          >
-            <Hand className="h-5 w-5" />
-          </Button>
-        </div>
-      </div>
+      <CanvasToolbar />
 
       {/* Bottom Right Controls */}
       <div className="absolute bottom-6 right-6 z-50 flex items-center gap-1 p-1 bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl shadow-2xl pointer-events-auto">
