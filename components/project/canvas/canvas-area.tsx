@@ -186,8 +186,8 @@ export function CanvasArea({
         className="absolute inset-0 pointer-events-none opacity-[0.03]"
         style={{
           backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
-          backgroundSize: `${20 * zoom}px ${20 * zoom}px`,
-          transform: `translate(${canvasOffset.x % (20 * zoom)}px, ${canvasOffset.y % (20 * zoom)}px)`
+          backgroundSize: `${20 * zoom * 0.5}px ${20 * zoom * 0.5}px`,
+          transform: `translate(${canvasOffset.x % (20 * zoom * 0.5)}px, ${canvasOffset.y % (20 * zoom * 0.5)}px)`
         }}
       />
 
@@ -242,10 +242,7 @@ export function CanvasArea({
       >
         {throttledArtifacts.length > 0 ? (
           <div 
-            className={cn(
-              "relative",
-              !isDraggingFrame && !isResizing && !isPanning && "transition-transform duration-75 ease-out"
-            )}
+            className="relative"
             style={{
               transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom * 0.5})`,
               transformOrigin: '0 0'

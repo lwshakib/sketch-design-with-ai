@@ -95,8 +95,10 @@ export function useCanvas({
     } else if (selectionBox && activeTool === 'select') {
       setSelectionBox({ ...selectionBox, x2: mx, y2: my });
     } else if (isDraggingFrame && activeTool === 'select' && selectedArtifactIds.size > 0) {
-      const dx = (e.clientX - dragStart.current.x) / zoom;
-      const dy = (e.clientY - dragStart.current.y) / zoom;
+      // The actual scale applied is zoom * 0.5
+      const actualScale = zoom * 0.5;
+      const dx = (e.clientX - dragStart.current.x) / actualScale;
+      const dy = (e.clientY - dragStart.current.y) / actualScale;
 
       const update = (prev: Artifact[]) => {
         return prev.map(art => {
@@ -116,8 +118,9 @@ export function useCanvas({
       const selectedIndex = artifacts.findIndex(a => a.id === selectedId);
       if (selectedIndex === -1) return;
 
-      const dx = (e.clientX - resizingStartPos.current.x) / zoom;
-      const dy = (e.clientY - resizingStartPos.current.y) / zoom;
+      const actualScale = zoom * 0.5;
+      const dx = (e.clientX - resizingStartPos.current.x) / actualScale;
+      const dy = (e.clientY - resizingStartPos.current.y) / actualScale;
       
       const updateArtifact = (prev: Artifact[]) => {
         const next = [...prev];
@@ -184,10 +187,16 @@ export function useCanvas({
            const height = art.height || dynamicFrameHeights[art.title] || (art.type === 'app' ? 800 : 700);
            
            // Artifact world to screen coordinates
-           const ax1 = (art.x || 0) * zoom + canvasOffset.x;
-           const ay1 = (art.y || 0) * zoom + canvasOffset.y;
-           const ax2 = ax1 + width * zoom;
-           const ay2 = ay1 + height * zoom;
+           // The actual scale applied is zoom * 0.5
+           const actualScale = zoom * 0.5;
+           const originX = rect.width / 2;
+           // pt-36 = 144px. If empty, centered.
+           const originY = artifacts.length === 0 ? rect.height / 2 : 144;
+
+           const ax1 = originX + canvasOffset.x + (art.x || 0) * actualScale;
+           const ay1 = originY + canvasOffset.y + (art.y || 0) * actualScale;
+           const ax2 = ax1 + width * actualScale;
+           const ay2 = ay1 + height * actualScale;
 
            const overlaps = !(x2 < ax1 || x1 > ax2 || y2 < ay1 || y1 > ay2);
            if (overlaps) {
@@ -291,24 +300,39 @@ export function useCanvas({
   }, [activeTool, artifacts, setSelectedArtifactIds, setIsDraggingFrame, selectedArtifactIds]);
 
   const handleZoom = useCallback((newScale: number, mx: number, my: number) => {
+    const rect = previewRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    // The content is centered horizontally (OriginX = width / 2)
+    // and pinned to the top (OriginY = 144 or centerY if empty)
+    const originX = rect.width / 2;
+    const originY = artifacts.length === 0 ? rect.height / 2 : 144;
+    
+    // Convert screen-relative mx/my to origin-relative coordinates
+    const localMx = mx - originX;
+    const localMy = my - originY;
+
     const prevZoom = zoomRef.current;
-    const prevOffset = canvasOffsetRef.current;
     
     // Clamp zoom between 0.1 and 5
     const nextZoom = Math.min(Math.max(newScale, 0.1), 5);
     if (nextZoom === prevZoom) return;
 
-    // Calculate the mouse position in 1:1 coordinate space relative to top-left of the canvas
-    const dx = (mx - prevOffset.x) / prevZoom;
-    const dy = (my - prevOffset.y) / prevZoom;
+    // The actual scale applied in CSS is zoom * 0.5
+    const prevActualScale = prevZoom * 0.5;
+    const nextActualScale = nextZoom * 0.5;
+
+    // dx/dy are content-space coordinates relative to the untranslated origin
+    const dx = (localMx - canvasOffsetRef.current.x) / prevActualScale;
+    const dy = (localMy - canvasOffsetRef.current.y) / prevActualScale;
 
     // Calculate new offset to keep the same point under the mouse
-    const newOffsetX = mx - dx * nextZoom;
-    const newOffsetY = my - dy * nextZoom;
+    const newOffsetX = localMx - dx * nextActualScale;
+    const newOffsetY = localMy - dy * nextActualScale;
 
     setZoom(nextZoom);
     setCanvasOffset({ x: newOffsetX, y: newOffsetY });
-  }, [setZoom, setCanvasOffset]);
+  }, [setZoom, setCanvasOffset, artifacts.length, previewRef]);
 
   const resetView = useCallback(() => {
     setCanvasOffset({ x: 0, y: 0 });
