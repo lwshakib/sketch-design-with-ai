@@ -5,6 +5,7 @@ import {
 import { GeminiModel } from "./model";
 import { MAXIMUM_OUTPUT_TOKENS } from "@/lib/constants";
 import { z } from "zod";
+import { google } from "@ai-sdk/google";
 
 export interface GenerateTextOptions {
   system?: string;
@@ -38,6 +39,10 @@ export async function generateText({
     messages,
     temperature,
     maxOutputTokens,
+    toolChoice: 'auto',
+    tools:{
+      googleSearch: google.tools.googleSearch({})
+    },
     // @ts-ignore - handled by SDK
     stopWhen,
   });

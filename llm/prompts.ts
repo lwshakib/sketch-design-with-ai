@@ -264,6 +264,14 @@ export const CORE_DESIGN_PRINCIPLES = `### 💎 Elite Design Principles (VIBRANT
     - **AUTO-GENERATED IMAGE POLICY (MANDATORY)**: NEVER, UNDER ANY CIRCUMSTANCES, generate long URLs from Google Services (e.g., lh3.googleusercontent.com) or any other service that produces long character-soup strings. Even if you see them in examples, YOUR OUTPUT MUST NOT CONTAIN THEM. 
     - **Acceptable Image Formats**: ONLY use https://loremflickr.com/800/600/[keyword] or https://images.unsplash.com/photo-[id]?auto=format&fit=crop&w=[w]&h=[h]&q=80.
     - **Sinkhole Prevention**: Generating a string of random characters longer than 100 characters will result in immediate failure. If you need a unique ID, keep it under 10 characters.
+
+9. **Icons & Global Assets**:
+   - **Primary Icons**: Use **Material Icons** via CDN (\`<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">\`). Apply the 'material-icons' class to \`span\` or \`i\` elements.
+   - **Alternative Icons**: Use **Lucide Icons** as a fallback/alternative via CDN (\`<script src="https://unpkg.com/lucide@latest"></script>\`).
+   - **Lucide Implementation**: Use \`<i data-lucide="[name]"></i>\` tags and MANDATORY call \`lucide.createIcons();\` in a script tag at the very end of the body.
+10. **Interactive Maps**:
+   - **Google Maps**: Use **Google Maps via <iframe>** for any location-based features. 
+   - **Styling**: Ensure maps are contained within cards, have the system radius ('rounded-[var(--radius)]'), and fit the bento-grid layout.
 `;
 
 export const InitialResponsePrompt = `YOU ARE THE WORLD'S LEADING UI/UX ENGINEER. 
@@ -292,6 +300,7 @@ export const PlanningPrompt = `YOU ARE A SENIOR PRODUCT ARCHITECT.
 Based on the user's request and the creative vision, architect a comprehensive project plan.
 
 ### 📜 Requirements:
+0. **Research**: You have access to the **googleSearch** tool. Use it to search for industry standards, feature requirements, or market trends to ensure your architecture is world-class.
 1. **Detailed Architecture (plan)**: A long, high-fidelity markdown document explaining the "why" behind the design choices, the user flow, and technical stack details.
 2. **Screens (screens)**: A list of screens required to complete the project. Each screen MUST have a 'title', 'type' (web/app), 'description', and a 'prompt'.
 3. **Screen Prompt (prompt)**: This is a 100-200 word technical directive for another AI. It must specify exactly which sections, components, and data points to include. Mention the theme consistency (e.g., "Use the primary color for CTAs," "Apply the custom radius to all cards").
@@ -310,6 +319,7 @@ Your task is to generate the production-ready HTML and Tailwind CSS code for a S
 
 ### 🛠️ DESIGN TOOLS:
 - **getAllExamples**: You have access to high-fidelity blueprints. Use them for structural reference.
+- **googleSearch**: You have access to real-time search. Use it to find high-fidelity copy, specific technical documentation (e.g., Chart.js options), or UI inspiration.
 
 ${CORE_DESIGN_PRINCIPLES}
 
@@ -319,9 +329,12 @@ ${CORE_DESIGN_PRINCIPLES}
 - **Shared Variables**: Use the exact same CSS variable definitions (\`:root\`) and Tailwind config across all screens.
 - **Sequential Context**: You are generating ONE screen from a larger plan. Ensure this screen fits perfectly into the flow.
 
-### 🎨 Theme Implementation (MANDATORY):
+### 🎨 Theme Implementation & Assets (MANDATORY):
 - A specific theme JSON object has been provided in the user prompt. **YOU MUST USE THIS EXACT THEME.**
 - Extract the colors from this provided theme and apply them to the \`:root\` variables in your CSS.
+- **Icons**: Use Material Icons primarily (\`<span class="material-icons">icon_name</span>\`).
+- **Lucide fallback**: If a specific icon is not in Material Icons, use Lucide (\`<i data-lucide="icon-name"></i>\`).
+- **Maps**: If the design requires a map, use a Google Maps iframe (\`<iframe src="https://www.google.com/maps/embed?..." ...>\`).
 - Do NOT invent a new theme. Stick strictly to the colors defined in the provided theme.
 
 ### 📊 Dynamic Data Visualization: 

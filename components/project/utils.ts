@@ -31,6 +31,7 @@ export const getInjectedHTML = (html: string) => {
       }
     </style>
     <script id="sketch-tailwind-cdn" src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="sketch-lucide-icons" src="https://unpkg.com/lucide@latest"></script>
     <script id="sketch-tailwind-config">
       if (window.tailwind) {
         tailwind.config = {
@@ -350,6 +351,11 @@ export const getInjectedHTML = (html: string) => {
               } catch (e) {}
             }
 
+            // 6. Initialize Lucide Icons
+            if (window.lucide) {
+              try { window.lucide.createIcons(); } catch (e) {}
+            }
+
             if (savedPath) {
                 var newEl = getElementByPath(savedPath);
                 if (newEl) {
@@ -388,6 +394,9 @@ export const getInjectedHTML = (html: string) => {
 
         var initObserver = function() {
           sendHeight();
+          if (window.lucide) {
+            try { window.lucide.createIcons(); } catch (e) {}
+          }
           observer.observe(document.body, { 
             childList: true, 
             subtree: true, 
