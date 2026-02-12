@@ -237,20 +237,25 @@ export function CanvasArea({
         className={cn(
           "absolute inset-0 flex select-none",
           throttledArtifacts.length === 0 ? "items-center justify-center pb-20" : "items-start justify-center pt-36",
-          !isDraggingFrame && !isResizing && !isPanning && "transition-transform duration-75 ease-out"
         )}
-        style={{
-          transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom})`,
-          transformOrigin: '0 0'
-        }}
       >
         {throttledArtifacts.length > 0 ? (
           <div 
-            className="relative"
+            className={cn(
+              "relative",
+              !isDraggingFrame && !isResizing && !isPanning && "transition-transform duration-75 ease-out"
+            )}
             style={{
-              transform: `translate(${framePos.x}px, ${framePos.y}px)`,
+              transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom * 0.5})`,
+              transformOrigin: '0 0'
             }}
           >
+            <div 
+              className="relative"
+              style={{
+                transform: `translate(${framePos.x}px, ${framePos.y}px)`,
+              }}
+            >
             {throttledArtifacts.map((artifact, index) => (
               <div 
                 key={index}
@@ -561,7 +566,7 @@ export function CanvasArea({
                       if (mode === 'app') return "380px";
                       if (mode === 'web') return "1280px";
                       if (mode === 'tablet') return "768px";
-                      return artifact.width ? `${artifact.width}px` : (artifact.type === 'app' ? "380px" : "1024px");
+                      return artifact.width ? `${artifact.width}px` : (artifact.type === 'app' ? "380px" : "1280px");
                     })(),
                     height: (() => {
                       // Manual resize takes absolute priority
@@ -648,6 +653,7 @@ export function CanvasArea({
                 )}
               </div>
             ))}
+          </div>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center animate-in fade-in zoom-in duration-1000">
