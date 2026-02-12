@@ -112,8 +112,13 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
         e.preventDefault();
         const scaleFactor = Math.pow(1.2, -e.deltaY / 120);
         const rect = element.getBoundingClientRect();
-        const mx = e.clientX - rect.left;
-        const my = e.clientY - rect.top;
+        
+        // Calculate mouse position relative to the center of the viewport
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const mx = (e.clientX - rect.left) - centerX;
+        const my = (e.clientY - rect.top) - centerY;
+
         handleZoom(zoomRef.current * scaleFactor, mx, my);
       } else {
         setCanvasOffset(prev => ({
@@ -132,6 +137,21 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
       if (e.key === ' ' && activeTool !== 'hand') setActiveTool('hand');
       if (e.key.toLowerCase() === 'v') setActiveTool('select');
       if (e.key.toLowerCase() === 'h') setActiveTool('hand');
+
+      // Zooming with keyboard uses center of viewport (0,0 relative to center)
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === '=' || e.key === '+') {
+          e.preventDefault();
+          handleZoom(zoomRef.current * 1.2, 0, 0); // Center is 0,0
+        } else if (e.key === '-') {
+          e.preventDefault();
+          handleZoom(zoomRef.current / 1.2, 0, 0);
+        } else if (e.key === '0') {
+          e.preventDefault();
+          setZoom(1);
+          setCanvasOffset({ x: 0, y: 0 });
+        }
+      }
     };
     const handleKeyUp = (e: KeyboardEvent) => {
       if (e.key === ' ') setActiveTool('select');
@@ -357,7 +377,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setZoom(prev => Math.max(0.1, prev - 0.1))}
+          onClick={() => handleZoom(Math.max(0.1, zoom - 0.1), 0, 0)}
           className="h-10 w-10 rounded-xl text-zinc-500 hover:text-white hover:bg-transparent transition-all"
           title="Zoom Out"
         >
@@ -369,7 +389,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setZoom(prev => Math.min(5, prev + 0.1))}
+          onClick={() => handleZoom(Math.min(5, zoom + 0.1), 0, 0)}
           className="h-10 w-10 rounded-xl text-zinc-500 hover:text-white hover:bg-transparent transition-all"
           title="Zoom In"
         >
