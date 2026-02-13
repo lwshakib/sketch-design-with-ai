@@ -747,32 +747,23 @@ export default function ProjectPage() {
   const handleRegenerateSubmit = async () => {
     const selectedId = Array.from(selectedArtifactIds)[0];
     const artifact = artifacts.find(a => a.id === selectedId);
-    if (!artifact || !artifact.id) return;
+    if (!artifact || !artifact.id || isGenerating) return;
     
     const instructions = regenerateInstructions.trim();
+    const content = `Regenerate the **${artifact.title}** screen. ${instructions ? `\n\n**Instructions:** ${instructions}` : ""}`;
+
     setIsGenerating(true); 
-    setRegeneratingArtifactIds(prev => new Set(prev).add(artifact.id!));
     toast.info(`Regenerating "${artifact.title}"...`);
     
     try {
-      await axios.post('/api/regenerate', {
-        projectId,
-        screenId: artifact.id,
-        messages: messages.map(m => ({
-          role: m.role,
-          content: m.content || (m.parts as any[])?.find(p => p.type === 'text')?.text || ""
-        })),
-        instructions
-      });
+      await sendMessage(
+        { text: content },
+        { body: { screenId: artifact.id, instructions } }
+      );
     } catch (err) {
       console.error('Regeneration error:', err);
       toast.error("Failed to start regeneration.");
       setIsGenerating(false);
-      setRegeneratingArtifactIds(prev => {
-        const next = new Set(prev);
-        next.delete(artifact.id!);
-        return next;
-      });
     }
 
     setIsRegenerateDialogOpen(false); 

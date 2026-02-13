@@ -115,6 +115,7 @@ export function ProjectDialogs({
     setIsSidebarVisible,
     secondarySidebarMode,
     setSecondarySidebarMode,
+    isGenerating,
     project
   } = useProjectStore();
 
@@ -172,9 +173,15 @@ export function ProjectDialogs({
             </Button>
             <Button 
               onClick={handleRegenerateSubmit}
-              className="rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm px-6"
+              disabled={isGenerating}
+              className="rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm px-6 disabled:opacity-50"
             >
-              Regenerate
+              {isGenerating ? (
+                <div className="flex items-center gap-2">
+                  <RotateCcw className="size-4 animate-spin" />
+                  Generating...
+                </div>
+              ) : "Regenerate"}
             </Button>
           </DialogFooter>
         </DialogContent>

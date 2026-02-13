@@ -64,11 +64,221 @@ export const generateDesign = inngest.createFunction(
   { id: "generate-design", retries: 5 },
   { event: "app/design.generate" },
   async ({ event, step, publish }) => {
-    const { messages, projectId, is3xMode, websiteUrl, isSilent } = event.data;
+    const { messages, projectId, is3xMode, websiteUrl, isSilent, screenId, instructions } = event.data;
     
     // Normalize messages
     const safeMessages = (Array.isArray(messages) ? messages : []).filter(m => m.content);
 
+    // --- MODE 1: REGENERATION ---
+    if (screenId) {
+      // --- STEP 1: FETCH DATA ---
+      const originalScreen = await step.run("fetch-original-screen", async () => {
+        return await prisma.screen.findUnique({
+          where: { id: screenId },
+          include: { project: true }
+        });
+      });
+
+      if (!originalScreen) return { error: "Screen not found" };
+
+      // --- STEP 1.5: CHECK CREDITS ---
+      await step.run("check-regeneration-credits", async () => {
+        const user = await prisma.user.findUnique({
+          where: { id: (originalScreen as any).project.userId },
+          select: { credits: true }
+        });
+        if (!user || user.credits < 2000) throw new Error("Insufficient credits for screen regeneration");
+      });
+
+      // --- STEP 2: INITIAL PERSISTENCE (Message & New Screen) ---
+      const { assistantMessageId, newScreenId } = await step.run("init-regeneration-assets", async () => {
+        // Create assistant message
+        const msg = await prisma.message.create({
+          data: {
+            projectId: projectId,
+            role: "assistant",
+            content: `*Architecting refactored layout for "${originalScreen.title}"...*`,
+            status: "generating",
+          },
+        });
+
+        // Calculate position for new screen (place it after the rightmost screen)
+        const lastScreen = await prisma.screen.findFirst({
+          where: { projectId: projectId },
+          orderBy: { x: 'desc' }
+        });
+
+        const currentX = lastScreen 
+          ? lastScreen.x + (lastScreen.width || (lastScreen.type === 'app' ? 380 : 1024)) + 120 
+          : originalScreen.x + (originalScreen.width || (originalScreen.type === 'app' ? 380 : 1024)) + 120;
+        
+        const newScreen = await prisma.screen.create({
+          data: {
+            projectId: projectId,
+            title: `${originalScreen.title} (Refactored)`,
+            content: "", // Placeholder
+            type: originalScreen.type,
+            status: "generating",
+            x: currentX,
+            y: originalScreen.y,
+            width: originalScreen.width || (originalScreen.type === 'app' ? 380 : 1024),
+            height: originalScreen.height
+          }
+        });
+
+        return { assistantMessageId: msg.id, newScreenId: newScreen.id };
+      });
+
+      // --- STEP 1.7: GENERATE REGENERATION METADATA ---
+      const { conclusionText, suggestion } = await step.run("generate-regeneration-metadata", async () => {
+        const hydratedMessages = await hydrateImages(safeMessages);
+        const { object } = await generateObject({
+          system: PlanningPrompt + "\n\nCRITICAL: The user has requested to REGENERATE/REFACTOR an existing screen. Generate a summary of the refactoring and a suggestion for a COMPLETELY NEW screen (never a regeneration of an existing one) that would complement the existing set and complete the user journey. The suggestion must be a question about adding a new feature or page.",
+          messages: [
+            ...hydratedMessages,
+            { role: 'assistant', content: `I am now regenerating the "${originalScreen.title}" screen based on your instructions: ${instructions || "General refactoring"}.` }
+          ] as any,
+          schema: z.object({
+            conclusionText: z.string().describe("Summary of the refactoring process."),
+            suggestion: z.string().describe("A suggestion for a NEW screen (never a regeneration) to add to the project. Format as a question.")
+          })
+        });
+        return object;
+      });
+
+      const regenPlan = {
+        screens: [{
+          id: newScreenId,
+          title: `${originalScreen.title} (Refactored)`,
+          type: originalScreen.type,
+          description: `Refactored version of ${originalScreen.title}`
+        }],
+        conclusionText,
+        suggestion
+      };
+
+      // Notify UI: add the message to the sidebar and start generation state
+      await publish({
+        channel: `project:${projectId}`,
+        topic: "plan",
+        data: {
+          markdown: `*Architecting refactored layout for "${originalScreen.title}"...*`,
+          messageId: assistantMessageId,
+          plan: regenPlan
+        }
+      });
+
+      await publish({
+        channel: `project:${projectId}`,
+        topic: "status",
+        data: { 
+          message: `Refactoring "${originalScreen.title}"...`, 
+          status: "generating", 
+          currentScreen: `${originalScreen.title} (Refactored)`,
+          screenId: newScreenId 
+        }
+      });
+
+      // --- STEP 3: GENERATE NEW CODE ---
+      const generatedScreen = await step.run("generate-new-code", async () => {
+        const inspiration = getAllExamples();
+        const systemPrompt = ScreenGenerationPrompt + "\n\nCRITICAL: You are REGENERATING/REFACTORING an existing screen. Rethink the layout and visual rhythm entirely while maintaining core functionality and branding.";
+        
+        const project = originalScreen.project;
+        const selectedTheme = project.selectedTheme || (project.themes as any[])?.[0] || null;
+
+        const hydratedMessages = await hydrateImages(safeMessages);
+
+        const { text } = await generateText({
+          system: systemPrompt,
+          messages: [
+            ...hydratedMessages,
+            { role: 'assistant', content: `Current Screen Code for "${originalScreen.title}":\n\n${originalScreen.content}` },
+            { role: 'user', content: `Regenerate the "${originalScreen.title}" (${originalScreen.type}) screen using the code provided above as a reference. 
+  Instructions: ${instructions || "Rethink the UI structure entirely while keeping the same theme and core functionality."}
+
+  ${selectedTheme ? `IMPORTANT: Use this theme for the color palette:\n${JSON.stringify(selectedTheme, null, 2)}` : ''}
+
+  CRITICAL INSTRUCTIONS:
+  1. CONSISTENCY: You MUST use the exact same color palette and typography as the project.
+  2. NEW LAYOUT: Do NOT repeat the previous layout. Rethink the component placement and visual rhythm. Rebuild it from the ground up if necessary.
+  3. FORMAT: You MUST wrap the code in a single artifact block with title="${originalScreen.title} (Refactored)".` }
+          ] as any,
+          maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
+          temperature: 0.8,
+        });
+
+        const artifacts = extractArtifacts(text);
+        return artifacts[0] || { title: `${originalScreen.title} (Refactored)`, content: text, type: originalScreen.type };
+      });
+
+      // Deduct regeneration credits
+      await step.run("deduct-regeneration-credits", async () => {
+        await recordCreditUsage((originalScreen as any).project.userId, 2000);
+      });
+
+      // --- STEP 4: PERSIST & NOTIFY ---
+      const finalScreen = await step.run("update-screen-db", async () => {
+        return await prisma.screen.update({
+          where: { id: newScreenId },
+          data: {
+            title: generatedScreen.title || `${originalScreen.title} (Refactored)`,
+            content: generatedScreen.content,
+            status: "completed",
+            updatedAt: new Date()
+          }
+        });
+      });
+
+      const finalMarkdown = `Conclusion: ${conclusionText}\n\nSuggestion: ${suggestion}`;
+
+      // Update the assistant message
+      await step.run("update-regeneration-message", async () => {
+        await prisma.message.update({
+          where: { id: assistantMessageId },
+          data: {
+            content: finalMarkdown,
+            plan: regenPlan,
+            status: "completed"
+          },
+        });
+      });
+
+      // Final completion signals
+      await publish({
+        channel: `project:${projectId}`,
+        topic: "plan",
+        data: {
+          markdown: finalMarkdown,
+          messageId: assistantMessageId,
+          plan: regenPlan
+        }
+      });
+
+      await publish({
+        channel: `project:${projectId}`,
+        topic: "status",
+        data: { 
+          message: `"${finalScreen.title}" complete.`, 
+          status: "partial_complete",
+          screen: finalScreen
+        }
+      });
+
+      await publish({
+         channel: `project:${projectId}`,
+         topic: "status",
+         data: {
+            message: `Regeneration complete.`,
+            status: "complete",
+            messageId: assistantMessageId
+         }
+      });
+
+      return { success: true };
+    }
+
+    // --- MODE 2: FULL DESIGN GENERATION ---
     // --- STEP PRE-0: INITIAL PERSISTENCE ---
     // Create the assistant message immediately so it shows up on UI
     const messageId = await step.run("save-initial-assistant-message", async () => {
@@ -610,133 +820,6 @@ CRITICAL INSTRUCTIONS:
     return { success: true };
   }
 );
-
-// --- worker: regenerate specific screen ---
-export const regenerateScreen = inngest.createFunction(
-  { id: "regenerate-screen", retries: 5 },
-  { event: "app/screen.regenerate" },
-  async ({ event, step, publish }) => {
-    const { messages, projectId, screenId, instructions } = event.data;
-
-    // --- STEP 1: FETCH DATA ---
-    const screen = await step.run("fetch-screen", async () => {
-      return await prisma.screen.findUnique({
-        where: { id: screenId },
-        include: { project: true }
-      });
-    });
-
-    if (!screen) return { error: "Screen not found" };
-
-    // --- STEP 1.5: CHECK CREDITS ---
-    await step.run("check-regeneration-credits", async () => {
-      const user = await prisma.user.findUnique({
-        where: { id: (screen as any).project.userId },
-        select: { credits: true }
-      });
-      if (!user || user.credits < 2000) throw new Error("Insufficient credits for screen regeneration");
-    });
-
-    // Update screen status to generating
-    await step.run("set-screen-status-generating", async () => {
-      await prisma.screen.update({
-        where: { id: screenId },
-        data: { status: "generating" }
-      });
-    });
-
-    // Notify UI: regeneration started for this screen
-    await publish({
-      channel: `project:${projectId}`,
-      topic: "status",
-      data: { 
-        message: `Regenerating "${screen.title}"...`, 
-        status: "regenerating", 
-        screenId: screenId 
-      }
-    });
-
-    // --- STEP 2: GENERATE NEW CODE ---
-    const generatedScreen = await step.run("generate-new-code", async () => {
-      // Check for regeneration credits (2000)
-      const user = await prisma.user.findUnique({
-        where: { id: (screen as any).project.userId },
-        select: { credits: true }
-      });
-      if (!user || user.credits < 2000) throw new Error("Insufficient credits for screen regeneration");
-
-      const inspiration = getAllExamples();
-      const systemPrompt = ScreenGenerationPrompt + "\n\nCRITICAL: You are REGENERATING an existing screen. Rethink the layout and visual rhythm entirely while maintaining the core functionality.";
-      
-      const project = screen.project;
-      const selectedTheme = project.selectedTheme || (project.themes as any[])?.[0] || null;
-
-      const hydratedMessages = await hydrateImages(messages);
-
-      const { text } = await generateText({
-        system: systemPrompt,
-        messages: [
-          ...hydratedMessages,
-          { role: 'user', content: `Regenerate the "${screen.title}" (${screen.type}) screen.
-Instructions: ${instructions || "Rethink the UI structure entirely while keeping the same theme and core functionality."}
-
-${selectedTheme ? `IMPORTANT: Use this theme for the color palette:\n${JSON.stringify(selectedTheme, null, 2)}` : ''}
-
-CRITICAL INSTRUCTIONS:
-1. CONSTISTENCY: You MUST use the exact same color palette and typography as the project.
-2. NEW LAYOUT: Do NOT repeat the previous layout. Rethink the component placement.
-3. FORMAT: You MUST wrap the code in a single artifact block with title="${screen.title}".` }
-        ] as any,
-        maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
-        temperature: 0.8, // Slightly higher for more variety
-      });
-
-      const artifacts = extractArtifacts(text);
-      return artifacts[0] || { title: screen.title, content: text, type: screen.type };
-    });
-
-    // Deduct regeneration credits
-    await step.run("deduct-regeneration-credits", async () => {
-      await recordCreditUsage((screen as any).project.userId, 2000);
-    });
-
-    // --- STEP 3: PERSIST & NOTIFY ---
-    const updatedScreen = await step.run("update-screen-db", async () => {
-      return await prisma.screen.update({
-        where: { id: screenId },
-        data: {
-          content: generatedScreen.content,
-          status: "completed",
-          updatedAt: new Date()
-        }
-      });
-    });
-
-    await publish({
-      channel: `project:${projectId}`,
-      topic: "status",
-      data: { 
-        message: `"${screen.title}" regenerated.`, 
-        status: "partial_complete",
-        screen: updatedScreen,
-        isSilent: true
-      }
-    });
-
-    await publish({
-       channel: `project:${projectId}`,
-       topic: "status",
-       data: {
-          message: `Regeneration of "${screen.title}" complete.`,
-          status: "complete",
-          isSilent: true
-       }
-    });
-
-    return { success: true };
-  }
-);
-
 
 
 // --- Daily Credit Reset ---
