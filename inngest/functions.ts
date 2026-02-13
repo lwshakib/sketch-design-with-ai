@@ -114,14 +114,14 @@ export const generateDesign = inngest.createFunction(
       });
     }
 
-    // --- STEP 1 & 2: VISION & PLANNING ---
+    // --- STEP 1: INITIAL METADATA ---
     await publish({
       channel: `project:${projectId}`,
       topic: "status",
-      data: { message: "Synthesizing design vision...", status: "vision" }
+      data: { message: "Architecting project flow...", status: "vision" }
     });
 
-    const { plan, vision, conclusionText, suggestion } = await step.run("generate-design-manifest", async () => {
+    const { conclusionText, suggestion } = await step.run("generate-design-metadata", async () => {
       // Check credits (1000)
       const proj = await prisma.project.findUnique({
           where: { id: projectId },
@@ -146,8 +146,6 @@ export const generateDesign = inngest.createFunction(
 
       let systemPrompt = PlanningPrompt + `\n\nUse these high-fidelity design examples as your primary inspiration for quality and code structure:\n${inspiration}`;
       
-      systemPrompt += `\n\nCRITICAL ON REGENERATION: If the user explicitly asks to 'Regenerate' a specific screen (especially if no other instructions are provided), you MUST provide a fundamentally different layout, structural composition, and visual rhythm for that screen. Avoid repeating the previous design structure. Rethink the wireframe from scratch while maintaining the core feature set and the selected theme.`;
-      
       if (websiteReferenceContext) {
         systemPrompt += `\n\nCRITICAL: The user has provided a reference website. Study its content, structure, and style to inform your design plan:\n${websiteReferenceContext}`;
       }
@@ -156,42 +154,123 @@ export const generateDesign = inngest.createFunction(
         system: systemPrompt,
         messages: stepMessages as any,
         schema: z.object({
-          vision: z.string().describe("A single, high-fidelity sentence describing the core visual style and design philosophy."),
-          themes: z.array(z.object({
-            name: z.string(),
-            colors: z.object({
-              background: z.string(),
-              foreground: z.string(),
-              primary: z.string(),
-              primaryForeground: z.string(),
-              secondary: z.string(),
-              secondaryForeground: z.string(),
-              muted: z.string(),
-              mutedForeground: z.string(),
-              accent: z.string(),
-              accentForeground: z.string(),
-              border: z.string(),
-              input: z.string(),
-              ring: z.string(),
-              radius: z.string(),
-              card: z.string(),
-              cardForeground: z.string(),
-              popover: z.string(),
-              popoverForeground: z.string(),
-            })
-            })).min(1),
+          conclusionText: z.string().describe("A detailed Markdown summary. Format: 'The [Screen Title] screens have been architected:', followed by a bulleted list '* **[Title]**: [Description]', ending with a follow-up question."),
+          suggestion: z.string().describe("A single, proactive suggestion for an additional full SCREEN (not just a modal, component, or dialog) that would complement the current design plan. Format as a question.")
+        })
+      });
+
+      return { 
+        conclusionText: object.conclusionText,
+        suggestion: object.suggestion
+      };
+    });
+
+    // --- STEP 2: THEME GENERATION (OR FETCH) ---
+    await publish({
+      channel: `project:${projectId}`,
+      topic: "status",
+      data: { message: "Exploring color palettes...", status: "vision" }
+    });
+
+    const { themes, selectedTheme } = await step.run("generate-design-themes", async () => {
+      // Fetch existing
+      const proj = await prisma.project.findUnique({
+        where: { id: projectId },
+        select: { themes: true, selectedTheme: true }
+      });
+      
+      let finalThemes = (proj?.themes as any[]) || [];
+      let finalSelectedTheme = (proj?.selectedTheme as any) || null;
+
+      if (finalThemes.length === 0) {
+        // Normalize messages
+        let stepMessages = Array.isArray(messages) ? messages : [];
+        if (stepMessages.length === 0) {
+          stepMessages = [{ role: 'user', content: 'Create a modern design' }];
+        } else {
+          stepMessages = await hydrateImages(stepMessages);
+        }
+
+        const { object } = await generateObject({
+          system: PlanningPrompt + "\n\nCRITICAL: You are generating exactly 10 high-fidelity color palettes for this project.",
+          messages: stepMessages as any,
+          schema: z.object({
+            themes: z.array(z.object({
+              name: z.string(),
+              colors: z.object({
+                background: z.string(),
+                foreground: z.string(),
+                primary: z.string(),
+                primaryForeground: z.string(),
+                secondary: z.string(),
+                secondaryForeground: z.string(),
+                muted: z.string(),
+                mutedForeground: z.string(),
+                accent: z.string(),
+                accentForeground: z.string(),
+                border: z.string(),
+                input: z.string(),
+                ring: z.string(),
+                radius: z.string(),
+                card: z.string(),
+                cardForeground: z.string(),
+                popover: z.string(),
+                popoverForeground: z.string(),
+              })
+            })).min(10).max(10).describe("Exactly 10 distinct, high-fidelity color palettes.")
+          })
+        });
+
+        finalThemes = object.themes;
+        finalSelectedTheme = finalThemes[0];
+
+        // Update Project
+        await prisma.project.update({
+          where: { id: projectId },
+          data: { 
+            themes: finalThemes,
+            selectedTheme: finalSelectedTheme
+          }
+        });
+      }
+
+      return { themes: finalThemes, selectedTheme: finalSelectedTheme };
+    });
+
+    // --- STEP 3: SCREEN PLANNING ---
+    await publish({
+      channel: `project:${projectId}`,
+      topic: "status",
+      data: { message: "Designing screen hierarchy...", status: "vision" }
+    });
+
+    const { plan } = await step.run("generate-screens-plan", async () => {
+      // Normalize messages
+      let stepMessages = Array.isArray(messages) ? messages : [];
+      if (stepMessages.length === 0) {
+        stepMessages = [{ role: 'user', content: 'Create a modern design' }];
+      } else {
+        stepMessages = await hydrateImages(stepMessages);
+      }
+
+      const inspiration = getAllExamples();
+      const systemPrompt = PlanningPrompt + `\n\nYou are generating the detailed plan for each screen. \n\nSELECTED THEME: ${JSON.stringify(selectedTheme || {})}`;
+
+      const { object } = await generateObject({
+        system: systemPrompt,
+        messages: stepMessages as any,
+        schema: z.object({
           screens: z.array(z.object({
             title: z.string(),
             type: z.enum(['web', 'app']),
             description: z.string(),
             prompt: z.string().describe("Extremely detailed, technical prompt for generating this specific screen's code, including layout, components, and interaction states.")
-          })),
-          conclusionText: z.string().describe("A detailed Markdown summary. Format: 'The [Screen Title] screens have been architected:', followed by a bulleted list '* **[Title]**: [Description]', ending with a follow-up question."),
-          suggestion: z.string().describe("A single, proactive suggestion for an additional full SCREEN (not just a modal, component, or dialog) that would complement the current design plan. Format as a question.")
+          }))
         })
       });
+
       let finalScreens = object.screens;
-      let finalConclusion = object.conclusionText;
+      let finalConclusion = conclusionText;
 
       if (is3xMode) {
         finalScreens = object.screens.flatMap((screen: any) => [
@@ -218,26 +297,13 @@ export const generateDesign = inngest.createFunction(
           `\n\nI am now generating all ${finalScreens.length} variations on your canvas. Which direction feels most aligned with your brand?`;
       }
 
-      const planJson = { 
-        screens: finalScreens, 
-        themes: object.themes,
-        conclusionText: finalConclusion,
-        suggestion: object.suggestion
-      };
-      
-      // Update Project with themes
-      if (object.themes && object.themes.length > 0) {
-        await prisma.project.update({
-          where: { id: projectId },
-          data: { themes: object.themes }
-        });
-      }
-
-      return { 
-        plan: planJson, 
-        vision: object.vision,
-        conclusionText: finalConclusion,
-        suggestion: object.suggestion
+      return {
+        plan: {
+          screens: finalScreens,
+          themes: themes,
+          conclusionText: finalConclusion,
+          suggestion: suggestion
+        }
       };
     });
 
@@ -250,11 +316,13 @@ export const generateDesign = inngest.createFunction(
       if (proj) await recordCreditUsage(proj.userId, 1000);
     });
 
+
+
     // Update status to planning
     await publish({
       channel: `project:${projectId}`,
       topic: "status",
-      data: { message: vision, status: "vision" }
+      data: { message: "Finalizing design manifest...", status: "vision" }
     });
 
     // Create placeholder screens in DB so they appear on UI immediately
@@ -312,7 +380,7 @@ export const generateDesign = inngest.createFunction(
       topic: "plan",
       data: { 
         plan: planWithIds, 
-        markdown: vision,
+        markdown: `Conclusion: ${plan.conclusionText}\n\nSuggestion: ${plan.suggestion}`,
         messageId: messageId
       }
     });
@@ -323,7 +391,7 @@ export const generateDesign = inngest.createFunction(
       await prisma.message.update({
         where: { id: messageId },
         data: {
-          content: vision,
+          content: `Conclusion: ${plan.conclusionText}\n\nSuggestion: ${plan.suggestion}`,
           plan: JSON.parse(JSON.stringify(planWithIds))
         },
       });
@@ -331,7 +399,7 @@ export const generateDesign = inngest.createFunction(
 
     // 3. Sequentially generate each screen in the plan
     if (plan.screens.length > 0) {
-      let screensContext: { title: string; content: string }[] = [];
+      const screensContext: { title: string; content: string }[] = [];
       for (let i = 0; i < plan.screens.length; i++) {
         const screen = plan.screens[i];
         if (!screen) continue;
@@ -371,8 +439,12 @@ export const generateDesign = inngest.createFunction(
           }
 
           // Contextual messages: Vision + Plan + Previous Screens
-          const themes = (plan as any).themes || [];
-          const selectedTheme = themes.length > 0 ? themes[0] : null;
+          // Contextual messages: Vision + Plan + Previous Screens
+          const proj = await prisma.project.findUnique({
+            where: { id: projectId },
+            select: { selectedTheme: true }
+          });
+          const selectedTheme = proj?.selectedTheme;
 
           await publish({
             channel: `project:${projectId}`,
@@ -400,7 +472,6 @@ export const generateDesign = inngest.createFunction(
           const recentContext = compatibleContext.slice(-contextMessagesSize);
 
           const contextMessages = [
-             { role: 'assistant', content: vision || '' },
              { role: 'assistant', content: `Design Plan: ${JSON.stringify({ screens: plan.screens })}` }, // Pass FULL plan for context
              ...recentContext.map(s => ({
                 role: 'assistant',
@@ -505,7 +576,7 @@ CRITICAL INSTRUCTIONS:
         await prisma.message.update({
           where: { id: messageId },
           data: {
-            content: `Vision: ${vision}\n\nConclusion: ${conclusionText}\n\nSuggestion: ${suggestion}`,
+            content: `Conclusion: ${plan.conclusionText}\n\nSuggestion: ${plan.suggestion}`,
             plan: JSON.parse(JSON.stringify(planWithIds)),
             status: "completed"
           },
@@ -518,7 +589,7 @@ CRITICAL INSTRUCTIONS:
         topic: "plan",
         data: { 
           plan: planWithIds, 
-          markdown: `Vision: ${vision}\n\nConclusion: ${conclusionText}\n\nSuggestion: ${suggestion}`,
+          markdown: `Conclusion: ${plan.conclusionText}\n\nSuggestion: ${plan.suggestion}`,
           messageId: messageId
         }
       });
@@ -595,11 +666,10 @@ export const regenerateScreen = inngest.createFunction(
       if (!user || user.credits < 2000) throw new Error("Insufficient credits for screen regeneration");
 
       const inspiration = getAllExamples();
-      let systemPrompt = ScreenGenerationPrompt + "\n\nCRITICAL: You are REGENERATING an existing screen. Rethink the layout and visual rhythm entirely while maintaining the core functionality.";
+      const systemPrompt = ScreenGenerationPrompt + "\n\nCRITICAL: You are REGENERATING an existing screen. Rethink the layout and visual rhythm entirely while maintaining the core functionality.";
       
       const project = screen.project;
-      const themes = project.themes as any || [];
-      const selectedTheme = themes.length > 0 ? themes[0] : null;
+      const selectedTheme = project.selectedTheme || (project.themes as any[])?.[0] || null;
 
       const hydratedMessages = await hydrateImages(messages);
 

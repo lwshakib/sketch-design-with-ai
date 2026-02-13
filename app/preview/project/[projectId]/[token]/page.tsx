@@ -46,9 +46,9 @@ export default async function ProjectPreviewPage({
     isComplete: true
   }));
 
-  // Extract applied theme from canvas data if it exists
+  // Extract applied theme: prefer project-level selectedTheme, fallback to canvasData
   const canvasData = project.canvasData as any;
-  const appliedTheme = canvasData?.appliedTheme || null;
+  const appliedTheme = (project as any).selectedTheme || canvasData?.appliedTheme || null;
 
   return (
     <ProjectShareView 

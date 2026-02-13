@@ -402,6 +402,16 @@ export default function ProjectPage() {
             }
           }
         }
+
+        // Apply selected theme from project root if available (newer source of truth)
+        if (data.selectedTheme) {
+          setAppliedTheme(data.selectedTheme);
+          setActiveThemeId(data.selectedTheme.id);
+        } else if (data.canvasData?.appliedTheme) {
+            // Fallback to canvasData for older projects
+            setAppliedTheme(data.canvasData.appliedTheme);
+            setActiveThemeId(data.canvasData.appliedTheme.id);
+        }
         const pendingPromptRaw = sessionStorage.getItem(`pending_prompt_${projectId}`);
         if (pendingPromptRaw) {
           const { content, attachments: initialAttachments, websiteUrl: initialWebsiteUrl } = JSON.parse(pendingPromptRaw);
@@ -650,7 +660,8 @@ export default function ProjectPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages,
-          canvasData: { artifacts, framePos, zoom, canvasOffset, dynamicFrameHeights, artifactPreviewModes, appliedTheme }
+          canvasData: { artifacts, framePos, zoom, canvasOffset, dynamicFrameHeights, artifactPreviewModes, appliedTheme },
+          selectedTheme: appliedTheme
         })
       });
       setHasUnsavedChanges(false);

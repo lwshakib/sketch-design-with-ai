@@ -63,7 +63,7 @@ export async function PATCH(
 
     const { projectId } = await params;
     const body = await req.json();
-    const { canvasData, title } = body;
+    const { canvasData, title, selectedTheme } = body;
 
     const project = await prisma.project.update({
       where: {
@@ -73,6 +73,7 @@ export async function PATCH(
       data: {
         canvasData,
         title,
+        selectedTheme,
       }
     });
 
