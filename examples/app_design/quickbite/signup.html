@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickBite - Sign Up</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e77e23",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#211811",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+        }
+        .form-input:focus {
+            border-color: #e77e23 !important;
+            --tw-ring-color: #e77e23 !important;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#181411] font-display antialiased">
+<div class="relative flex min-h-screen w-full flex-col max-w-[480px] mx-auto bg-white dark:bg-background-dark shadow-xl overflow-x-hidden">
+<!-- Header -->
+<div class="flex items-center bg-white dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<button class="text-[#181411] dark:text-white flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex-1 px-4">
+<h2 class="text-[#181411] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Join QuickBite</h2>
+</div>
+<div class="size-12"></div> <!-- Spacer for balance -->
+</div>
+<div class="px-4 pt-6 pb-2">
+<h1 class="text-[#181411] dark:text-white tracking-tight text-[32px] font-bold leading-tight">Create Account</h1>
+<p class="text-[#887463] dark:text-gray-400 text-base font-normal leading-normal mt-2">Sign up to start ordering your favorite meals.</p>
+</div>
+<!-- Registration Form -->
+<form class="flex flex-col gap-1 px-4 py-4" onsubmit="event.preventDefault(); window.location.href='otp.html'">
+<!-- Full Name -->
+<div class="py-2">
+<label class="flex flex-col gap-2">
+<span class="text-[#181411] dark:text-white text-sm font-semibold leading-normal px-1">Full Name</span>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#887463] text-[20px]">person</span>
+<input class="form-input flex w-full min-w-0 flex-1 rounded-xl text-[#181411] border border-[#e5e0dc] bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-white h-14 pl-12 pr-4 placeholder:text-[#887463] text-base font-normal leading-normal focus:ring-1" placeholder="John Doe" type="text"/>
+</div>
+</label>
+</div>
+<!-- Email -->
+<div class="py-2">
+<label class="flex flex-col gap-2">
+<span class="text-[#181411] dark:text-white text-sm font-semibold leading-normal px-1">Email</span>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#887463] text-[20px]">mail</span>
+<input class="form-input flex w-full min-w-0 flex-1 rounded-xl text-[#181411] border border-[#e5e0dc] bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-white h-14 pl-12 pr-4 placeholder:text-[#887463] text-base font-normal leading-normal focus:ring-1" placeholder="email@example.com" type="email"/>
+</div>
+</label>
+</div>
+<!-- Phone Number -->
+<div class="py-2">
+<label class="flex flex-col gap-2">
+<span class="text-[#181411] dark:text-white text-sm font-semibold leading-normal px-1">Phone Number</span>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#887463] text-[20px]">call</span>
+<input class="form-input flex w-full min-w-0 flex-1 rounded-xl text-[#181411] border border-[#e5e0dc] bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-white h-14 pl-12 pr-4 placeholder:text-[#887463] text-base font-normal leading-normal focus:ring-1" placeholder="+1 (555) 000-0000" type="tel"/>
+</div>
+</label>
+</div>
+<!-- Password -->
+<div class="py-2">
+<label class="flex flex-col gap-2">
+<span class="text-[#181411] dark:text-white text-sm font-semibold leading-normal px-1">Password</span>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#887463] text-[20px]">lock</span>
+<input class="form-input flex w-full min-w-0 flex-1 rounded-xl text-[#181411] border border-[#e5e0dc] bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-white h-14 pl-12 pr-12 placeholder:text-[#887463] text-base font-normal leading-normal focus:ring-1" placeholder="Create a password" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-[#887463]" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+</label>
+</div>
+<!-- Confirm Password -->
+<div class="py-2">
+<label class="flex flex-col gap-2">
+<span class="text-[#181411] dark:text-white text-sm font-semibold leading-normal px-1">Confirm Password</span>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#887463] text-[20px]">lock_reset</span>
+<input class="form-input flex w-full min-w-0 flex-1 rounded-xl text-[#181411] border border-[#e5e0dc] bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-white h-14 pl-12 pr-12 placeholder:text-[#887463] text-base font-normal leading-normal focus:ring-1" placeholder="Repeat password" type="password"/>
+</div>
+</label>
+</div>
+<!-- Terms & Privacy -->
+<div class="flex items-start gap-3 py-4">
+<input class="mt-1 h-5 w-5 rounded border-[#e5e0dc] text-primary focus:ring-primary dark:bg-gray-900 dark:border-gray-700" id="terms" type="checkbox"/>
+<label class="text-sm text-[#181411] dark:text-gray-300 leading-normal" for="terms">
+                    I agree to the <a class="text-primary font-semibold hover:underline" href="#">Terms of Service</a> and <a class="text-primary font-semibold hover:underline" href="#">Privacy Policy</a>.
+                </label>
+</div>
+<!-- Create Account Button -->
+<div class="pt-4 pb-2">
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#cf6d1a] transition-colors shadow-lg shadow-primary/20" type="submit">
+<span class="truncate">Create Account</span>
+</button>
+</div>
+</form>
+<!-- Divider -->
+<div class="flex items-center px-4 py-4">
+<div class="flex-1 h-[1px] bg-[#e5e0dc] dark:bg-gray-800"></div>
+<span class="px-4 text-sm text-[#887463] dark:text-gray-500 font-medium">Or sign up with</span>
+<div class="flex-1 h-[1px] bg-[#e5e0dc] dark:bg-gray-800"></div>
+</div>
+<!-- Social Buttons -->
+<div class="flex gap-4 px-4 pb-6">
+<button class="flex-1 flex items-center justify-center h-14 border border-[#e5e0dc] dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<img alt="" class="w-6 h-6" data-alt="Google colorful G logo icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFqUy0FUm2iRm-Q9n8ewCUwY1xl0L-0y1B6YVSGVvjPR5FAJxA13gywIDBThWQUKlBTU2WCq7iYnSCdeQUBu1-77n0zZjUD9Oi3HGEqpWBt6LfkRw9KaeWw_o0nxDTCfIXg9Hgqv0otqgWcKx7OXx3dLyNIBOdjYSvJFMFtH5eZM299WB3XOz3QJw11TycisqPNzGz2q_yqwkL-WuPTRueHFCOc_i2pdCWmVLTQp6I-KyuwLjv-Ea3qSl34OYkb4V6P2QMVe08hd4"/>
+</button>
+<button class="flex-1 flex items-center justify-center h-14 border border-[#e5e0dc] dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-blue-600">social_leaderboard</span>
+</button>
+<button class="flex-1 flex items-center justify-center h-14 border border-[#e5e0dc] dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined dark:text-white">ios</span>
+</button>
+</div>
+<!-- Footer -->
+<div class="mt-auto p-6 text-center">
+<p class="text-base text-[#181411] dark:text-gray-300">
+                Already have an account? 
+                <a class="text-primary font-bold hover:underline" href="signin.html">Log In</a>
+</p>
+</div>
+<div class="h-6 bg-white dark:bg-background-dark"></div>
+</div>
+</body></html>

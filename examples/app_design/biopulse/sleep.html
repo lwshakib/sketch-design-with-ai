@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BioPulse - Sleep Analysis</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec6d",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#0a120d",
+                        "surface": "#141e17",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+        }
+        .neon-text { filter: drop-shadow(0 0 8px rgba(19, 236, 109, 0.6)); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background-dark text-white min-h-screen flex flex-col items-center p-0">
+<div class="w-full max-w-[430px] min-h-screen bg-background-dark flex flex-col overflow-hidden relative border-x border-white/5">
+<!-- Header -->
+<header class="p-8 flex justify-between items-center sticky top-0 bg-background-dark/80 backdrop-blur-md z-50">
+<div class="flex items-center gap-4">
+<button class="size-11 rounded-2xl glass-card flex items-center justify-center" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-2xl font-black tracking-tight">Sleep Analysis</h1>
+</div>
+</header>
+<!-- Scrollable Content -->
+<main class="flex-1 overflow-y-auto no-scrollbar px-8 py-6 space-y-10">
+<!-- Recovery Gauge -->
+<section class="flex flex-col items-center justify-center py-6 relative">
+<div class="relative size-64 flex items-center justify-center">
+<svg class="absolute inset-0 size-full -rotate-90">
+<circle class="fill-none stroke-white/5 stroke-[10px]" cx="128" cy="128" r="110"></circle>
+<circle class="fill-none stroke-primary stroke-[10px] neon-text" cx="128" cy="128" r="110" stroke-dasharray="691" stroke-dashoffset="100" stroke-linecap="round"></circle>
+</svg>
+<div class="text-center z-10">
+<p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 mb-2">Recovery</p>
+<div class="text-7xl font-black tracking-tighter leading-none flex items-baseline justify-center">
+                            88<span class="text-2xl font-bold opacity-30 ml-1">%</span>
+</div>
+<p class="text-[10px] font-black uppercase tracking-[0.2em] text-primary mt-4">Peak Readiness</p>
+</div>
+</div>
+</section>
+<!-- Sleep Stages -->
+<section class="space-y-4">
+<div class="flex items-center justify-between px-2">
+<h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Hypnogram</h3>
+<span class="text-[10px] font-black text-primary uppercase tracking-widest">7H 42M TOTAL</span>
+</div>
+<div class="glass-card rounded-[2.5rem] p-8 h-48 relative overflow-hidden">
+<!-- Step Graph Simulation -->
+<div class="absolute inset-x-8 top-8 bottom-12 flex flex-col justify-between">
+<div class="w-full border-t border-white/5 flex justify-end"><span class="text-[8px] -mt-1.5 opacity-20 uppercase font-black">Awake</span></div>
+<div class="w-full border-t border-white/5 flex justify-end"><span class="text-[8px] -mt-1.5 opacity-20 uppercase font-black">REM</span></div>
+<div class="w-full border-t border-white/5 flex justify-end"><span class="text-[8px] -mt-1.5 opacity-20 uppercase font-black">Light</span></div>
+<div class="w-full border-t border-white/5 flex justify-end"><span class="text-[8px] -mt-1.5 opacity-20 uppercase font-black">Deep</span></div>
+</div>
+<!-- The Graph Visualization -->
+<div class="absolute inset-x-8 top-8 bottom-12 flex items-end">
+<div class="flex-1 bg-primary/10 h-[20%] border-t-2 border-primary/40"></div>
+<div class="flex-1 bg-primary/20 h-[50%] border-t-2 border-primary/60"></div>
+<div class="flex-1 bg-primary/40 h-[80%] border-t-2 border-primary"></div>
+<div class="flex-1 bg-primary/20 h-[40%] border-t-2 border-primary/60"></div>
+<div class="flex-1 bg-primary/10 h-[20%] border-t-2 border-primary/40"></div>
+<div class="flex-1 bg-primary/40 h-[90%] border-t-2 border-primary"></div>
+<div class="flex-1 bg-primary/20 h-[60%] border-t-2 border-primary/60"></div>
+</div>
+</div>
+<!-- Breakdown -->
+<div class="grid grid-cols-4 gap-2">
+<div class="text-center">
+<p class="text-xs font-black">12m</p>
+<p class="text-[8px] font-black opacity-30 uppercase">Awake</p>
+</div>
+<div class="text-center">
+<p class="text-xs font-black text-primary">1h 45m</p>
+<p class="text-[8px] font-black opacity-30 uppercase">REM</p>
+</div>
+<div class="text-center">
+<p class="text-xs font-black">4h 15m</p>
+<p class="text-[8px] font-black opacity-30 uppercase">Light</p>
+</div>
+<div class="text-center text-primary">
+<p class="text-xs font-black">1h 30m</p>
+<p class="text-[8px] font-black opacity-30 uppercase">Deep</p>
+</div>
+</div>
+</section>
+<!-- Respiratory -->
+<section class="glass-card rounded-[2.5rem] p-8">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-[10px] font-black uppercase tracking-widest opacity-40">Breathing Rate</h3>
+<p class="text-xl font-black">14.2 <span class="text-xs opacity-30 uppercase">BRPM</span></p>
+</div>
+<div class="h-16 flex items-center justify-center opacity-40">
+<svg class="w-full h-full stroke-primary fill-none stroke-2" viewbox="0 0 400 100">
+<path d="M0,50 Q25,20 50,50 T100,50 T150,50 T200,50 T250,50 T300,50 T350,50 T400,50"></path>
+</svg>
+</div>
+</section>
+<!-- Insight -->
+<section class="bg-primary/5 rounded-[2.5rem] p-8 border border-primary/10 relative overflow-hidden">
+<div class="absolute top-[-20%] left-[-10%] size-32 bg-primary/10 blur-3xl rounded-full"></div>
+<div class="flex gap-4 items-start">
+<div class="size-11 bg-primary/20 rounded-2xl flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined">lightbulb</span>
+</div>
+<div class="space-y-2">
+<h4 class="text-sm font-black uppercase tracking-widest">BioPulse Insight</h4>
+<p class="text-xs font-medium text-white/50 leading-relaxed">
+                        Your deep sleep was 15% higher than average. This strongly correlates with the lower caffeine intake yesterday.
+                    </p>
+</div>
+</div>
+</section>
+<div class="h-40"></div>
+</main>
+<!-- Bottom Nav -->
+<nav class="absolute bottom-0 left-0 right-0 bg-background-dark/80 backdrop-blur-xl border-t border-white/5 px-8 pt-4 pb-12 z-50 rounded-t-[3rem] shadow-[0_-20px_40px_rgba(0,0,0,0.3)]">
+<div class="flex justify-between items-center">
+<button class="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-all" onclick="window.location.href='dashboard.html'">
+<span class="material-symbols-outlined text-3xl">grid_view</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Home</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-all" onclick="window.location.href='metrics.html'">
+<span class="material-symbols-outlined text-3xl">analytics</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Metrics</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-primary" onclick="window.location.href='sleep.html'">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1">bedtime</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Sleep</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-all" onclick="window.location.href='workout.html'">
+<span class="material-symbols-outlined text-3xl">fitness_center</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Workouts</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-all" onclick="window.location.href='profile.html'">
+<span class="material-symbols-outlined text-3xl">settings</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Profile</span>
+</button>
+</div>
+</nav>
+</div>
+</body></html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickBite Onboarding - Fast &amp; Secure Payments</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e77e23",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#211811",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#181411] transition-colors duration-300">
+<div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto overflow-hidden">
+<!-- Top App Bar / Navigation -->
+<div class="flex items-center bg-transparent p-4 justify-between">
+<button class="text-[#181411] dark:text-white flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-primary/10 transition-colors" onclick="history.back()">
+<span class="material-symbols-outlined text-[28px]">arrow_back</span>
+</button>
+<div class="text-[#887463] text-sm font-medium">Step 4 of 4</div>
+<div class="size-12"></div> <!-- Spacer for balance -->
+</div>
+<!-- Visual Hero Section -->
+<div class="flex-1 flex flex-col items-center justify-center px-6">
+<div class="relative w-full aspect-square flex items-center justify-center">
+<!-- Decorative Circles -->
+<div class="absolute inset-0 bg-primary/5 rounded-full scale-75 blur-3xl"></div>
+<div class="absolute inset-0 border-2 border-primary/10 rounded-full scale-90 border-dashed"></div>
+<!-- Central Security Badge -->
+<div class="z-20 bg-white dark:bg-[#2d2219] p-8 rounded-xl shadow-xl shadow-primary/10 border border-primary/20 flex flex-col items-center gap-3">
+<div class="bg-primary p-4 rounded-full text-white shadow-lg shadow-primary/40">
+<span class="material-symbols-outlined text-[48px] font-light">verified_user</span>
+</div>
+<span class="text-primary font-bold tracking-wide text-xs uppercase">Verified Security</span>
+</div>
+<!-- Floating Payment Icons -->
+<!-- Visa -->
+<div class="absolute top-[10%] left-[10%] z-10 bg-white dark:bg-[#2d2219] p-4 rounded-lg shadow-lg border border-primary/5 w-20 h-14 flex items-center justify-center">
+<div class="w-full h-full bg-contain bg-center bg-no-repeat" data-alt="Visa payment network logo display" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDnGAiP218-L6if90K-wEqJuLZnslkuhRgWcZiprMhd9MEzrnpntGHwQFThmD4WSZV6-jcJJAMOBEib_5eUshHIPrM8j2tSndmf0w_W8VvOinTamHVIGYSMza-STasVhjWwWtiaGPcYM_JCraY4um5wZZbEOTX28ZvxAX2OEInoMCDP2rSrNd0PlBjoEh8ImEvke_oI1Dfv35fcadpcBV48B4NW3u5gn3KBV9Bd6Hs5oz9LG6NUwOMThAosnJAewZqQcdecVGJQlp0");'></div>
+</div>
+<!-- Mastercard -->
+<div class="absolute bottom-[20%] right-[5%] z-10 bg-white dark:bg-[#2d2219] p-4 rounded-lg shadow-lg border border-primary/5 w-20 h-14 flex items-center justify-center">
+<div class="w-full h-full bg-contain bg-center bg-no-repeat" data-alt="Mastercard payment network logo display" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuABJysVxkB0JeWw5s4d_VK_axjGaV4-CDV7AiOMEy7WD4iBm2cgBB-KIJqnhJFSMB5Vf3xz15L4noJycMcyxqXUvl2n6S_BRz_IEMNZUNNezKBS6zmLaZCqzgY3Y_rJvx9UZtL1ApTsfB4L_xaNo7rPt4u8MCTDTEzyhpfCwuqaSuIePgIhk2I6g-e_QnkdZ_2FiGpmeXd1HbUVMTzJEl--sjmMtX5UHbq66q-t7pHYJqAcnC7MjUJzKVWqO6z0KRmRWE1I2GdeaTY");'></div>
+</div>
+<!-- Apple Pay -->
+<div class="absolute top-[25%] right-[10%] z-10 bg-white dark:bg-[#2d2219] p-4 rounded-lg shadow-lg border border-primary/5 w-20 h-14 flex items-center justify-center">
+<div class="w-full h-full bg-contain bg-center bg-no-repeat" data-alt="Apple Pay electronic payment logo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCOb5tKNsM1V1nviWuvyPzUt2ZB50Bu2kn-K6e8cl73-NFE4um-3G1ESEmNf0w-nRo0n7JQfXOfuJcPHvIfnGAyA3F1xok3RCF-FxZShWG7RBnmJWAQ86JW5XywvviwnGn30UKUaORmhirCsXgIg8mEQp4QfRsEMscj9uUg7hBd-i3A4oUQO2iSagsKqJuc8cDF30yQkJA9FXa0l3_3dU7MBG_defSQVrDZLxxCKFH1v8fLhIKFJ4GXPDqDrygQOdm5aQbcfRIPHWs");'></div>
+</div>
+<!-- Generic Shield Decoration -->
+<div class="absolute bottom-[15%] left-[15%] z-10 bg-primary/20 p-3 rounded-full text-primary">
+<span class="material-symbols-outlined text-[24px]">lock</span>
+</div>
+</div>
+<!-- Content Area -->
+<div class="text-center mt-8 px-4">
+<h1 class="text-[#181411] dark:text-white tracking-tight text-[32px] font-extrabold leading-tight mb-4">
+                    Fast &amp; Secure Payments
+                </h1>
+<p class="text-[#887463] dark:text-[#b0a094] text-base font-normal leading-relaxed">
+                    Choose from multiple secure payment options. Your financial data is encrypted and protected at all times.
+                </p>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="p-6 flex flex-col gap-6">
+<!-- Progress Indicator -->
+<div class="flex justify-center gap-2">
+<div class="h-2 w-2 rounded-full bg-primary/20"></div>
+<div class="h-2 w-2 rounded-full bg-primary/20"></div>
+<div class="h-2 w-2 rounded-full bg-primary/20"></div>
+<div class="h-2 w-8 rounded-full bg-primary"></div>
+</div>
+<!-- Trust Badge Info -->
+<div class="flex items-center justify-center gap-2 bg-primary/5 rounded-lg py-3 px-4 border border-primary/10">
+<span class="material-symbols-outlined text-primary text-[20px]">shield</span>
+<span class="text-[#887463] dark:text-[#b0a094] text-xs font-medium uppercase tracking-widest">Bank-Level Encryption</span>
+</div>
+<!-- CTA Button -->
+<button class="w-full bg-primary hover:bg-[#d6711c] text-white h-14 rounded-xl font-bold text-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2" onclick="window.location.href='signup.html'">
+<span>Create Account</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<!-- Bottom Spacer for Home Indicator -->
+<div class="h-2"></div>
+</div>
+</div>
+</body></html>

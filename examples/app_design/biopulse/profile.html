@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BioPulse - Profile Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec6d",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#0a120d",
+                        "surface": "#141e17",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+        }
+        .neon-text { filter: drop-shadow(0 0 8px rgba(19, 236, 109, 0.6)); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background-dark text-white min-h-screen flex flex-col items-center p-0">
+<div class="w-full max-w-[430px] min-h-screen bg-background-dark flex flex-col overflow-hidden relative border-x border-white/5">
+<!-- Header -->
+<header class="p-8 flex justify-between items-center sticky top-0 bg-background-dark/80 backdrop-blur-md z-50">
+<div class="flex items-center gap-4">
+<button class="size-11 rounded-2xl glass-card flex items-center justify-center" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-2xl font-black tracking-tight">Settings</h1>
+</div>
+</header>
+<!-- Scrollable Content -->
+<main class="flex-1 overflow-y-auto no-scrollbar px-8 py-6 space-y-10">
+<!-- Profile Header -->
+<section class="glass-card p-6 rounded-[3rem] flex items-center gap-6">
+<div class="relative">
+<div class="size-20 rounded-full border-2 border-primary p-1 bg-background-dark shadow-2xl">
+<img alt="" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBz4RnYVdUZ00DSk38rbrcukSc4mm9TNX2zFmtxH_POj6d4ssfuowMsF_yTgzz9HnXHi0WuIgfHQKc62HyIGdm2WroelGZzln5sackbi_namM9r9TbnsIhW_0ItoZcSwyMPbhpeXyZ1yM3VlA3hovlMWeQow6nny3_J7SH_j7RTlBaWOnwd3oUdhcbzUR8NjYw6NL2JCGKxAUTsVJb6Z3TYgXBmeXKAaygOe2dNpRvowTwejcKMGDzpBk12DiJe5tVuZpUZVUjgqfA"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-background-dark text-[8px] font-black px-2 py-0.5 rounded-full shadow-lg">PRO</div>
+</div>
+<div>
+<h2 class="text-xl font-black tracking-tight">Alex Rivers</h2>
+<p class="text-[10px] font-black opacity-30 uppercase tracking-widest mt-1">ID: BP-88293</p>
+<button class="mt-3 text-[10px] font-black uppercase text-primary tracking-widest flex items-center gap-1.5 hover:underline">
+                        Edit Profile <span class="material-symbols-outlined text-xs">edit</span>
+</button>
+</div>
+</section>
+<!-- Menu Groups -->
+<div class="space-y-10">
+<!-- Preferences -->
+<section>
+<h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 px-2 mb-4">App Preferences</h3>
+<div class="glass-card rounded-[2.5rem] overflow-hidden">
+<button class="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-all border-b border-white/5">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">straighten</span>
+<span class="text-xs font-black uppercase tracking-widest">Unit System</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-black opacity-30 uppercase">Metric</span>
+<span class="material-symbols-outlined opacity-30 text-sm">chevron_right</span>
+</div>
+</button>
+<button class="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-all border-b border-white/5">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">language</span>
+<span class="text-xs font-black uppercase tracking-widest">Language</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-black opacity-30 uppercase">English</span>
+<span class="material-symbols-outlined opacity-30 text-sm">chevron_right</span>
+</div>
+</button>
+<button class="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-all">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">dark_mode</span>
+<span class="text-xs font-black uppercase tracking-widest">Appearance</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-black opacity-30 uppercase">Dark</span>
+<span class="material-symbols-outlined opacity-30 text-sm">chevron_right</span>
+</div>
+</button>
+</div>
+</section>
+<!-- Notifications -->
+<section>
+<h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 px-2 mb-4">Notifications</h3>
+<div class="glass-card rounded-[2.5rem] overflow-hidden">
+<div class="flex items-center justify-between p-6 border-b border-white/5">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">favorite</span>
+<div class="text-left">
+<p class="text-xs font-black uppercase tracking-widest">Heart Alerts</p>
+<p class="text-[8px] font-black opacity-30 uppercase">High/Low BPM</p>
+</div>
+</div>
+<div class="relative inline-flex items-center cursor-pointer">
+<div class="w-10 h-5 bg-primary rounded-full"></div>
+<div class="absolute right-1 top-1 bg-white size-3 rounded-full shadow-sm"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-6">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">fitness_center</span>
+<div class="text-left">
+<p class="text-xs font-black uppercase tracking-widest">Reminders</p>
+<p class="text-[8px] font-black opacity-30 uppercase">Daily goal nudges</p>
+</div>
+</div>
+<div class="relative inline-flex items-center cursor-pointer">
+<div class="w-10 h-5 bg-white/10 rounded-full"></div>
+<div class="absolute left-1 top-1 bg-white/40 size-3 rounded-full shadow-sm"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Danger Zone -->
+<button class="w-full h-16 bg-red-500/10 border border-red-500/20 text-red-500 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-red-500 hover:text-white transition-all" onclick="window.location.href='onboarding.html'">
+                    Sign Out Bio-Link
+                </button>
+</div>
+<div class="h-40"></div>
+</main>
+<!-- Bottom Nav -->
+<nav class="absolute bottom-0 left-0 right-0 bg-background-dark/80 backdrop-blur-xl border-t border-white/5 px-8 pt-4 pb-12 z-50 rounded-t-[3rem] shadow-[0_-20px_40px_rgba(0,0,0,0.3)]">
+<div class="flex justify-between items-center">
+<button class="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-all" onclick="window.location.href='dashboard.html'">
+<span class="material-symbols-outlined text-3xl">grid_view</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Home</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-all" onclick="window.location.href='metrics.html'">
+<span class="material-symbols-outlined text-3xl">analytics</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Metrics</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-all" onclick="window.location.href='sleep.html'">
+<span class="material-symbols-outlined text-3xl">bedtime</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Sleep</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-all" onclick="window.location.href='workout.html'">
+<span class="material-symbols-outlined text-3xl">fitness_center</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Workouts</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-primary" onclick="window.location.href='profile.html'">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1">settings</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Profile</span>
+</button>
+</div>
+</nav>
+</div>
+</body></html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e77e23",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#211811",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>QuickBite - Restaurant Details</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#181411] dark:text-white antialiased">
+<div class="relative flex min-h-screen w-full flex-col bg-white dark:bg-background-dark max-w-md mx-auto shadow-2xl">
+<!-- Hero Section -->
+<div class="relative h-64 w-full overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A delicious gourmet burger with fresh ingredients" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBFoeYzgvT2fz1c96yWjVlhRfQXj87Pmwrk8qvzrRqBnSs2s7DFsr7Ij2z5ug2X07IoC3WNZXS7DohAQ76Dx1mevpomaHgqBxpIEqYfLnBceOntAMj4bfPrZkhH3mUfzUOyKy81AG9m7_I5wDzZMRD3CQXWNh_99J2FG6uK22rkoNy2Myx99SGRk83_NMXENOPMwHRTmWfaLeTcAC_ZfXzdyB7uIL4gNiw94bQ-RjaLkuo9bvXPjDWQ1eICCAh_4ISJoOjdgbk7eGI')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<!-- Overlay Controls -->
+<div class="absolute top-4 left-4 right-4 flex justify-between items-center">
+<button class="bg-white/90 dark:bg-background-dark/90 p-2 rounded-full shadow-lg flex items-center justify-center cursor-pointer" onclick="history.back()">
+<span class="material-symbols-outlined text-[#181411] dark:text-white">arrow_back</span>
+</button>
+<div class="flex gap-2">
+<button class="bg-white/90 dark:bg-background-dark/90 p-2 rounded-full shadow-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[#181411] dark:text-white">share</span>
+</button>
+<button class="bg-white/90 dark:bg-background-dark/90 p-2 rounded-full shadow-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined fill-1">favorite</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Restaurant Info Header -->
+<div class="px-5 py-6 bg-white dark:bg-background-dark -mt-6 rounded-t-xl relative z-10 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+<div class="flex justify-between items-start mb-2">
+<h1 class="text-2xl font-bold tracking-tight text-[#181411] dark:text-white">The Burger Joint</h1>
+<div class="bg-primary/10 text-primary px-2 py-1 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="font-bold text-sm">4.8</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#887463] dark:text-gray-400">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">chat_bubble</span>
+<span>500+ reviews</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span>15-25 min</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">distance</span>
+<span>1.2 km</span>
+</div>
+</div>
+<p class="mt-3 text-[#887463] dark:text-gray-400 text-sm italic">American • Burgers • Fast Food • Premium</p>
+</div>
+<!-- Tabs Navigation -->
+<div class="sticky top-0 z-20 bg-white dark:bg-background-dark border-b border-[#e5e0dc] dark:border-white/10">
+<div class="flex px-5">
+<a class="flex-1 py-4 text-center border-b-2 border-primary text-primary font-bold text-sm" href="#">Menu</a>
+<a class="flex-1 py-4 text-center border-b-2 border-transparent text-[#887463] dark:text-gray-400 font-bold text-sm" href="#">Reviews</a>
+<a class="flex-1 py-4 text-center border-b-2 border-transparent text-[#887463] dark:text-gray-400 font-bold text-sm" href="#">Info</a>
+</div>
+</div>
+<!-- Category Chips -->
+<div class="flex gap-3 px-5 py-4 overflow-x-auto no-scrollbar bg-background-light dark:bg-background-dark/50">
+<button class="flex h-10 shrink-0 items-center justify-center rounded-full bg-primary px-5 text-white shadow-sm font-semibold text-sm">
+                Starters
+            </button>
+<button class="flex h-10 shrink-0 items-center justify-center rounded-full bg-white dark:bg-white/10 px-5 text-[#181411] dark:text-white border border-[#e5e0dc] dark:border-white/10 font-medium text-sm">
+                Main Course
+            </button>
+<button class="flex h-10 shrink-0 items-center justify-center rounded-full bg-white dark:bg-white/10 px-5 text-[#181411] dark:text-white border border-[#e5e0dc] dark:border-white/10 font-medium text-sm">
+                Desserts
+            </button>
+<button class="flex h-10 shrink-0 items-center justify-center rounded-full bg-white dark:bg-white/10 px-5 text-[#181411] dark:text-white border border-[#e5e0dc] dark:border-white/10 font-medium text-sm">
+                Beverages
+            </button>
+</div>
+<!-- Food Menu Items -->
+<div class="px-5 py-4 space-y-6 flex-1 bg-white dark:bg-background-dark">
+<h3 class="text-lg font-bold text-[#181411] dark:text-white mb-2">Starters</h3>
+<!-- Item 1 -->
+<div class="flex gap-4 items-center">
+<div class="flex-1">
+<h4 class="font-bold text-[#181411] dark:text-white">Truffle Burger</h4>
+<p class="text-xs text-[#887463] dark:text-gray-400 line-clamp-2 mt-1">Juicy beef patty with truffle oil, aged cheddar, and caramelized onions on brioche.</p>
+<div class="flex items-center justify-between mt-3">
+<span class="text-primary font-bold">$14.99</span>
+<button class="bg-primary hover:bg-primary/90 text-white rounded-lg px-3 py-1 flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-lg">add</span>
+<span class="text-sm font-bold">Add</span>
+</button>
+</div>
+</div>
+<div class="w-24 h-24 rounded-xl bg-center bg-cover bg-no-repeat flex-shrink-0" data-alt="Truffle burger with golden fries" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBDVztb94DjG6RAmkOWMT_BVtaFkyAW8aQvbVWJbjUoY9QGXDzOxyEZ4Eg_7FagFUw8iyauD3XdJFxzUvC05660bwU9vyJeNBcaR2SWQvC3-U7QMIuFaL2_1XoOLVsNlmIsS6V3xmpoG78we2TUpRBfuhJnshLmqDdWK401TFwxeGBMbTZkv3M6qOFScDcgp4BNZjbRSL7MA64lIMmXH3DBNSznNCdfj0Es1ii48XlZHefA4O0NFilzBqUwElFfrzhAQ2qwfzS2Qbc')"></div>
+</div>
+<hr class="border-[#e5e0dc] dark:border-white/10"/>
+<!-- Item 2 -->
+<div class="flex gap-4 items-center">
+<div class="flex-1">
+<h4 class="font-bold text-[#181411] dark:text-white">Loaded Nachos</h4>
+<p class="text-xs text-[#887463] dark:text-gray-400 line-clamp-2 mt-1">Crispy tortilla chips topped with molten cheese, jalapeños, and fresh pico de gallo.</p>
+<div class="flex items-center justify-between mt-3">
+<span class="text-primary font-bold">$11.50</span>
+<button class="bg-primary hover:bg-primary/90 text-white rounded-lg px-3 py-1 flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-lg">add</span>
+<span class="text-sm font-bold">Add</span>
+</button>
+</div>
+</div>
+<div class="w-24 h-24 rounded-xl bg-center bg-cover bg-no-repeat flex-shrink-0" data-alt="Plate of nachos with cheese and jalapeños" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA8-701zXyR-mUOfskIng55y6o5G2N_0Sll83szKESFZ9x9bc4k8pRFTaglT4EXTuoNS3Od8-VHeCtHB0lCBVSfMxuZIV_oFImcKlrIyds3K96eKe1OvqjLw6fRR0mKaSxkMPfobGNvhy2OrDo0X3RqLY6FnsaCJ8yKcoc5zQ-Qu56UM_TCJrewLKPsg4X4dCVilpuIuyfkvOeNLnYefTgf3jxAblVJolcMuYT7LD9xuyf3kO5TYf_TvMIxTU4afRTA7FYS4OukQIg')"></div>
+</div>
+<hr class="border-[#e5e0dc] dark:border-white/10"/>
+<!-- Item 3 -->
+<div class="flex gap-4 items-center">
+<div class="flex-1">
+<h4 class="font-bold text-[#181411] dark:text-white">Crispy Buffalo Wings</h4>
+<p class="text-xs text-[#887463] dark:text-gray-400 line-clamp-2 mt-1">6 pieces of bone-in wings tossed in our signature spicy buffalo sauce with ranch.</p>
+<div class="flex items-center justify-between mt-3">
+<span class="text-primary font-bold">$9.99</span>
+<button class="bg-primary hover:bg-primary/90 text-white rounded-lg px-3 py-1 flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-lg">add</span>
+<span class="text-sm font-bold">Add</span>
+</button>
+</div>
+</div>
+<div class="w-24 h-24 rounded-xl bg-center bg-cover bg-no-repeat flex-shrink-0" data-alt="Hot spicy buffalo chicken wings" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBV5-mQMY_zf7qhVR3zeIOp6THFUHeD5pxaiuLR2M7NWdbX6HnfaYdyfyvxjsrH49g-kzhNL61NLZGUfJKl9xf0wgFHhIr1lEK-I2i9OeTEwdNFzhsoOH-T9rFA5SscBOdR4G4g8X_Yfog-K3BEZjbx9053u5bcHK1tq09XLSoukyyu2Ba0cAHo2ZasoYj43a17EnffiR00rMkuOZloS6c7zXQbI7-oV8Q98k_yQS7b1opofjzKBXsNDo725SJuuRvtdyrpxhYsNUc')"></div>
+</div>
+<div class="h-24"></div> <!-- Spacer for floating bar -->
+</div>
+<!-- Floating Cart Summary -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-40px)] max-w-[360px] z-30">
+<button class="w-full bg-primary text-white p-4 rounded-xl flex items-center justify-between shadow-2xl hover:scale-[1.02] transition-transform cursor-pointer" onclick="window.location.href='cart.html'">
+<div class="flex items-center gap-3">
+<div class="bg-white/20 px-2 py-1 rounded text-xs font-bold">2 ITEMS</div>
+<span class="font-bold">View Cart</span>
+</div>
+<span class="font-bold text-lg">$26.49</span>
+</button>
+</div>
+</div>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .fill-1 {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</body></html>

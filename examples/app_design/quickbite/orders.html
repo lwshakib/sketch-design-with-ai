@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickBite - My Orders</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e77e23",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#211811",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181411] dark:text-white min-h-screen flex flex-col">
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-white dark:bg-background-dark border-b border-primary/10 px-4 py-4 flex items-center justify-between">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-primary/10 transition-colors cursor-pointer" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold tracking-tight">My Orders</h1>
+<div class="size-10"></div> <!-- Spacer for symmetry -->
+</header>
+<!-- Status Tabs -->
+<nav class="sticky top-[73px] z-40 bg-white dark:bg-background-dark border-b border-primary/5">
+<div class="flex px-4">
+<button class="flex-1 py-4 text-sm font-bold text-primary border-b-2 border-primary">
+                Active
+            </button>
+<button class="flex-1 py-4 text-sm font-semibold text-[#887463] dark:text-gray-400 hover:text-primary transition-colors">
+                Completed
+            </button>
+<button class="flex-1 py-4 text-sm font-semibold text-[#887463] dark:text-gray-400 hover:text-primary transition-colors">
+                Cancelled
+            </button>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+<!-- Active Order Card -->
+<div class="bg-white dark:bg-[#2d221a] rounded-xl p-4 shadow-sm border border-primary/10">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-3">
+<div class="size-14 rounded-lg bg-cover bg-center shrink-0" data-alt="Gourmet burger restaurant storefront interior" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDm0yG0njC2ZK0Qd6lIvVkjO6bvWptaLHHTUcDq6Fc727y54W3ltOxarqRPskss6b7GPQmB0X7Sq6ehyAdAlYSY05NhK3uXPEt0kA7qZh_eQ-QoJfRo2ouB4Di7FOZRGvzn5T9ndhGvQwIxcpk1vaj02rWJ709gTksBpcL6C5IkHoHj1L33k5P61E57zA6hHwd4So9un2rl7xs9KJmRDHD8teYzrr639RFrT80_mNvxSXonjlnl2HRIfygnv8uXFvjj0nZCGlD6pCQ')"></div>
+<div>
+<h3 class="font-bold text-base">The Burger Joint</h3>
+<p class="text-xs text-[#887463] dark:text-gray-400">Order #QB-9421 • $32.40</p>
+<p class="text-xs font-medium text-primary mt-1">Estimated Arrival: 15-20 min</p>
+</div>
+</div>
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">In Progress</span>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">restaurant</span>
+<p class="text-sm">2x Truffle Burger, 1x Sweet Potato Fries</p>
+</div>
+<!-- Progress Bar -->
+<div class="w-full bg-primary/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-2/3 rounded-full"></div>
+</div>
+<div class="flex gap-2 pt-2">
+<button class="flex-1 bg-primary text-white font-bold py-2.5 rounded-lg text-sm flex items-center justify-center gap-2 active:scale-[0.98] transition-transform cursor-pointer" onclick="window.location.href='tracking.html'">
+<span class="material-symbols-outlined text-lg">near_me</span>
+                        Track Order
+                    </button>
+<button class="flex items-center justify-center size-10 border border-primary/20 rounded-lg text-primary">
+<span class="material-symbols-outlined">call</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Section Title for Previous Orders -->
+<h2 class="text-sm font-bold text-[#887463] dark:text-gray-400 pt-2 px-1 uppercase tracking-widest text-[10px]">Recent Activity</h2>
+<!-- Completed Order Card 1 -->
+<div class="bg-white dark:bg-[#2d221a] rounded-xl p-4 shadow-sm border border-primary/5">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-3">
+<div class="size-14 rounded-lg bg-cover bg-center shrink-0" data-alt="Hot pepperoni pizza in a cardboard box" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD_SUFlbfz0BA7_Ax4S9LnUqMDAsZNVpL21YC_K5bRq4-1DkeFDkTWco0I_0vfW9tBwa-TeVgD2oyqX_Teddhqjg0MxcjGrtK4jvU-Z8IGtU4MdYpDvUumUYfb2G0NY384RBQHhl9hyeBAN130GThaRI86CwBxRpL2HTJuYv3BzBN_t7CtePayrN5JaejDECpqXRo0NYlA2WYl4GnPtz5OkPXllxkYHuntlgWgbMmFOuNSW8snHA9cvLjJ4bEHXQw0v3j5zhwIiq30')"></div>
+<div>
+<h3 class="font-bold text-base">Pizza Paradise</h3>
+<p class="text-xs text-[#887463] dark:text-gray-400">Oct 24, 2023 • $24.50</p>
+</div>
+</div>
+<span class="bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Delivered</span>
+</div>
+<div class="flex items-center justify-between">
+<p class="text-sm text-[#887463] dark:text-gray-400">1x Large Pepperoni, 2x Garlic Knot</p>
+<button class="bg-primary/10 text-primary font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">rebase_edit</span>
+                    Reorder
+                </button>
+</div>
+</div>
+<!-- Completed Order Card 2 -->
+<div class="bg-white dark:bg-[#2d221a] rounded-xl p-4 shadow-sm border border-primary/5">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-3">
+<div class="size-14 rounded-lg bg-cover bg-center shrink-0" data-alt="Fresh salad bowl with avocado and eggs" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC4mWkV8GQcgBg5QZ_fV8Of7PGy_ljFFJvbCgK6vTCjhZKuDOxDDHfEovVHfkPOZN82vRgEqKjMHXDEWE1o4pdYAN1in60nWxL4W_3776a4a-qvZCAGDTNiRbgvziHfd5OLID3Ud6NMUndQvwo36yKitXpENeB7kZ-xSg0g5MuRG90JHXrpQeQOhFNV8xJeXwb_G89fLDNtbBkje4uYVjTFVshpkl7lYDoAQ_II-o4GLrYoJQlf3wiDYwF81HgoRHTmt84zbjgorXU')"></div>
+<div>
+<h3 class="font-bold text-base">Salad Stop</h3>
+<p class="text-xs text-[#887463] dark:text-gray-400">Oct 20, 2023 • $18.90</p>
+</div>
+</div>
+<span class="bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Delivered</span>
+</div>
+<div class="flex items-center justify-between">
+<p class="text-sm text-[#887463] dark:text-gray-400">1x Caesar Salad, 1x Green Smoothie</p>
+<button class="bg-primary/10 text-primary font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">rebase_edit</span>
+                    Reorder
+                </button>
+</div>
+</div>
+<!-- Completed Order Card 3 -->
+<div class="bg-white dark:bg-[#2d221a] rounded-xl p-4 shadow-sm border border-primary/5 opacity-80">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-3">
+<div class="size-14 rounded-lg bg-cover bg-center shrink-0" data-alt="Sushi platter with salmon and tuna" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCi3FRp3N9z6GEMd66mqoVt83raRrICerJHp6mykXP2bQA38XjLwOfOosx8TzQa_Cr7L12ZMrjdDfNw5rxNn9KtiBvGur1l8l319Yla3Z6b7EhOULbbECn_YeOpKbfvcKb0gCNGrFT0l8UsfIsBP87LzmNoIP8nGgvsCxpsW4dorUHQpXDX8j7WD5w12zxGwWcj4mMj1AL4vQhk5s-mh_-4o1lm0ZRia-0tK8S0Bz8xPFr1JSvbYgIEZVws8jXnYOViywDDNPh35O8')"></div>
+<div>
+<h3 class="font-bold text-base">Sushi Zen</h3>
+<p class="text-xs text-[#887463] dark:text-gray-400">Oct 15, 2023 • $45.00</p>
+</div>
+</div>
+<span class="bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">Delivered</span>
+</div>
+<div class="flex items-center justify-between">
+<p class="text-sm text-[#887463] dark:text-gray-400">1x Omakase Set, 1x Miso Soup</p>
+<button class="bg-primary/10 text-primary font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">rebase_edit</span>
+                    Reorder
+                </button>
+</div>
+</div>
+<div class="h-8"></div> <!-- Bottom padding for scroll -->
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="bg-white dark:bg-[#211811] border-t border-primary/5 px-4 pt-2 pb-6 flex justify-around items-center">
+<a class="flex flex-col items-center gap-1 group" href="dashboard.html">
+<span class="material-symbols-outlined text-[#887463] group-hover:text-primary transition-colors">home</span>
+<span class="text-[10px] font-medium text-[#887463] group-hover:text-primary uppercase tracking-wide">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 group" href="search.html">
+<span class="material-symbols-outlined text-[#887463] group-hover:text-primary transition-colors">search</span>
+<span class="text-[10px] font-medium text-[#887463] group-hover:text-primary uppercase tracking-wide">Search</span>
+</a>
+<a class="flex flex-col items-center gap-1" href="orders.html">
+<span class="material-symbols-outlined text-primary fill-[1]">receipt_long</span>
+<span class="text-[10px] font-bold text-primary uppercase tracking-wide">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 group" href="profile.html">
+<span class="material-symbols-outlined text-[#887463] group-hover:text-primary transition-colors">person</span>
+<span class="text-[10px] font-medium text-[#887463] group-hover:text-primary uppercase tracking-wide">Profile</span>
+</a>
+</nav>
+</body></html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400,500,600,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e77e23",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#211811",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-item {
+            color: #e77e23 !important;
+        }
+        /* Custom Toggle Switch Style */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #e77e23;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #e77e23;
+        }
+    </style>
+<title>QuickBite - Profile</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col">
+<!-- Header / Top Bar -->
+<header class="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-primary/10 px-4 py-4 flex items-center justify-between">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary/5 transition-colors" onclick="history.back()">
+<span class="material-symbols-outlined text-[#181411]">arrow_back</span>
+</button>
+<h1 class="text-[#181411] text-lg font-bold">Profile</h1>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Profile Info Section -->
+<section class="flex flex-col items-center py-8 px-6 bg-white border-b border-primary/5">
+<div class="relative">
+<div class="w-28 h-28 rounded-full border-4 border-primary/10 p-1">
+<div class="w-full h-full rounded-full bg-center bg-cover" data-alt="Close up portrait of a smiling man" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA3WXRizy3eFFW9vYNWzcJaOrMFM_seJQQSVb0jhXSqbl21Df16h9Fb3JtSj-9iU5npXhEcwDdCTj0_atbONOkq28sZ6p9TRjzZgnPgugG0xbo41E5gbRVyrYgvguqL05JICMTv2MF9oKo8e3nxgtz5MJ7V0mEJeruuTQkZI_pNeyBP5GScqKSsil8O4Bl-hj6PopGnX56aIi3-Q3qekB0GlFvarZ04EAAv9I5Ao2zo7gROAGGO_a1JF7N1l8IfdbeCy8gY7mP68DE')"></div>
+</div>
+<button class="absolute bottom-1 right-1 bg-primary text-white p-2 rounded-full shadow-lg border-2 border-white flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">edit</span>
+</button>
+</div>
+<h2 class="mt-4 text-[#181411] text-2xl font-bold">Alex Johnson</h2>
+<p class="text-gray-500 font-medium">alex.johnson@example.com</p>
+</section>
+<!-- Menu Groups -->
+<div class="px-4 space-y-6 mt-6">
+<!-- Account Settings Group -->
+<div class="space-y-2">
+<h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 px-2">Account Settings</h3>
+<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-primary/5">
+<!-- Edit Profile -->
+<a class="flex items-center justify-between px-4 py-4 hover:bg-primary/5 transition-colors border-b border-gray-50" href="#">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<span class="font-semibold text-[#181411]">Edit Profile</span>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</a>
+<!-- Saved Addresses -->
+<a class="flex items-center justify-between px-4 py-4 hover:bg-primary/5 transition-colors border-b border-gray-50" href="#">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<span class="font-semibold text-[#181411]">Saved Addresses</span>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</a>
+<!-- Payment Methods -->
+<a class="flex items-center justify-between px-4 py-4 hover:bg-primary/5 transition-colors" href="#">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="font-semibold text-[#181411]">Payment Methods</span>
+</div>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</a>
+</div>
+</div>
+<!-- Preferences Group -->
+<div class="space-y-2">
+<h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 px-2">Preferences</h3>
+<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-primary/5">
+<!-- Notification Preference 1 -->
+<div class="flex items-center justify-between px-4 py-4 border-b border-gray-50">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</div>
+<div class="flex-1">
+<p class="font-semibold text-[#181411]">Order Updates</p>
+<p class="text-xs text-gray-400">Real-time tracking notifications</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Notification Preference 2 -->
+<div class="flex items-center justify-between px-4 py-4 border-b border-gray-50">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">campaign</span>
+</div>
+<div class="flex-1">
+<p class="font-semibold text-[#181411]">Promotions</p>
+<p class="text-xs text-gray-400">Coupons and weekly deals</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Language -->
+<a class="flex items-center justify-between px-4 py-4 hover:bg-primary/5 transition-colors" href="#">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">language</span>
+</div>
+<span class="font-semibold text-[#181411]">Language</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-sm text-gray-500">English</span>
+<span class="material-symbols-outlined text-gray-400">chevron_right</span>
+</div>
+</a>
+</div>
+</div>
+<!-- Actions -->
+<div class="pb-10">
+<button class="w-full flex items-center justify-center gap-2 py-4 px-4 bg-white border border-red-100 text-red-500 rounded-xl font-bold hover:bg-red-50 transition-colors shadow-sm" onclick="window.location.href='signin.html'">
+<span class="material-symbols-outlined">logout</span>
+                    Logout
+                </button>
+<p class="text-center text-xs text-gray-400 mt-6">QuickBite v2.4.0</p>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-primary/5 px-6 pt-3 pb-6 flex items-center justify-between shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center gap-1 text-gray-400" href="dashboard.html">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold uppercase tracking-tight">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-400" href="orders.html">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-[10px] font-bold uppercase tracking-tight">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-400" href="search.html">
+<div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center -mt-8 shadow-lg shadow-primary/30 text-white">
+<span class="material-symbols-outlined text-3xl">search</span>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-tight mt-1">Search</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-gray-400" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="text-[10px] font-bold uppercase tracking-tight">Saved</span>
+</a>
+<a class="flex flex-col items-center gap-1 active-nav-item" href="profile.html">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-tight">Profile</span>
+</a>
+</nav>
+</body></html>

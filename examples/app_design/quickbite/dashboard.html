@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickBite - Food Delivery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e77e23",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#211811",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#181411] dark:text-white min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="p-4 flex items-center justify-between sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-50">
+<div class="flex flex-col">
+<span class="text-xs text-primary font-bold uppercase tracking-wider">Deliver to</span>
+<div class="flex items-center gap-1 cursor-pointer">
+<span class="material-symbols-outlined text-primary text-xl">location_on</span>
+<h2 class="text-base font-bold leading-tight">San Francisco, CA</h2>
+<span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+</div>
+</div>
+<div class="size-10 rounded-full bg-white dark:bg-[#322820] flex items-center justify-center shadow-sm border border-primary/10">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Search Bar -->
+<div class="px-4 py-3">
+<div class="flex gap-3">
+<label class="flex flex-col flex-1 h-12">
+<div class="flex w-full flex-1 items-stretch rounded-xl h-full shadow-sm">
+<div class="text-[#887463] flex border-none bg-white dark:bg-[#322820] items-center justify-center pl-4 rounded-l-xl">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-white dark:bg-[#322820] focus:ring-0 h-full placeholder:text-[#887463] px-3 text-base font-normal rounded-r-xl" placeholder="Search for food, groceries..." onclick="window.location.href='search.html'"/>
+</div>
+</label>
+<button class="bg-primary text-white size-12 rounded-xl flex items-center justify-center shadow-md shadow-primary/20">
+<span class="material-symbols-outlined">tune</span>
+</button>
+</div>
+</div>
+<!-- Promo Banner Carousel -->
+<div class="overflow-x-auto hide-scrollbar flex gap-4 px-4 py-2">
+<div class="min-w-[85%] relative aspect-[21/9] rounded-xl bg-gradient-to-r from-primary to-[#ff9d47] p-6 flex flex-col justify-center text-white overflow-hidden shrink-0">
+<div class="relative z-10">
+<p class="text-sm font-medium opacity-90">First Order Deal</p>
+<h3 class="text-2xl font-bold leading-tight mb-2">50% OFF<br/>Everything</h3>
+<button class="bg-white text-primary text-xs font-bold px-4 py-2 rounded-lg mt-1">Order Now</button>
+</div>
+<div class="absolute right-[-10%] bottom-[-10%] opacity-20 transform rotate-12">
+<span class="material-symbols-outlined text-[120px]">fastfood</span>
+</div>
+</div>
+<div class="min-w-[85%] relative aspect-[21/9] rounded-xl bg-background-dark p-6 flex flex-col justify-center text-white overflow-hidden shrink-0">
+<div class="relative z-10">
+<p class="text-sm font-medium opacity-90">Weekend Special</p>
+<h3 class="text-2xl font-bold leading-tight mb-2">Free Delivery<br/>on all orders</h3>
+<button class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg mt-1">Claim Offer</button>
+</div>
+<div class="absolute right-[-5%] top-[-5%] opacity-10">
+<span class="material-symbols-outlined text-[100px]">local_shipping</span>
+</div>
+</div>
+</div>
+<!-- Categories Section -->
+<div class="py-6">
+<div class="flex items-center justify-between px-4 mb-4">
+<h3 class="text-lg font-bold">Categories</h3>
+<a class="text-primary text-sm font-semibold" href="#">See All</a>
+</div>
+<div class="flex overflow-x-auto hide-scrollbar gap-5 px-4">
+<div class="flex flex-col items-center gap-2 shrink-0">
+<div class="size-16 rounded-full bg-white dark:bg-[#322820] shadow-sm flex items-center justify-center border-2 border-primary">
+<span class="material-symbols-outlined text-primary text-3xl">local_pizza</span>
+</div>
+<span class="text-xs font-semibold">Pizza</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0">
+<div class="size-16 rounded-full bg-white dark:bg-[#322820] shadow-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-[#887463] text-3xl">lunch_dining</span>
+</div>
+<span class="text-xs font-semibold">Burgers</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0">
+<div class="size-16 rounded-full bg-white dark:bg-[#322820] shadow-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-[#887463] text-3xl">ramen_dining</span>
+</div>
+<span class="text-xs font-semibold">Asian</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0">
+<div class="size-16 rounded-full bg-white dark:bg-[#322820] shadow-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-[#887463] text-3xl">icecream</span>
+</div>
+<span class="text-xs font-semibold">Desserts</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0">
+<div class="size-16 rounded-full bg-white dark:bg-[#322820] shadow-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-[#887463] text-3xl">bakery_dining</span>
+</div>
+<span class="text-xs font-semibold">Bakery</span>
+</div>
+<div class="flex flex-col items-center gap-2 shrink-0">
+<div class="size-16 rounded-full bg-white dark:bg-[#322820] shadow-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-[#887463] text-3xl">coffee</span>
+</div>
+<span class="text-xs font-semibold">Coffee</span>
+</div>
+</div>
+</div>
+<!-- Popular Restaurants -->
+<div class="py-2">
+<div class="flex items-center justify-between px-4 mb-4">
+<h3 class="text-lg font-bold">Popular Restaurants</h3>
+<a class="text-primary text-sm font-semibold" href="#">View More</a>
+</div>
+<!-- Restaurant Card 1 -->
+<div class="px-4 mb-6">
+<div class="bg-white dark:bg-[#322820] rounded-xl overflow-hidden shadow-sm border border-black/5" onclick="window.location.href='restaurant.html'">
+<div class="relative h-48 w-full bg-center bg-cover" data-alt="Delicious gourmet pizza with melting cheese" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAzTHbeaMmtvCN8-OhejYnunfVdhgyHioH0_8uKpR6iUN5q19z86ZcGa4hQzWjBqlXEfXYWkgcOKdI1MzAQWzeU6pDBTBPzCN-rpdkuQaY6JowKTRlS67Gm5J5etVDeQLG3P3urMO-BAE476kTxgJhdifXj19rs6zbYhPLKOfH35D62all11ytmG3SY_gu3A8JmDEjPtGySYW5fSDxJt3qAj2vopdx0WoBKwEIw3K2VBBladQcyn53_ZotsHbgHycc5-RVbG9yW1QM')">
+<div class="absolute top-3 left-3 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg uppercase tracking-wider">
+                            Top Rated
+                        </div>
+<div class="absolute top-3 right-3 size-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1">favorite</span>
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-1">
+<h4 class="text-base font-bold">Luigi's Authentic Pizza</h4>
+<div class="flex items-center gap-1 bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-bold">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+                                4.8
+                            </div>
+</div>
+<p class="text-sm text-[#887463] mb-3">Italian • Pizzas • $$</p>
+<div class="flex items-center gap-4 text-xs font-medium text-[#887463]">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                20-30 min
+                            </div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">delivery_dining</span>
+                                Free Delivery
+                            </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Restaurant Card 2 -->
+<div class="px-4 mb-6">
+<div class="bg-white dark:bg-[#322820] rounded-xl overflow-hidden shadow-sm border border-black/5" onclick="window.location.href='restaurant.html'">
+<div class="relative h-48 w-full bg-center bg-cover" data-alt="Juicy double cheeseburger with fresh ingredients" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAXpfbAB1WdiIkesjxH-S2N305YWo8_0F84raWXbtInoNZ17-ClRmdwc1kb2QSF1oyMS9SBOQ_0bU_3m4GFKs3aBpYiDS5Whn4qpb_JucQTMJ4t7lTwXzdWfwuysWZxBKM3dmFl9lZ24yVTPniDUj6ArlyJVvUjmBmFwa3_UI7LTH53mjfoS9H78fJIKQeVByWbq19kuOSL9GtRgZj8CVMu0QyB5eRIjlKlQeXxgm6blj9BEbbA6g4cYwIQWGDnrqWl4jUWKKe3yrI')">
+<div class="absolute top-3 left-3 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg uppercase tracking-wider">
+                            20% OFF
+                        </div>
+<div class="absolute top-3 right-3 size-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#887463] shadow-sm">
+<span class="material-symbols-outlined text-xl">favorite</span>
+</div>
+</div>
+<div class="p-4">
+<div class="flex justify-between items-start mb-1">
+<h4 class="text-base font-bold">Burger Artisan</h4>
+<div class="flex items-center gap-1 bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-bold">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+                                4.5
+                            </div>
+</div>
+<p class="text-sm text-[#887463] mb-3">American • Burgers • $</p>
+<div class="flex items-center gap-4 text-xs font-medium text-[#887463]">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                15-25 min
+                            </div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">delivery_dining</span>
+                                $1.99 Delivery
+                            </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recommended Section -->
+<div class="py-2">
+<div class="flex items-center justify-between px-4 mb-4">
+<h3 class="text-lg font-bold">Recommended for You</h3>
+</div>
+<div class="flex overflow-x-auto hide-scrollbar gap-4 px-4 pb-4">
+<div class="min-w-[160px] bg-white dark:bg-[#322820] rounded-xl overflow-hidden shadow-sm shrink-0 border border-black/5">
+<div class="h-28 w-full bg-center bg-cover" data-alt="Healthy fresh salad bowl with mixed greens" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDOsx_z9wqa7Ps_FWVD2hnfcWJeul9tVv0doropWrV3wOC6H_JwY1W7Hfy3LpRzb45uta5O5dVoOtmN38wCVokpnCR26wG7cunS8syWufVHNqxIf4BieEfoFEZIPgjx42jz278dnVae02qPj_o8YUtlFiNY28QfFS7aTrn__67LRC52k7jLaVAXAUrmHzX21SIBE8wUn2Xjd2Ja-l3Fdq2PmuzetmJ9_yxupJXi7MXBmHocsDbW2ynOjLpCUaw8L3p2frYWEPiGgmw')"></div>
+<div class="p-3">
+<h5 class="text-sm font-bold truncate">Green Bowl Cafe</h5>
+<p class="text-xs text-[#887463] mt-1">10-15 min</p>
+</div>
+</div>
+<div class="min-w-[160px] bg-white dark:bg-[#322820] rounded-xl overflow-hidden shadow-sm shrink-0 border border-black/5">
+<div class="h-28 w-full bg-center bg-cover" data-alt="Traditional sushi platter with fresh fish" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCoy-oPPUFLnfvq-lNUqxlA0iKfmjz2I7pT-09yowLRRcgbXZJiFcX4YIahCOOlCXDKOmWTGmU5q3A8xy6pDSE_90a5aCRODwyFyqX4eEe1R_vHFThYfu77GCq8tWZz_bcqFvOdCzYp9s43D3tW4ewnZV62MoyR42sCWw8t9XZy7Do_5oiqKtqd4uERVo2QFjYgCB07IB5JX31DMHipJEzuE9cutVgHD0ObtCsWYKeZF6-14Z-UN9iesOrdUuFJ8vTm4wXwApbySO0')"></div>
+<div class="p-3">
+<h5 class="text-sm font-bold truncate">Sushi Master</h5>
+<p class="text-xs text-[#887463] mt-1">30-40 min</p>
+</div>
+</div>
+<div class="min-w-[160px] bg-white dark:bg-[#322820] rounded-xl overflow-hidden shadow-sm shrink-0 border border-black/5">
+<div class="h-28 w-full bg-center bg-cover" data-alt="Spicy taco with various fillings" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCltF_X40cn15ttA72_HF8SgGf487nsaYr_yV9qcUpWyqGbaRlbQQGLEwn5QezxF4DbP-d1G0tZjR-hplUdjVeHTabPiKtS3rqLiON8MclQox157nlTkUt3tfaydrwkem80UiZPmonIFUVfzfscD-PbfYnY8_3OhTryOCZvrfEC1uE3plv6wIukydmVIROiMcYihWxcLICjwi6Z3AVhAnNE5tElKZYDw5gQXUaFUG57Ak9CTDTAR3yJrqGhVp8LqDAnFmSwgPc6Vwg')"></div>
+<div class="p-3">
+<h5 class="text-sm font-bold truncate">Taco Heaven</h5>
+<p class="text-xs text-[#887463] mt-1">20-25 min</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#322820] border-t border-black/5 dark:border-white/5 px-6 pb-6 pt-3 z-50">
+<div class="flex justify-between items-center max-w-lg mx-auto">
+<a class="flex flex-col items-center gap-1 text-primary" href="dashboard.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#887463]" href="search.html">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[10px] font-medium">Search</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#887463]" href="orders.html">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-[10px] font-medium">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#887463] relative" href="cart.html">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="text-[10px] font-medium">Cart</span>
+<div class="absolute -top-1 -right-1 bg-primary text-white text-[8px] size-4 rounded-full flex items-center justify-center font-bold">3</div>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#887463]" href="profile.html">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickBite Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e77e23",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#211811",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col items-center justify-center">
+<div class="relative w-full max-w-[430px] h-[932px] bg-white dark:bg-background-dark shadow-2xl overflow-hidden flex flex-col">
+<!-- Hero Image Section (Top 60%) -->
+<div class="relative h-[60%] w-full overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Gourmet delicious beef burger with melting cheese" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuARfgV4GYzyC0iQfpfzK_94BxKaRSXrUILmuAZnVmGdIpBCwWkSvTM0pGjTTGt013QJ9TNN8kvW5JPFkDSkaa4rSjCwwUfKDUsYZEf5-J84q_eS3oDFksntbmx4ouAZl3a33rQpX0ReEbaakMVekJjitMewF99KpdcynKocQcm-OSUyM7r5iXb73HFdP3oUMbnVANW60fIK_3Arq0nRLHgjbCjOY1AernSYjxpnzeM761DDXs1rA1lmXDI-mSwCWSCIYfoRAm0R8xc');">
+<!-- Overlay for logo readability -->
+<div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent"></div>
+</div>
+<!-- Top App Bar / Logo Overlay -->
+<div class="absolute top-0 left-0 w-full p-6 flex items-center justify-between">
+<div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+<span class="material-symbols-outlined text-primary text-2xl">restaurant</span>
+<span class="text-white font-bold text-lg tracking-tight">QuickBite</span>
+</div>
+<button class="text-white font-medium text-sm hover:opacity-80" onclick="window.location.href='discover.html'">Skip</button>
+</div>
+</div>
+<!-- Content Card (Overlapping White Container) -->
+<div class="relative -mt-12 flex-1 bg-white dark:bg-background-dark rounded-t-xl px-8 pt-10 pb-12 flex flex-col items-center shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
+<!-- Progress Indicator (1 of 4) -->
+<div class="flex gap-2 mb-8">
+<div class="h-1.5 w-8 rounded-full bg-primary"></div>
+<div class="h-1.5 w-2 rounded-full bg-primary/20"></div>
+<div class="h-1.5 w-2 rounded-full bg-primary/20"></div>
+<div class="h-1.5 w-2 rounded-full bg-primary/20"></div>
+</div>
+<!-- Headlines -->
+<div class="text-center space-y-4 mb-10">
+<h1 class="text-[#181411] dark:text-white text-3xl font-extrabold leading-tight tracking-tight">
+                    Delicious food delivered to your doorstep
+                </h1>
+<p class="text-[#181411]/60 dark:text-white/60 text-base leading-relaxed">
+                    Satisfy your cravings with the best restaurants in your city, delivered fast and fresh.
+                </p>
+</div>
+<!-- Actions -->
+<div class="w-full space-y-4 mt-auto">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 group" onclick="window.location.href='discover.html'">
+<span>Get Started</span>
+<span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<div class="text-center pt-2">
+<p class="text-[#181411]/60 dark:text-white/60 text-sm font-medium">
+                        Already have an account? 
+                        <a class="text-primary font-bold hover:underline underline-offset-4 ml-1" href="signin.html">Sign In</a>
+</p>
+</div>
+</div>
+</div>
+<!-- Safe area home indicator (Mobile Style) -->
+
+</div>
+</body></html>

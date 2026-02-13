@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickBite - Sign In</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e77e23",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#211811",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#1b140e] dark:text-[#fcfaf8] min-h-screen flex flex-col">
+<!-- Top App Bar -->
+<div class="flex items-center p-4 justify-between sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-10">
+<button class="text-[#1b140e] dark:text-[#fcfaf8] flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-primary/10 transition-colors" onclick="window.location.href='onboarding.html'">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="text-primary text-xl font-bold leading-tight tracking-tight flex-1 text-center pr-10">QuickBite</h2>
+</div>
+<!-- Main Content Container -->
+<main class="flex-1 flex flex-col items-center justify-center px-6 max-w-[480px] mx-auto w-full pb-12">
+<!-- Welcome Header -->
+<div class="text-center mb-8">
+<div class="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+<span class="material-symbols-outlined text-primary text-5xl">restaurant</span>
+</div>
+<h1 class="text-[#1b140e] dark:text-white tracking-tight text-3xl font-bold leading-tight mb-2">Welcome Back!</h1>
+<p class="text-[#97704e] dark:text-[#d4bca7] text-base font-normal">Hungry? Sign in to start ordering.</p>
+</div>
+<!-- Sign In Form -->
+<div class="w-full space-y-4">
+<!-- Email/Phone Input -->
+<div class="flex flex-col w-full">
+<label class="text-[#1b140e] dark:text-[#fcfaf8] text-sm font-semibold leading-normal pb-2 ml-1">Email or Phone Number</label>
+<div class="relative">
+<input class="form-input flex w-full rounded-xl text-[#1b140e] dark:text-white border border-[#e7dbd0] dark:border-[#4a3a2e] bg-white dark:bg-[#2d221a] focus:ring-2 focus:ring-primary focus:border-primary h-14 placeholder:text-[#97704e]/60 px-4 text-base font-normal transition-all" placeholder="Enter your email or phone" type="text" value=""/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="flex flex-col w-full">
+<label class="text-[#1b140e] dark:text-[#fcfaf8] text-sm font-semibold leading-normal pb-2 ml-1">Password</label>
+<div class="flex w-full items-stretch relative">
+<input class="form-input flex w-full rounded-xl text-[#1b140e] dark:text-white border border-[#e7dbd0] dark:border-[#4a3a2e] bg-white dark:bg-[#2d221a] focus:ring-2 focus:ring-primary focus:border-primary h-14 placeholder:text-[#97704e]/60 px-4 pr-12 text-base font-normal transition-all" placeholder="Enter your password" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-[#97704e] hover:text-primary transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<!-- Actions: Remember Me & Forgot Password -->
+<div class="flex items-center justify-between py-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded text-primary focus:ring-primary border-[#e7dbd0] dark:border-[#4a3a2e] dark:bg-[#2d221a]" type="checkbox"/>
+<span class="text-sm font-medium text-[#97704e] dark:text-[#d4bca7] group-hover:text-primary transition-colors">Remember me</span>
+</label>
+<a class="text-sm font-semibold text-primary hover:underline" href="forgot-password.html">Forgot password?</a>
+</div>
+<!-- Sign In Button -->
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98] mt-4" onclick="window.location.href='dashboard.html'">
+                Sign In
+            </button>
+</div>
+<!-- Divider -->
+<div class="relative w-full flex items-center py-8">
+<div class="flex-grow border-t border-[#e7dbd0] dark:border-[#4a3a2e]"></div>
+<span class="flex-shrink mx-4 text-[#97704e] dark:text-[#d4bca7] text-sm font-medium">Or continue with</span>
+<div class="flex-grow border-t border-[#e7dbd0] dark:border-[#4a3a2e]"></div>
+</div>
+<!-- Social Login Buttons -->
+<div class="grid grid-cols-2 gap-4 w-full">
+<button class="flex items-center justify-center gap-3 px-4 py-3 border border-[#e7dbd0] dark:border-[#4a3a2e] rounded-xl bg-white dark:bg-[#2d221a] hover:bg-[#fcfaf8] dark:hover:bg-[#3a2c22] transition-colors">
+<img alt="" class="w-6 h-6" data-alt="Google colorful logo icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIWBJKD0lzGNo8zCy4bI0GPvvX_dbi1kmVQxsg2Rbzt0zbXCs7A4-3nmyP2oSP48B06swwdYfxLXjBcuUVpxN3FU8TtZBu4K21khf5GCdrv3n6F_PGB91MVHP_lAKPeJWSRjKsh4GQiXBgYPG5D0694Pq0-RGblJn-F_RONHG1Lv9_HgqG8LYe4ylsKhOxPfhoZ0cmG3OdtDBxlMDZf-YiZw_7i974rHpqApM5PwA1CtiaLsqQiAbDwvufxJ7_3RS5dcsiQvkO6qc"/>
+<span class="font-semibold text-sm">Google</span>
+</button>
+<button class="flex items-center justify-center gap-3 px-4 py-3 border border-[#e7dbd0] dark:border-[#4a3a2e] rounded-xl bg-white dark:bg-[#2d221a] hover:bg-[#fcfaf8] dark:hover:bg-[#3a2c22] transition-colors">
+<span class="material-symbols-outlined text-2xl">ios</span>
+<span class="font-semibold text-sm">Apple</span>
+</button>
+</div>
+<!-- Footer Sign Up Link -->
+<p class="mt-10 text-center text-[#97704e] dark:text-[#d4bca7] text-sm font-medium">
+            Don't have an account? 
+            <a class="text-primary font-bold hover:underline ml-1" href="signup.html">Sign Up</a>
+</p>
+</main>
+<!-- App Bottom Indicator (Visual only) -->
+
+</body></html>

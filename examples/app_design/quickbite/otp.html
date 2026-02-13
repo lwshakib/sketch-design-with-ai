@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QuickBite - OTP Verification</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e77e23",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#211811",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .otp-input:focus {
+            border-color: #e77e23;
+            box-shadow: 0 0 0 1px #e77e23;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex justify-center">
+<!-- Mobile Container -->
+<div class="relative flex h-full min-h-screen w-full max-w-[480px] flex-col bg-white dark:bg-background-dark overflow-x-hidden shadow-2xl">
+<!-- Top App Bar -->
+<div class="flex items-center bg-white dark:bg-background-dark p-4 pb-2 justify-between">
+<button class="text-[#181411] dark:text-white flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-primary/10 transition-colors" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="text-[#181411] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">OTP Verification</h2>
+</div>
+<div class="flex flex-col items-center px-6 pt-10 pb-8">
+<!-- Icon/Illustration -->
+<div class="mb-8 flex items-center justify-center size-20 rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined !text-4xl">stay_primary_portrait</span>
+</div>
+<h1 class="text-[#181411] dark:text-white tracking-tight text-2xl font-bold leading-tight text-center mb-2">Verify Phone Number</h1>
+<p class="text-[#181411]/70 dark:text-white/70 text-base font-normal leading-relaxed text-center max-w-[280px]">
+                We have sent a 6-digit code to <span class="font-semibold text-[#181411] dark:text-white">+1 234-567-890</span>
+</p>
+</div>
+<!-- OTP Input Group -->
+<div class="flex justify-center px-6 py-6">
+<fieldset class="relative flex gap-2 sm:gap-4">
+<input class="otp-input flex h-14 w-12 text-center rounded-lg border border-[#e5e0dc] dark:border-[#3d2e21] bg-transparent text-xl font-bold text-[#181411] dark:text-white focus:outline-none transition-all" inputmode="numeric" maxlength="1" type="text" value="4"/>
+<input class="otp-input flex h-14 w-12 text-center rounded-lg border border-[#e5e0dc] dark:border-[#3d2e21] bg-transparent text-xl font-bold text-[#181411] dark:text-white focus:outline-none transition-all" inputmode="numeric" maxlength="1" type="text" value="8"/>
+<input autofocus="" class="otp-input flex h-14 w-12 text-center rounded-lg border border-primary dark:border-primary bg-transparent text-xl font-bold text-[#181411] dark:text-white focus:outline-none transition-all" inputmode="numeric" maxlength="1" type="text"/>
+<input class="otp-input flex h-14 w-12 text-center rounded-lg border border-[#e5e0dc] dark:border-[#3d2e21] bg-transparent text-xl font-bold text-[#181411] dark:text-white focus:outline-none transition-all" inputmode="numeric" maxlength="1" type="text"/>
+<input class="otp-input flex h-14 w-12 text-center rounded-lg border border-[#e5e0dc] dark:border-[#3d2e21] bg-transparent text-xl font-bold text-[#181411] dark:text-white focus:outline-none transition-all" inputmode="numeric" maxlength="1" type="text"/>
+<input class="otp-input flex h-14 w-12 text-center rounded-lg border border-[#e5e0dc] dark:border-[#3d2e21] bg-transparent text-xl font-bold text-[#181411] dark:text-white focus:outline-none transition-all" inputmode="numeric" maxlength="1" type="text"/>
+</fieldset>
+</div>
+<!-- Timer Section -->
+<div class="flex flex-col items-center gap-4 py-6 px-6">
+<div class="flex gap-3">
+<div class="flex flex-col items-center gap-1">
+<div class="flex h-12 w-16 items-center justify-center rounded-xl bg-primary/10 dark:bg-primary/20">
+<p class="text-primary text-lg font-bold leading-tight">00</p>
+</div>
+<p class="text-[#181411]/50 dark:text-white/50 text-[10px] uppercase font-bold tracking-wider">Min</p>
+</div>
+<div class="text-primary text-lg font-bold flex items-center pt-1">:</div>
+<div class="flex flex-col items-center gap-1">
+<div class="flex h-12 w-16 items-center justify-center rounded-xl bg-primary/10 dark:bg-primary/20">
+<p class="text-primary text-lg font-bold leading-tight">30</p>
+</div>
+<p class="text-[#181411]/50 dark:text-white/50 text-[10px] uppercase font-bold tracking-wider">Sec</p>
+</div>
+</div>
+<p class="text-[#181411]/70 dark:text-white/70 text-sm font-medium">
+                Didn't receive the code? 
+                <button class="text-primary font-bold hover:underline ml-1">Resend Code</button>
+</p>
+</div>
+<!-- Action Button -->
+<div class="mt-auto px-6 pb-10">
+<button class="w-full h-14 bg-primary text-white text-lg font-bold rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2" onclick="window.location.href='dashboard.html'">
+                Verify &amp; Proceed
+                <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<!-- Bottom Indicator for Mobile -->
+
+</div>
+<!-- Decoration Element -->
+<div class="absolute -top-20 -right-20 size-64 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+<div class="absolute -bottom-20 -left-20 size-64 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+</div>
+</body></html>

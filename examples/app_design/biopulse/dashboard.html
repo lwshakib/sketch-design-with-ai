@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BioPulse - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec6d",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#0a120d",
+                        "surface": "#141e17",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+        }
+        .neon-text { filter: drop-shadow(0 0 8px rgba(19, 236, 109, 0.6)); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background-dark text-white min-h-screen flex flex-col items-center p-0">
+<div class="w-full max-w-[430px] min-h-screen bg-background-dark flex flex-col overflow-hidden relative border-x border-white/5">
+<!-- Header -->
+<header class="p-8 flex justify-between items-center sticky top-0 bg-background-dark/80 backdrop-blur-md z-50">
+<div class="flex items-center gap-4">
+<div class="size-14 rounded-2xl p-1 border border-primary/20 shadow-xl shadow-primary/5">
+<img alt="" class="w-full h-full rounded-xl object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3WXRizy3eFFW9vYNWzcJaOrMFM_seJQQSVb0jhXSqbl21Df16h9Fb3JtSj-9iU5npXhEcwDdCTj0_atbONOkq28sZ6p9TRjzZgnPgugG0xbo41E5gbRVyrYgvguqL05JICMTv2MF9oKo8e3nxgtz5MJ7V0mEJeruuTQkZI_pNeyBP5GScqKSsil8O4Bl-hj6PopGnX56aIi3-Q3qekB0GlFvarZ04EAAv9I5Ao2zo7gROAGGO_a1JF7N1l8IfdbeCy8gY7mP68DE"/>
+</div>
+<div>
+<p class="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Biometric ID Sync</p>
+<h1 class="text-xl font-black tracking-tight">Alex Carter</h1>
+</div>
+</div>
+<button class="size-12 rounded-2xl glass-card flex items-center justify-center relative">
+<span class="material-symbols-outlined text-primary">notifications</span>
+<div class="absolute top-3 right-3 size-2 bg-primary rounded-full neon-glow shadow-[0_0_8px_rgba(19,236,109,1)]"></div>
+</button>
+</header>
+<!-- Scrollable Content -->
+<main class="flex-1 overflow-y-auto no-scrollbar px-8 py-6 space-y-10">
+<!-- Hero Gauge -->
+<section class="flex flex-col items-center justify-center py-6 relative">
+<div class="absolute inset-0 bg-primary/5 blur-[100px] rounded-full scale-75"></div>
+<div class="relative size-72 flex items-center justify-center">
+<!-- Gauge Ring -->
+<svg class="absolute inset-0 size-full -rotate-90">
+<circle class="fill-none stroke-white/5 stroke-[12px]" cx="144" cy="144" r="120"></circle>
+<circle class="fill-none stroke-primary stroke-[12px] neon-text" cx="144" cy="144" r="120" stroke-dasharray="753" stroke-dashoffset="180" stroke-linecap="round"></circle>
+</svg>
+<div class="text-center z-10">
+<span class="material-symbols-outlined text-primary text-4xl mb-2" style="font-variation-settings: 'FILL' 1">favorite</span>
+<div class="text-[72px] font-black tracking-tighter leading-none flex items-baseline justify-center">
+                            74<span class="text-xl font-bold opacity-30 ml-2">BPM</span>
+</div>
+<p class="text-[10px] font-black uppercase tracking-[0.3em] text-primary mt-3">Steady Pulse</p>
+</div>
+<!-- Metric Badges -->
+<div class="absolute -top-4 -right-2 glass-card px-4 py-2 rounded-2xl flex items-center gap-2 shadow-2xl">
+<span class="material-symbols-outlined text-blue-400 text-sm">water_drop</span>
+<span class="text-[10px] font-black">98% SpO2</span>
+</div>
+</div>
+</section>
+<!-- Daily Stats -->
+<section class="grid grid-cols-2 gap-4">
+<div class="glass-card p-6 rounded-[2.5rem] space-y-2">
+<p class="text-[10px] font-black uppercase tracking-widest opacity-40">Daily Min</p>
+<p class="text-2xl font-black">58 <span class="text-xs opacity-30">BPM</span></p>
+</div>
+<div class="glass-card p-6 rounded-[2.5rem] space-y-2">
+<p class="text-[10px] font-black uppercase tracking-widest opacity-40">Daily Max</p>
+<p class="text-2xl font-black">142 <span class="text-xs opacity-30">BPM</span></p>
+</div>
+</section>
+<!-- Activity Chart -->
+<section class="glass-card rounded-[3rem] p-8">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h3 class="text-[10px] font-black uppercase tracking-widest opacity-40 mb-2">Weekly Burn</h3>
+<p class="text-3xl font-black tracking-tight">14,240 <span class="text-sm font-bold opacity-30">kcal</span></p>
+</div>
+<div class="bg-primary/10 text-primary px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
+<span class="material-symbols-outlined text-xs font-black">trending_up</span> 12%
+                    </div>
+</div>
+<div class="flex justify-between items-end h-32 gap-3">
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-white/5 rounded-full relative h-20">
+<div class="absolute bottom-0 w-full bg-primary/20 rounded-full" style="height: 60%"></div>
+</div>
+<span class="text-[8px] font-black opacity-30">M</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-white/5 rounded-full relative h-24">
+<div class="absolute bottom-0 w-full bg-primary/40 rounded-full" style="height: 80%"></div>
+</div>
+<span class="text-[8px] font-black opacity-30">T</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-white/5 rounded-full relative h-28">
+<div class="absolute bottom-0 w-full bg-primary/60 rounded-full" style="height: 70%"></div>
+</div>
+<span class="text-[8px] font-black opacity-30">W</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-white/5 rounded-full relative h-32">
+<div class="absolute bottom-0 w-full bg-primary rounded-full shadow-[0_0_12px_rgba(19,236,109,0.3)]" style="height: 95%"></div>
+</div>
+<span class="text-[8px] font-black text-primary">T</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-white/5 rounded-full relative h-24">
+<div class="absolute bottom-0 w-full bg-primary/40 rounded-full" style="height: 65%"></div>
+</div>
+<span class="text-[8px] font-black opacity-30">F</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-white/5 rounded-full relative h-16">
+<div class="absolute bottom-0 w-full bg-primary/20 rounded-full" style="height: 40%"></div>
+</div>
+<span class="text-[8px] font-black opacity-30">S</span>
+</div>
+</div>
+</section>
+<!-- More Stats -->
+<section class="grid grid-cols-12 gap-4">
+<!-- Hydration -->
+<div class="col-span-12 glass-card rounded-[2.5rem] p-8 flex items-center justify-between">
+<div class="space-y-2">
+<h3 class="text-[10px] font-black uppercase tracking-widest opacity-40">Hydration</h3>
+<p class="text-3xl font-black">1.8 <span class="text-sm opacity-30">L</span></p>
+<p class="text-[10px] font-black opacity-30 uppercase tracking-widest">Goal: 2.5L</p>
+</div>
+<div class="relative size-24">
+<svg class="size-full -rotate-90">
+<circle class="fill-none stroke-white/5 stroke-[8px]" cx="48" cy="48" r="40"></circle>
+<circle class="fill-none stroke-primary stroke-[8px]" cx="48" cy="48" r="40" stroke-dasharray="251" stroke-dashoffset="60" stroke-linecap="round"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">opacity</span>
+</div>
+</div>
+</div>
+</section>
+<div class="h-40"></div>
+</main>
+<!-- Bottom Nav -->
+<nav class="absolute bottom-0 left-0 right-0 bg-background-dark/80 backdrop-blur-xl border-t border-white/5 px-8 pt-4 pb-12 z-50 rounded-t-[3rem] shadow-[0_-20px_40px_rgba(0,0,0,0.3)]">
+<div class="flex justify-between items-center">
+<button class="flex flex-col items-center gap-2 text-primary" onclick="window.location.href='dashboard.html'">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1">grid_view</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Home</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-all" onclick="window.location.href='metrics.html'">
+<span class="material-symbols-outlined text-3xl">analytics</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Metrics</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-all" onclick="window.location.href='sleep.html'">
+<span class="material-symbols-outlined text-3xl">bedtime</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Sleep</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-all" onclick="window.location.href='workout.html'">
+<span class="material-symbols-outlined text-3xl">fitness_center</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Workouts</span>
+</button>
+<button class="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-all" onclick="window.location.href='profile.html'">
+<span class="material-symbols-outlined text-3xl">settings</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Profile</span>
+</button>
+</div>
+</nav>
+</div>
+</body></html>

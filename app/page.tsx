@@ -15,7 +15,8 @@ import {
   Globe,
   X,
   Loader2,
-  Zap
+  Zap,
+  RotateCcw
 } from "lucide-react";
 import NumberFlow from "@number-flow/react";
 import Link from "next/link";
@@ -211,6 +212,14 @@ export default function Home() {
 
   const [shuffledPrompts, setShuffledPrompts] = useState<string[]>([]);
 
+  const refreshPrompts = () => {
+    const allPrompts = [...PROMPTS.app, ...PROMPTS.web];
+    const shuffled = allPrompts
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3);
+    setShuffledPrompts(shuffled);
+  };
+
   useEffect(() => {
     setIsMounted(true);
     fetchProjects();
@@ -219,11 +228,7 @@ export default function Home() {
 
   useEffect(() => {
     if (isMounted) {
-      const allPrompts = [...PROMPTS.app, ...PROMPTS.web];
-      const shuffled = allPrompts
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 3);
-      setShuffledPrompts(shuffled);
+      refreshPrompts();
     }
   }, [isMounted]);
 
@@ -355,13 +360,14 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/settings" className="flex items-center px-4 py-2 rounded-2xl bg-zinc-900/40 border border-white/5 transition-all hover:bg-zinc-900/80 shadow-sm group">
-              <span className="text-[11px] font-medium text-zinc-400 flex items-center gap-1.5">
+            <Link href="/settings" className="flex items-center px-4 py-2 rounded-2xl bg-zinc-100/50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-white/10 transition-all hover:bg-zinc-200/50 dark:hover:bg-zinc-800/80 shadow-sm group">
+              <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
                 <NumberFlow 
                   value={(credits || 0) / 1000} 
+                  className="font-bold text-zinc-900 dark:text-zinc-100"
                   format={{ minimumFractionDigits: 1, maximumFractionDigits: 1 }}
                 />
-                <span className="text-zinc-500">k credits remaining</span>
+                <span className="text-zinc-500 dark:text-zinc-500">k credits remaining</span>
               </span>
             </Link>
             <UserMenu />
@@ -389,12 +395,8 @@ export default function Home() {
               
               {/* Main Title Row */}
               <div className="flex flex-col items-center text-center space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-[0.2em] text-primary">
-                  <Sparkles className="size-3" />
-                  AI Powered Canvas
-                </div>
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground uppercase italic leading-none">
-                  Start a new design
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground leading-tight">
+                  Start a new UI design
                 </h1>
                 <p className="text-sm text-muted-foreground max-w-md font-medium">
                   Transform your ideas into high-fidelity prototypes instantly using our neural design engine.
@@ -404,9 +406,9 @@ export default function Home() {
               {/* Premium Chat Input */}
               <div className="relative group w-full">
                 {/* Outer Glow Overlay */}
-                <div className="absolute -inset-[1px] rounded-[32px] opacity-0 group-focus-within:opacity-100 transition-all duration-700 blur-2xl pointer-events-none bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10" />
+                <div className="absolute -inset-[1px] rounded-[24px] opacity-0 group-focus-within:opacity-100 transition-all duration-700 blur-2xl pointer-events-none bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10" />
 
-                <div className="relative bg-[#0A0A0A] rounded-[32px] p-8 space-y-4 border border-white/5 transition-all duration-500 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] group-focus-within:border-primary/20 group-focus-within:shadow-[0_0_60px_-10px_rgba(var(--primary-rgb),0.2)]">
+                <div className="relative bg-white dark:bg-zinc-950 rounded-[24px] p-6 space-y-4 border border-zinc-200 dark:border-white/5 transition-all duration-500 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] group-focus-within:border-primary/20 group-focus-within:shadow-[0_0_60px_-10px_rgba(var(--primary-rgb),0.2)]">
                   {/* Image Previews & Website URL */}
                   <AnimatePresence>
                     {(attachments.length > 0 || websiteUrl || showUrlInput) && (
@@ -419,7 +421,7 @@ export default function Home() {
                         {attachments.map((attr, i) => (
                           <div
                             key={i}
-                            className="relative group/img h-20 w-20 rounded-xl overflow-hidden border border-white/10 bg-zinc-900 shadow-sm"
+                            className="relative group/img h-20 w-20 rounded-xl overflow-hidden border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900 shadow-sm"
                           >
                             <img
                               src={attr.url}
@@ -431,7 +433,7 @@ export default function Home() {
                             />
                             {attr.isUploading && (
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <Loader2 className="h-5 w-5 text-white animate-spin" />
+                                <Loader2 className="h-5 w-5 text-zinc-500 animate-spin" />
                               </div>
                             )}
                             <button
@@ -444,14 +446,14 @@ export default function Home() {
                         ))}
 
                         {websiteUrl && !showUrlInput && (
-                          <div className="flex items-center gap-2 px-3 h-10 rounded-xl bg-primary/10 border border-primary/20 text-primary group">
+                          <div className="flex items-center gap-2 px-3 h-10 rounded-xl bg-primary/5 dark:bg-primary/10 border border-primary/10 dark:border-primary/20 text-primary group">
                             <LucideLink className="size-3 shrink-0" />
                             <span className="text-xs font-bold truncate max-w-[200px]">
                               {websiteUrl}
                             </span>
                             <button
                               onClick={() => setWebsiteUrl(null)}
-                              className="size-4 shrink-0 hover:bg-white/10 rounded flex items-center justify-center"
+                              className="size-4 shrink-0 hover:bg-black/5 dark:hover:bg-white/10 rounded flex items-center justify-center"
                             >
                               <X className="size-2" />
                             </button>
@@ -462,9 +464,9 @@ export default function Home() {
                           <form
                             onSubmit={handleUrlSubmit}
                             className={cn(
-                              "flex-1 min-w-[240px] flex items-center gap-2 px-3 h-10 rounded-xl bg-zinc-900 border transition-all duration-200",
+                              "flex-1 min-w-[240px] flex items-center gap-2 px-3 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900 border transition-all duration-200",
                               isUrlValid
-                                ? "border-white/10"
+                                ? "border-zinc-200 dark:border-white/10"
                                 : "border-red-500/50 ring-1 ring-red-500/20"
                             )}
                           >
@@ -482,7 +484,7 @@ export default function Home() {
                                 if (!isUrlValid) setIsUrlValid(true);
                               }}
                               placeholder="Paste URL (e.g. google.com)"
-                              className="flex-1 bg-transparent outline-none text-xs text-zinc-200 placeholder:text-zinc-600"
+                              className="flex-1 bg-transparent outline-none text-xs text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
                             />
                             <button
                               type="button"
@@ -491,7 +493,7 @@ export default function Home() {
                                 setUrlTemp("");
                                 setIsUrlValid(true);
                               }}
-                              className="size-4 shrink-0 hover:bg-white/10 rounded flex items-center justify-center"
+                              className="size-4 shrink-0 hover:bg-black/5 dark:hover:bg-white/10 rounded flex items-center justify-center"
                             >
                               <X className="size-2 text-zinc-500" />
                             </button>
@@ -505,7 +507,7 @@ export default function Home() {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder="Describe your design vision..."
-                    className="w-full h-32 bg-transparent outline-none resize-none text-xl text-foreground placeholder:text-zinc-600 font-medium leading-relaxed hide-scrollbar"
+                    className="w-full h-24 bg-transparent outline-none resize-none text-lg text-foreground placeholder:text-zinc-400 dark:placeholder:text-zinc-600 font-medium leading-relaxed hide-scrollbar"
                   />
 
                   <div className="flex items-center justify-between pt-2">
@@ -521,21 +523,19 @@ export default function Home() {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-10 w-10 rounded-full bg-zinc-900/50 text-zinc-500 hover:text-white border border-white/5 transition-colors"
+                          <button
+                            className="h-10 w-10 rounded-full bg-zinc-50 dark:bg-zinc-900/50 text-zinc-500 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5 transition-colors flex items-center justify-center outline-none"
                           >
                             <Plus className="h-5 w-5" />
-                          </Button>
+                          </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                           align="start"
-                          className="w-48 bg-[#0F0F0F] border-white/10 rounded-xl shadow-2xl p-1.5 z-[100]"
+                          className="w-48 bg-white dark:bg-[#0F0F0F] border-zinc-200 dark:border-white/10 rounded-xl shadow-2xl p-1.5 z-[100]"
                         >
                           <DropdownMenuItem
                             onClick={() => fileInputRef.current?.click()}
-                            className="flex items-center gap-2 p-2 hover:bg-white/5 rounded-lg text-zinc-300 transition-colors cursor-pointer"
+                            className="flex items-center gap-2 p-2 hover:bg-zinc-50 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer"
                           >
                             <ImageIcon className="h-4 w-4" />
                             <span className="text-[13px] font-medium">
@@ -544,7 +544,7 @@ export default function Home() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => setShowUrlInput(true)}
-                            className="flex items-center gap-2 p-2 hover:bg-white/5 rounded-lg text-zinc-300 transition-colors cursor-pointer"
+                            className="flex items-center gap-2 p-2 hover:bg-zinc-50 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer"
                           >
                             <LucideLink className="h-4 w-4" />
                             <span className="text-[13px] font-medium">
@@ -554,9 +554,9 @@ export default function Home() {
                         </DropdownMenuContent>
                       </DropdownMenu>
 
-                      <div className="h-4 w-[1px] bg-white/10 mx-1" />
+                      <div className="h-4 w-[1px] bg-zinc-200 dark:bg-white/10 mx-1" />
 
-                      <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest hidden sm:block">
+                      <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-600 uppercase tracking-widest hidden sm:block">
                         Press Enter to Generate
                       </p>
                     </div>
@@ -564,7 +564,7 @@ export default function Home() {
                     <Button 
                        onClick={onSubmit}
                        disabled={(!inputValue.trim() && attachments.length === 0 && !websiteUrl) || attachments.some(a => a.isUploading) || isSubmitting}
-                       className="h-12 px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 border border-white/10 shadow-xl transition-all"
+                       className="h-12 px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 border border-black/5 dark:border-white/10 shadow-xl transition-all"
                     >
                       {isSubmitting ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
@@ -579,9 +579,18 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Mobile Only Prompts */}
-              <div className="xl:hidden space-y-4">
-                 <h3 className="text-[10px] font-black text-muted-foreground ml-1 uppercase tracking-widest">Try these prompts</h3>
+              {/* Prompt Suggestions */}
+              <div className="space-y-4">
+                 <div className="flex items-center justify-between px-1">
+                   <h3 className="text-sm font-medium text-zinc-500 dark:text-muted-foreground capitalize">Try these prompts</h3>
+                   <button 
+                     onClick={refreshPrompts}
+                     className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                     title="Refresh prompts"
+                   >
+                     <RotateCcw className="size-4" />
+                   </button>
+                 </div>
                  <div className="flex flex-col gap-2">
                     {shuffledPrompts.map((prompt: string, i: number) => (
                       <button
@@ -590,9 +599,11 @@ export default function Home() {
                           setInputValue(prompt);
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
-                        className="w-full p-4 rounded-xl bg-card border border-border text-left text-sm text-muted-foreground font-medium hover:bg-secondary hover:border-border transition-all leading-snug shadow-sm active:scale-[0.98]"
+                        className="p-4 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-white/5 text-left text-xs text-zinc-500 dark:text-zinc-400 font-medium hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-primary/20 transition-all leading-relaxed shadow-sm active:scale-[0.98] group"
                       >
-                        {prompt}
+                        <span className="group-hover:text-zinc-900 dark:group-hover:text-zinc-200 transition-colors">
+                          {prompt}
+                        </span>
                       </button>
                     ))}
                  </div>
@@ -600,79 +611,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right Sidebar - Minimal & Eye Catching */}
-          <aside className="w-[340px] border-l border-white/5 bg-[#050505]/40 p-8 hidden xl:flex flex-col gap-10 overflow-y-auto scrollbar-hide">
-            
-            {/* Try these prompts Section */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-2 px-1">
-                <div className="size-2 rounded-full bg-primary animate-pulse" />
-                <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">Inspiration</h3>
-              </div>
-              
-              <div className="flex flex-col gap-3">
-                {shuffledPrompts.map((prompt: string, i: number) => (
-                  <button
-                    key={i}
-                    onClick={() => setInputValue(prompt)}
-                    className="group relative w-full p-4 rounded-2xl bg-zinc-900/20 border border-white/5 text-left transition-all hover:bg-zinc-900/40 hover:border-white/10 active:scale-[0.98]"
-                  >
-                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ArrowRight className="size-3 text-primary" />
-                    </div>
-                    <p className="text-[13px] text-zinc-400 font-medium leading-relaxed pr-4 group-hover:text-zinc-200 transition-colors">
-                      {prompt}
-                    </p>
-                  </button>
-                ))}
-              </div>
-            </div>
 
-            {/* Design Tips Section */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-2 px-1">
-                <div className="size-2 rounded-full bg-zinc-800" />
-                <h3 className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">Quick Tips</h3>
-              </div>
-              
-              <div className="space-y-4">
-                {[
-                  { icon: Zap, title: "Be Specific", text: "Mention layouts, colors, and specific UI elements for better results." },
-                  { icon: Globe, title: "Image Reference", text: "Upload screenshots of designs you like to guide the AI's vision." },
-                  { icon: Zap, title: "Iterative Design", text: "Start simple and refine with detailed follow-up prompts." }
-                ].map((tip, i) => (
-                  <div key={i} className="flex gap-4 group">
-                    <div className="size-10 rounded-xl bg-zinc-900/50 border border-white/5 flex items-center justify-center shrink-0 group-hover:border-primary/20 transition-colors">
-                      <tip.icon className="size-4 text-zinc-500 group-hover:text-primary transition-colors" />
-                    </div>
-                    <div className="space-y-1 pt-0.5">
-                      <h4 className="text-[12px] font-bold text-zinc-300 tracking-tight">{tip.title}</h4>
-                      <p className="text-[11px] text-zinc-500 leading-normal font-medium">{tip.text}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Pro Badge */}
-            <div className="mt-auto pt-10">
-              <div className="relative p-6 rounded-[24px] bg-gradient-to-br from-zinc-900 to-black border border-white/5 overflow-hidden group">
-                <div className="absolute -top-10 -right-10 size-40 bg-primary/5 blur-3xl rounded-full" />
-                <div className="relative space-y-3">
-                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-primary text-[10px] font-black uppercase tracking-wider text-black">
-                    Pro
-                  </div>
-                  <h4 className="text-sm font-bold text-white tracking-tight">Unlimited Vision</h4>
-                  <p className="text-[11px] text-zinc-500 font-medium leading-relaxed">
-                    Upgrade to Pro to unlock advanced modeling and unlimited design exports.
-                  </p>
-                  <Button className="w-full h-8 rounded-lg bg-white text-black text-[11px] font-black uppercase tracking-tighter hover:bg-zinc-200 transition-colors mt-2">
-                    Upgrade Now
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </aside>
         </div>
       </main>
     </div>

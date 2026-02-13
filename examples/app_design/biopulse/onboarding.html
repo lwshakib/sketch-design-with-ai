@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BioPulse - Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec6d",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#0a120d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .pulse-glow { filter: drop-shadow(0 0 10px rgba(19, 236, 109, 0.4)); }
+        .mask-fade { mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent); }
+    </style>
+</head>
+<body class="bg-background-dark text-white min-h-screen flex flex-col items-center justify-center p-0">
+<div class="w-full max-w-[430px] min-h-screen bg-background-dark flex flex-col overflow-hidden relative border-x border-white/5">
+<!-- Background Glows -->
+<div class="absolute top-[-10%] left-[-20%] size-64 bg-primary/10 blur-[100px] rounded-full"></div>
+<div class="absolute bottom-[-10%] right-[-20%] size-96 bg-primary/5 blur-[120px] rounded-full"></div>
+<!-- Top Skip -->
+<header class="p-8 flex justify-between items-center z-10">
+<div class="flex items-center gap-2">
+<div class="size-2 bg-primary rounded-full animate-pulse shadow-[0_0_8px_rgba(19,236,109,1)]"></div>
+<span class="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">BioPulse Systems</span>
+</div>
+<button class="text-xs font-black uppercase tracking-widest text-primary hover:opacity-80 transition-opacity">Skip</button>
+</header>
+<!-- Hero Content -->
+<main class="flex-1 flex flex-col items-center justify-center px-10 text-center relative">
+<!-- Visual Element -->
+<div class="relative w-full h-48 flex items-center justify-center mb-16 mask-fade">
+<svg class="w-full h-full stroke-primary fill-none stroke-[3] pulse-glow" viewbox="0 0 400 100">
+<path d="M0,50 L50,50 L60,30 L75,70 L90,10 L105,90 L120,40 L135,50 L180,50 L190,35 L205,65 L220,15 L235,85 L250,35 L265,50 L310,50 L320,40 L335,60 L350,20 L365,80 L380,50 L400,50"></path>
+</svg>
+<div class="absolute top-0 right-1/4 bg-background-dark/80 backdrop-blur-md border border-primary/20 p-3 rounded-2xl flex items-center gap-3 shadow-2xl">
+<span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1">favorite</span>
+<div class="text-left">
+<p class="text-[8px] font-black uppercase tracking-widest opacity-40">Live Pulse</p>
+<p class="text-xl font-black leading-none">72 <span class="text-[10px] font-medium opacity-50">BPM</span></p>
+</div>
+</div>
+</div>
+<!-- Text -->
+<div class="space-y-6">
+<h1 class="text-[44px] font-black leading-[1.1] tracking-tighter">
+                    AI Health<br/><span class="text-primary">Ecosystem</span>.
+                </h1>
+<p class="text-sm font-medium text-white/50 leading-relaxed px-4">
+                    Monitor your vitals with medical-grade precision using next-gen AI diagnostics.
+                </p>
+</div>
+</main>
+<!-- Footer -->
+<footer class="p-10 space-y-10">
+<!-- Progress -->
+<div class="flex justify-center gap-2">
+<div class="h-1.5 w-8 rounded-full bg-primary shadow-[0_0_12px_rgba(19,236,109,0.5)]"></div>
+<div class="h-1.5 w-1.5 rounded-full bg-white/10"></div>
+<div class="h-1.5 w-1.5 rounded-full bg-white/10"></div>
+<div class="h-1.5 w-1.5 rounded-full bg-white/10"></div>
+</div>
+<!-- Button -->
+<button class="w-full h-16 bg-primary text-background-dark font-black text-sm uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all" onclick="window.location.href='signup.html'">
+                    Get Started
+<span class="material-symbols-outlined text-xl">arrow_forward</span>
+</button>
+</footer>
+</div>
+</body></html>

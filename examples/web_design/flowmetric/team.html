@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Team Collaboration Hub - FlowMetric</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3c83f6",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101722",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 min-h-screen">
+<!-- Navigation Header -->
+<nav class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons text-white text-lg">insights</span>
+</div>
+<span class="font-bold text-xl tracking-tight text-slate-900 dark:text-white">FlowMetric</span>
+</div>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-primary font-medium text-sm" href="#">Team Hub</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm" href="#">Projects</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-sm" href="#">Reports</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-full text-sm w-64 focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Search team members..." type="text"/>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all">
+<span class="material-icons text-sm">person_add</span>
+                    Add Member
+                </button>
+</div>
+</div>
+</nav>
+<main class="max-w-[1600px] mx-auto px-6 py-8">
+<!-- Top Stats Overview -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4 shadow-sm">
+<div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+<span class="material-icons text-primary">groups</span>
+</div>
+<div>
+<p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Members</p>
+<h3 class="text-2xl font-bold dark:text-white">24</h3>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4 shadow-sm">
+<div class="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
+<span class="material-icons text-green-500">task_alt</span>
+</div>
+<div>
+<p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Tasks</p>
+<h3 class="text-2xl font-bold dark:text-white">142</h3>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4 shadow-sm">
+<div class="w-12 h-12 bg-orange-500/10 rounded-lg flex items-center justify-center">
+<span class="material-icons text-orange-500">bolt</span>
+</div>
+<div>
+<p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Team Velocity</p>
+<h3 class="text-2xl font-bold dark:text-white">94%</h3>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4 shadow-sm">
+<div class="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center">
+<span class="material-icons text-purple-500">hourglass_empty</span>
+</div>
+<div>
+<p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Open Roles</p>
+<h3 class="text-2xl font-bold dark:text-white">3</h3>
+</div>
+</div>
+</div>
+<!-- Main Analytics Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+<!-- Collaboration Graph Visualization -->
+<div class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h2 class="text-lg font-bold dark:text-white">Collaboration Network</h2>
+<p class="text-sm text-slate-500">Interaction frequency between members</p>
+</div>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+<span class="material-icons text-slate-400 text-sm">refresh</span>
+</button>
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+<span class="material-icons text-slate-400 text-sm">fullscreen</span>
+</button>
+</div>
+</div>
+<div class="relative h-[400px] w-full bg-slate-50 dark:bg-slate-950/50 rounded-lg flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#3c83f6 0.5px, transparent 0.5px); background-size: 20px 20px;"></div>
+<!-- Mock Collaboration Graph Visualization -->
+<div class="relative w-full h-full p-10 flex items-center justify-center">
+<!-- Connecting Lines Mockup using SVG -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+<line stroke="#3c83f6" stroke-opacity="0.3" stroke-width="2" x1="50%" x2="25%" y1="50%" y2="25%"></line>
+<line stroke="#3c83f6" stroke-opacity="0.5" stroke-width="3" x1="50%" x2="75%" y1="50%" y2="25%"></line>
+<line stroke="#3c83f6" stroke-opacity="0.2" stroke-width="1" x1="50%" x2="50%" y1="50%" y2="80%"></line>
+<line stroke="#3c83f6" stroke-opacity="0.1" stroke-width="1" x1="25%" x2="75%" y1="25%" y2="25%"></line>
+</svg>
+<!-- Graph Nodes -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-16 h-16 rounded-full border-4 border-primary/20 p-1 bg-white dark:bg-slate-900 ring-4 ring-primary ring-offset-2 dark:ring-offset-slate-900 transition-transform hover:scale-110 cursor-pointer">
+<img alt="Sarah Chen" class="w-full h-full rounded-full object-cover" data-alt="Portrait of a male project manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWzsc_jKgnCGW3NRpyIGRWswx9DZqCEszmmNPkJjITTz1LAGqZD0i0JoFvsz8OAPUsKuGHJZlso0mkJKdr_wLFzEy0UWWqxHkK8v0iSMnnY-tMpTDAmNp2Qf-mNPayTQFVvJctj6n3Oqv-c7kH9pDh7Ur5a1xLjR-4HljJAGwngTJvOASDsl3F0mB5Q-aFgrC4VaiRBXRODH_pGdE-hT-M1x0LcHVg_2DKFEaLRTNWCgUnR1bS77bBz1YOGoXPKYAacJqc2nAC8TE"/>
+</div>
+<span class="text-xs font-bold mt-2 bg-primary text-white px-2 py-0.5 rounded-full">Sarah (Lead)</span>
+</div>
+<div class="absolute top-[25%] left-[25%] -translate-x-1/2 -translate-y-1/2 group">
+<div class="w-12 h-12 rounded-full border-2 border-slate-200 dark:border-slate-800 p-0.5 bg-white dark:bg-slate-900 transition-all group-hover:border-primary cursor-pointer">
+<img alt="Alex" class="w-full h-full rounded-full object-cover" data-alt="Close up of a smiling man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCB2oY6uf5R56p66ItHE71J43w_Sgv9hlhn3kT5YGjF5DKOPXuMVhNtGwAWPFtbCV7qDr0auJtAGDDgVAWplKwL2cfj76HZXbS9q3njQF7U-60VF2LS99_Ddxjg5q5MheQPkgRbN78AbkXw3r27lECo0JezuhRs1egzRT7tTbyyNsCwLilG5alo1z02QWDR9HCJSVKRz9VvWnUVBVLKtffje2gFZflre60KEvuo0RhI_9TpCEdISs94cGKsq-7gtR9jQNzmMcdwwjA"/>
+</div>
+</div>
+<div class="absolute top-[25%] left-[75%] -translate-x-1/2 -translate-y-1/2 group">
+<div class="w-14 h-14 rounded-full border-2 border-slate-200 dark:border-slate-800 p-0.5 bg-white dark:bg-slate-900 transition-all group-hover:border-primary cursor-pointer">
+<img alt="Elena" class="w-full h-full rounded-full object-cover" data-alt="Close up of a smiling woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6sJDONfbS9I2lMvr7YW-mwP2TxTTqE-mNEKJl4FtDrRNkUi5VE-p6iW4Eg7sXZA_giN8HcyFAUBIadqDR7oVvCKA66yMGH9Ee5JNyrN_x5dd-v7AFKmd3yob_goBLWPZ-7hYyyJuVkAcVYJUNAYbySv2U1yH0A_vszoRO22wCFsoE0oMj6x6l65jHR-NHbXI0F6K57FgQ4JOM6YYGmu5MSyuDZSzzivk96oI7WXIgwdggfqy70hrClVfznR-9FPoW4jtm4Ty3BYI"/>
+</div>
+</div>
+<div class="absolute bottom-[20%] left-[50%] -translate-x-1/2 -translate-y-1/2 group">
+<div class="w-10 h-10 rounded-full border-2 border-slate-200 dark:border-slate-800 p-0.5 bg-white dark:bg-slate-900 transition-all group-hover:border-primary cursor-pointer">
+<img alt="Marcus" class="w-full h-full rounded-full object-cover" data-alt="Professional man in a suit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI8V_RrLAaWrWlt4G7NRl6M-LIzv-Tl4RVD5ZWWdo01I8HW_ymvoJRqMIMaxWJ2ymIuvIVTP-sK0V_LfNuN7dFSaj_6fIaj6Jfs_fLHyqojqAXQgbPFT5nvRncdxxnrK3iRlWfD5GhfGdp5i91zrDXkT9ixfkLf-zyz_tBfI5upcsJRterEe975TG4GyMzQqF9JlEOWTgmks45wGLk6Pe71Hjft52yICZDk5dBQjcx7tJF01Bg01gu_3yj52V00m-gdnAyZm4beSw"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Workload Horizontal Bar Chart -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<h2 class="text-lg font-bold mb-1 dark:text-white">Shared Workload</h2>
+<p class="text-sm text-slate-500 mb-6">Task distribution by member</p>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span class="dark:text-white">Sarah Chen</span>
+<span class="text-slate-500">24 / 30 Tasks</span>
+</div>
+<div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
+<div class="h-full bg-primary" style="width: 80%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span class="dark:text-white">Alex Rivera</span>
+<span class="text-slate-500">18 / 30 Tasks</span>
+</div>
+<div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
+<div class="h-full bg-primary/60" style="width: 60%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span class="dark:text-white">Elena Sokolov</span>
+<span class="text-slate-500">28 / 30 Tasks</span>
+</div>
+<div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
+<div class="h-full bg-red-400" style="width: 93%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span class="dark:text-white">Marcus Thorne</span>
+<span class="text-slate-500">12 / 30 Tasks</span>
+</div>
+<div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
+<div class="h-full bg-primary/40" style="width: 40%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-medium">
+<span class="dark:text-white">Jamie Wu</span>
+<span class="text-slate-500">5 / 30 Tasks</span>
+</div>
+<div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
+<div class="h-full bg-primary/20" style="width: 15%"></div>
+</div>
+</div>
+</div>
+<div class="mt-8 p-4 bg-slate-50 dark:bg-slate-950/30 rounded-lg border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 text-primary mb-1">
+<span class="material-icons text-sm">info</span>
+<span class="text-xs font-bold uppercase">Resource Alert</span>
+</div>
+<p class="text-xs text-slate-600 dark:text-slate-400">Elena is currently over-allocated. Consider redistributing 4 tasks to Jamie.</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+<!-- Team Directory -->
+<div class="lg:col-span-3">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-bold dark:text-white">Team Directory</h2>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-1 text-xs font-semibold text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-lg">
+<span class="material-icons text-sm">filter_list</span> Filter
+                        </button>
+<button class="flex items-center gap-1 text-xs font-semibold text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-lg">
+<span class="material-icons text-sm">sort</span> Sort
+                        </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Member Card -->
+<div class="group bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:shadow-lg transition-all">
+<div class="flex items-start justify-between mb-4">
+<div class="relative">
+<img alt="Sarah" class="w-14 h-14 rounded-xl object-cover" data-alt="Man in professional attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAf0R80I08jLiVYQNqsB6L8v5vIk7ntq8Mart2Tx-Rxyis9Bc_WO_01BWuPiPxOq77u8b2FvKkIUXusymlL_H-hXmyvurUG4HBCuIZQRyJK3kYR9-GpHgbrIs8F_UttXdW74KuxKn-sXZQiQE69_LTEewKXOfgjlj-AblMtalg0aoomXgijSA521jFCfoceRuhWiktB4h82Jj7BFKdPlGaSCR4-YCnfy3OiJOfa2zUZ5Jg8k9GxvgoYLS8ZQehmmmL0d2qepKgZFM"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"><span class="material-icons text-sm">chat_bubble_outline</span></button>
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"><span class="material-icons text-sm">more_vert</span></button>
+</div>
+</div>
+<h4 class="font-bold dark:text-white">Sarah Chen</h4>
+<p class="text-xs text-slate-500 font-medium mb-3 uppercase tracking-tight">Lead UX Designer</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tighter">FIGMA</span>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tighter">REACT</span>
+</div>
+</div>
+<!-- Member Card -->
+<div class="group bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:shadow-lg transition-all">
+<div class="flex items-start justify-between mb-4">
+<div class="relative">
+<img alt="Alex" class="w-14 h-14 rounded-xl object-cover" data-alt="Portrait of a young man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgiKgMqqY1tMsm_e5zQFxPZdHX3HimuccsXrkXXTH3zdJ5a8W90ww1YZFhLOMnnOXFXFpZw3uwtkKq5YtEvGkyfBJCiWIPlpt4QZGwWcVTS3-1bdBc2murnC8jndSjgBDrhuQL2HgunONVGMoN3Jj9YRfhQYrw8vT8pogWEhcg4kn86AKtNTSSBTbWMCS1vFP_Bf594UlZ5qpdmOBW8WUlOsNnxQMBPM-VmMLEBDXzn6p5K-edeeoKm4uJK-Ukx4GSXluKNV91ECI"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-orange-400 border-2 border-white dark:border-slate-900 rounded-full"></div>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"><span class="material-icons text-sm">chat_bubble_outline</span></button>
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"><span class="material-icons text-sm">more_vert</span></button>
+</div>
+</div>
+<h4 class="font-bold dark:text-white">Alex Rivera</h4>
+<p class="text-xs text-slate-500 font-medium mb-3 uppercase tracking-tight">Full-Stack Developer</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tighter">PYTHON</span>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tighter">NODE.JS</span>
+</div>
+</div>
+<!-- Member Card -->
+<div class="group bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:shadow-lg transition-all">
+<div class="flex items-start justify-between mb-4">
+<div class="relative">
+<img alt="Elena" class="w-14 h-14 rounded-xl object-cover" data-alt="Woman smiling into the camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFN3_R0M3i3F-VocEgCPJuq2UgPCxEiULvTHeKTy-fhbs66-f6iQFkjWs_K-j8-D_Mp_co2gIUyX4nxbXLjcLG3SyFXb-nIrxvxyWExoNrRVic3tO6SSYgtqMAddvp_3-Yct_VPyLbVvpO4UX9vY62_HK3JOY1IOjWYTsIa0GV8FCkT4Y2fKxk9Cl96XICSiAmTYG5R7ugNOkRoJnFr3KS9jGA_NFCl7cFGdlI9tS2K81eGQsyOZGqdg5fnRgziLOj3ONJFrkKN1A"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"><span class="material-icons text-sm">chat_bubble_outline</span></button>
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"><span class="material-icons text-sm">more_vert</span></button>
+</div>
+</div>
+<h4 class="font-bold dark:text-white">Elena Sokolov</h4>
+<p class="text-xs text-slate-500 font-medium mb-3 uppercase tracking-tight">Senior Product Manager</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tighter">AGILE</span>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tighter">STRATEGY</span>
+</div>
+</div>
+<!-- Member Card -->
+<div class="group bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:shadow-lg transition-all">
+<div class="flex items-start justify-between mb-4">
+<div class="relative">
+<img alt="Marcus" class="w-14 h-14 rounded-xl object-cover" data-alt="Man in casual wear smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArMVE4IsUeOnr049PGSRCaHdZJv96ZQljMPPq2gbyKbR7rJhGrSiNrIUzdmwzDBrI9spGRJTrBnO5pr-90TaBpQWXjGUVDopZtct1vZ13e14BhJO6smLyEebpFfaM5ogBDJnPurtYQs9qKpUrR7mfwLH_SRKSo7WHdCGfs9HMv-UjCEuMLXHumwxF59fE9N4ZcAoUK7iYHONalKLx7oxWBnDjcj-LrVXd3TpirwGbNoEDTsKIBMcy3dxG7Ib4xBaZcU_YxkalPUCs"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-slate-300 border-2 border-white dark:border-slate-900 rounded-full"></div>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"><span class="material-icons text-sm">chat_bubble_outline</span></button>
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"><span class="material-icons text-sm">more_vert</span></button>
+</div>
+</div>
+<h4 class="font-bold dark:text-white">Marcus Thorne</h4>
+<p class="text-xs text-slate-500 font-medium mb-3 uppercase tracking-tight">Quality Assurance</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tighter">CYPRESS</span>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tighter">JEST</span>
+</div>
+</div>
+<!-- Member Card -->
+<div class="group bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:shadow-lg transition-all">
+<div class="flex items-start justify-between mb-4">
+<div class="relative">
+<img alt="Jamie" class="w-14 h-14 rounded-xl object-cover" data-alt="Close up of a man's face" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6E7f-dE0vUCms4H4h5tJsbyakcCHk6JesMDNwdxD0F6LxWGPSLJbiy1qOdrU8_tMofK5ZELZfieEKYNU7cvOnfl5spHW4DpfiyLTDJ_sGwPvSpJqi9ioIDvW69YEdiWU9tvBj3o3H3PV9zMKVPn5-NRiWaita-W-8bRavB8tLXCZPqFtptxZJYI1JleBAWfMlyHbsMk2G_BeBYSnHyztIkWWA4yEKlK3Tfn8ppmFZB3J3HasOndN7kQpV1GyLULV0idW3eA4LtM4"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"><span class="material-icons text-sm">chat_bubble_outline</span></button>
+<button class="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"><span class="material-icons text-sm">more_vert</span></button>
+</div>
+</div>
+<h4 class="font-bold dark:text-white">Jamie Wu</h4>
+<p class="text-xs text-slate-500 font-medium mb-3 uppercase tracking-tight">Junior Developer</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tighter">JAVASCRIPT</span>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tighter">TAILWIND</span>
+</div>
+</div>
+<!-- Add New Card -->
+<button class="flex flex-col items-center justify-center p-5 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:bg-primary/5 transition-all group">
+<div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-icons">add</span>
+</div>
+<span class="text-sm font-semibold text-slate-500 group-hover:text-primary transition-colors">Add Team Member</span>
+</button>
+</div>
+<!-- Role Permissions Table -->
+<div class="mt-12 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+<h2 class="text-lg font-bold dark:text-white">Role Management</h2>
+<button class="text-primary text-sm font-semibold hover:underline">Edit All Permissions</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-950/50">
+<th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 tracking-wider">Role Name</th>
+<th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 tracking-wider text-center">Projects</th>
+<th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 tracking-wider text-center">Analytics</th>
+<th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 tracking-wider text-center">Admin</th>
+<th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 tracking-wider text-right">Members</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="font-bold dark:text-white">Administrator</div>
+<div class="text-[10px] text-slate-400 uppercase">Full Control</div>
+</td>
+<td class="px-6 py-4 text-center"><span class="material-icons text-green-500 text-sm">check_circle</span></td>
+<td class="px-6 py-4 text-center"><span class="material-icons text-green-500 text-sm">check_circle</span></td>
+<td class="px-6 py-4 text-center"><span class="material-icons text-green-500 text-sm">check_circle</span></td>
+<td class="px-6 py-4 text-right font-medium">4</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="font-bold dark:text-white">Lead Designer</div>
+<div class="text-[10px] text-slate-400 uppercase">Manage Workflows</div>
+</td>
+<td class="px-6 py-4 text-center"><span class="material-icons text-green-500 text-sm">check_circle</span></td>
+<td class="px-6 py-4 text-center"><span class="material-icons text-green-500 text-sm">check_circle</span></td>
+<td class="px-6 py-4 text-center"><span class="material-icons text-slate-300 dark:text-slate-700 text-sm">cancel</span></td>
+<td class="px-6 py-4 text-right font-medium">2</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="font-bold dark:text-white">Developer</div>
+<div class="text-[10px] text-slate-400 uppercase">Write Access</div>
+</td>
+<td class="px-6 py-4 text-center"><span class="material-icons text-green-500 text-sm">check_circle</span></td>
+<td class="px-6 py-4 text-center"><span class="material-icons text-slate-300 dark:text-slate-700 text-sm">cancel</span></td>
+<td class="px-6 py-4 text-center"><span class="material-icons text-slate-300 dark:text-slate-700 text-sm">cancel</span></td>
+<td class="px-6 py-4 text-right font-medium">15</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="font-bold dark:text-white">Reviewer</div>
+<div class="text-[10px] text-slate-400 uppercase">Read Only</div>
+</td>
+<td class="px-6 py-4 text-center"><span class="material-icons text-slate-300 dark:text-slate-700 text-sm">remove_circle</span></td>
+<td class="px-6 py-4 text-center"><span class="material-icons text-slate-300 dark:text-slate-700 text-sm">remove_circle</span></td>
+<td class="px-6 py-4 text-center"><span class="material-icons text-slate-300 dark:text-slate-700 text-sm">cancel</span></td>
+<td class="px-6 py-4 text-right font-medium">3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Activity Timeline -->
+<div class="lg:col-span-1">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm sticky top-24">
+<h2 class="text-lg font-bold mb-6 dark:text-white">Member Activity</h2>
+<div class="relative space-y-8 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-px before:bg-slate-100 dark:before:bg-slate-800">
+<!-- Timeline Item -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center border-2 border-white dark:border-slate-900 z-10">
+<span class="material-icons text-[14px] text-primary">commit</span>
+</div>
+<div class="text-xs text-slate-500 mb-1">14:20 PM • Sarah Chen</div>
+<p class="text-sm font-medium dark:text-slate-200">Merged PR #452 into <span class="text-primary">main</span> branch</p>
+</div>
+<!-- Timeline Item -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center border-2 border-white dark:border-slate-900 z-10">
+<span class="material-icons text-[14px] text-green-500">task_alt</span>
+</div>
+<div class="text-xs text-slate-500 mb-1">11:05 AM • Alex Rivera</div>
+<p class="text-sm font-medium dark:text-slate-200">Completed <span class="font-bold underline decoration-green-500/30">Auth Redesign</span> task</p>
+</div>
+<!-- Timeline Item -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-purple-500/10 flex items-center justify-center border-2 border-white dark:border-slate-900 z-10">
+<span class="material-icons text-[14px] text-purple-500">person</span>
+</div>
+<div class="text-xs text-slate-500 mb-1">09:15 AM • Admin</div>
+<p class="text-sm font-medium dark:text-slate-200">New member <span class="text-primary font-bold">Jamie Wu</span> joined the team</p>
+</div>
+<!-- Timeline Item -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-orange-500/10 flex items-center justify-center border-2 border-white dark:border-slate-900 z-10">
+<span class="material-icons text-[14px] text-orange-500">warning</span>
+</div>
+<div class="text-xs text-slate-500 mb-1">Yesterday • System</div>
+<p class="text-sm font-medium dark:text-slate-200">Deployment failed for project <span class="text-red-400">Apollo-Core</span></p>
+</div>
+<!-- Timeline Item -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border-2 border-white dark:border-slate-900 z-10">
+<span class="material-icons text-[14px] text-slate-500">more_horiz</span>
+</div>
+<button class="text-xs font-bold text-slate-400 hover:text-primary transition-colors">View All Activity</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="max-w-[1600px] mx-auto px-6 py-12 border-t border-slate-200 dark:border-slate-800 mt-12">
+<div class="flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 bg-slate-400/20 rounded-md flex items-center justify-center">
+<span class="material-icons text-slate-400 text-sm">insights</span>
+</div>
+<span class="text-sm font-bold text-slate-400">FlowMetric © 2024</span>
+</div>
+<div class="flex gap-8 text-xs font-semibold text-slate-400 uppercase tracking-widest">
+<a class="hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="hover:text-primary transition-colors" href="#">API Reference</a>
+<a class="hover:text-primary transition-colors" href="#">Support</a>
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+</div>
+</div>
+</footer>
+</body></html>

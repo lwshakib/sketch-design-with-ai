@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#3caff6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101b22",
+            },
+            fontFamily: {
+              "display": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<title>Welcome to ParkPoint</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#0d161c] antialiased">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Header/Navigation Placeholder -->
+<header class="flex items-center justify-between px-10 py-4">
+<div class="flex items-center gap-2">
+<div class="flex h-8 w-8 items-center justify-center rounded bg-primary text-white">
+<span class="material-symbols-outlined !text-[20px]">local_parking</span>
+</div>
+<span class="text-lg font-bold tracking-tight text-[#0d161c] dark:text-white">ParkPoint</span>
+</div>
+</header>
+<div class="px-4 md:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[560px] flex-1 justify-center">
+<!-- Progress Bar Component -->
+<div class="flex flex-col gap-3 p-4 mb-8">
+<div class="flex gap-6 justify-between items-end">
+<p class="text-[#0d161c] dark:text-white text-base font-semibold leading-normal">Step 1 of 4</p>
+<p class="text-primary text-sm font-bold leading-normal">25% Complete</p>
+</div>
+<div class="rounded-full bg-primary/20 h-2.5 w-full overflow-hidden">
+<div class="h-full rounded-full bg-primary" style="width: 25%;"></div>
+</div>
+</div>
+<!-- Illustration/Visual Section -->
+<div class="@container">
+<div class="px-4 py-3">
+<div class="w-full bg-center bg-no-repeat bg-cover flex flex-col justify-center items-center overflow-hidden bg-white dark:bg-[#1a2933] rounded-xl min-h-[320px] shadow-sm border border-primary/10" data-alt="Abstract city map with parking location pins" style="background-image: linear-gradient(to bottom right, rgba(60, 175, 246, 0.05), rgba(60, 175, 246, 0.15));">
+<div class="relative flex items-center justify-center">
+<!-- Stylized Map Iconography -->
+<div class="absolute w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-white dark:bg-background-dark shadow-xl text-primary">
+<span class="material-symbols-outlined !text-[48px]">location_on</span>
+</div>
+<div class="flex gap-2">
+<div class="h-3 w-12 rounded-full bg-primary/40"></div>
+<div class="h-3 w-20 rounded-full bg-primary/20"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Text Content -->
+<div class="flex flex-col items-center text-center px-4">
+<h1 class="text-[#0d161c] dark:text-white tracking-tight text-[32px] md:text-[40px] font-extrabold leading-tight pb-3 pt-8">
+                            Welcome to ParkPoint
+                        </h1>
+<p class="text-[#497c9c] dark:text-slate-400 text-lg font-normal leading-relaxed max-w-[400px]">
+                            Discover and book the perfect parking spot in seconds. Stop circling the block and start saving time.
+                        </p>
+</div>
+<!-- CTA Section -->
+<div class="flex flex-col gap-4 px-4 py-8 items-center">
+<button class="flex min-w-[240px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-primary text-white text-lg font-bold leading-normal tracking-wide shadow-lg shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.98]">
+<span class="truncate">Get Started</span>
+</button>
+<button class="text-[#497c9c] dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors">
+                            Already have an account? <span class="text-primary font-bold">Log in</span>
+</button>
+</div>
+<!-- Trust Indicators -->
+<div class="flex justify-center items-center gap-8 py-6 opacity-60 grayscale hover:grayscale-0 transition-all">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined !text-[18px]">verified_user</span>
+<span class="text-xs font-semibold uppercase tracking-widest">Secure</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined !text-[18px]">bolt</span>
+<span class="text-xs font-semibold uppercase tracking-widest">Instant</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined !text-[18px]">star</span>
+<span class="text-xs font-semibold uppercase tracking-widest">4.9/5 Rating</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Decorative Element -->
+<footer class="py-6 text-center text-[#497c9c]/50 text-xs">
+                © 2024 ParkPoint Technologies Inc. All rights reserved.
+            </footer>
+</div>
+</div>
+</body></html>
