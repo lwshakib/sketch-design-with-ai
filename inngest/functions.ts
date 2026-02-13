@@ -64,7 +64,12 @@ export const generateDesign = inngest.createFunction(
   { id: "generate-design", retries: 5 },
   { event: "app/design.generate" },
   async ({ event, step, publish }) => {
-    const { messages, projectId, is3xMode, websiteUrl, isSilent, screenId, instructions } = event.data;
+    const { 
+      messages, projectId, is3xMode, websiteUrl, isSilent, 
+      screenId, instructions,
+      isVariations, originalScreenId, optionsCount,
+      variationCreativeRange, variationCustomInstructions, variationAspects
+    } = event.data;
     
     // Normalize messages
     const safeMessages = (Array.isArray(messages) ? messages : []).filter(m => m.content);
@@ -273,6 +278,217 @@ export const generateDesign = inngest.createFunction(
             status: "complete",
             messageId: assistantMessageId
          }
+      });
+
+      return { success: true };
+    }
+
+    // --- MODE 1.5: VARIATIONS ---
+    if (isVariations && originalScreenId) {
+      // 1. Fetch original screen
+      const originalScreen = await step.run("fetch-original-screen-variations", async () => {
+        return await prisma.screen.findUnique({
+          where: { id: originalScreenId },
+          include: { project: true }
+        });
+      });
+      if (!originalScreen) return { error: "Screen not found" };
+
+      // 2. Check credits
+      await step.run("check-variation-credits", async () => {
+        const user = await prisma.user.findUnique({
+          where: { id: (originalScreen as any).project.userId },
+          select: { credits: true }
+        });
+        const required = (optionsCount || 3) * 2000;
+        if (!user || user.credits < required) throw new Error(`Insufficient credits for ${optionsCount} variations`);
+      });
+
+      // 3. Initial Message
+      const messageId = await step.run("init-variations-message", async () => {
+        const msg = await prisma.message.create({
+          data: {
+            projectId: projectId,
+            role: "assistant",
+            content: `*Architecting ${optionsCount} variations for "${originalScreen.title}"...*`,
+            status: "generating",
+          },
+        });
+        return msg.id;
+      });
+
+      // 4. Architect variations
+      const { variations, conclusionText, suggestion } = await step.run("architect-variations", async () => {
+        const hydratedMessages = await hydrateImages(safeMessages);
+        const { object } = await generateObject({
+          system: PlanningPrompt + `\n\nCRITICAL: The user wants to generate ${optionsCount} variations of an existing screen. 
+CREATIVE RANGE: ${variationCreativeRange} (refine=subtle, explore=notable, reimagine=radical)
+ASPECTS TO VARY: ${variationAspects.join(', ')}
+${variationCustomInstructions ? `CUSTOM INSTRUCTIONS: ${variationCustomInstructions}` : ""}
+
+Provide a unique title and technical description for each of the ${optionsCount} variations. Focus heavily on the requested aspects while maintaining global project branding.`,
+          messages: [
+            ...hydratedMessages,
+            { role: 'assistant', content: `Source Screen for Variations: "${originalScreen.title}"` }
+          ] as any,
+          schema: z.object({
+            variations: z.array(z.object({
+              title: z.string().describe("Variation Title, e.g., 'Modern Minimalist', 'Bento Layout', etc."),
+              description: z.string().describe("Short description of what changed in this variation."),
+              prompt: z.string().describe("Specific technical instructions for this variation.")
+            })).length(optionsCount || 3),
+            conclusionText: z.string().describe("A summary of the variations being created."),
+            suggestion: z.string().describe("A proactive suggestion for a NEXT NEW screen (not variation) that would complement the project.")
+          })
+        });
+        return object;
+      });
+
+      // 5. Create Placeholders
+      const dbScreens = await step.run("init-variation-placeholders", async () => {
+        const lastScreen = await prisma.screen.findFirst({
+          where: { projectId: projectId },
+          orderBy: { x: 'desc' }
+        });
+        let currentX = lastScreen 
+          ? lastScreen.x + (lastScreen.width || (lastScreen.type === 'app' ? 380 : 1024)) + 120 
+          : originalScreen.x + (originalScreen.width || (originalScreen.type === 'app' ? 380 : 1024)) + 120;
+        
+        const created = [];
+        for (const v of variations) {
+          const width = originalScreen.width || (originalScreen.type === 'app' ? 380 : 1024);
+          const s = await prisma.screen.create({
+            data: {
+              projectId: projectId,
+              title: v.title,
+              content: "",
+              type: originalScreen.type,
+              status: "generating",
+              x: currentX,
+              y: originalScreen.y,
+              width: width,
+              height: originalScreen.height
+            }
+          });
+          created.push(s);
+          currentX += width + 120;
+        }
+        return created;
+      });
+
+      const varPlan = {
+        screens: variations.map((v: any, i: number) => ({ ...v, id: dbScreens[i].id, type: originalScreen.type })),
+        conclusionText,
+        suggestion
+      };
+
+      // Notify UI
+      await publish({
+        channel: `project:${projectId}`,
+        topic: "plan",
+        data: { 
+          plan: varPlan, 
+          markdown: `Conclusion: ${conclusionText}\n\nSuggestion: ${suggestion}`, 
+          messageId 
+        }
+      });
+
+      // 6. Generate each variation
+      for (let i = 0; i < variations.length; i++) {
+        const v = variations[i];
+        const screenId = dbScreens[i].id;
+        
+        await publish({
+          channel: `project:${projectId}`,
+          topic: "status",
+          data: { 
+            message: `Building variation: "${v.title}"...`, 
+            status: "generating", 
+            currentScreen: v.title, 
+            screenId 
+          }
+        });
+
+        const generated = await step.run(`generate-variation-${i}`, async () => {
+          const systemPrompt = ScreenGenerationPrompt + "\n\nCRITICAL: You are generating a VARIATION of an existing screen. Focus on the specific variation focus and description provided.";
+          // ... 
+          const project = originalScreen.project;
+          const selectedTheme = project.selectedTheme || (project.themes as any[])?.[0] || null;
+          const hydratedMessages = await hydrateImages(safeMessages);
+
+          const { text } = await generateText({
+            system: systemPrompt,
+            messages: [
+              ...hydratedMessages,
+              { role: 'assistant', content: `Source Screen Code for "${originalScreen.title}":\n\n${originalScreen.content}` },
+              { role: 'user', content: `Generate the variation "${v.title}" for the "${originalScreen.title}" screen.
+Variation Focus: ${v.description}
+Technical Prompt: ${v.prompt}
+
+${selectedTheme ? `Use this theme:\n${JSON.stringify(selectedTheme, null, 2)}` : ''}
+
+CRITICAL: Wrap code in <artifact title="${v.title}"> block.` }
+            ] as any,
+            maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
+            temperature: 0.8,
+          });
+          const arts = extractArtifacts(text);
+          return arts[0] || { title: v.title, content: text, type: originalScreen.type };
+        });
+
+        const savedVar = await step.run(`save-variation-${i}`, async () => {
+          return await prisma.screen.update({
+            where: { id: screenId },
+            data: { 
+              content: generated.content, 
+              status: "completed",
+              updatedAt: new Date()
+            }
+          });
+        });
+        
+        await step.run(`deduct-variation-${i}-credits`, async () => {
+          await recordCreditUsage((originalScreen as any).project.userId, 2000);
+        });
+
+        await publish({
+          channel: `project:${projectId}`,
+          topic: "status",
+          data: { 
+            message: `"${v.title}" complete.`, 
+            status: "partial_complete", 
+            screen: savedVar
+          }
+        });
+      }
+
+      // 7. Finalize message
+      const finalMarkdown = `Conclusion: ${conclusionText}\n\nSuggestion: ${suggestion}`;
+      await step.run("finalize-variation-message", async () => {
+        await prisma.message.update({
+          where: { id: messageId },
+          data: { 
+            content: finalMarkdown, 
+            plan: JSON.parse(JSON.stringify(varPlan)), 
+            status: "completed" 
+          }
+        });
+      });
+
+      await publish({
+        channel: `project:${projectId}`,
+        topic: "plan",
+        data: { plan: varPlan, markdown: finalMarkdown, messageId }
+      });
+
+      await publish({
+        channel: `project:${projectId}`,
+        topic: "status",
+        data: { 
+          message: conclusionText, 
+          status: "complete", 
+          messageId 
+        }
       });
 
       return { success: true };

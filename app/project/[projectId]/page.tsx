@@ -19,6 +19,7 @@ import { authClient } from "@/lib/auth-client";
 import { ShareDialog } from "@/components/project/share-dialog";
 import { ProjectDialogs } from "@/components/project/project-dialogs";
 import { CodeViewerModal } from "@/components/project/code-viewer-modal";
+import { VariationsSheet } from "@/components/project/variations-sheet";
 import { useProjectStore } from "@/hooks/use-project-store";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 
@@ -73,7 +74,8 @@ export default function ProjectPage() {
     websiteUrl, setWebsiteUrl,
     regeneratingArtifactIds, setRegeneratingArtifactIds,
     messages, setMessages,
-    updateState, setActiveTool, resetProjectState
+    updateState, setActiveTool, resetProjectState,
+    setIsVariationsSheetOpen, setVariationsArtifactIndex
   } = useProjectStore();
 
   const { fetchCredits } = useWorkspaceStore();
@@ -737,7 +739,12 @@ export default function ProjectPage() {
     let prompt = "";
     if (action === 'more') prompt = `Analyze the project based on the "${artifact.title}" screen and architect additional screens (you decide how many, e.g., 2-3 or more) to complete the full user journey and application logic. Generate them now.`;
     else if (action === 'regenerate') { setRegenerateInstructions(""); setIsRegenerateDialogOpen(true); return; }
-    else if (action === 'variations') prompt = `Generate 3 distinct layout variations of the "${artifact.title}" screen...`;
+    else if (action === 'variations') {
+      const idx = throttledArtifacts.findIndex(a => a.id === artifact.id);
+      setVariationsArtifactIndex(idx);
+      setIsVariationsSheetOpen(true);
+      return;
+    }
     if (prompt) { 
       setIsGenerating(true); 
       sendMessage({ text: prompt }, { body: { isSilent: false } }); 
@@ -769,6 +776,39 @@ export default function ProjectPage() {
     setIsRegenerateDialogOpen(false); 
     setRegenerateInstructions("");
   };
+
+  const handleGenerateVariations = useCallback(async () => {
+    const { 
+      variationsArtifactIndex, 
+      variationOptions, 
+      variationCreativeRange, 
+      variationCustomInstructions, 
+      variationAspects,
+      throttledArtifacts
+    } = useProjectStore.getState();
+
+    const artifact = variationsArtifactIndex !== null ? throttledArtifacts[variationsArtifactIndex] : null;
+    if (!artifact || !artifact.id) return;
+
+    const prompt = `Generate ${variationOptions} distinct variations of the "${artifact.title}" screen. 
+Variation Focus: ${variationCreativeRange} (Targeting ${variationAspects.join(', ')}).
+${variationCustomInstructions ? `\nInstructions: ${variationCustomInstructions}` : ""}
+Reference the existing screen code provided in the context.`;
+
+    setIsGenerating(true);
+    setIsVariationsSheetOpen(false);
+    
+    sendMessage({ text: prompt }, { 
+      body: { 
+        isVariations: true, 
+        originalScreenId: artifact.id, 
+        optionsCount: variationOptions,
+        variationCreativeRange,
+        variationCustomInstructions,
+        variationAspects
+      } 
+    });
+  }, [sendMessage, setIsGenerating, setIsVariationsSheetOpen]);
 
   const deleteArtifact = (index: number) => {
     const updateFn = (prev: Artifact[]) => prev.filter((_, i) => i !== index);
@@ -949,6 +989,9 @@ export default function ProjectPage() {
       />
 
       <ShareDialog />
+      <VariationsSheet 
+        handleGenerateVariations={handleGenerateVariations}
+      />
     </div>
   );
 }

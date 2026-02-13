@@ -70,6 +70,12 @@ interface ProjectState {
   isCommandMenuOpen: boolean;
   isSettingsDialogOpen: boolean;
   isShareDialogOpen: boolean;
+  isVariationsSheetOpen: boolean;
+  variationsArtifactIndex: number | null;
+  variationOptions: number;
+  variationCreativeRange: 'refine' | 'explore' | 'reimagine';
+  variationCustomInstructions: string;
+  variationAspects: string[];
 
   // Theme & Selection
   activeThemeId: string | null;
@@ -130,6 +136,12 @@ interface ProjectState {
   setIsCommandMenuOpen: (open: boolean) => void;
   setIsSettingsDialogOpen: (open: boolean) => void;
   setIsShareDialogOpen: (open: boolean) => void;
+  setIsVariationsSheetOpen: (open: boolean) => void;
+  setVariationsArtifactIndex: (index: number | null) => void;
+  setVariationOptions: (val: number | ((prev: number) => number)) => void;
+  setVariationCreativeRange: (range: 'refine' | 'explore' | 'reimagine') => void;
+  setVariationCustomInstructions: (instructions: string) => void;
+  setVariationAspects: (val: string[] | ((prev: string[]) => string[])) => void;
 
   setActiveThemeId: (id: string | null) => void;
   setAppliedTheme: (theme: any | null) => void;
@@ -194,6 +206,12 @@ export const useProjectStore = create<ProjectState>((set) => ({
   isCommandMenuOpen: false,
   isSettingsDialogOpen: false,
   isShareDialogOpen: false,
+  isVariationsSheetOpen: false,
+  variationsArtifactIndex: null,
+  variationOptions: 3,
+  variationCreativeRange: 'explore',
+  variationCustomInstructions: "",
+  variationAspects: [],
 
   activeThemeId: null,
   appliedTheme: null,
@@ -253,6 +271,12 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setIsCommandMenuOpen: (isCommandMenuOpen) => set({ isCommandMenuOpen }),
   setIsSettingsDialogOpen: (isSettingsDialogOpen) => set({ isSettingsDialogOpen }),
   setIsShareDialogOpen: (isShareDialogOpen) => set({ isShareDialogOpen }),
+  setIsVariationsSheetOpen: (isVariationsSheetOpen) => set({ isVariationsSheetOpen }),
+  setVariationsArtifactIndex: (variationsArtifactIndex) => set({ variationsArtifactIndex }),
+  setVariationOptions: (val) => set((state) => ({ variationOptions: typeof val === 'function' ? val(state.variationOptions) : val })),
+  setVariationCreativeRange: (variationCreativeRange) => set({ variationCreativeRange }),
+  setVariationCustomInstructions: (variationCustomInstructions) => set({ variationCustomInstructions }),
+  setVariationAspects: (val) => set((state) => ({ variationAspects: typeof val === 'function' ? val(state.variationAspects) : val })),
 
   setActiveThemeId: (activeThemeId) => set({ activeThemeId }),
   setAppliedTheme: (appliedTheme) => set({ appliedTheme }),
