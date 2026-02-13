@@ -449,7 +449,9 @@ export function ChatSidebar({
                                       ) : (
                                         <div className="flex flex-col gap-4">
                                           <div className="text-foreground/90 leading-relaxed text-[15px]">
-                                            {msg.content || (msg.parts ? (msg.parts as any[]).filter(p => p.type === 'text').map(p => p.text).join('') : "")}
+                                            <MessageResponse>
+                                              {msg.content || (msg.parts ? (msg.parts as any[]).filter(p => p.type === 'text').map(p => p.text).join('') : "")}
+                                            </MessageResponse>
                                           </div>
                                           
                                           {/* Selected Screens Preview */}
