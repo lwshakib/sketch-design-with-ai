@@ -385,6 +385,7 @@ IF images are provided in the chat context:
 
 **NO** animated libraries (GSAP, Framer Motion). **NO** VH/VW units. 
 **NEVER** hardcode hex values for main surfaces; use the CSS variables.
+**UNIQUE NAMING**: ALWAYS invent a new, unique application name or website title for the header/logo unless the user explicitly provides one. DO NOT use generic names like "ParkPoint", "QuickBite", or "FlowMetric" unless requested.
 
 ### 📝 Example Output:
 
