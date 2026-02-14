@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { useProjectStore } from "@/hooks/use-project-store";
-import { Maximize2, Trash2 } from "lucide-react";
+import { Maximize2, EyeOff } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -111,8 +111,8 @@ export function GenerationStatus({
 
           const hasContent = !!artifact?.content;
           const isPlaceholder = planItem.id === 'placeholder-pulse';
-          // A screen is considered deleted if we are complete but the matching artifact is missing from the global state
-          const isDeleted = isComplete && !isPlaceholder && !artifact;
+          // A screen is considered not available if we are complete but the matching artifact is missing from the global state
+          const isNotAvailable = isComplete && !isPlaceholder && !artifact;
 
           return (
             <TooltipProvider key={idx}>
@@ -126,16 +126,9 @@ export function GenerationStatus({
                       "h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg group transition-all",
                       hasContent ? "cursor-pointer hover:border-primary/50 hover:shadow-primary/10" : "cursor-default",
                       isPlaceholder && "animate-pulse",
-                      isDeleted && "border-red-500/20 opacity-60 bg-red-500/5"
+                      isNotAvailable && "opacity-40 grayscale"
                     )}
                   >
-                    {/* Deleted State */}
-                    {isDeleted && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-red-500/10">
-                        <Trash2 className="size-4 text-red-500/50" />
-                        <span className="text-[8px] font-black text-red-500/40 uppercase tracking-tighter">Deleted</span>
-                      </div>
-                    )}
                     {/* Preview Content (scaled iframe) */}
                     {hasContent ? (
                       <>
@@ -163,14 +156,19 @@ export function GenerationStatus({
                           <Maximize2 className="h-4 w-4 text-primary" />
                         </div>
                       </>
+                    ) : isNotAvailable ? (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-zinc-900/50">
+                        <EyeOff className="size-4 text-muted-foreground/30" />
+                        <span className="text-[7px] font-bold text-muted-foreground/30 uppercase tracking-tighter text-center px-1">Not Available</span>
+                      </div>
                     ) : (
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
                     )}
                   </div>
                 </TooltipTrigger>
-                { (hasContent || isDeleted) && (
-                  <TooltipContent side="bottom" className={cn("text-[10px] py-1 px-2 border-primary/20 bg-zinc-950 text-foreground font-medium", isDeleted && "border-red-500/30 text-red-400")}>
-                    {isDeleted ? "Screen deleted" : "Go to screen"}
+                { (hasContent || isNotAvailable) && (
+                  <TooltipContent side="bottom" className={cn("text-[10px] py-1 px-2 border-primary/20 bg-zinc-950 text-foreground font-medium", isNotAvailable && "border-white/10 text-muted-foreground/60")}>
+                    {isNotAvailable ? "Screen not available" : "Go to screen"}
                   </TooltipContent>
                 )}
               </Tooltip>
