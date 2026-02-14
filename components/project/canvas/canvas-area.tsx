@@ -245,7 +245,8 @@ export function CanvasArea({
             className="relative"
             style={{
               transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom * 0.5})`,
-              transformOrigin: '0 0'
+              transformOrigin: '0 0',
+              transition: (isPanning || isDraggingFrame || isResizing) ? 'none' : 'transform 0.5s cubic-bezier(0.2, 0, 0, 1)'
             }}
           >
             <div 

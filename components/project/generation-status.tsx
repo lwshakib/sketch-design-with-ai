@@ -88,15 +88,17 @@ export function GenerationStatus({
 
   const handleFocusScreen = (artifactTitle: string) => {
     const allArtifacts = useProjectStore.getState().throttledArtifacts;
-    const index = allArtifacts.findIndex(a => a.title === artifactTitle);
-    const artifact = allArtifacts[index];
+    const artifact = allArtifacts.find(a => a.title === artifactTitle);
     
     if (!artifact) return;
 
-    // Standard focus zoom
-    const targetZoom = 0.8;
+    // Zoom in for focus (targetZoom = 1.0 means effective scale 0.5)
+    const targetZoom = 1.2; 
     setZoom(targetZoom);
     if (artifact.id) setSelectedArtifactIds(new Set([artifact.id]));
+
+    // EFFECTIVE SCALE: CanvasArea uses zoom * 0.5
+    const effectiveScale = targetZoom * 0.5;
 
     // Calculate center
     // CanvasArea has 'justify-center' horizontally and 'items-start pt-36' vertically.
@@ -107,11 +109,11 @@ export function GenerationStatus({
     const artifactWidth = artifact.width || (artifact.type === 'app' ? 380 : 1024);
     const artifactHeight = artifact.height || 800;
 
-    // Horizontally centered by justify-center, so we only need the relative offset
-    const targetX = - (framePos.x + (artifact.x || 0) + artifactWidth / 2) * targetZoom;
+    // Horizontally centered relative to parent container center
+    const targetX = - (framePos.x + (artifact.x || 0) + artifactWidth / 2) * effectiveScale;
     
-    // Vertically centered relative to the pt-36 start
-    const targetY = (mainHeight / 2) - topPadding - (framePos.y + (artifact.y || 0) + artifactHeight / 2) * targetZoom;
+    // Vertically centered relative to the viewport center, accounting for the pt-36 top padding
+    const targetY = (mainHeight / 2) - topPadding - (framePos.y + (artifact.y || 0) + artifactHeight / 2) * effectiveScale;
 
     setCanvasOffset({ x: targetX, y: targetY });
   };
