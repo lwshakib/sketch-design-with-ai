@@ -47,14 +47,18 @@ async function hydrateImages(messages: any[]) {
 
 
 interface PlanScreen {
+  id?: string;
   title: string;
   type: 'web' | 'app';
   description: string;
+  prompt?: string;
 }
 
 interface Plan {
   screens: PlanScreen[];
   themes?: any[];
+  conclusionText?: string;
+  suggestion?: string;
 }
 
 
@@ -68,7 +72,8 @@ export const generateDesign = inngest.createFunction(
       messages, projectId, is3xMode, websiteUrl, isSilent, 
       screenId, instructions,
       isVariations, originalScreenId, optionsCount,
-      variationCreativeRange, variationCustomInstructions, variationAspects
+      variationCreativeRange, variationCustomInstructions, variationAspects,
+      assistantMessageId: providedMessageId
     } = event.data;
     
     // Normalize messages
@@ -97,15 +102,19 @@ export const generateDesign = inngest.createFunction(
 
       // --- STEP 2: INITIAL PERSISTENCE (Message & New Screen) ---
       const { assistantMessageId, newScreenId } = await step.run("init-regeneration-assets", async () => {
-        // Create assistant message
-        const msg = await prisma.message.create({
-          data: {
-            projectId: projectId,
-            role: "assistant",
-            content: `*Architecting refactored layout for "${originalScreen.title}"...*`,
-            status: "generating",
-          },
-        });
+        // Create assistant message ONLY if not provided
+        let msgId = providedMessageId;
+        if (!msgId) {
+          const msg = await prisma.message.create({
+            data: {
+              projectId: projectId,
+              role: "assistant",
+              content: `*Architecting refactored layout for "${originalScreen.title}"...*`,
+              status: "generating",
+            },
+          });
+          msgId = msg.id;
+        }
 
         // Calculate position for new screen (place it after the rightmost screen)
         const lastScreen = await prisma.screen.findFirst({
@@ -131,7 +140,7 @@ export const generateDesign = inngest.createFunction(
           }
         });
 
-        return { assistantMessageId: msg.id, newScreenId: newScreen.id };
+        return { assistantMessageId: msgId, newScreenId: newScreen.id };
       });
 
       // --- STEP 1.7: GENERATE REGENERATION METADATA ---
@@ -206,8 +215,9 @@ export const generateDesign = inngest.createFunction(
 
   CRITICAL INSTRUCTIONS:
   1. CONSISTENCY: You MUST use the exact same color palette and typography as the project.
-  2. NEW LAYOUT: Do NOT repeat the previous layout. Rethink the component placement and visual rhythm. Rebuild it from the ground up if necessary.
-  3. FORMAT: You MUST wrap the code in a single artifact block with title="${originalScreen.title} (Refactored)".` }
+  2. BACKGROUND: You MUST set the body or main container background to the theme's background color (\`var(--background)\`).
+  3. NEW LAYOUT: Do NOT repeat the previous layout. Rethink the component placement and visual rhythm. Rebuild it from the ground up if necessary.
+  4. FORMAT: You MUST wrap the code in a single artifact block with title="${originalScreen.title} (Refactored)".` }
           ] as any,
           maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
           temperature: 0.8,
@@ -306,6 +316,7 @@ export const generateDesign = inngest.createFunction(
 
       // 3. Initial Message
       const messageId = await step.run("init-variations-message", async () => {
+        if (providedMessageId) return providedMessageId;
         const msg = await prisma.message.create({
           data: {
             projectId: projectId,
@@ -427,7 +438,9 @@ Technical Prompt: ${v.prompt}
 
 ${selectedTheme ? `Use this theme:\n${JSON.stringify(selectedTheme, null, 2)}` : ''}
 
-CRITICAL: Wrap code in <artifact title="${v.title}"> block.` }
+CRITICAL: 
+1. BACKGROUND: You MUST set the body or main container background to the theme's background color (\`var(--background)\`).
+2. WRAP: Wrap code in <artifact title="${v.title}"> block.` }
             ] as any,
             maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
             temperature: 0.8,
@@ -499,6 +512,7 @@ CRITICAL: Wrap code in <artifact title="${v.title}"> block.` }
     // Create the assistant message immediately so it shows up on UI
     const messageId = await step.run("save-initial-assistant-message", async () => {
       if (isSilent) return null;
+      if (providedMessageId) return providedMessageId;
       const msg = await prisma.message.create({
         data: {
           projectId: projectId,
@@ -540,15 +554,8 @@ CRITICAL: Wrap code in <artifact title="${v.title}"> block.` }
       });
     }
 
-    // --- STEP 1: INITIAL METADATA ---
-    await publish({
-      channel: `project:${projectId}`,
-      topic: "status",
-      data: { message: "Architecting project flow...", status: "vision" }
-    });
-
-    const { conclusionText, suggestion } = await step.run("generate-design-metadata", async () => {
-      // Check credits (1000)
+    // --- STEP 1: CREDIT CHECK ---
+    await step.run("check-planning-credits", async () => {
       const proj = await prisma.project.findUnique({
           where: { id: projectId },
           select: { userId: true }
@@ -559,36 +566,19 @@ CRITICAL: Wrap code in <artifact title="${v.title}"> block.` }
           select: { credits: true }
       });
       if (!user || user.credits < 1000) throw new Error("Insufficient credits for planning");
+    });
 
-      // Normalize messages
-      let stepMessages = Array.isArray(messages) ? messages : [];
-      if (stepMessages.length === 0) {
-        stepMessages = [{ role: 'user', content: 'Create a modern design' }];
-      } else {
-        stepMessages = await hydrateImages(stepMessages);
-      }
-      
-      const inspiration = getAllExamples();
-
-      let systemPrompt = PlanningPrompt + `\n\nUse these high-fidelity design examples as your primary inspiration for quality and code structure:\n${inspiration}`;
-      
-      if (websiteReferenceContext) {
-        systemPrompt += `\n\nCRITICAL: The user has provided a reference website. Study its content, structure, and style to inform your design plan:\n${websiteReferenceContext}`;
-      }
-
-      const { object } = await generateObject({
-        system: systemPrompt,
-        messages: stepMessages as any,
-        schema: z.object({
-          conclusionText: z.string().describe("A detailed Markdown summary. Format: 'The [Screen Title] screens have been architected:', followed by a bulleted list '* **[Title]**: [Description]', ending with a follow-up question."),
-          suggestion: z.string().describe("A single, proactive suggestion for an additional full SCREEN (not just a modal, component, or dialog) that would complement the current design plan. Format as a question.")
-        })
+    // --- STEP 1.5: FETCH EXISTING SCREENS ---
+    const existingScreens = await step.run("fetch-existing-screens", async () => {
+      return await prisma.screen.findMany({
+        where: { projectId: projectId },
+        orderBy: { createdAt: 'asc' },
+        select: {
+          title: true,
+          type: true,
+          content: true,
+        }
       });
-
-      return { 
-        conclusionText: object.conclusionText,
-        suggestion: object.suggestion
-      };
     });
 
     // --- STEP 2: THEME GENERATION (OR FETCH) ---
@@ -680,12 +670,26 @@ CRITICAL: Wrap code in <artifact title="${v.title}"> block.` }
       }
 
       const inspiration = getAllExamples();
-      const systemPrompt = PlanningPrompt + `\n\nYou are generating the detailed plan for each screen. \n\nSELECTED THEME: ${JSON.stringify(selectedTheme || {})}`;
+      let systemPrompt = PlanningPrompt + `\n\nYou are generating the detailed plan for each screen. \n\nSELECTED THEME: ${JSON.stringify(selectedTheme || {})}`;
+      
+      if (existingScreens.length > 0) {
+        systemPrompt += `\n\nEXISTING SCREENS IN PROJECT (ordered from oldest to newest):\n${JSON.stringify(existingScreens.map(s => ({ title: s.title, type: s.type })), null, 2)}`;
+        const lastScreen = existingScreens[existingScreens.length - 1];
+        systemPrompt += `\n\nCRITICAL - LAST GENERATED SCREEN: "${lastScreen.title}" (Type: ${lastScreen.type}). You MUST prioritize this screen's type for any new screens added to the plan to ensure sequential consistency.`;
+      }
+
+      systemPrompt += `\n\nUse these high-fidelity design examples as your primary inspiration for quality and code structure:\n${inspiration}`;
+
+      if (websiteReferenceContext) {
+        systemPrompt += `\n\nCRITICAL: The user has provided a reference website. Study its content, structure, and style to inform your design plan:\n${websiteReferenceContext}`;
+      }
 
       const { object } = await generateObject({
         system: systemPrompt,
         messages: stepMessages as any,
         schema: z.object({
+          conclusionText: z.string().describe("A detailed Markdown summary. Format: 'The [Screen Title] screens have been architected:', followed by a bulleted list '* **[Title]**: [Description]', ending with a follow-up question."),
+          suggestion: z.string().describe("A single, proactive suggestion for an additional full SCREEN (not just a modal, component, or dialog) that would complement the current design plan. Format as a question."),
           screens: z.array(z.object({
             title: z.string(),
             type: z.enum(['web', 'app']),
@@ -695,8 +699,9 @@ CRITICAL: Wrap code in <artifact title="${v.title}"> block.` }
         })
       });
 
-      let finalScreens = object.screens;
-      let finalConclusion = conclusionText;
+      let finalScreens = object.screens as PlanScreen[];
+      let finalConclusion = object.conclusionText;
+      let finalSuggestion = object.suggestion;
 
       if (is3xMode) {
         finalScreens = object.screens.flatMap((screen: any) => [
@@ -728,10 +733,10 @@ CRITICAL: Wrap code in <artifact title="${v.title}"> block.` }
           screens: finalScreens,
           themes: themes,
           conclusionText: finalConclusion,
-          suggestion: suggestion
+          suggestion: finalSuggestion
         }
       };
-    });
+    }) as { plan: Plan };
 
     // Deduct planning credits
     await step.run("deduct-planning-credits", async () => {
@@ -825,7 +830,10 @@ CRITICAL: Wrap code in <artifact title="${v.title}"> block.` }
 
     // 3. Sequentially generate each screen in the plan
     if (plan.screens.length > 0) {
-      const screensContext: { title: string; content: string }[] = [];
+      const screensContext: { title: string; content: string }[] = existingScreens.map(s => ({
+        title: s.title,
+        content: s.content
+      }));
       for (let i = 0; i < plan.screens.length; i++) {
         const screen = plan.screens[i];
         if (!screen) continue;
@@ -922,9 +930,10 @@ ${selectedTheme ? `IMPORTANT: Use this theme for the color palette:\n${JSON.stri
 
 CRITICAL INSTRUCTIONS:
 1. CONSTISTENCY: You MUST use the exact same color palette, typography, and corner variations as the previous screens.
-2. DETAIL: The code must be extremely detailed. Use strict Tailwind classes for everything.
-3. THEME: Ensure the theme is consistent. If previous screens used a specific background gradient, YOU MUST USE IT TOO.
-4. CONTENT: Use realistic data. No 'Lorem Ipsum'.
+2. BACKGROUND: You MUST set the body or main container background to the theme's background color (\`var(--background)\`). NEVER leave it default white unless the theme explicitly defines it as white.
+3. DETAIL: The code must be extremely detailed. Use strict Tailwind classes for everything.
+4. THEME: Ensure the theme is consistent. If previous screens used a specific background gradient, YOU MUST USE IT TOO.
+5. CONTENT: Use realistic data. No 'Lorem Ipsum'.
 5. FORMAT: You MUST wrap the code in a single artifact block exactly like this:
 <artifact type="${screen.type === 'app' ? 'app' : 'web'}" title="${screen.title}">
 ... code here ...
@@ -1025,7 +1034,7 @@ CRITICAL INSTRUCTIONS:
         channel: `project:${projectId}`,
         topic: "status",
         data: { 
-          message: conclusionText, 
+          message: plan.conclusionText || "Design complete!", 
           status: "complete",
           isSilent,
           messageId: messageId

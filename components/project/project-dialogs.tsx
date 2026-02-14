@@ -145,7 +145,7 @@ export function ProjectDialogs({
     <>
       {/* Regenerate Dialog */}
       <Dialog open={isRegenerateDialogOpen} onOpenChange={setIsRegenerateDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white rounded-2xl p-6">
+        <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white rounded-3xl p-6 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold tracking-tight">Regenerate Screen</DialogTitle>
             <DialogDescription className="text-zinc-500 text-sm">
@@ -163,25 +163,20 @@ export function ProjectDialogs({
             />
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="flex flex-row items-center gap-3">
             <Button 
               variant="ghost" 
               onClick={() => setIsRegenerateDialogOpen(false)}
-              className="rounded-xl hover:bg-zinc-900 text-zinc-400 text-sm"
+              className="flex-1 h-10 rounded-xl hover:bg-zinc-900 text-zinc-400 hover:text-white text-sm"
             >
               Cancel
             </Button>
             <Button 
               onClick={handleRegenerateSubmit}
               disabled={isGenerating}
-              className="rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm px-6 disabled:opacity-50"
+              className="flex-1 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition-all shadow-md disabled:opacity-50"
             >
-              {isGenerating ? (
-                <div className="flex items-center gap-2">
-                  <RotateCcw className="size-4 animate-spin" />
-                  Generating...
-                </div>
-              ) : "Regenerate"}
+              {isGenerating ? "Regenerating..." : "Regenerate Screen"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -189,11 +184,11 @@ export function ProjectDialogs({
 
       {/* Edit Title Dialog */}
       <Dialog open={isEditTitleDialogOpen} onOpenChange={setIsEditTitleDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Edit Project Title</DialogTitle>
-            <DialogDescription>
-              Update the title for your project.
+        <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white rounded-3xl p-6 shadow-2xl">
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="text-xl font-bold tracking-tight">Edit Project Title</DialogTitle>
+            <DialogDescription className="text-zinc-500 text-sm leading-relaxed">
+              Update the title for your project. This will change how it appears in history.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -207,20 +202,22 @@ export function ProjectDialogs({
                 }
               }}
               placeholder="Enter project title"
-              className="w-full px-4 py-3 bg-muted border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/50 text-sm transition-all"
               autoFocus
             />
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex flex-row items-center gap-3">
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={() => setIsEditTitleDialogOpen(false)}
+              className="flex-1 h-10 rounded-xl text-zinc-400 hover:bg-zinc-900 hover:text-white text-sm"
             >
               Cancel
             </Button>
             <Button
               onClick={() => updateProjectTitle(editingTitle)}
               disabled={!editingTitle.trim()}
+              className="flex-1 h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold"
             >
               Save Changes
             </Button>
@@ -230,20 +227,20 @@ export function ProjectDialogs({
 
       {/* Delete Project Alert */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent className="bg-[#0A0A0A] border border-white/5 text-white rounded-[32px] p-8 max-w-[400px] shadow-2xl">
-          <AlertDialogHeader className="space-y-3">
+        <AlertDialogContent className="bg-zinc-950 border border-zinc-800 text-white rounded-3xl p-6 max-w-[380px] shadow-2xl">
+          <AlertDialogHeader className="space-y-2">
             <AlertDialogTitle className="text-xl font-bold tracking-tight">Delete Project</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-500 text-sm font-medium leading-relaxed">
-              Are you sure you want to permanently delete <span className="text-white font-bold">"{project?.title}"</span>? All screens and history will be lost.
+            <AlertDialogDescription className="text-zinc-400 text-sm leading-relaxed">
+              Are you sure? This will permanently remove <span className="text-white font-bold">"{project?.title}"</span> and all its associated screens. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mt-8 flex flex-row items-center gap-3">
-            <AlertDialogCancel className="flex-1 h-11 rounded-2xl bg-zinc-900 border-white/5 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-all text-[11px] font-black uppercase tracking-widest mt-0">
+          <AlertDialogFooter className="mt-6 flex flex-row items-center gap-3">
+            <AlertDialogCancel className="flex-1 h-10 rounded-xl bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-all text-sm font-medium mt-0">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeleteProject}
-              className="flex-1 h-11 rounded-2xl bg-destructive text-white hover:bg-destructive/90 transition-all text-[11px] font-black uppercase tracking-widest"
+              className="flex-1 h-10 rounded-xl bg-red-600 hover:bg-red-500 text-white transition-all text-sm font-semibold"
             >
               Delete
             </AlertDialogAction>
@@ -260,7 +257,7 @@ export function ProjectDialogs({
                     <Layout className="size-6 text-primary" />
                 </div>
                 <div>
-                    <DialogTitle className="text-2xl font-black uppercase tracking-tight">Project Manifest</DialogTitle>
+                    <DialogTitle className="text-2xl font-bold tracking-tight">Project Manifest</DialogTitle>
                     <DialogDescription className="text-zinc-500 text-sm font-medium">
                       Detailed architecture and screen flow plan.
                     </DialogDescription>
@@ -280,10 +277,10 @@ export function ProjectDialogs({
               )}
           </div>
 
-          <DialogFooter className="p-6 bg-secondary/10 border-t border-border/50">
+          <DialogFooter className="p-4 bg-zinc-900/30 border-t border-zinc-800/50">
               <Button 
                 onClick={() => setIsPlanDialogOpen(false)}
-                className="w-full h-11 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-bold uppercase tracking-widest text-[11px]"
+                className="w-full h-10 rounded-xl bg-zinc-100 text-zinc-900 hover:bg-white font-semibold text-sm transition-all shadow-sm"
               >
                 Close Manifest
               </Button>
@@ -308,7 +305,7 @@ export function ProjectDialogs({
 
           <div className="p-6 space-y-8">
             <div className="space-y-4">
-              <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest px-1">Production Assets</h4>
+              <h4 className="text-xs font-semibold text-zinc-500 px-1">Production Assets</h4>
               
               <div className="grid gap-3">
                 <button 
@@ -316,14 +313,14 @@ export function ProjectDialogs({
                     if (exportArtifactIndex !== null) handleExportZip(exportArtifactIndex);
                     setIsExportSheetOpen(false);
                   }}
-                  className="group flex items-start gap-4 p-4 bg-muted/40 border border-border rounded-2xl hover:bg-muted/80 hover:border-primary/30 transition-all text-left"
+                  className="group flex items-start gap-4 p-4 bg-zinc-900 border border-zinc-800 rounded-2xl hover:bg-zinc-800/80 hover:border-primary/30 transition-all text-left"
                 >
                   <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                     <Download className="size-5 text-primary" />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-sm font-bold text-foreground">Download Project (ZIP)</span>
-                    <span className="text-[11px] text-muted-foreground leading-relaxed">
+                    <span className="text-sm font-semibold text-white">Download Project (ZIP)</span>
+                    <span className="text-[11px] text-zinc-500 leading-relaxed">
                       Includes the complete HTML, CSS, and a high-resolution preview image.
                     </span>
                   </div>
@@ -331,14 +328,14 @@ export function ProjectDialogs({
 
                 <button 
                   onClick={handleCopyCode}
-                  className="group flex items-start gap-4 p-4 bg-muted/40 border border-border rounded-2xl hover:bg-muted/80 hover:border-primary/30 transition-all text-left"
+                  className="group flex items-start gap-4 p-4 bg-zinc-900 border border-zinc-800 rounded-2xl hover:bg-zinc-800/80 hover:border-primary/30 transition-all text-left"
                 >
                   <div className="size-10 rounded-xl bg-orange-500/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                     {hasCopied ? <Check className="size-5 text-orange-500" /> : <Clipboard className="size-5 text-orange-500" />}
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-sm font-bold text-foreground">Copy Code to Clipboard</span>
-                    <span className="text-[11px] text-muted-foreground leading-relaxed">
+                    <span className="text-sm font-semibold text-white">Copy Code to Clipboard</span>
+                    <span className="text-[11px] text-zinc-500 leading-relaxed">
                       Instant copy of the production-ready HTML and Tailwind CSS structure.
                     </span>
                   </div>
@@ -347,21 +344,21 @@ export function ProjectDialogs({
             </div>
 
             <div className="space-y-4">
-                <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest px-1">Design Specs</h4>
-                <div className="p-4 bg-muted/40 border border-border rounded-2xl space-y-3">
+                <h4 className="text-xs font-semibold text-zinc-500 px-1">Design Specs</h4>
+                <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-muted-foreground font-medium">Screen Type</span>
-                    <span className="text-[11px] font-bold text-foreground">
+                    <span className="text-[11px] text-zinc-500 font-medium">Screen Type</span>
+                    <span className="text-[11px] font-semibold text-zinc-300">
                       {exportArtifactIndex !== null ? (throttledArtifacts[exportArtifactIndex]?.type === 'app' ? 'Mobile App' : 'Web Application') : ''}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-muted-foreground font-medium">Framework</span>
-                    <span className="text-[11px] font-bold text-foreground">Tailwind CSS (CDN)</span>
+                    <span className="text-[11px] text-zinc-500 font-medium">Framework</span>
+                    <span className="text-[11px] font-semibold text-zinc-300">Tailwind CSS (CDN)</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-muted-foreground font-medium">Typography</span>
-                    <span className="text-[11px] font-bold text-foreground">Outfit / Inter</span>
+                    <span className="text-[11px] text-zinc-500 font-medium">Typography</span>
+                    <span className="text-[11px] font-semibold text-zinc-300">Outfit / Inter</span>
                   </div>
                 </div>
             </div>
@@ -487,7 +484,7 @@ export function ProjectDialogs({
           <DialogFooter className="p-6 bg-zinc-900/30 border-t border-zinc-800/50">
             <Button 
                 onClick={() => setIsSettingsDialogOpen(false)}
-                className="w-full h-11 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-bold uppercase tracking-widest text-[11px]"
+                className="w-full h-10 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm transition-all"
               >
                 Done
               </Button>

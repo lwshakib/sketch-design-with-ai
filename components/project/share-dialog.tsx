@@ -63,21 +63,21 @@ export function ShareDialog() {
 
   return (
     <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
-      <DialogContent className="sm:max-w-[420px] bg-background border-border">
-        <DialogHeader>
-          <DialogTitle>Preview Project</DialogTitle>
-          <DialogDescription>
-            Anyone with this link can preview the project.
+      <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white rounded-3xl p-6 shadow-2xl">
+        <DialogHeader className="space-y-2">
+          <DialogTitle className="text-xl font-bold tracking-tight">Preview Project</DialogTitle>
+          <DialogDescription className="text-zinc-500 text-sm leading-relaxed">
+            Anyone with this link can preview the project designs in real-time.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-4">
           {!project.shareToken ? (
-             <div className="flex flex-col items-center justify-center p-6 border border-dashed rounded-lg bg-muted/50">
+             <div className="flex flex-col items-center justify-center p-8 border border-zinc-800 border-dashed rounded-2xl bg-zinc-900/50">
                 <Button 
                   onClick={handleReset} 
                   disabled={isResetting}
-                  size="sm"
+                  className="h-10 px-5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold"
                 >
                   {isResetting ? "Generating..." : "Generate Preview Link"}
                 </Button>
@@ -85,21 +85,20 @@ export function ShareDialog() {
           ) : (
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
-                <Link className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Link className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
                 <Input 
                   readOnly 
                   value={shareUrl} 
-                  className="pl-9 pr-2 h-10 bg-muted/50 font-mono text-xs"
+                  className="pl-9 pr-2 h-10 bg-zinc-900 border-zinc-800 text-zinc-300 font-mono text-xs rounded-xl focus-visible:ring-0"
                 />
               </div>
               <Button 
                 onClick={handleCopy}
                 size="icon"
-                variant="outline"
-                className="h-10 w-10 shrink-0"
+                className="h-10 w-10 shrink-0 bg-zinc-900 border-zinc-800 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-xl"
               >
                 {hasCopied ? (
-                  <Check className="h-4 w-4 text-green-500" />
+                  <Check className="h-4 w-4 text-emerald-500" />
                 ) : (
                   <Copy className="h-4 w-4" />
                 )}
@@ -114,10 +113,10 @@ export function ShareDialog() {
                 size="sm"
                 onClick={handleReset}
                 disabled={isResetting}
-                className="h-auto p-0 text-muted-foreground hover:text-foreground text-xs"
+                className="h-auto p-0 text-zinc-500 hover:text-zinc-300 text-xs transition-colors"
               >
                 <RotateCcw className={cn("mr-1.5 h-3 w-3", isResetting && "animate-spin")} />
-                Regenerate link
+                Regenerate project link
               </Button>
             </div>
           )}

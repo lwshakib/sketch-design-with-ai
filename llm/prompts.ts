@@ -235,7 +235,8 @@ export const CORE_DESIGN_PRINCIPLES = `### 💎 Elite Design Principles (VIBRANT
 2. **Chromatic Vibrancy & Alchemy (DYNAMIC THEMING)**:
    - **MANDATORY**: You MUST define a :root block with CSS variables for all core colors. The specific color values will be provided by the architectural plan's chosen theme.
    - **System Variables**: Define --background, --foreground, --primary, --primary-foreground, --secondary, --secondary-foreground, --muted, --muted-foreground, --accent, --accent-foreground, --card, --card-foreground, --border, --input, --ring, and --radius.
-   - **Tailwind Integration**: Map these CSS variables in your tailwind.config (e.g., colors: { primary: "var(--primary)", ... }).
+   - **Tailwind Integration**: Map these CSS variables in your tailwind.config (e.g., colors: { primary: "var(--primary)", background: "var(--background)", ... }).
+   - **BODY BACKGROUND (CRITICAL)**: You MUST apply the theme's background color to the body or root container element: \`<body class="bg-[var(--background)] text-[var(--foreground)] ...">\`.
    - **Visual Excellence**: NEVER hardcode hex values for main surfaces. ALWAYS reference var(--name).
    - **Gradients (Strict Standards)**: Use variables in gradients. Only use smooth transitions. No more than 3 colors.
    - **Action Accents**: Use the accent color aggressively but intelligently for high-priority CTA elements.
@@ -299,11 +300,18 @@ export const DEFAULT_THEMES_PROMPT = `
 export const PlanningPrompt = `YOU ARE A SENIOR PRODUCT ARCHITECT.
 Based on the user's request and the creative vision, architect a comprehensive project plan.
 
+### 📦 EXISTING PROJECT CONTEXT:
+If the user is adding to an existing project, study the provided list of existing screens carefully:
+1. **Consistency**: Ensure all new screens match the existing context in type (web vs app) and visual style.
+2. **Type Selection (Last Screen Priority)**: If both 'web' and 'app' types are present, YOU MUST follow the type of the **LAST GENERATED SCREEN** provided in the context. Consistency with the most recent direction is paramount.
+3. **Primary Type**: If existing screens are predominantly one type, stick to that type.
+4. **Ambiguity**: If it is a new project with no screens, choose the most appropriate type (web/app) based on the user's intent. You may also architect both if the user journey requires a multi-platform experience.
+
 ### 📜 Requirements:
 0. **Research**: You have access to the **googleSearch** tool. Use it to search for industry standards, feature requirements, or market trends to ensure your architecture is world-class.
 1. **Detailed Architecture (plan)**: A long, high-fidelity markdown document explaining the "why" behind the design choices, the user flow, and technical stack details.
 2. **Screens (screens)**: A list of screens required to complete the project. Each screen MUST have a 'title', 'type' (web/app), 'description', and a 'prompt'.
-3. **Screen Prompt (prompt)**: This is a 100-200 word technical directive for another AI. It must specify exactly which sections, components, and data points to include. Mention the theme consistency (e.g., "Use the primary color for CTAs," "Apply the custom radius to all cards").
+3. **Screen Prompt (prompt)**: This is a 100-200 word technical directive for another AI. It must specify exactly which sections, components, and data points to include. Mention the theme consistency (e.g., "Use the primary color for CTAs," "Apply the custom radius to all cards," "Set the page background using the theme's background color").
 4. **Themes (themes)**: Exactly 10 distinct, high-fidelity color palettes.
 5. **Conclusion (conclusionText)**: A detailed, enthusiastic summary in MARKDOWN. Follow this EXACT format: 
    - Start with "The [Screen Title] screen(s) have been architected:"

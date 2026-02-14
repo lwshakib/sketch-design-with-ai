@@ -118,38 +118,50 @@ export function GenerationStatus({
 
   const finalConclusionText = conclusionText || (status === 'complete' ? statusMessage : null);
 
+  const displayedPlanScreens = planScreens.length > 0 ? planScreens : (!isComplete ? [{ id: 'placeholder-pulse', title: 'Loading' }] : []);
+
   return (
     <div className={cn("flex flex-col gap-6", className)}>
       {/* First Row: Skeleton Squares with Previews */}
       <div className="flex flex-wrap gap-4">
-        {projectArtifacts
-          .filter(a => {
-            // Show all artifacts that are part of the current plan
-            return !planScreens || planScreens.some(p => p.title === a.title);
-          })
-          .map((artifact, idx) => {
-            const isCurrentlyGenerating = currentScreenTitle === artifact.title;
-            const hasContent = !!artifact.content;
+        {displayedPlanScreens.map((planItem, idx) => {
+          // Find the artifact that matches this plan item
+          let artifact = null;
+          if (planItem.id) {
+            artifact = projectArtifacts.find(a => a.id === planItem.id);
+          }
+          // Fallback to title if no ID match or planItem has no ID, but only if the artifact itself doesn't have an ID yet
+          if (!artifact && planItem.title) {
+            artifact = projectArtifacts.find(a => a.title === planItem.title && !a.id);
+          }
+          // If still no artifact, try matching by title regardless of artifact ID (for existing artifacts)
+          if (!artifact && planItem.title) {
+            artifact = projectArtifacts.find(a => a.title === planItem.title);
+          }
 
-            return (
-              <TooltipProvider key={idx}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div 
-                      onClick={() => hasContent && handleFocusScreen(artifact.title)}
-                      className={cn(
-                        "h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg group transition-all",
-                        hasContent ? "cursor-pointer hover:border-primary/50 hover:shadow-primary/10" : "cursor-default"
-                      )}
-                    >
-                      {/* Preview Content (scaled iframe) */}
-                      {hasContent ? (
-                        <>
-                          <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-80 group-hover:opacity-40 transition-all translate-z-0">
-                             <iframe 
-                               title={`mini-preview-${idx}`}
-                               className="w-full h-full border-none"
-                               srcDoc={`
+          const hasContent = !!artifact?.content;
+          const isPlaceholder = planItem.id === 'placeholder-pulse';
+
+          return (
+            <TooltipProvider key={idx}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    onClick={() => hasContent && handleFocusScreen(artifact!.title)}
+                    className={cn(
+                      "h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg group transition-all",
+                      hasContent ? "cursor-pointer hover:border-primary/50 hover:shadow-primary/10" : "cursor-default",
+                      isPlaceholder && "animate-pulse"
+                    )}
+                  >
+                    {/* Preview Content (scaled iframe) */}
+                    {hasContent ? (
+                      <>
+                        <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-80 group-hover:opacity-40 transition-all translate-z-0">
+                          <iframe
+                            title={`mini-preview-${idx}`}
+                            className="w-full h-full border-none"
+                            srcDoc={`
                                  <!DOCTYPE html>
                                  <html>
                                    <head>
@@ -159,35 +171,30 @@ export function GenerationStatus({
                                        ::-webkit-scrollbar { display: none; }
                                      </style>
                                    </head>
-                                   <body>${artifact.content}</body>
+                                   <body>${artifact?.content}</body>
                                  </html>
                                `}
-                             />
-                          </div>
-                          {/* Hover Overlay Icon */}
-                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-primary/5">
-                            <Maximize2 className="h-4 w-4 text-primary" />
-                          </div>
-                        </>
-                      ) : (
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
-                      )}
-                    </div>
-                  </TooltipTrigger>
-                  {hasContent && (
-                    <TooltipContent side="bottom" className="text-[10px] py-1 px-2 border-primary/20 bg-zinc-950 text-foreground font-medium">
-                      Go to screen
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              </TooltipProvider>
-            );
-          })}
-        
-        {/* Only show the pulse square if we truly have no artifacts (e.g. initial planning) */}
-        {projectArtifacts.length === 0 && (
-          <div className="h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg animate-pulse" />
-        )}
+                          />
+                        </div>
+                        {/* Hover Overlay Icon */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-primary/5">
+                          <Maximize2 className="h-4 w-4 text-primary" />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
+                    )}
+                  </div>
+                </TooltipTrigger>
+                {hasContent && (
+                  <TooltipContent side="bottom" className="text-[10px] py-1 px-2 border-primary/20 bg-zinc-950 text-foreground font-medium">
+                    Go to screen
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          );
+        })}
       </div>
 
       <div className="flex-1 min-w-0">

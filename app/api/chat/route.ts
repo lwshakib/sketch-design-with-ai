@@ -23,7 +23,13 @@ export async function POST(req: Request) {
       isSilent, 
       selectedScreens,
       screenId,
-      instructions
+      instructions,
+      isVariations,
+      originalScreenId,
+      optionsCount,
+      variationCreativeRange,
+      variationCustomInstructions,
+      variationAspects
     } = await req.json();
 
     if (!projectId) {
@@ -42,25 +48,38 @@ export async function POST(req: Request) {
       );
     }
 
-    // Save user message only if NOT silent
+    // 1. Create User Message
+    const userMsg = await prisma.message.create({
+      data: {
+        projectId: projectId,
+        role: "user",
+        content: typeof lastMessage.content === 'string' 
+          ? lastMessage.content 
+          : lastMessage.parts?.find((p: any) => p.type === 'text')?.text || "",
+        plan: selectedScreens ? { selectedScreens } : undefined,
+        websiteUrls: websiteUrls || [],
+        imageUrls: imageUrls || []
+      },
+    });
+
+    // 2. Create Assistant Message Placeholder (if not silent)
+    let assistantMessageId = null;
     if (!isSilent) {
-      const messageContent = typeof lastMessage.content === 'string' 
-        ? lastMessage.content 
-        : lastMessage.parts?.find((p: any) => p.type === 'text')?.text || "";
-      
-      await prisma.message.create({
+      const assistantMsg = await prisma.message.create({
         data: {
           projectId: projectId,
-          role: "user",
-          content: messageContent,
-          plan: selectedScreens ? { selectedScreens } : undefined,
-          websiteUrls: websiteUrls || [],
-          imageUrls: imageUrls || []
+          role: "assistant",
+          content: screenId 
+            ? "*Architecting refactored layout...*" 
+            : isVariations 
+              ? `*Architecting variations...*`
+              : "*Analyzing your request and architecting project manifest...*",
+          status: "generating",
         },
       });
+      assistantMessageId = assistantMsg.id;
     }
 
-    // Normalize messages for Inngest - convertToModelMessages expects { role, content } format
     // Normalize messages for Inngest
     const normalizedMessages = (messages || []).map((msg: any) => {
       // Handle simple string content
@@ -86,9 +105,6 @@ export async function POST(req: Request) {
        return !!msg.content;
     });
 
-    console.log('is3xMode',is3xMode);
-    
-
     // Trigger Inngest function
     await inngest.send({
       name: "app/design.generate",
@@ -99,11 +115,18 @@ export async function POST(req: Request) {
         websiteUrls: websiteUrls || [],
         isSilent,
         screenId,
-        instructions
+        instructions,
+        assistantMessageId, // Pass the ID we just created
+        isVariations,
+        originalScreenId,
+        optionsCount,
+        variationCreativeRange,
+        variationCustomInstructions,
+        variationAspects
       },
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, assistantMessageId });
   } catch (error) {
     console.error("[CHAT]", error);
     return NextResponse.json({ error: "Failed to start design generation" }, { status: 500 });

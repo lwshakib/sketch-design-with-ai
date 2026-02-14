@@ -413,13 +413,20 @@ export function ChatSidebar({
                                           }
 
                                           const hasPlan = !!msg.plan;
+                                          const isPending = msg.status === 'pending';
                                           const isLastMessage = idx === messages.length - 1;
-                                                                                     const isComplete = msg.status === 'completed' || (!isGenerating && !isLastMessage);
+                                          const isComplete = msg.status === 'completed' || (!isGenerating && isLastMessage);
 
+                                          // Use message-specific status if available, fallback to global if it's the last message
+                                          const statuses = (useProjectStore.getState().realtimeStatuses || {}) as any;
+                                          const specificStatus = statuses[msg.id] || (isLastMessage ? realtimeStatus : null);
                                           const plan = msg.plan;
                                           
-                                          // Show status if it has a plan OR if it's the latest and still generating
-                                          const showStatus = hasPlan || (isLastMessage && isGenerating);
+                                          // Only show artifacts generated for this specific message in the generation status grid
+                                          const messageArtifacts = throttledArtifacts.filter(a => a.generationMessageId === msg.id);
+
+                                          // Show status if it has a plan OR if it's pending OR if it's the latest and still generating
+                                          const showStatus = hasPlan || isPending || (isLastMessage && isGenerating) || (specificStatus && !isComplete);
 
                                           return (
                                             <div className="flex flex-col gap-5">
@@ -434,11 +441,11 @@ export function ChatSidebar({
                                                   <GenerationStatus 
                                                     isComplete={isComplete}
                                                     conclusionText={plan?.conclusionText}
-                                                    status={realtimeStatus?.status}
+                                                    status={specificStatus?.status}
                                                     planScreens={plan?.screens}
-                                                    projectArtifacts={throttledArtifacts}
-                                                    currentScreenTitle={realtimeStatus?.currentScreen}
-                                                    statusMessage={realtimeStatus?.message}
+                                                    projectArtifacts={messageArtifacts}
+                                                    currentScreenTitle={specificStatus?.currentScreen}
+                                                    statusMessage={specificStatus?.message}
                                                   />
 
                                                 </div>

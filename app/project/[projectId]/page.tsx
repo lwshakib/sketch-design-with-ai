@@ -67,7 +67,7 @@ export default function ProjectPage() {
     is3xMode,
     hasCopied, setHasCopied,
     designPlan, setDesignPlan,
-    realtimeStatus, setRealtimeStatus,
+    realtimeStatus, setRealtimeStatus, setRealtimeStatuses,
     isPlanDialogOpen, setIsPlanDialogOpen,
     isPromptDialogOpen, setIsPromptDialogOpen,
     viewingPrompt, setViewingPrompt,
@@ -127,7 +127,7 @@ export default function ProjectPage() {
     }
 
     const newUserMessage = {
-      id: `m-${Date.now()}`,
+      id: `u-${Date.now()}`,
       role: 'user' as const,
       content: params.text, // Keep original text for UI
       _contextualContent: contextualText, // Context for backend
@@ -137,14 +137,29 @@ export default function ProjectPage() {
       isSilent
     };
 
-    const updatedMessages = [...messages, newUserMessage];
-    setMessages(updatedMessages);
+    // Add a placeholder assistant message for streaming if NOT silent
+    if (!isSilent) {
+        setMessages(prev => {
+            const assistantPlaceholder = {
+                id: `pending-${newUserMessage.id}`,
+                role: 'assistant' as const,
+                content: "",
+                status: 'pending' as any,
+                isSilent: false
+            };
+            return [...prev, newUserMessage, assistantPlaceholder];
+        });
+    } else {
+        setMessages(prev => [...prev, newUserMessage]);
+    }
+
     setIsGenerating(true);
 
     try {
+      const messagesForApi = [...messages, newUserMessage];
       const body = {
         projectId,
-        messages: updatedMessages.map(m => ({
+        messages: messagesForApi.map((m: any) => ({
           role: m.role,
           content: (m as any)._contextualContent || m.content || (m.parts as any[])?.find(p => p.type === 'text')?.text || ""
         })),
@@ -155,7 +170,19 @@ export default function ProjectPage() {
       };
 
       console.log('DEBUG: Custom sendMessage sending body:', body);
-      await axios.post('/api/chat', body);
+      const res = await axios.post('/api/chat', body);
+      
+      // Update the pending assistant message with the real ID from the DB
+      if (res.data.assistantMessageId) {
+        setMessages(prev => {
+          const updated = [...prev];
+          const pendingIdx = updated.findIndex(m => m.id === `pending-${newUserMessage.id}`);
+          if (pendingIdx !== -1) {
+            updated[pendingIdx] = { ...updated[pendingIdx], id: res.data.assistantMessageId };
+          }
+          return updated;
+        });
+      }
     } catch (err) {
       console.error('Chat error:', err);
       toast.error("Engine encountered an error.");
@@ -208,7 +235,27 @@ export default function ProjectPage() {
           setDesignPlan({ screens: plan.screens, _markdown: markdown || plan._markdown });
         }
       } else if (event.topic === 'status') {
+        const eventMessageId = event.data.messageId;
         setRealtimeStatus(event.data);
+        if (eventMessageId) {
+          // If we have a stable messageId, check if we need to "claim" a pending message
+          setMessages(prev => {
+            const hasStable = prev.some(m => m.id === eventMessageId);
+            if (hasStable) return prev;
+            
+            // Look for the first pending message or the default assistant-plan
+            const pendingIndex = prev.findIndex(m => m.role === 'assistant' && (m.id?.toString().startsWith('pending-') || m.id === 'assistant-plan'));
+            if (pendingIndex !== -1) {
+              const updated = [...prev];
+              updated[pendingIndex] = { ...updated[pendingIndex], id: eventMessageId };
+              return updated;
+            }
+            return prev;
+          });
+          
+          setRealtimeStatuses(prev => ({ ...prev, [eventMessageId]: event.data }));
+        }
+
         if (event.data.status === 'vision' || event.data.status === 'planning') setIsGenerating(true);
         if (event.data.status === 'regenerating' && event.data.screenId) {
           setIsGenerating(true);
@@ -229,15 +276,14 @@ export default function ProjectPage() {
               const last = existing[existing.length - 1];
               const getWidth = (t: string) => t === 'app' ? 380 : t === 'web' ? 1024 : 800;
               const currentWidth = getWidth(scrType);
-              return last ? (last.x || 0) + (last.width || getWidth(last.type)) + 120 : -(currentWidth / 2);
-            };
-            return [...prev, { id: screenId, title, content: "", type: type as 'web' | 'app', isComplete: false, x: getNewX(prev, type), y: 0 }];
+            return last ? (last.x || 0) + (last.width || getWidth(last.type)) + 120 : -(currentWidth / 2);
           };
-          setArtifacts(updateFn);
-          setThrottledArtifacts(updateFn);
+          return [...prev, { id: screenId, title, content: "", type: type as 'web' | 'app', isComplete: false, x: getNewX(prev, type), y: 0, generationMessageId: eventMessageId }];
+        };
+        setArtifacts(updateFn);
+        setThrottledArtifacts(updateFn);
         }
         if (event.data.status === 'complete') {
-          setIsGenerating(false);
           const eventMessageId = event.data.messageId;
           setMessages(prev => {
             const updated = [...prev];
@@ -255,6 +301,16 @@ export default function ProjectPage() {
             if (targetIndex !== -1) {
               (updated[targetIndex] as any).status = 'completed';
             }
+            
+            // Check if any other assistant message is still generating
+            const stillBusy = updated.some(m => 
+              m.role === 'assistant' && 
+              (m as any).status !== 'completed' && 
+              // Either it has a plan, or it has a status that indicates activity, or it's a pending placeholder
+              ((m as any).plan || (m as any).status === 'generating' || m.id?.toString().startsWith('pending-'))
+            );
+            setIsGenerating(stillBusy);
+            
             return updated;
           });
           if (event.data.isSilent) {
@@ -271,10 +327,10 @@ export default function ProjectPage() {
           const updateFn = (prev: Artifact[]) => {
             const updated = [...prev];
             // Match by ID
-            const idx = updated.findIndex(a => a.id === newScreen.id);
-            if (idx >= 0) {
-              updated[idx] = { ...updated[idx], ...newScreen, x: updated[idx].x, y: updated[idx].y, isComplete: true };
-              if (newScreen.id) {
+          const idx = updated.findIndex(a => a.id === newScreen.id);
+          if (idx >= 0) {
+            updated[idx] = { ...updated[idx], ...newScreen, x: updated[idx].x, y: updated[idx].y, isComplete: true, generationMessageId: eventMessageId || updated[idx].generationMessageId };
+            if (newScreen.id) {
                 setRegeneratingArtifactIds(prev => {
                   const next = new Set(prev);
                   next.delete(newScreen.id);
@@ -304,47 +360,62 @@ export default function ProjectPage() {
       }
     });
 
-    if (hasPlanUpdate) {
-      const planEvent = newEvents.find((e: any) => e.topic === 'plan');
-      const eventMessageId = planEvent?.data.messageId;
-
+    const planEvents = newEvents.filter((e: any) => e.topic === 'plan');
+    
+    if (planEvents.length > 0) {
       setMessages(prev => {
-        const existingIndex = eventMessageId 
-          ? prev.findIndex(m => m.id === eventMessageId)
-          : prev.findIndex(m => m.id === 'assistant-plan');
+        let updated = [...prev];
         
-        if (existingIndex !== -1) {
-          const updated = [...prev];
-          const existing = updated[existingIndex] as any;
-          updated[existingIndex] = { 
-            ...existing, 
-            content: newMarkdown, 
-            plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } 
-          };
-          return updated;
-        }
-
-        const last = prev[prev.length - 1] as any;
-        if (last && last.role === 'assistant') {
-          const updated = [...prev];
-          updated[updated.length - 1] = { 
-            ...last, 
-            id: eventMessageId || last.id,
-            content: newMarkdown, 
-            plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } 
-          } as any;
-          return updated;
-        }
+        planEvents.forEach((planEvent: any) => {
+          const { plan, markdown, messageId: eventMessageId } = planEvent.data;
+          
+          let targetIndex = eventMessageId 
+            ? updated.findIndex(m => m.id === eventMessageId)
+            : updated.findIndex(m => m.id === 'assistant-plan');
+          
+          // If not found, try to claim a pending message
+          if (targetIndex === -1) {
+            targetIndex = updated.findIndex(m => m.role === 'assistant' && (m.id?.toString().startsWith('pending-') || m.id === 'assistant-plan'));
+            if (targetIndex !== -1 && eventMessageId) {
+              updated[targetIndex] = { ...updated[targetIndex], id: eventMessageId };
+            }
+          }
+          
+          if (targetIndex !== -1) {
+            const existing = updated[targetIndex] as any;
+            updated[targetIndex] = { 
+              ...existing, 
+              content: markdown, 
+              plan: { ...plan, _markdown: markdown || plan._markdown } 
+            };
+          } else {
+            // Find the most recently added user message that doesn't have an assistant response yet
+            // Or just the last message if it's an assistant and has no ID
+            const last = updated[updated.length - 1] as any;
+            
+            if (last && last.role === 'assistant' && (last.id === 'assistant-plan' || !last.id)) {
+                updated[updated.length - 1] = { 
+                  ...last, 
+                  id: eventMessageId || last.id,
+                  content: markdown, 
+                  plan: { ...plan, _markdown: markdown || plan._markdown } 
+                } as any;
+            } else {
+                // Add brand new assistant message
+                updated.push({ 
+                  id: eventMessageId || 'assistant-plan', 
+                  role: 'assistant', 
+                  content: markdown, 
+                  plan: { ...plan, _markdown: markdown || plan._markdown } 
+                } as any);
+            }
+          }
+        });
         
-        return [...prev, { 
-          id: eventMessageId || 'assistant-plan', 
-          role: 'assistant', 
-          content: newMarkdown, 
-          plan: { ...newPlan, _markdown: newMarkdown || newPlan._markdown } 
-        } as any];
+        return updated;
       });
     }
-  }, [realtimeData, setMessages, setDesignPlan, setRealtimeStatus, setIsGenerating, setArtifacts, setThrottledArtifacts, projectId]);
+  }, [realtimeData, setMessages, setDesignPlan, setRealtimeStatus, setRealtimeStatuses, setIsGenerating, setArtifacts, setThrottledArtifacts, projectId]);
 
   useEffect(() => {
     let pollInterval: NodeJS.Timeout;
@@ -725,8 +796,6 @@ export default function ProjectPage() {
     
     const text = input.trim();
     setIsGenerating(true); 
-    setDesignPlan({ screens: [] }); 
-    setRealtimeStatus(null);
     
     sendMessage({ 
       text, 

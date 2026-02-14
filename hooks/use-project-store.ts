@@ -21,7 +21,8 @@ interface ProjectState {
   attachments: { url: string; isUploading: boolean }[];
   input: string;
   designPlan: { screens: any[], _markdown?: string };
-  realtimeStatus: { message: string; status: string; currentScreen?: string } | null;
+  realtimeStatus: { message: string; status: string; currentScreen?: string; messageId?: string } | null;
+  realtimeStatuses: Record<string, { message: string; status: string; currentScreen?: string }>;
   loading: boolean;
   websiteUrl: string | null;
   messages: any[];
@@ -90,7 +91,8 @@ interface ProjectState {
   setAttachments: (val: { url: string; isUploading: boolean }[] | ((prev: { url: string; isUploading: boolean }[]) => { url: string; isUploading: boolean }[])) => void;
   setInput: (input: string) => void;
   setDesignPlan: (designPlan: { screens: any[], _markdown?: string }) => void;
-  setRealtimeStatus: (status: { message: string; status: string; currentScreen?: string } | null) => void;
+  setRealtimeStatus: (status: { message: string; status: string; currentScreen?: string; messageId?: string } | null) => void;
+  setRealtimeStatuses: (val: Record<string, any> | ((prev: Record<string, any>) => Record<string, any>)) => void;
   setLoading: (loading: boolean) => void;
   setIs3xMode: (mode: boolean) => void;
 
@@ -161,6 +163,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   input: "",
   designPlan: { screens: [] },
   realtimeStatus: null,
+  realtimeStatuses: {},
   loading: true,
   websiteUrl: null,
   messages: [],
@@ -226,6 +229,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setInput: (input) => set({ input }),
   setDesignPlan: (designPlan) => set({ designPlan }),
   setRealtimeStatus: (realtimeStatus) => set({ realtimeStatus }),
+  setRealtimeStatuses: (val) => set((state) => ({ realtimeStatuses: typeof val === 'function' ? val(state.realtimeStatuses) : val })),
   setLoading: (loading) => set({ loading }),
   setIs3xMode: (is3xMode) => set({ is3xMode }),
 
@@ -292,6 +296,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
     input: "",
     designPlan: { screens: [] },
     realtimeStatus: null,
+    realtimeStatuses: {},
     loading: true,
     websiteUrl: null,
     messages: [],

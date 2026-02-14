@@ -169,7 +169,7 @@ export function VariationsSheet({
           <Button
             onClick={handleGenerateVariations}
             disabled={isGenerating || (variationAspects.length === 0 && !variationCustomInstructions.trim())}
-            className="w-full h-12 rounded-xl bg-zinc-100 hover:bg-white text-zinc-950 font-bold text-sm transition-all disabled:opacity-50 shadow-lg"
+            className="w-full h-10 rounded-xl bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-sm transition-all disabled:opacity-50 shadow-lg"
           >
             {isGenerating ? "Generating..." : "Generate variations"}
           </Button>

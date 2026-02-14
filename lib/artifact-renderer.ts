@@ -11,6 +11,7 @@ export interface Artifact {
   isLiked?: boolean;
   isDisliked?: boolean;
   status?: 'generating' | 'completed';
+  generationMessageId?: string;
 }
 
 /**
@@ -136,7 +137,7 @@ export function renderHTMLToCanvas(
           body.offsetHeight,
           html.clientHeight,
           html.scrollHeight,
-          html.offsetHeight
+          html.offsetWidth
         );
 
         // Set iframe to actual content size

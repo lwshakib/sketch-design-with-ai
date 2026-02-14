@@ -32,8 +32,8 @@ export function CodeViewerModal({ isOpen, onClose, code, title }: CodeViewerModa
                          <div className="size-3 rounded-full bg-amber-500" />
                          <div className="size-3 rounded-full bg-emerald-500" />
                      </div>
-                     <span className="text-zinc-400 font-bold text-sm uppercase tracking-widest ml-4 flex items-center gap-2">
-                        <Code className="size-4 text-indigo-400" />
+                     <span className="text-zinc-500 font-semibold text-xs ml-4 flex items-center gap-2">
+                        <Code className="size-3.5 text-indigo-400" />
                         {title} source
                      </span>
                  </div>

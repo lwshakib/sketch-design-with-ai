@@ -564,14 +564,14 @@ export default function Home() {
                     <Button 
                        onClick={onSubmit}
                        disabled={(!inputValue.trim() && attachments.length === 0 && !websiteUrl) || attachments.some(a => a.isUploading) || isSubmitting}
-                       className="h-12 px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 border border-black/5 dark:border-white/10 shadow-xl transition-all"
+                       className="h-10 px-5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 border border-black/5 dark:border-white/10 shadow-xl transition-all"
                     >
                       {isSubmitting ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-sm tracking-tight">Generate</span>
-                          <ArrowRight className="h-4 w-4" />
+                          <span className="font-semibold text-sm tracking-tight">Generate</span>
+                          <ArrowRight className="h-3.5 w-3.5" />
                         </div>
                       )}
                     </Button>
