@@ -141,6 +141,17 @@ export function ChatSidebar({
   const [urlTemp, setUrlTemp] = React.useState("");
   const [isUrlValid, setIsUrlValid] = React.useState(true);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  };
+
+  React.useEffect(() => {
+    // Small delay to ensure the DOM has updated (especially for iframes/shimmers)
+    const timer = setTimeout(scrollToBottom, 50);
+    return () => clearTimeout(timer);
+  }, [messages, isGenerating, realtimeStatus]);
 
   const handleUrlSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -597,6 +608,7 @@ export function ChatSidebar({
                       )}
                     </div>
                   )}
+                  <div ref={messagesEndRef} />
                 </div>
               </ConversationContent>
             </Conversation>
