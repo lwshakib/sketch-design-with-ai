@@ -297,14 +297,9 @@ export function CanvasArea({
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            disabled={status !== 'ready'}
-                            className="h-9 px-3 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-md flex items-center gap-2 text-[13px] font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="h-9 px-3 text-foreground/80 hover:text-foreground hover:bg-transparent rounded-md flex items-center gap-2 text-[13px] font-medium transition-colors"
                           >
-                            {status !== 'ready' ? (
-                              <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                            ) : (
-                              <Sparkles className="h-4 w-4 text-primary" />
-                            )}
+                            <Sparkles className="h-4 w-4 text-primary" />
                             Generate
                             <ChevronDown className="h-3.5 w-3.5 opacity-50" />
                           </Button>
@@ -337,7 +332,6 @@ export function CanvasArea({
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        disabled={status !== 'ready'}
                         onClick={() => {
                           if (secondarySidebarMode === 'properties') {
                             setSecondarySidebarMode('none');
@@ -358,7 +352,6 @@ export function CanvasArea({
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        disabled={status !== 'ready'}
                         onClick={() => {
                           if (secondarySidebarMode === 'theme') {
                             setSecondarySidebarMode('none');
