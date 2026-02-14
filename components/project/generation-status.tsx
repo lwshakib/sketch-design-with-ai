@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { useProjectStore } from "@/hooks/use-project-store";
-import { Maximize2 } from "lucide-react";
+import { Maximize2, Trash2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -55,11 +55,7 @@ export function GenerationStatus({
   const [dots, setDots] = useState("...");
   
   const { 
-    setCanvasOffset, 
-    setZoom, 
-    setSelectedArtifactIds,
-    framePos,
-    isSidebarVisible
+    focusArtifact
   } = useProjectStore();
 
   useEffect(() => {
@@ -87,35 +83,7 @@ export function GenerationStatus({
   }, [isComplete]);
 
   const handleFocusScreen = (artifactTitle: string) => {
-    const allArtifacts = useProjectStore.getState().throttledArtifacts;
-    const artifact = allArtifacts.find(a => a.title === artifactTitle);
-    
-    if (!artifact) return;
-
-    // Zoom in for focus (targetZoom = 1.0 means effective scale 0.5)
-    const targetZoom = 1.2; 
-    setZoom(targetZoom);
-    if (artifact.id) setSelectedArtifactIds(new Set([artifact.id]));
-
-    // EFFECTIVE SCALE: CanvasArea uses zoom * 0.5
-    const effectiveScale = targetZoom * 0.5;
-
-    // Calculate center
-    // CanvasArea has 'justify-center' horizontally and 'items-start pt-36' vertically.
-    // pt-36 = 9rem = 144px.
-    const mainHeight = window.innerHeight;
-    const topPadding = 144; 
-
-    const artifactWidth = artifact.width || (artifact.type === 'app' ? 380 : 1024);
-    const artifactHeight = artifact.height || 800;
-
-    // Horizontally centered relative to parent container center
-    const targetX = - (framePos.x + (artifact.x || 0) + artifactWidth / 2) * effectiveScale;
-    
-    // Vertically centered relative to the viewport center, accounting for the pt-36 top padding
-    const targetY = (mainHeight / 2) - topPadding - (framePos.y + (artifact.y || 0) + artifactHeight / 2) * effectiveScale;
-
-    setCanvasOffset({ x: targetX, y: targetY });
+    focusArtifact(artifactTitle);
   };
 
   const finalConclusionText = conclusionText || (status === 'complete' ? statusMessage : null);
@@ -143,19 +111,31 @@ export function GenerationStatus({
 
           const hasContent = !!artifact?.content;
           const isPlaceholder = planItem.id === 'placeholder-pulse';
+          // A screen is considered deleted if we are complete but the matching artifact is missing from the global state
+          const isDeleted = isComplete && !isPlaceholder && !artifact;
 
           return (
             <TooltipProvider key={idx}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
-                    onClick={() => hasContent && handleFocusScreen(artifact!.title)}
+                    onClick={() => {
+                      if (hasContent) handleFocusScreen(artifact!.title);
+                    }}
                     className={cn(
                       "h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg group transition-all",
                       hasContent ? "cursor-pointer hover:border-primary/50 hover:shadow-primary/10" : "cursor-default",
-                      isPlaceholder && "animate-pulse"
+                      isPlaceholder && "animate-pulse",
+                      isDeleted && "border-red-500/20 opacity-60 bg-red-500/5"
                     )}
                   >
+                    {/* Deleted State */}
+                    {isDeleted && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-red-500/10">
+                        <Trash2 className="size-4 text-red-500/50" />
+                        <span className="text-[8px] font-black text-red-500/40 uppercase tracking-tighter">Deleted</span>
+                      </div>
+                    )}
                     {/* Preview Content (scaled iframe) */}
                     {hasContent ? (
                       <>
@@ -188,9 +168,9 @@ export function GenerationStatus({
                     )}
                   </div>
                 </TooltipTrigger>
-                {hasContent && (
-                  <TooltipContent side="bottom" className="text-[10px] py-1 px-2 border-primary/20 bg-zinc-950 text-foreground font-medium">
-                    Go to screen
+                { (hasContent || isDeleted) && (
+                  <TooltipContent side="bottom" className={cn("text-[10px] py-1 px-2 border-primary/20 bg-zinc-950 text-foreground font-medium", isDeleted && "border-red-500/30 text-red-400")}>
+                    {isDeleted ? "Screen deleted" : "Go to screen"}
                   </TooltipContent>
                 )}
               </Tooltip>

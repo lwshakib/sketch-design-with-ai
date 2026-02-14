@@ -263,6 +263,11 @@ export function CanvasArea({
                     startDraggingFrame(e, index);
                   }
                 }}
+                onDoubleClick={() => {
+                  if (activeTool === 'select') {
+                    useProjectStore.getState().focusArtifact(artifact.title);
+                  }
+                }}
                 className={cn(
                   "group absolute top-0 left-0 select-none",
                   activeTool === 'hand' ? (isPanning ? "cursor-grabbing" : "cursor-grab") : (isDraggingFrame ? "cursor-grabbing" : "cursor-default")

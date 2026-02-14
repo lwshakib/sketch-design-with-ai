@@ -149,6 +149,7 @@ interface ProjectState {
   setAppliedTheme: (theme: any | null) => void;
   setSelectedEl: (el: HTMLElement | null | ((prev: HTMLElement | null) => HTMLElement | null)) => void;
   
+  focusArtifact: (title: string) => void;
   updateState: (updates: Partial<ProjectState>) => void;
   resetProjectState: () => void;
 }
@@ -286,6 +287,28 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setAppliedTheme: (appliedTheme) => set({ appliedTheme }),
   setSelectedEl: (val) => set((state) => ({ selectedEl: typeof val === 'function' ? val(state.selectedEl) : val })),
   
+  focusArtifact: (title) => {
+    const { throttledArtifacts, framePos, setZoom, setCanvasOffset, setSelectedArtifactIds } = useProjectStore.getState();
+    const artifact = throttledArtifacts.find(a => a.title === title);
+    if (!artifact) return;
+
+    const targetZoom = 1.2;
+    setZoom(targetZoom);
+    if (artifact.id) setSelectedArtifactIds(new Set([artifact.id]));
+
+    const effectiveScale = targetZoom * 0.5;
+    const mainHeight = typeof window !== 'undefined' ? window.innerHeight : 1000;
+    const topPadding = 144; 
+
+    const artifactWidth = artifact.width || (artifact.type === 'app' ? 380 : 1024);
+    const artifactHeight = artifact.height || 800;
+
+    const targetX = - (framePos.x + (artifact.x || 0) + artifactWidth / 2) * effectiveScale;
+    const targetY = (mainHeight / 2) - topPadding - (framePos.y + (artifact.y || 0) + artifactHeight / 2) * effectiveScale;
+
+    setCanvasOffset({ x: targetX, y: targetY });
+  },
+
   updateState: (updates) => set((state) => ({ ...state, ...updates })),
   resetProjectState: () => set({
     projectId: null,
