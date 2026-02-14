@@ -69,6 +69,11 @@ import {
   DropdownMenuPortal,
   DropdownMenuSubContent
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { extractArtifacts, stripArtifact } from "@/lib/artifact-renderer";
 import { useProjectStore } from "@/hooks/use-project-store";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
@@ -353,8 +358,8 @@ export function ChatSidebar({
                                         className="h-8 w-8 rounded-full object-cover flex-shrink-0"
                                       />
                                     ) : (
-                                      <div className="h-8 w-8 rounded-full flex items-center justify-center bg-zinc-900 border border-white/5 flex-shrink-0">
-                                        <User className="h-4 w-4 text-zinc-400" />
+                                      <div className="h-8 w-8 rounded-full flex items-center justify-center bg-muted border border-border flex-shrink-0">
+                                        <User className="h-4 w-4 text-muted-foreground" />
                                       </div>
                                     )
                                   ) : (
@@ -482,9 +487,9 @@ export function ChatSidebar({
                                                     {selectedScreens.map((screen: any, sIdx: number) => (
                                                       <div 
                                                         key={screen.id || sIdx} 
-                                                        className="relative w-16 h-16 rounded-xl border border-white/10 bg-zinc-900 overflow-hidden shadow-sm"
+                                                        className="relative w-16 h-16 rounded-xl border border-border/60 bg-background overflow-hidden shadow-sm transition-all hover:shadow-md hover:border-primary/20"
                                                       >
-                                                        <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-80">
+                                                        <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-100">
                                                           <iframe 
                                                             title={`msg-history-preview-${screen.id || sIdx}`}
                                                             className="w-full h-full border-none"
@@ -503,7 +508,7 @@ export function ChatSidebar({
                                                             `}
                                                           />
                                                         </div>
-                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                                                        <div className="absolute inset-0 bg-transparent pointer-events-none" />
                                                       </div>
                                                     ))}
                                                   </div>
@@ -520,7 +525,7 @@ export function ChatSidebar({
                             </div>
                             {idx < messages.length - 1 && (
                               <div className="px-5">
-                                <Separator className="bg-border" />
+                                <Separator className="bg-border/50" />
                               </div>
                             )}
                           </React.Fragment>
@@ -550,7 +555,7 @@ export function ChatSidebar({
                         const lastAssistantWithPlan = [...messages].reverse().find(m => (m as any).plan);
                         const plan = (lastAssistantWithPlan as any)?.plan;
                         
-                        // Show suggestion if not generating, or if it's a silent generation (like regeneration)
+                        // Show suggestion if not generating, or if it's the latest and we are silently regenerating
                         const isSilentRegen = isGenerating && (messages[messages.length - 1] as any)?.isSilent;
                         const shouldShow = !isGenerating || isSilentRegen;
                         
@@ -558,15 +563,15 @@ export function ChatSidebar({
                           return (
                             <div className="px-5 py-4 flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-700 delay-300">
                               <div className="flex items-center gap-3">
-                                <div className="h-[1px] flex-1 bg-border" />
-                                <span className="text-[10px] font-bold text-zinc-500 shrink-0">Suggested Reply</span>
+                                <div className="h-[1px] flex-1 bg-border/50" />
+                                <span className="text-[10px] font-bold text-muted-foreground shrink-0">Suggested Reply</span>
                               </div>
                               
                               <button 
                                 onClick={() => setInput(plan.suggestion)}
-                                className="group px-3 py-1.5 rounded-lg bg-muted/50 border border-border hover:bg-muted hover:border-primary/20 transition-all duration-200 text-left w-fit max-w-[240px] shadow-sm hover:shadow-md"
+                                className="group px-3 py-1.5 rounded-lg bg-background border border-border hover:border-primary/30 hover:bg-muted/50 transition-all duration-200 text-left w-fit max-w-[240px] shadow-sm hover:shadow-md"
                               >
-                                <span className="text-[12px] font-medium text-foreground/80 group-hover:text-foreground transition-colors">
+                                <span className="text-[12px] font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                                   {plan.suggestion}
                                 </span>
                               </button>
@@ -603,7 +608,7 @@ export function ChatSidebar({
 
           <div className="p-4 bg-sidebar">
             <div className="flex flex-col gap-3">
-              <div className="bg-[#0F0F0F] rounded-[16px] p-4 border border-white/5 shadow-2xl transition-all focus-within:border-white/10 group/input">
+              <div className="bg-background rounded-[16px] p-4 border border-input shadow-sm transition-all focus-within:ring-1 focus-within:ring-primary/20 group/input">
                     {selectedArtifactIds.size > 0 && (
                       <div className="flex flex-wrap gap-3 mb-5 animate-in fade-in slide-in-from-bottom-1 duration-300">
                         {Array.from(selectedArtifactIds).map(id => {
@@ -612,10 +617,10 @@ export function ChatSidebar({
                           return (
                             <div 
                               key={id} 
-                              className="group relative w-16 h-16 rounded-xl border-2 border-indigo-500/80 bg-zinc-900 overflow-hidden shadow-2xl transition-all hover:border-indigo-500"
+                              className="group relative w-16 h-16 rounded-xl border border-border bg-background overflow-hidden shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
                             >
                               {/* Scaled Preview */}
-                              <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-90 transition-opacity">
+                              <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-100 transition-opacity">
                                 <iframe 
                                   title={`mini-preview-input-${id}`}
                                   className="w-full h-full border-none"
@@ -636,7 +641,7 @@ export function ChatSidebar({
                               </div>
 
                               {/* Hover Selection Overlay */}
-                              <div className="absolute inset-0 bg-indigo-500/5 group-hover:bg-transparent transition-colors" />
+                              <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors" />
 
                               <button 
                                 onClick={(e) => {
@@ -647,9 +652,9 @@ export function ChatSidebar({
                                     return next;
                                   });
                                 }}
-                                className="absolute top-1 right-1 h-4 w-4 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 shadow-xl"
+                                className="absolute top-1 right-1 h-5 w-5 rounded-full bg-background border border-border flex items-center justify-center text-foreground opacity-0 group-hover:opacity-100 transition-all hover:bg-destructive hover:text-destructive-foreground shadow-sm z-10"
                               >
-                                <X className="size-2.5 flex-shrink-0" />
+                                <X className="size-3 flex-shrink-0" />
                               </button>
                             </div>
                           );
@@ -668,37 +673,37 @@ export function ChatSidebar({
                         }
                       }}
                       placeholder="Describe your design"
-                      className="w-full bg-transparent outline-none resize-none text-[15px] text-foreground placeholder:text-[#525252] min-h-[56px] max-h-[200px] leading-relaxed"
+                      className="w-full bg-transparent outline-none resize-none text-[15px] text-foreground placeholder:text-muted-foreground min-h-[56px] max-h-[200px] leading-relaxed"
                     />
 
                 {(attachments.length > 0 || websiteUrl || showUrlInput) && (
                   <div className="flex flex-wrap gap-2 mb-3 mt-4">
                     {attachments.map((att, idx) => (
-                      <div key={idx} className="relative group size-12 rounded-lg overflow-hidden border border-white/10 bg-zinc-900 flex-shrink-0">
-                        <img src={att.url} className="w-full h-full object-cover opacity-60" />
+                      <div key={idx} className="relative group size-12 rounded-lg overflow-hidden border border-border bg-muted flex-shrink-0">
+                        <img src={att.url} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                         <button 
                           onClick={() => setAttachments(prev => prev.filter((_, i) => i !== idx))}
-                          className="absolute top-0.5 right-0.5 size-4 bg-black/60 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-0.5 right-0.5 size-4 bg-black/50 hover:bg-destructive text-white rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
                         >
-                          <X className="size-2 text-white" />
+                          <X className="size-2.5" />
                         </button>
                         {att.isUploading && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                            <div className="size-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                          <div className="absolute inset-0 flex items-center justify-center bg-background/40">
+                            <div className="size-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                           </div>
                         )}
                       </div>
                     ))}
 
                     {websiteUrl && !showUrlInput && (
-                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 max-w-[200px] group">
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/5 border border-primary/10 text-primary max-w-[200px] group">
                         <Globe className="size-3 shrink-0" />
                         <span className="text-[11px] font-bold truncate">{websiteUrl}</span>
                         <button 
                           onClick={() => setWebsiteUrl(null)}
-                          className="size-4 shrink-0 hover:bg-white/10 rounded flex items-center justify-center"
+                          className="size-4 shrink-0 hover:bg-primary/20 rounded-full flex items-center justify-center transition-colors"
                         >
-                          <X className="size-2" />
+                          <X className="size-2.5" />
                         </button>
                       </div>
                     )}
@@ -707,11 +712,11 @@ export function ChatSidebar({
                       <form 
                         onSubmit={handleUrlSubmit} 
                         className={cn(
-                          "flex-1 min-w-[200px] flex items-center gap-2 px-2 py-1.5 rounded-xl bg-[#1A1A1A] border transition-all duration-200 animate-in fade-in zoom-in",
-                          isUrlValid ? "border-white/10" : "border-red-500/50 ring-1 ring-red-500/20"
+                          "flex-1 min-w-[200px] flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted/50 border transition-all duration-200 animate-in fade-in zoom-in",
+                          isUrlValid ? "border-border focus-within:border-primary/30 focus-within:ring-1 focus-within:ring-primary/20" : "border-destructive/50 ring-1 ring-destructive/20"
                         )}
                       >
-                        <Link className={cn("size-3", isUrlValid ? "text-zinc-500" : "text-red-400")} />
+                        <Link className={cn("size-3", isUrlValid ? "text-muted-foreground" : "text-destructive")} />
                         <input 
                           autoFocus
                           value={urlTemp}
@@ -720,15 +725,15 @@ export function ChatSidebar({
                             if (!isUrlValid) setIsUrlValid(true);
                           }}
                           placeholder="Paste URL (e.g. google.com)"
-                          className="flex-1 bg-transparent outline-none text-[11px] text-zinc-200 placeholder:text-zinc-600"
+                          className="flex-1 bg-transparent outline-none text-[11px] text-foreground placeholder:text-muted-foreground"
                         />
                         <button type="submit" className="hidden" />
                         <button 
                           type="button"
                           onClick={() => { setShowUrlInput(false); setUrlTemp(""); }}
-                          className="size-4 shrink-0 hover:bg-white/10 rounded flex items-center justify-center"
+                          className="size-4 shrink-0 hover:bg-background/20 rounded flex items-center justify-center"
                         >
-                          <X className="size-2 text-zinc-500" />
+                          <X className="size-2 text-muted-foreground" />
                         </button>
                       </form>
                     )}
@@ -743,24 +748,24 @@ export function ChatSidebar({
                           variant="ghost" 
                           size="icon" 
                           disabled={false}
-                          className="h-9 w-9 rounded-full bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525] border border-white/5"
+                          className="h-9 w-9 rounded-full bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-border/50"
                         >
                           <Plus className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-48 bg-[#0F0F0F] border-white/10 rounded-xl shadow-2xl p-1.5">
+                      <DropdownMenuContent align="start" className="w-48 bg-popover border-border text-popover-foreground rounded-xl shadow-lg p-1.5">
                         <DropdownMenuItem 
                           onClick={() => fileInputRef.current?.click()}
-                          className="flex items-center gap-2 p-2 hover:bg-white/5 rounded-lg text-zinc-300 transition-colors"
+                          className="flex items-center gap-2 p-2 hover:bg-muted rounded-lg cursor-pointer transition-colors"
                         >
-                          <ImageIcon className="h-4 w-4" />
+                          <ImageIcon className="h-4 w-4 text-muted-foreground" />
                           <span className="text-[13px] font-medium">Upload Images</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => setShowUrlInput(true)}
-                          className="flex items-center gap-2 p-2 hover:bg-white/5 rounded-lg text-zinc-300 transition-colors"
+                          className="flex items-center gap-2 p-2 hover:bg-muted rounded-lg cursor-pointer transition-colors"
                         >
-                          <Link className="h-4 w-4" />
+                          <Link className="h-4 w-4 text-muted-foreground" />
                           <span className="text-[13px] font-medium">Website URL</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -774,46 +779,68 @@ export function ChatSidebar({
                       onChange={propHandleFileUpload} 
                     />
                     
-                    <button 
-                      onClick={() => setIs3xMode(!is3xMode)}
-                      className={cn(
-                        "flex items-center gap-2 h-9 px-3 rounded-full border transition-all duration-200",
-                        is3xMode 
-                          ? "bg-primary/20 border-primary/30 text-primary shadow-[0_0_15px_rgba(var(--primary),0.1)]" 
-                          : "bg-[#1A1A1A] border-white/5 text-zinc-400 hover:text-white hover:bg-[#252525]"
-                      )}
-                    >
-                      <CopyPlus className="h-4 w-4" />
-                      <span className="text-[13px] font-bold tracking-tight mt-0.5">3x</span>
-                    </button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button 
+                          onClick={() => setIs3xMode(!is3xMode)}
+                          className={cn(
+                            "flex items-center gap-2 h-9 px-3 rounded-full border transition-all duration-200 shadow-sm",
+                            is3xMode 
+                              ? "bg-primary text-primary-foreground border-primary" 
+                              : "bg-muted/50 border-border/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+                          )}
+                        >
+                          <CopyPlus className="h-4 w-4" />
+                          <span className="text-[13px] font-bold tracking-tight mt-0.5">3x</span>
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>Generate 3 variations</TooltipContent>
+                    </Tooltip>
 
-                    <Button 
-                      onClick={() => setSecondarySidebarMode(secondarySidebarMode === 'theme' ? 'none' : 'theme')}
-                      variant="ghost" 
-                      size="icon" 
-                      className={cn(
-                        "h-9 w-9 rounded-full bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525] border border-white/5",
-                        secondarySidebarMode === 'theme' && "bg-primary/20 text-primary border-primary/30 shadow-[0_0_15px_rgba(var(--primary),0.1)]"
-                      )}
-                    >
-                      <Palette className="h-4 w-4" />
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          onClick={() => setSecondarySidebarMode(secondarySidebarMode === 'theme' ? 'none' : 'theme')}
+                          variant="ghost" 
+                          size="icon" 
+                          className={cn(
+                            "h-9 w-9 rounded-full transition-all duration-200 border shadow-sm",
+                            secondarySidebarMode === 'theme' 
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted border-border/50"
+                          )}
+                        >
+                          <Palette className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Theme Settings</TooltipContent>
+                    </Tooltip>
                   </div>
                   
                   <div className="flex flex-col items-end gap-2.5">
                     <div className="flex items-center gap-3">
-                      <Button 
-                        onClick={handleCustomSubmit}
-                        disabled={(status === 'ready' && (!input.trim() && attachments.length === 0))}
-                        className="h-9 w-9 rounded-full p-0 shadow-lg transition-all border border-white/5 bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525]"
-                      >
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            onClick={handleCustomSubmit}
+                            disabled={(status === 'ready' && (!input.trim() && attachments.length === 0))}
+                            className={cn(
+                              "h-9 w-9 rounded-full p-0 shadow-md transition-all border",
+                              (status === 'ready' && (!input.trim() && attachments.length === 0))
+                                ? "bg-muted border-border text-muted-foreground cursor-not-allowed opacity-50"
+                                : "bg-primary border-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:scale-105 active:scale-95"
+                            )}
+                          >
+                            <ArrowRight className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Send Message</TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
                 </div>
               </div>
-              <p className="text-[12px] text-center text-[#4F4F4F] font-medium leading-relaxed">
+              <p className="text-[12px] text-center text-muted-foreground font-medium leading-relaxed">
                 Sketch can make mistakes. Please check its work.
               </p>
             </div>
