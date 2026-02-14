@@ -204,7 +204,6 @@ export function ChatSidebar({
                   >
                     <Download className="h-4 w-4 text-muted-foreground" />
                     Download Project
-                    <DropdownMenuShortcut>Full ZIP</DropdownMenuShortcut>
                   </DropdownMenuItem>
                   
                   <DropdownMenuItem 

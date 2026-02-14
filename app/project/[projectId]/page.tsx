@@ -980,40 +980,63 @@ Reference the existing screen code provided in the context.`;
   const session = authClient.useSession();
 
   const handleDownloadFullProject = async () => {
-    toast.info("Preparing full project export...");
-    const zip = new JSZip();
-    
-    for (let i = 0; i < throttledArtifacts.length; i++) {
-      const artifact = throttledArtifacts[i];
-      const folderName = artifact.title.replace(/\s+/g, '_');
-      const folder = zip.folder(folderName);
-      if (folder) {
-        folder.file("code.html", artifact.content);
-        const dataUrl = await captureFrameImage(i);
-        if (dataUrl) {
-          folder.file("screen.png", dataUrl.split(',')[1], { base64: true });
+    toast.promise(async () => {
+      const zip = new JSZip();
+      
+      for (let i = 0; i < throttledArtifacts.length; i++) {
+        const artifact = throttledArtifacts[i];
+        const folderName = artifact.title.replace(/\s+/g, '_');
+        const folder = zip.folder(folderName);
+        if (folder) {
+          folder.file("code.html", artifact.content);
+          const dataUrl = await captureFrameImage(i);
+          if (dataUrl) {
+            folder.file("screen.png", dataUrl.split(',')[1], { base64: true });
+          }
         }
       }
-    }
-    
-    const content = await zip.generateAsync({ type: "blob" });
-    const link = document.createElement('a');
-    link.download = `${project?.title.replace(/\s+/g, '_') || 'Project'}_Full_Package.zip`;
-    link.href = URL.createObjectURL(content);
-    link.click();
-    toast.success("Full project downloaded");
+      
+      const content = await zip.generateAsync({ type: "blob" });
+      const link = document.createElement('a');
+      link.download = `${project?.title.replace(/\s+/g, '_') || 'Project'}_Full_Package.zip`;
+      link.href = URL.createObjectURL(content);
+      link.click();
+    }, {
+      loading: 'Preparing full project export...',
+      success: 'Full project processed',
+      error: 'Failed to download project'
+    });
   };
 
+  const handleDownloadFullProjectRef = useRef(handleDownloadFullProject);
+  useEffect(() => { handleDownloadFullProjectRef.current = handleDownloadFullProject; }, [handleDownloadFullProject]);
+
+  useEffect(() => {
+    const handler = () => handleDownloadFullProjectRef.current();
+    document.addEventListener('DOWNLOAD_PROJECT', handler);
+    return () => document.removeEventListener('DOWNLOAD_PROJECT', handler);
+  }, []);
+
+
   const handleDuplicateProject = async () => {
-    try {
+    toast.promise(async () => {
       const res = await axios.post(`/api/projects/${projectId}/duplicate`);
-      toast.success("Project duplicated!");
-      router.push(`/project/${res.data.id}`);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to duplicate project");
-    }
+      // User explicitly requested to stay on the current project, so no redirect.
+    }, {
+      loading: 'Duplicating project...',
+      success: 'Project duplicated!',
+      error: 'Failed to duplicate project'
+    });
   };
+
+  const handleDuplicateProjectRef = useRef(handleDuplicateProject);
+  useEffect(() => { handleDuplicateProjectRef.current = handleDuplicateProject; }, [handleDuplicateProject]);
+
+  useEffect(() => {
+    const handler = () => handleDuplicateProjectRef.current();
+    document.addEventListener('DUPLICATE_PROJECT', handler);
+    return () => document.removeEventListener('DUPLICATE_PROJECT', handler);
+  }, []);
 
   const updateProjectTitle = async (title: string) => {
     try {
@@ -1028,14 +1051,14 @@ Reference the existing screen code provided in the context.`;
   };
 
   const confirmDeleteProject = async () => {
-    try {
+    toast.promise(async () => {
       await axios.delete(`/api/projects/${projectId}`);
-      toast.success("Project deleted");
       router.push('/');
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to delete project");
-    }
+    }, {
+      loading: 'Deleting project...',
+      success: 'Project deleted',
+      error: 'Failed to delete project'
+    });
   };
 
   if (loading || !project) {
