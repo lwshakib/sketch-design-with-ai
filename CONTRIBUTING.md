@@ -228,17 +228,23 @@ Add screenshots to help explain your changes.
    bun run db:migrate
    ```
 
-4. **Start the development server**:
+4. **Start the Inngest Dev Server**:
+   ```bash
+   bun run inngest
+   ```
+
+5. **Start the development server**:
    ```bash
    bun dev
    ```
 
-5. **Open** [http://localhost:3000](http://localhost:3000) in your browser
+6. **Open** [http://localhost:3000](http://localhost:3000) in your browser
 
 ### Available Scripts
 
 ```bash
 # Development
+bun run inngest      # Start Inngest dev server
 bun dev              # Start dev server with hot reload
 bun build            # Build for production
 bun start            # Start production server

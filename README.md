@@ -20,6 +20,46 @@
 - 🎭 **Theme Customization**: Apply and customize themes with glassmorphism, dark mode, and vibrant color palettes
 - 📱 **Responsive Design**: Generate designs that work seamlessly across all device sizes
 
+## 🏗️ Architecture
+
+```mermaid
+graph TD
+    User([User])
+    subgraph Client ["Client Side (Next.js)"]
+        UI[User Interface]
+        Canvas[Infinite Canvas]
+    end
+    
+    subgraph Server ["Server Side (Next.js API Routes)"]
+        Auth[Better Auth]
+        InngestAPI[Inngest Functions]
+        ProjectAPI[Project API]
+    end
+    
+    subgraph Services ["External Services"]
+        Gemini[Google Gemini AI]
+        InngestCloud[Inngest Dev Server / Cloud]
+    end
+    
+    subgraph Data ["Data Layer"]
+        DB[(PostgreSQL)]
+    end
+
+    User -->|Interacts| UI
+    UI -->|Draws/Edits| Canvas
+    UI -->|Authenticates| Auth
+    UI -->|API Requests| ProjectAPI
+    
+    ProjectAPI -->|CRUD| DB
+    ProjectAPI -->|Trigger Event| InngestCloud
+    
+    InngestCloud -->|Execute Function| InngestAPI
+    InngestAPI -->|Generate Content| Gemini
+    InngestAPI -->|Store Result| DB
+    
+    Auth -->|Persist Session| DB
+```
+
 ## 📸 Screenshots
 
 <div align="center">
@@ -160,7 +200,19 @@ bun run db:migrate
 bun run db:studio
 ```
 
-### 5. Run the Development Server
+### 5. Run the Inngest Dev Server
+
+In a separate terminal, run the Inngest dev server to handle background jobs and AI generation:
+
+```bash
+bun run inngest
+```
+
+This will start the Inngest dashboard at [http://localhost:8288](http://localhost:8288).
+
+### 6. Run the Development Server
+
+In another terminal, run the Next.js development server:
 
 ```bash
 bun dev
@@ -268,6 +320,7 @@ For production, use a managed PostgreSQL service:
 
 ```bash
 # Development
+bun run inngest      # Start Inngest dev server
 bun dev              # Start dev server
 bun build            # Build for production
 bun start            # Start production server

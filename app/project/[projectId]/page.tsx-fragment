@@ -1,9 +1,0 @@
-
-  const handleDownloadFullProjectRef = useRef(handleDownloadFullProject);
-  useEffect(() => { handleDownloadFullProjectRef.current = handleDownloadFullProject; }, [handleDownloadFullProject]);
-
-  useEffect(() => {
-    const handler = () => handleDownloadFullProjectRef.current();
-    document.addEventListener('DOWNLOAD_PROJECT', handler);
-    return () => document.removeEventListener('DOWNLOAD_PROJECT', handler);
-  }, []);

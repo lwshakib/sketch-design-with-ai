@@ -152,6 +152,6 @@ If you have questions about this Code of Conduct, please reach out to the projec
 
 ---
 
-**Last Updated**: January 2026
+**Last Updated**: February 2026
 
 Thank you for helping make this a welcoming, friendly community for everyone!
