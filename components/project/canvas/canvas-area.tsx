@@ -540,14 +540,14 @@ export function CanvasArea({
                   <div className="absolute -top-7 left-0 right-0 flex items-center justify-between px-1 pointer-events-none select-none">
                      <span 
                        className="text-[12px] font-bold"
-                       style={{ color: appliedTheme?.cssVars.primary || 'var(--primary)' }}
+                       style={{ color: appliedTheme?.cssVars?.primary || 'var(--primary)' }}
                      >
                        {artifact.title || "Untitled Screen"}
                      </span>
                     <div className="flex items-center gap-2">
                        <Code 
                          className="h-3.5 w-3.5" 
-                         style={{ color: appliedTheme?.cssVars.mutedForeground || 'var(--muted-foreground)' }}
+                         style={{ color: appliedTheme?.cssVars?.mutedForeground || 'var(--muted-foreground)' }}
                        />
                     </div>
                   </div>
@@ -578,8 +578,8 @@ export function CanvasArea({
                     })(),
                     minHeight: (artifactPreviewModes[artifact.title] === 'app' || (artifact.type === 'app' && !artifactPreviewModes[artifact.title])) ? '800px' : '400px',
                     transition: isResizing ? 'none' : 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    backgroundColor: appliedTheme?.cssVars.background || 'var(--background)',
-                    borderColor: artifact.id && selectedArtifactIds.has(artifact.id) ? SELECTION_BLUE : (appliedTheme?.cssVars.border || 'var(--border)'),
+                    backgroundColor: appliedTheme?.cssVars?.background || 'var(--background)',
+                    borderColor: artifact.id && selectedArtifactIds.has(artifact.id) ? SELECTION_BLUE : (appliedTheme?.cssVars?.border || 'var(--border)'),
                     boxShadow: artifact.id && selectedArtifactIds.has(artifact.id) ? `0 0 0 2px ${SELECTION_BLUE}40, 0 40px 100px rgba(0,0,0,0.4)` : undefined
                   }}
                 >

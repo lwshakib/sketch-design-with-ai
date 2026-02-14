@@ -6,7 +6,7 @@ export const ModernShimmer = ({ type = 'app', appliedTheme }: { type?: 'web' | '
   return (
     <div 
       className="absolute inset-0 z-50 overflow-hidden pointer-events-none flex flex-col p-10 gap-10" 
-      style={{ backgroundColor: appliedTheme?.cssVars.background || 'var(--background)' }}
+      style={{ backgroundColor: appliedTheme?.cssVars?.background || 'var(--background)' }}
     >
 
       {/* Standard Shimmer Overlay */}

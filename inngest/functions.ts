@@ -643,8 +643,15 @@ CRITICAL:
           })
         });
 
-        finalThemes = object.themes;
-        finalSelectedTheme = finalThemes[0];
+        finalThemes = object.themes.map((t: any, i: number) => ({
+          ...t,
+          id: `project-theme-${i}`
+        }));
+        
+        // ONLY overwrite selectedTheme if it doesn't already exist
+        if (!finalSelectedTheme) {
+          finalSelectedTheme = finalThemes[0];
+        }
 
         // Update Project
         await prisma.project.update({
@@ -738,6 +745,7 @@ CRITICAL:
         plan: {
           screens: finalScreens,
           themes: themes,
+          selectedTheme: selectedTheme,
           conclusionText: finalConclusion,
           suggestion: finalSuggestion
         }

@@ -43,7 +43,7 @@ export function ThemeSettings({ activeThemeId, onApplyTheme, appliedTheme }: Pro
 
   // Normalize project themes
   const projectThemes: Theme[] = (project?.themes || []).map((t: any, i: number) => ({
-    id: `project-theme-${i}`,
+    id: t.id || `project-theme-${i}`,
     name: t.name,
     description: "AI-generated design system tailored for this project.",
     colors: [t.colors.primary, t.colors.secondary, t.colors.accent, t.colors.background],
@@ -141,6 +141,16 @@ export function ThemeSettings({ activeThemeId, onApplyTheme, appliedTheme }: Pro
     );
   };
 
+  const [activeTab, setActiveTab] = React.useState("presets");
+  
+  // Auto-switch to AI tab if an AI theme is active
+  React.useEffect(() => {
+    const isProjectTheme = activeThemeId?.startsWith('project-theme-') || activeThemeId?.startsWith('ai-gen-') || appliedTheme?.isGenerated;
+    if (isProjectTheme) {
+      setActiveTab("ai");
+    }
+  }, [activeThemeId, appliedTheme]);
+
   return (
     <div className="h-full flex flex-col bg-zinc-950 animate-in fade-in duration-300">
       {/* Header */}
@@ -150,9 +160,9 @@ export function ThemeSettings({ activeThemeId, onApplyTheme, appliedTheme }: Pro
             <span className="text-[13px] font-bold text-zinc-100">Theme Library</span>
         </div>
       </div>
-
+ 
       <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-        <Tabs defaultValue="presets" className="flex-1 min-h-0 flex flex-col">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 min-h-0 flex flex-col">
             <div className="px-4 pt-4 flex-shrink-0">
                 <TabsList className="w-full bg-zinc-900/50 border border-white/5 p-1 rounded-xl h-10">
                     <TabsTrigger 
@@ -268,7 +278,7 @@ export function ThemeSettings({ activeThemeId, onApplyTheme, appliedTheme }: Pro
                         <Type className="size-3.5 text-indigo-500 group-hover:scale-110 transition-transform" />
                         <div className="flex flex-col items-start translate-y-[1px]">
                             <span className="text-[9px] font-black text-zinc-600 uppercase tracking-tighter">Font</span>
-                            <span className="text-[11px] font-bold text-zinc-300 leading-none">{appliedTheme?.cssVars.fontSans?.split(',')[0] || "Inter"}</span>
+                            <span className="text-[11px] font-bold text-zinc-300 leading-none">{appliedTheme?.cssVars?.fontSans?.split(',')[0] || "Inter"}</span>
                         </div>
                     </button>
                 </PopoverTrigger>
@@ -294,7 +304,7 @@ export function ThemeSettings({ activeThemeId, onApplyTheme, appliedTheme }: Pro
                             }}
                             className={cn(
                                 "w-full text-left px-3 py-2 text-[11px] rounded-lg transition-all",
-                                appliedTheme?.cssVars.fontSans === font.value 
+                                appliedTheme?.cssVars?.fontSans === font.value 
                                     ? "bg-indigo-600 text-white font-bold" 
                                     : "text-zinc-400 hover:bg-white/5 hover:text-white"
                             )}
@@ -311,7 +321,7 @@ export function ThemeSettings({ activeThemeId, onApplyTheme, appliedTheme }: Pro
                         <Box className="size-3.5 text-indigo-500 group-hover:scale-110 transition-transform" />
                         <div className="flex flex-col items-start translate-y-[1px]">
                             <span className="text-[9px] font-black text-zinc-600 uppercase tracking-tighter">Radius</span>
-                            <span className="text-[11px] font-bold text-zinc-300 leading-none">{appliedTheme?.cssVars.radius || "0.5rem"}</span>
+                            <span className="text-[11px] font-bold text-zinc-300 leading-none">{appliedTheme?.cssVars?.radius || "0.5rem"}</span>
                         </div>
                     </button>
                 </PopoverTrigger>
@@ -338,7 +348,7 @@ export function ThemeSettings({ activeThemeId, onApplyTheme, appliedTheme }: Pro
                             }}
                             className={cn(
                                 "w-full text-left px-3 py-2 text-[11px] rounded-lg transition-all",
-                                appliedTheme?.cssVars.radius === rad.value 
+                                appliedTheme?.cssVars?.radius === rad.value 
                                     ? "bg-indigo-600 text-white font-bold" 
                                     : "text-zinc-400 hover:bg-white/5 hover:text-white"
                             )}

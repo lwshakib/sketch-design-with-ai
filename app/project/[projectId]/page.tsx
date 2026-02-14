@@ -267,7 +267,7 @@ export default function ProjectPage() {
           const screenId = event.data.screenId;
           const updateFn = (prev: Artifact[]) => {
             // Match by ID if available, otherwise fallback to title
-            const existingIdx = prev.findIndex(a => (screenId && a.id === screenId) || a.title === title);
+            const existingIdx = prev.findIndex(a => (screenId && a.id === screenId) || (a.title === title && a.generationMessageId === eventMessageId));
             if (existingIdx !== -1) return prev;
 
             const planItem = designPlanRef.current.find(p => p.title === title);
@@ -339,7 +339,7 @@ export default function ProjectPage() {
               }
             } else {
               // Fallback to title matching if ID didn't find it (unlikely with new system)
-              const titleIdx = updated.findIndex(a => a.title === newScreen.title);
+              const titleIdx = updated.findIndex(a => a.title === newScreen.title && a.generationMessageId === eventMessageId);
               if (titleIdx >= 0) {
                  updated[titleIdx] = { ...updated[titleIdx], ...newScreen, x: updated[titleIdx].x, y: updated[titleIdx].y, isComplete: true, generationMessageId: eventMessageId || updated[titleIdx].generationMessageId };
               } else {
@@ -379,6 +379,15 @@ export default function ProjectPage() {
             if (targetIndex !== -1 && eventMessageId) {
               updated[targetIndex] = { ...updated[targetIndex], id: eventMessageId };
             }
+          }
+          
+          if (plan?.themes) {
+            setProject(prev => prev ? { ...prev, themes: plan.themes } : null);
+          }
+          
+          if (plan?.selectedTheme) {
+            setAppliedTheme(plan.selectedTheme);
+            setActiveThemeId(plan.selectedTheme.id);
           }
           
           if (targetIndex !== -1) {
@@ -527,7 +536,10 @@ export default function ProjectPage() {
           const updated = [...prev];
           let changed = false;
           artifactData.forEach(newArt => {
-            const existingIndex = updated.findIndex(a => a.title === newArt.title);
+            const existingIndex = updated.findIndex(a => 
+              a.title === newArt.title && 
+              (a.generationMessageId === lastAssistantMessage.id || !a.generationMessageId)
+            );
             if (existingIndex >= 0) {
               if (updated[existingIndex].content !== newArt.content || updated[existingIndex].isComplete !== newArt.isComplete) {
                 updated[existingIndex] = { ...updated[existingIndex], content: newArt.content, isComplete: newArt.isComplete };
@@ -544,7 +556,10 @@ export default function ProjectPage() {
           const updated = [...prev];
           let changed = false;
           artifactData.forEach(newArt => {
-            const existingIndex = updated.findIndex(a => a.title === newArt.title);
+            const existingIndex = updated.findIndex(a => 
+              a.title === newArt.title && 
+              (a.generationMessageId === lastAssistantMessage.id || !a.generationMessageId)
+            );
             if (existingIndex === -1) {
               updated.push({ ...newArt, content: "", x: getNewX(updated, newArt.type), y: 0, isComplete: false });
               changed = true;
@@ -651,11 +666,21 @@ export default function ProjectPage() {
   const commitEditsRef = useRef(commitEdits);
   useEffect(() => { commitEditsRef.current = commitEdits; }, [commitEdits]);
 
-  const applyTheme = useCallback((theme: any) => {
+  const applyTheme = useCallback(async (theme: any) => {
     setActiveThemeId(theme.id);
     setAppliedTheme(theme);
-    toast.success(`Theme "${theme.name}" selected. Click Save to persist.`);
-  }, [setActiveThemeId, setAppliedTheme]);
+    
+    // Automatically persist the selected theme to the database so AI can use it immediately
+    try {
+      await axios.patch(`/api/projects/${projectId}`, {
+        selectedTheme: theme
+      });
+      toast.success(`Theme "${theme.name}" applied & saved.`);
+    } catch (error) {
+      console.error("Failed to persist theme selection:", error);
+      toast.success(`Theme "${theme.name}" selected locally.`);
+    }
+  }, [projectId, setActiveThemeId, setAppliedTheme]);
 
   const hoveredElRef = useRef<HTMLElement | null>(null);
   const selectedElRef = useRef<HTMLElement | null>(null);

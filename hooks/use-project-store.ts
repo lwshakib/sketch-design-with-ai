@@ -85,7 +85,7 @@ interface ProjectState {
 
   // Actions
   setProjectId: (id: string | null) => void;
-  setProject: (project: Project | null) => void;
+  setProject: (val: Project | null | ((prev: Project | null) => Project | null)) => void;
   setArtifacts: (val: Artifact[] | ((prev: Artifact[]) => Artifact[])) => void;
   setThrottledArtifacts: (val: Artifact[] | ((prev: Artifact[]) => Artifact[])) => void;
   setAttachments: (val: { url: string; isUploading: boolean }[] | ((prev: { url: string; isUploading: boolean }[]) => { url: string; isUploading: boolean }[])) => void;
@@ -222,7 +222,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
 
   // Actions
   setProjectId: (projectId) => set({ projectId }),
-  setProject: (project) => set({ project }),
+  setProject: (val) => set((state) => ({ project: typeof val === 'function' ? val(state.project) : val })),
   setArtifacts: (val) => set((state) => ({ artifacts: typeof val === 'function' ? val(state.artifacts) : val })),
   setThrottledArtifacts: (val) => set((state) => ({ throttledArtifacts: typeof val === 'function' ? val(state.throttledArtifacts) : val })),
   setAttachments: (val) => set((state) => ({ attachments: typeof val === 'function' ? val(state.attachments) : val })),
