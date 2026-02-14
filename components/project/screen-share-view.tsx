@@ -220,7 +220,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
       {/* Header */}
       <header className="h-16 border-b border-zinc-800 flex items-center justify-between px-6 bg-zinc-950/80 backdrop-blur-xl z-50 sticky top-0">
         <div className="flex items-center gap-4">
-          <Logo showBadge={false} textSize="1.2rem" iconSize={28} className="text-white" />
+          <Logo textSize="1.2rem" iconSize={28} className="text-white" />
           <div className="h-4 w-[1px] bg-zinc-800" />
           <h1 className="text-sm font-medium text-zinc-400 truncate max-w-[200px]">
             {project.title}

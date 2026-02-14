@@ -221,7 +221,7 @@ export function ProjectShareView({ project, artifacts }: ProjectShareViewProps) 
       {/* Header */}
       <header className="h-16 border-b border-zinc-800 flex items-center justify-between px-6 bg-zinc-950/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="flex items-center gap-4">
-          <Logo showBadge={false} textSize="1.2rem" iconSize={28} className="text-white" />
+          <Logo textSize="1.2rem" iconSize={28} className="text-white" />
           <div className="h-4 w-[1px] bg-zinc-800" />
           <h1 className="text-lg font-bold text-white truncate max-w-[400px] tracking-tight">
             {project.title}
