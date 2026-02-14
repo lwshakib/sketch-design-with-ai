@@ -149,6 +149,8 @@ model Screen {
   
   status    MESSAGE_STATUS @default(completed)
   
+  generationMessageId String?
+  
   projectId String
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   

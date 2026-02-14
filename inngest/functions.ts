@@ -136,7 +136,8 @@ export const generateDesign = inngest.createFunction(
             x: currentX,
             y: originalScreen.y,
             width: originalScreen.width || (originalScreen.type === 'app' ? 380 : 1024),
-            height: originalScreen.height
+            height: originalScreen.height,
+            generationMessageId: msgId
           }
         });
 
@@ -189,7 +190,8 @@ export const generateDesign = inngest.createFunction(
           message: `Refactoring "${originalScreen.title}"...`, 
           status: "generating", 
           currentScreen: `${originalScreen.title} (Refactored)`,
-          screenId: newScreenId 
+          screenId: newScreenId,
+          messageId: assistantMessageId
         }
       });
 
@@ -276,7 +278,8 @@ export const generateDesign = inngest.createFunction(
         data: { 
           message: `"${finalScreen.title}" complete.`, 
           status: "partial_complete",
-          screen: finalScreen
+          screen: finalScreen,
+          messageId: assistantMessageId
         }
       });
 
@@ -378,7 +381,8 @@ Provide a unique title and technical description for each of the ${optionsCount}
               x: currentX,
               y: originalScreen.y,
               width: width,
-              height: originalScreen.height
+              height: originalScreen.height,
+              generationMessageId: messageId
             }
           });
           created.push(s);
@@ -416,7 +420,8 @@ Provide a unique title and technical description for each of the ${optionsCount}
             message: `Building variation: "${v.title}"...`, 
             status: "generating", 
             currentScreen: v.title, 
-            screenId 
+            screenId,
+            messageId
           }
         });
 
@@ -470,7 +475,8 @@ CRITICAL:
           data: { 
             message: `"${v.title}" complete.`, 
             status: "partial_complete", 
-            screen: savedVar
+            screen: savedVar,
+            messageId: messageId
           }
         });
       }
@@ -585,7 +591,7 @@ CRITICAL:
     await publish({
       channel: `project:${projectId}`,
       topic: "status",
-      data: { message: "Exploring color palettes...", status: "vision" }
+      data: { message: "Exploring color palettes...", status: "vision", messageId }
     });
 
     const { themes, selectedTheme } = await step.run("generate-design-themes", async () => {
@@ -657,7 +663,7 @@ CRITICAL:
     await publish({
       channel: `project:${projectId}`,
       topic: "status",
-      data: { message: "Designing screen hierarchy...", status: "vision" }
+      data: { message: "Designing screen hierarchy...", status: "vision", messageId }
     });
 
     const { plan } = await step.run("generate-screens-plan", async () => {
@@ -753,7 +759,7 @@ CRITICAL:
     await publish({
       channel: `project:${projectId}`,
       topic: "status",
-      data: { message: "Finalizing design manifest...", status: "vision" }
+      data: { message: "Finalizing design manifest...", status: "vision", messageId }
     });
 
     // Create placeholder screens in DB so they appear on UI immediately
@@ -788,7 +794,8 @@ CRITICAL:
              x: currentX,
              y: 0,
              width: width,
-             height: null
+             height: null,
+             generationMessageId: messageId
            }
          });
          created.push(s);
@@ -847,7 +854,8 @@ CRITICAL:
             message: `Designing "${screen.title}"...`, 
             status: "generating", 
             currentScreen: screen.title,
-            screenId: screenId
+            screenId: screenId,
+            messageId
           }
         });
 
@@ -860,7 +868,8 @@ CRITICAL:
               message: `Applying theme to "${screen.title}"...`, 
               status: "generating", 
               currentScreen: screen.title,
-              screenId: screenId
+              screenId: screenId,
+              messageId
             }
           });
           
@@ -887,7 +896,8 @@ CRITICAL:
               message: `Building components for "${screen.title}"...`, 
               status: "generating", 
               currentScreen: screen.title,
-              screenId: screenId
+              screenId: screenId,
+              messageId
             }
           });
 
@@ -998,7 +1008,8 @@ CRITICAL INSTRUCTIONS:
           data: { 
             message: `"${screen.title}" complete.`, 
             status: "partial_complete",
-            screen: savedScreen
+            screen: savedScreen,
+            messageId: messageId // Include messageId in status update for UI filtering
           }
         });
       }

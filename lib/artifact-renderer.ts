@@ -47,12 +47,14 @@ export function extractArtifacts(text: string): Artifact[] {
       }
     }
 
-    artifacts.push({
-      content,
-      type,
-      isComplete: text.toLowerCase().includes(`</${tagName}>`, match.index),
-      title
-    });
+    if (content.length > 0) {
+      artifacts.push({
+        content,
+        type,
+        isComplete: text.toLowerCase().includes(`</${tagName}>`, match.index),
+        title
+      });
+    }
   }
 
   // Fallback for raw HTML without tags

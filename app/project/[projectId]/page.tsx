@@ -341,7 +341,7 @@ export default function ProjectPage() {
               // Fallback to title matching if ID didn't find it (unlikely with new system)
               const titleIdx = updated.findIndex(a => a.title === newScreen.title);
               if (titleIdx >= 0) {
-                 updated[titleIdx] = { ...updated[titleIdx], ...newScreen, x: updated[titleIdx].x, y: updated[titleIdx].y, isComplete: true };
+                 updated[titleIdx] = { ...updated[titleIdx], ...newScreen, x: updated[titleIdx].x, y: updated[titleIdx].y, isComplete: true, generationMessageId: eventMessageId || updated[titleIdx].generationMessageId };
               } else {
                 const getNewX = (existing: any[], type: string) => {
                   const last = existing[existing.length - 1];

@@ -421,9 +421,14 @@ export function ChatSidebar({
                                           const statuses = (useProjectStore.getState().realtimeStatuses || {}) as any;
                                           const specificStatus = statuses[msg.id] || (isLastMessage ? realtimeStatus : null);
                                           const plan = msg.plan;
+                                          const planScreens = plan?.screens || [];
+                                          const planScreenIds = (planScreens as any[]).map(s => s.id).filter(Boolean);
                                           
                                           // Only show artifacts generated for this specific message in the generation status grid
-                                          const messageArtifacts = throttledArtifacts.filter(a => a.generationMessageId === msg.id);
+                                          // We match by generationMessageId OR if the artifact's ID is in the message's plan
+                                          const messageArtifacts = throttledArtifacts.filter(a => 
+                                            a.generationMessageId === msg.id || planScreenIds.includes(a.id)
+                                          );
 
                                           // Show status if it has a plan OR if it's pending OR if it's the latest and still generating
                                           const showStatus = hasPlan || isPending || (isLastMessage && isGenerating) || (specificStatus && !isComplete);
