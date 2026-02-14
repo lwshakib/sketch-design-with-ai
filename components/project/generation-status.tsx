@@ -127,8 +127,8 @@ export function GenerationStatus({
                       if (hasContent) handleFocusScreen(artifact!.title);
                     }}
                     className={cn(
-                      "h-16 w-16 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative shrink-0 shadow-lg group transition-all",
-                      hasContent ? "cursor-pointer hover:border-primary/50 hover:shadow-primary/10" : "cursor-default",
+                      "h-16 w-16 rounded-xl bg-muted/50 border border-border overflow-hidden relative shrink-0 shadow-sm group transition-all",
+                      hasContent ? "cursor-pointer hover:border-primary/50 hover:shadow-md hover:bg-muted" : "cursor-default",
                       isPlaceholder && "animate-pulse",
                       isNotAvailable && "opacity-40 grayscale"
                     )}
@@ -136,7 +136,7 @@ export function GenerationStatus({
                     {/* Preview Content (scaled iframe) */}
                     {hasContent ? (
                       <>
-                        <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-80 group-hover:opacity-40 transition-all translate-z-0">
+                        <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-90 group-hover:opacity-40 transition-all translate-z-0">
                           <iframe
                             title={`mini-preview-${idx}`}
                             className="w-full h-full border-none"
@@ -156,23 +156,41 @@ export function GenerationStatus({
                           />
                         </div>
                         {/* Hover Overlay Icon */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-primary/5">
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-primary/10">
                           <Maximize2 className="h-4 w-4 text-primary" />
                         </div>
                       </>
                     ) : isNotAvailable ? (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-zinc-900/50">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-muted/30">
                         <EyeOff className="size-4 text-muted-foreground/30" />
                         <span className="text-[7px] font-bold text-muted-foreground/30 uppercase tracking-tighter text-center px-1">Not Available</span>
                       </div>
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
                     )}
                   </div>
                 </TooltipTrigger>
                 { (hasContent || isNotAvailable) && (
-                  <TooltipContent side="bottom" className={cn("text-[10px] py-1 px-2 border-primary/20 bg-zinc-950 text-foreground font-medium", isNotAvailable && "border-white/10 text-muted-foreground/60")}>
-                    {isNotAvailable ? "Screen not available" : "Go to screen"}
+                  <TooltipContent 
+                    side="top" 
+                    className={cn(
+                      "text-[11px] py-1.5 px-3 border border-border bg-popover text-popover-foreground font-bold rounded-lg shadow-xl animate-in zoom-in-95 duration-200", 
+                      isNotAvailable && "opacity-80"
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                       {isNotAvailable ? (
+                         <>
+                           <EyeOff className="size-3 text-muted-foreground" />
+                           <span>Screen not available</span>
+                         </>
+                       ) : (
+                         <>
+                           <Maximize2 className="size-3 text-primary" />
+                           <span>View full screen</span>
+                         </>
+                       )}
+                    </div>
                   </TooltipContent>
                 )}
               </Tooltip>

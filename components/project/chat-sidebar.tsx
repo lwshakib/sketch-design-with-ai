@@ -485,31 +485,37 @@ export function ChatSidebar({
                                                 {selectedScreens && selectedScreens.length > 0 && (
                                                   <div className="flex flex-wrap gap-3">
                                                     {selectedScreens.map((screen: any, sIdx: number) => (
-                                                      <div 
-                                                        key={screen.id || sIdx} 
-                                                        className="relative w-16 h-16 rounded-xl border border-border/60 bg-background overflow-hidden shadow-sm transition-all hover:shadow-md hover:border-primary/20"
-                                                      >
-                                                        <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-100">
-                                                          <iframe 
-                                                            title={`msg-history-preview-${screen.id || sIdx}`}
-                                                            className="w-full h-full border-none"
-                                                            srcDoc={`
-                                                              <!DOCTYPE html>
-                                                              <html>
-                                                                <head>
-                                                                  <script src="https://cdn.tailwindcss.com"></script>
-                                                                  <style>
-                                                                    body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
-                                                                    ::-webkit-scrollbar { display: none; }
-                                                                  </style>
-                                                                </head>
-                                                                <body>${screen.content || ''}</body>
-                                                              </html>
-                                                            `}
-                                                          />
-                                                        </div>
-                                                        <div className="absolute inset-0 bg-transparent pointer-events-none" />
-                                                      </div>
+                                                      <Tooltip key={screen.id || sIdx}>
+                                                        <TooltipTrigger asChild>
+                                                          <div 
+                                                            className="relative w-16 h-16 rounded-xl border border-border bg-muted/50 overflow-hidden shadow-sm transition-all hover:shadow-md hover:border-primary/20 cursor-help"
+                                                          >
+                                                            <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-100">
+                                                              <iframe 
+                                                                title={`msg-history-preview-${screen.id || sIdx}`}
+                                                                className="w-full h-full border-none"
+                                                                srcDoc={`
+                                                                  <!DOCTYPE html>
+                                                                  <html>
+                                                                    <head>
+                                                                      <script src="https://cdn.tailwindcss.com"></script>
+                                                                      <style>
+                                                                        body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
+                                                                        ::-webkit-scrollbar { display: none; }
+                                                                      </style>
+                                                                    </head>
+                                                                    <body>${screen.content || ''}</body>
+                                                                  </html>
+                                                                `}
+                                                              />
+                                                            </div>
+                                                            <div className="absolute inset-0 bg-transparent pointer-events-none" />
+                                                          </div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent side="top" className="text-[11px] font-bold py-1.5 px-3">
+                                                          Reference: {screen.title || 'Untitled Screen'}
+                                                        </TooltipContent>
+                                                      </Tooltip>
                                                     ))}
                                                   </div>
                                                 )}
@@ -615,48 +621,54 @@ export function ChatSidebar({
                           const art = throttledArtifacts.find(a => a.id === id);
                           if (!art) return null;
                           return (
-                            <div 
-                              key={id} 
-                              className="group relative w-16 h-16 rounded-xl border border-border bg-background overflow-hidden shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
-                            >
-                              {/* Scaled Preview */}
-                              <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-100 transition-opacity">
-                                <iframe 
-                                  title={`mini-preview-input-${id}`}
-                                  className="w-full h-full border-none"
-                                  srcDoc={`
-                                    <!DOCTYPE html>
-                                    <html>
-                                      <head>
-                                        <script src="https://cdn.tailwindcss.com"></script>
-                                        <style>
-                                          body { margin: 0; padding: 0; overflow: hidden; background: transparent; height: auto; }
-                                          ::-webkit-scrollbar { display: none; }
-                                        </style>
-                                      </head>
-                                      <body>${art.content}</body>
-                                    </html>
-                                  `}
-                                />
-                              </div>
+                            <Tooltip key={id}>
+                              <TooltipTrigger asChild>
+                                <div 
+                                  className="group relative w-16 h-16 rounded-xl border border-border bg-muted/50 overflow-hidden shadow-sm transition-all hover:border-primary/50 hover:shadow-md cursor-help"
+                                >
+                                  {/* Scaled Preview */}
+                                  <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-100 transition-opacity">
+                                    <iframe 
+                                      title={`mini-preview-input-${id}`}
+                                      className="w-full h-full border-none"
+                                      srcDoc={`
+                                        <!DOCTYPE html>
+                                        <html>
+                                          <head>
+                                            <script src="https://cdn.tailwindcss.com"></script>
+                                            <style>
+                                              body { margin: 0; padding: 0; overflow: hidden; background: transparent; height: auto; }
+                                              ::-webkit-scrollbar { display: none; }
+                                            </style>
+                                          </head>
+                                          <body>${art.content}</body>
+                                        </html>
+                                      `}
+                                    />
+                                  </div>
 
-                              {/* Hover Selection Overlay */}
-                              <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors" />
+                                  {/* Hover Selection Overlay */}
+                                  <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors" />
 
-                              <button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedArtifactIds(prev => {
-                                    const next = new Set(prev);
-                                    next.delete(id);
-                                    return next;
-                                  });
-                                }}
-                                className="absolute top-1 right-1 h-5 w-5 rounded-full bg-background border border-border flex items-center justify-center text-foreground opacity-0 group-hover:opacity-100 transition-all hover:bg-destructive hover:text-destructive-foreground shadow-sm z-10"
-                              >
-                                <X className="size-3 flex-shrink-0" />
-                              </button>
-                            </div>
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedArtifactIds(prev => {
+                                        const next = new Set(prev);
+                                        next.delete(id);
+                                        return next;
+                                      });
+                                    }}
+                                    className="absolute top-1 right-1 h-5 w-5 rounded-full bg-background border border-border flex items-center justify-center text-foreground opacity-0 group-hover:opacity-100 transition-all hover:bg-destructive hover:text-destructive-foreground shadow-sm z-10"
+                                  >
+                                    <X className="size-3 flex-shrink-0" />
+                                  </button>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="text-[11px] font-bold py-1.5 px-3">
+                                Reference: {art.title || 'Untitled Screen'}
+                              </TooltipContent>
+                            </Tooltip>
                           );
                         })}
                       </div>
