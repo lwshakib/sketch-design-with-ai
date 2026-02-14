@@ -68,19 +68,19 @@ export const generateDesign = inngest.createFunction(
   { id: "generate-design", retries: 5 },
   { event: "app/design.generate" },
   async ({ event, step, publish }) => {
-    const { 
-      messages, projectId, is3xMode, websiteUrl, isSilent, 
-      screenId, instructions,
-      isVariations, originalScreenId, optionsCount,
-      variationCreativeRange, variationCustomInstructions, variationAspects,
-      assistantMessageId: providedMessageId
-    } = event.data;
-    
-    // Normalize messages
-    const safeMessages = (Array.isArray(messages) ? messages : []).filter(m => m.content);
+    try {
+      const { 
+        messages, projectId, is3xMode, websiteUrl, isSilent, 
+        screenId, instructions,
+        isVariations, originalScreenId, optionsCount,
+        variationCreativeRange, variationCustomInstructions, variationAspects,
+        assistantMessageId: providedMessageId
+      } = event.data;
+      
+      // Normalize messages
+      const safeMessages = (Array.isArray(messages) ? messages : []).filter(m => m.content);
 
-    // --- MODE 1: REGENERATION ---
-    if (screenId) {
+      if (screenId) {
       // --- STEP 1: FETCH DATA ---
       const originalScreen = await step.run("fetch-original-screen", async () => {
         return await prisma.screen.findUnique({
@@ -567,11 +567,7 @@ CRITICAL:
           select: { userId: true }
       });
       if (!proj) throw new Error("Project not found");
-      const user = await prisma.user.findUnique({
-          where: { id: proj.userId },
-          select: { credits: true }
-      });
-      if (!user || user.credits < 1000) throw new Error("Insufficient credits for planning");
+      await recordCreditUsage(proj.userId, 1000);
     });
 
     // --- STEP 1.5: FETCH EXISTING SCREENS ---
@@ -867,6 +863,15 @@ CRITICAL:
           }
         });
 
+        // Deduct screen credits before generation
+        await step.run(`deduct-screen-credits-${i}`, async () => {
+          const proj = await prisma.project.findUnique({
+              where: { id: projectId },
+              select: { userId: true }
+          });
+          if (proj) await recordCreditUsage(proj.userId, 2000);
+        });
+
         const generatedScreen = await step.run(`generate-screen-${i}`, async () => {
           // Notify inner status
           await publish({
@@ -1000,15 +1005,6 @@ CRITICAL INSTRUCTIONS:
           });
         });
 
-        // Deduct screen credits
-        await step.run(`deduct-screen-credits-${i}`, async () => {
-          const proj = await prisma.project.findUnique({
-              where: { id: projectId },
-              select: { userId: true }
-          });
-          if (proj) await recordCreditUsage(proj.userId, 2000);
-        });
-
         // Notify UI: screen complete with database record
         await publish({
           channel: `project:${projectId}`,
@@ -1062,6 +1058,25 @@ CRITICAL INSTRUCTIONS:
     }
 
     return { success: true };
+    } catch (error: any) {
+      console.error("Design generation error:", error);
+      const msg = error.message || "An unexpected error occurred during generation.";
+      const isCreditError = msg.toLowerCase().includes("insufficient credits");
+      
+      await publish({
+        channel: `project:${event.data.projectId}`,
+        topic: "status",
+        data: { 
+          message: msg, 
+          status: "error",
+          isCreditError,
+          messageId: event.data.assistantMessageId || event.data.providedMessageId 
+        }
+      });
+      // Throw error to trigger Inngest retries if it's not a credit error
+      if (!isCreditError) throw error;
+      return { error: msg };
+    }
   }
 );
 

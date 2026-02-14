@@ -10,6 +10,16 @@ export async function recordCreditUsage(userId: string, amount: number) {
   today.setHours(0, 0, 0, 0);
 
   return await prisma.$transaction(async (tx) => {
+    // Check current credits
+    const currentUser = await tx.user.findUnique({
+      where: { id: userId },
+      select: { credits: true }
+    });
+
+    if (!currentUser || currentUser.credits < amount) {
+      throw new Error(`Insufficient credits: ${currentUser?.credits ?? 0} available, ${amount} required.`);
+    }
+
     // Deduct credits from user
     const user = await tx.user.update({
       where: { id: userId },

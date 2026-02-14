@@ -21,8 +21,8 @@ interface ProjectState {
   attachments: { url: string; isUploading: boolean }[];
   input: string;
   designPlan: { screens: any[], _markdown?: string };
-  realtimeStatus: { message: string; status: string; currentScreen?: string; messageId?: string } | null;
-  realtimeStatuses: Record<string, { message: string; status: string; currentScreen?: string }>;
+  realtimeStatus: { message: string; status: string; currentScreen?: string; messageId?: string; isCreditError?: boolean } | null;
+  realtimeStatuses: Record<string, { message: string; status: string; currentScreen?: string; isCreditError?: boolean }>;
   loading: boolean;
   websiteUrl: string | null;
   messages: any[];
@@ -91,7 +91,7 @@ interface ProjectState {
   setAttachments: (val: { url: string; isUploading: boolean }[] | ((prev: { url: string; isUploading: boolean }[]) => { url: string; isUploading: boolean }[])) => void;
   setInput: (input: string) => void;
   setDesignPlan: (designPlan: { screens: any[], _markdown?: string }) => void;
-  setRealtimeStatus: (status: { message: string; status: string; currentScreen?: string; messageId?: string } | null) => void;
+  setRealtimeStatus: (status: { message: string; status: string; currentScreen?: string; messageId?: string; isCreditError?: boolean } | null) => void;
   setRealtimeStatuses: (val: Record<string, any> | ((prev: Record<string, any>) => Record<string, any>)) => void;
   setLoading: (loading: boolean) => void;
   setIs3xMode: (mode: boolean) => void;

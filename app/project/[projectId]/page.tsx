@@ -283,6 +283,11 @@ export default function ProjectPage() {
         setArtifacts(updateFn);
         setThrottledArtifacts(updateFn);
         }
+        if (event.data.status === 'error') {
+          setIsGenerating(false);
+          toast.error(event.data.message || "An error occurred during generation");
+        }
+        
         if (event.data.status === 'complete') {
           const eventMessageId = event.data.messageId;
           setMessages(prev => {

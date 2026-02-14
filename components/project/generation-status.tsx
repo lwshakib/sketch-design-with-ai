@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { MessageResponse } from "@/components/ai-elements/message";
 import { useProjectStore } from "@/hooks/use-project-store";
-import { Maximize2, EyeOff } from "lucide-react";
+import { Maximize2, EyeOff, AlertCircle } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -39,6 +39,8 @@ interface GenerationStatusProps {
   currentScreenTitle?: string;
   statusMessage?: string;
   className?: string;
+  error?: string;
+  isCreditError?: boolean;
 }
 
 export function GenerationStatus({ 
@@ -49,7 +51,9 @@ export function GenerationStatus({
   projectArtifacts = [],
   currentScreenTitle,
   statusMessage,
-  className 
+  className,
+  error,
+  isCreditError
 }: GenerationStatusProps) {
   const [dummyStatus, setDummyStatus] = useState(DUMMY_STATUSES[0]);
   const [dots, setDots] = useState("...");
@@ -178,7 +182,35 @@ export function GenerationStatus({
       </div>
 
       <div className="flex-1 min-w-0">
-        {isComplete && finalConclusionText ? (
+        {error ? (
+          <div className="flex flex-col gap-3 p-4 rounded-xl border border-destructive/20 bg-destructive/5 animate-in fade-in slide-in-from-top-2">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="size-5 text-destructive shrink-0 mt-0.5" />
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-semibold text-destructive">
+                  {isCreditError ? "Credits Exhausted" : "Generation Error"}
+                </p>
+                <p className="text-[13px] text-destructive/80 leading-relaxed">
+                  {error}
+                </p>
+              </div>
+            </div>
+            
+            {isCreditError && (
+              <div className="flex flex-col gap-2 mt-1">
+                <button 
+                  onClick={() => window.open('https://sketch.com/pricing', '_blank')}
+                  className="w-full py-2 px-4 rounded-lg bg-destructive text-white text-xs font-bold hover:bg-destructive/90 transition-all shadow-lg shadow-destructive/20 uppercase tracking-widest"
+                >
+                  Upgrade to Pro
+                </button>
+                <p className="text-[10px] text-destructive/60 text-center italic">
+                  Generate unlimited screens with a Pro subscription
+                </p>
+              </div>
+            )}
+          </div>
+        ) : isComplete && finalConclusionText ? (
           <div className="animate-in fade-in slide-in-from-top-2 duration-1000">
             <MessageResponse className="text-foreground/90 text-[13px] leading-relaxed">
               {finalConclusionText}

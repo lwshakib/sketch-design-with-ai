@@ -461,7 +461,8 @@ export function ChatSidebar({
                                                     planScreens={plan?.screens}
                                                     projectArtifacts={messageArtifacts}
                                                     currentScreenTitle={specificStatus?.currentScreen}
-                                                    statusMessage={specificStatus?.message}
+                                                    error={specificStatus?.status === 'error' ? specificStatus?.message : undefined}
+                                                    isCreditError={specificStatus?.isCreditError}
                                                   />
 
                                                 </div>
@@ -555,6 +556,8 @@ export function ChatSidebar({
                             isComplete={false}
                             status={realtimeStatus?.status}
                             statusMessage={realtimeStatus?.message}
+                            error={realtimeStatus?.status === 'error' ? realtimeStatus?.message : undefined}
+                            isCreditError={realtimeStatus?.isCreditError}
                           />
                         </div>
                       )}
