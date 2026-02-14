@@ -824,6 +824,13 @@ export default function ProjectPage() {
     e.preventDefault();
     if (!input.trim() && attachments?.length === 0) return;
     
+    // Check credits before sending
+    const { credits } = useWorkspaceStore.getState();
+    if (credits !== null && credits < 10000) {
+      toast.error("Insufficient credits (10k required)");
+      return;
+    }
+
     const text = input.trim();
     setIsGenerating(true); 
     
@@ -835,6 +842,13 @@ export default function ProjectPage() {
   };
 
   const handleArtifactAction = (action: 'more' | 'regenerate' | 'variations', artifact: Artifact) => {
+    // Check credits before starting any generation action
+    const { credits } = useWorkspaceStore.getState();
+    if (credits !== null && credits < 10000) {
+      toast.error("Insufficient credits (10k required)");
+      return;
+    }
+
     let prompt = "";
     if (action === 'more') prompt = `Analyze the project based on the "${artifact.title}" screen and architect additional screens (you decide how many, e.g., 2-3 or more) to complete the full user journey and application logic. Generate them now.`;
     else if (action === 'regenerate') { setRegenerateInstructions(""); setIsRegenerateDialogOpen(true); return; }
@@ -851,6 +865,13 @@ export default function ProjectPage() {
   };
 
   const handleRegenerateSubmit = async () => {
+    // Check credits
+    const { credits } = useWorkspaceStore.getState();
+    if (credits !== null && credits < 10000) {
+      toast.error("Insufficient credits (10k required)");
+      return;
+    }
+
     const selectedId = Array.from(selectedArtifactIds)[0];
     const artifact = artifacts.find(a => a.id === selectedId);
     if (!artifact || !artifact.id || isGenerating) return;

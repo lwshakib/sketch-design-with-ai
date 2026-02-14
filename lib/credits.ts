@@ -16,8 +16,8 @@ export async function recordCreditUsage(userId: string, amount: number) {
       select: { credits: true }
     });
 
-    if (!currentUser || currentUser.credits < amount) {
-      throw new Error(`Insufficient credits: ${currentUser?.credits ?? 0} available, ${amount} required.`);
+    if (!currentUser || currentUser.credits < 10000) {
+      throw new Error(`Insufficient credits: 10,000 credits required to generate. You have ${currentUser?.credits ?? 0}.`);
     }
 
     // Deduct credits from user

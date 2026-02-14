@@ -97,7 +97,7 @@ export const generateDesign = inngest.createFunction(
           where: { id: (originalScreen as any).project.userId },
           select: { credits: true }
         });
-        if (!user || user.credits < 2000) throw new Error("Insufficient credits for screen regeneration");
+        if (!user || user.credits < 10000) throw new Error("Insufficient credits: 10,000 credits required to generate.");
       });
 
       // --- STEP 2: INITIAL PERSISTENCE (Message & New Screen) ---
@@ -314,7 +314,7 @@ export const generateDesign = inngest.createFunction(
           select: { credits: true }
         });
         const required = (optionsCount || 3) * 2000;
-        if (!user || user.credits < required) throw new Error(`Insufficient credits for ${optionsCount} variations`);
+        if (!user || user.credits < 10000) throw new Error("Insufficient credits: 10,000 credits required to generate.");
       });
 
       // 3. Initial Message

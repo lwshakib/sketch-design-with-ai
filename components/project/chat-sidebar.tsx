@@ -54,6 +54,8 @@ import {
 import {
   MessageContent,
   MessageResponse,
+  MessageAttachment,
+  MessageAttachments,
 } from "@/components/ai-elements/message";
 import {
   DropdownMenu,
@@ -127,8 +129,6 @@ export function ChatSidebar({
     setAttachments,
     selectedArtifactIds,
     setSelectedArtifactIds,
-    messageParts,
-    setMessageParts
   } = useProjectStore();
 
   const { credits, fetchCredits } = useWorkspaceStore();
@@ -170,41 +170,6 @@ export function ChatSidebar({
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    const newAttachments = Array.from(files).map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-      type: file.type.startsWith("image/") ? "image" : "file",
-      name: file.name,
-      isUploading: true
-    }));
-
-    setMessageParts((prev) => [...prev, ...newAttachments]);
-
-    for (let i = 0; i < newAttachments.length; i++) {
-        const attachment = newAttachments[i];
-        try {
-            const result = await uploadFileToCloudinary(attachment.file);
-            setMessageParts(prev => prev.map(p => 
-                p.url === attachment.url 
-                ? { ...p, url: result.secureUrl, isUploading: false }
-                : p
-            ));
-        } catch (error) {
-            console.error("Upload failed", error);
-            toast.error(`Failed to upload ${attachment.name}`);
-            setMessageParts(prev => prev.filter(p => p.url !== attachment.url));
-        }
-    }
-    
-    if (textareaRef.current) {
-        textareaRef.current.focus();
-    }
-    e.target.value = "";
-  };
 
   if (!project) return null;
 
@@ -471,12 +436,31 @@ export function ChatSidebar({
                                           );
                                         })()
                                       ) : (
-                                        <div className="flex flex-col gap-4">
-                                          <div className="text-foreground/90 leading-relaxed text-[15px]">
-                                            <MessageResponse>
-                                              {msg.content || (msg.parts ? (msg.parts as any[]).filter(p => p.type === 'text').map(p => p.text).join('') : "")}
-                                            </MessageResponse>
-                                          </div>
+                                          <div className="flex flex-col gap-4">
+                                            <div className="text-foreground/90 leading-relaxed text-[15px]">
+                                              <MessageResponse>
+                                                {msg.content || (msg.parts ? (msg.parts as any[]).filter(p => p.type === 'text').map(p => p.text).join('') : "")}
+                                              </MessageResponse>
+                                            </div>
+
+                                            {/* Image Attachments */}
+                                            {(() => {
+                                              const images = msg.imageUrls || 
+                                                (msg.parts ? (msg.parts as any[]).filter(p => p.type === 'image' || p.type === 'file').map(p => p.url) : []);
+                                              
+                                              if (!images || images.length === 0) return null;
+                                              
+                                              return (
+                                                <MessageAttachments>
+                                                  {images.map((url: string, imgIdx: number) => (
+                                                    <MessageAttachment 
+                                                      key={imgIdx}
+                                                      data={{ url, mediaType: 'image/png', type: 'file' }} // Simple fallback mediaType
+                                                    />
+                                                  ))}
+                                                </MessageAttachments>
+                                              );
+                                            })()}
                                           
                                           {/* Selected Screens Preview */}
                                           {(() => {
@@ -601,6 +585,7 @@ export function ChatSidebar({
                               variant="outline" 
                               size="sm" 
                               onClick={() => handleRetry()}
+                              disabled={false}
                               className="gap-2 text-destructive border-destructive/20 hover:bg-destructive/10 hover:text-destructive transition-all"
                             >
                               <RotateCcw className="size-3" />
@@ -787,7 +772,7 @@ export function ChatSidebar({
                       accept="image/*" 
                       className="hidden" 
                       ref={fileInputRef} 
-                      onChange={handleFileUpload} 
+                      onChange={propHandleFileUpload} 
                     />
                     
                     <button 
@@ -816,14 +801,16 @@ export function ChatSidebar({
                     </Button>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <Button 
-                      onClick={handleCustomSubmit}
-                      disabled={status === 'ready' && (!input.trim() && attachments.length === 0)}
-                      className="h-9 w-9 rounded-full p-0 shadow-lg transition-all border border-white/5 bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525]"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
+                  <div className="flex flex-col items-end gap-2.5">
+                    <div className="flex items-center gap-3">
+                      <Button 
+                        onClick={handleCustomSubmit}
+                        disabled={(status === 'ready' && (!input.trim() && attachments.length === 0))}
+                        className="h-9 w-9 rounded-full p-0 shadow-lg transition-all border border-white/5 bg-[#1A1A1A] text-zinc-400 hover:text-white hover:bg-[#252525]"
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>

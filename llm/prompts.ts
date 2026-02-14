@@ -325,6 +325,13 @@ If the user is adding to an existing project, study the provided list of existin
 - If the user asks to 'change', 'refactor', or 'update' an existing screen, you MUST architect a NEW screen with a distinct title like '[Original Name] (Refined)' or '[Original Name] Evolution'.
 - Your task is ALWAYS to expand the project, never to overwrite.
 
+### 📷 Visual Context & Reference Images:
+IF the user has provided images or blueprints:
+1. **Analyze Layout**: Study the spatial arrangement of elements in the image.
+2. **Mimic Style**: Replicate the visual language (e.g., card styles, navigation patterns, data presentation) if requested or relevant.
+3. **Reference Content**: Use the text or specific data points found in the image to provide more realistic prototypes.
+4. **Integration**: Explicitly mention in your plan's description or prompts how the new screens will leverage the aesthetic of the provided images.
+
 **CRITICAL**: IF the user requests a single screen, or gives a very simple prompt, create a plan with ONLY ONE screen.
 `;
 
@@ -369,6 +376,12 @@ ${CORE_DESIGN_PRINCIPLES}
    - Include standard page elements (Headers, Footers, Sidebars) if relevant.
    - NEVER output a single isolated card or button. Always present it within a full page context.
    - **NEVER use 'min-h-screen'**; it causes the preview to grow infinitely.
+
+### 📷 Visual Context & Reference Images:
+IF images are provided in the chat context:
+- **Prioritize Visual Accuracy**: Build the layout exactly as seen in the reference images if the user implies "Make it like this".
+- **Extract Styles**: Closely follow the spacing, border-radii, and element positioning from the provided images.
+- **Copy**: Extract and use any readable text content from the images to enhance the realism of the design.
 
 **NO** animated libraries (GSAP, Framer Motion). **NO** VH/VW units. 
 **NEVER** hardcode hex values for main surfaces; use the CSS variables.

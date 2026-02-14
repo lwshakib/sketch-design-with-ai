@@ -29,6 +29,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { 
+  Zap,
   RotateCcw, 
   Sparkles, 
   Layout, 
@@ -69,6 +70,7 @@ import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 import { getInjectedHTML } from "@/components/project/utils";
 import { useProjectStore } from "@/hooks/use-project-store";
+import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 
 interface ProjectDialogsProps {
   handleRegenerateSubmit: () => void;
@@ -118,6 +120,7 @@ export function ProjectDialogs({
     isGenerating,
     project
   } = useProjectStore();
+  const { credits } = useWorkspaceStore();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -163,21 +166,23 @@ export function ProjectDialogs({
             />
           </div>
 
-          <DialogFooter className="flex flex-row items-center gap-3">
-            <Button 
-              variant="ghost" 
-              onClick={() => setIsRegenerateDialogOpen(false)}
-              className="flex-1 h-10 rounded-xl hover:bg-zinc-900 text-zinc-400 hover:text-white text-sm"
-            >
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleRegenerateSubmit}
-              disabled={isGenerating}
-              className="flex-1 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition-all shadow-md disabled:opacity-50"
-            >
-              {isGenerating ? "Regenerating..." : "Regenerate Screen"}
-            </Button>
+          <DialogFooter className="flex flex-col gap-3">
+            <div className="flex flex-row items-center gap-3 w-full">
+              <Button 
+                variant="ghost" 
+                onClick={() => setIsRegenerateDialogOpen(false)}
+                className="flex-1 h-10 rounded-xl hover:bg-zinc-900 text-zinc-400 hover:text-white text-sm"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleRegenerateSubmit}
+                disabled={isGenerating}
+                className="flex-1 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition-all shadow-md disabled:opacity-50"
+              >
+                {isGenerating ? "Regenerating..." : "Regenerate Screen"}
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

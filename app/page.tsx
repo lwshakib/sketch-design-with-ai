@@ -251,6 +251,12 @@ export default function Home() {
 
   const onSubmit = async () => {
     if (!inputValue.trim() && attachments.length === 0 && !websiteUrl) return;
+    
+    if (credits !== null && credits < 10000) {
+      toast.error("Insufficient credits (10k required)");
+      return;
+    }
+
     if (attachments.some(a => a.isUploading)) {
       toast.error("Please wait for images to finish uploading");
       return;
@@ -510,71 +516,73 @@ export default function Home() {
                     className="w-full h-24 bg-transparent outline-none resize-none text-lg text-foreground placeholder:text-zinc-400 dark:placeholder:text-zinc-600 font-medium leading-relaxed hide-scrollbar"
                   />
 
-                  <div className="flex items-center justify-between pt-2">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        className="hidden"
-                        ref={fileInputRef}
-                        onChange={handleFileUpload}
-                      />
+                  <div className="flex flex-col items-end gap-3 pt-2">
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          className="hidden"
+                          ref={fileInputRef}
+                          onChange={handleFileUpload}
+                        />
 
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            className="h-10 w-10 rounded-full bg-zinc-50 dark:bg-zinc-900/50 text-zinc-500 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5 transition-colors flex items-center justify-center outline-none"
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              className="h-10 w-10 rounded-full bg-zinc-50 dark:bg-zinc-900/50 text-zinc-500 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5 transition-colors flex items-center justify-center outline-none"
+                            >
+                              <Plus className="h-5 w-5" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="start"
+                            className="w-48 bg-white dark:bg-[#0F0F0F] border-zinc-200 dark:border-white/10 rounded-xl shadow-2xl p-1.5 z-[100]"
                           >
-                            <Plus className="h-5 w-5" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="start"
-                          className="w-48 bg-white dark:bg-[#0F0F0F] border-zinc-200 dark:border-white/10 rounded-xl shadow-2xl p-1.5 z-[100]"
-                        >
-                          <DropdownMenuItem
-                            onClick={() => fileInputRef.current?.click()}
-                            className="flex items-center gap-2 p-2 hover:bg-zinc-50 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer"
-                          >
-                            <ImageIcon className="h-4 w-4" />
-                            <span className="text-[13px] font-medium">
-                              Upload Images
-                            </span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => setShowUrlInput(true)}
-                            className="flex items-center gap-2 p-2 hover:bg-zinc-50 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer"
-                          >
-                            <LucideLink className="h-4 w-4" />
-                            <span className="text-[13px] font-medium">
-                              Website URL
-                            </span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            <DropdownMenuItem
+                              onClick={() => fileInputRef.current?.click()}
+                              className="flex items-center gap-2 p-2 hover:bg-zinc-50 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer"
+                            >
+                              <ImageIcon className="h-4 w-4" />
+                              <span className="text-[13px] font-medium">
+                                Upload Images
+                              </span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setShowUrlInput(true)}
+                              className="flex items-center gap-2 p-2 hover:bg-zinc-50 dark:hover:bg-white/5 rounded-lg text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer"
+                            >
+                              <LucideLink className="h-4 w-4" />
+                              <span className="text-[13px] font-medium">
+                                Website URL
+                              </span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
 
-                      <div className="h-4 w-[1px] bg-zinc-200 dark:bg-white/10 mx-1" />
+                        <div className="h-4 w-[1px] bg-zinc-200 dark:bg-white/10 mx-1" />
 
-                      <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-600 uppercase tracking-widest hidden sm:block">
-                        Press Enter to Generate
-                      </p>
+                        <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-600 uppercase tracking-widest hidden sm:block">
+                          Press Enter to Generate
+                        </p>
+                      </div>
+                      
+                      <Button 
+                        onClick={onSubmit}
+                        disabled={(!inputValue.trim() && attachments.length === 0 && !websiteUrl) || attachments.some(a => a.isUploading) || isSubmitting}
+                        className="h-10 px-5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 border border-black/5 dark:border-white/10 shadow-xl transition-all"
+                      >
+                        {isSubmitting ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-sm tracking-tight">Generate</span>
+                            <ArrowRight className="h-3.5 w-3.5" />
+                          </div>
+                        )}
+                      </Button>
                     </div>
-                    
-                    <Button 
-                       onClick={onSubmit}
-                       disabled={(!inputValue.trim() && attachments.length === 0 && !websiteUrl) || attachments.some(a => a.isUploading) || isSubmitting}
-                       className="h-10 px-5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 border border-black/5 dark:border-white/10 shadow-xl transition-all"
-                    >
-                      {isSubmitting ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm tracking-tight">Generate</span>
-                          <ArrowRight className="h-3.5 w-3.5" />
-                        </div>
-                      )}
-                    </Button>
                   </div>
                 </div>
               </div>
