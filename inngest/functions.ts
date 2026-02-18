@@ -4,9 +4,9 @@ import { generateText, generateObject } from "../llm/generate";
 import { z } from "zod";
 import { GeminiModel } from "../llm/model";
 import { 
-  InitialResponsePrompt, 
   PlanningPrompt, 
   ScreenGenerationPrompt,
+  IntentAnalysisPrompt,
 } from "../llm/prompts";
 import { getAllExamples } from "../llm/helpers";
 import prisma from "../lib/prisma";
@@ -79,6 +79,80 @@ export const generateDesign = inngest.createFunction(
       
       // Normalize messages
       const safeMessages = (Array.isArray(messages) ? messages : []).filter(m => m.content);
+
+      // --- STEP 0: ANALYZE INTENT ---
+      // We only do this for standard messages, not for silent or specific mode triggers if they are already clear.
+      // However, to be safe and follow the user request "on every message", we check it here.
+      // EXCEPT for regeneration/variations where the intent is explicitly passed.
+      if (!screenId && !isVariations && !isSilent) {
+        const intent = await step.run("analyze-intent", async () => {
+          const hydratedMessages = await hydrateImages(safeMessages);
+          const { object } = await generateObject({
+            system: IntentAnalysisPrompt,
+            messages: hydratedMessages as any,
+            schema: z.object({
+              action: z.enum(["generate", "chat"]),
+              response: z.string()
+            })
+          });
+          return object;
+        });
+
+        if (intent.action === "chat") {
+          // ... (existing chat logic)
+          await step.run("respond-to-chat", async () => {
+            await prisma.message.update({
+              where: { id: providedMessageId },
+              data: {
+                content: intent.response,
+                status: "completed"
+              }
+            });
+          });
+
+          await publish({
+            channel: `project:${projectId}`,
+            topic: "status",
+            data: { 
+              message: "Chat response sent.", 
+              status: "complete", 
+              messageId: providedMessageId 
+            }
+          });
+
+          await publish({
+            channel: `project:${projectId}`,
+            topic: "plan",
+            data: {
+              markdown: intent.response,
+              messageId: providedMessageId
+            }
+          });
+
+          return { success: true, chat: true };
+        } else {
+          // If action is "generate", update the placeholder with the Creative Vision in DB and UI
+          await step.run("show-creative-vision", async () => {
+            // Update DB first
+            await prisma.message.update({
+              where: { id: providedMessageId },
+              data: {
+                content: `*${intent.response}*`
+              }
+            });
+
+            // Then notify UI
+            await publish({
+              channel: `project:${projectId}`,
+              topic: "plan",
+              data: {
+                markdown: `*${intent.response}*`,
+                messageId: providedMessageId
+              }
+            });
+          });
+        }
+      }
 
       if (screenId) {
       // --- STEP 1: FETCH DATA ---

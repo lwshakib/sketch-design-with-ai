@@ -60,20 +60,24 @@ graph TD
     Auth -->|Persist Session| DB
 ```
 
-## 📸 Screenshots
+## 🎬 App Demos
 
 <div align="center">
-  <h3>Light Mode</h3>
-  <img src="public/light.png" alt="Light Mode" width="100%" />
-  <img src="public/light1.png" alt="Editor Light Mode" width="100%" />
-  <br/><br/>
+  <p align="center">
+    <img src="public/app_demo/dark_demo.png" alt="Sketch Dark Mode" width="100%" />
+  </p>
+  <p align="center">
+    <em>Dark Mode: A sleek, professional workspace for your AI design iterations.</em>
+  </p>
   
-  <h3>Dark Mode</h3>
-  <img src="public/dark.png" alt="Dark Mode" width="100%" />
-  <img src="public/dark1.png" alt="Editor Dark Mode" width="100%" />
-  <br/><br/>
+  <br/>
 
-
+  <p align="center">
+    <img src="public/app_demo/light_demo.png" alt="Sketch Light Mode" width="100%" />
+  </p>
+  <p align="center">
+    <em>Light Mode: Clean, vibrant, and focused interface for maximum productivity.</em>
+  </p>
 </div>
 
 ## ✨ Key Features

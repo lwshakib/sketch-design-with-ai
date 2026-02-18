@@ -400,7 +400,7 @@ export default function ProjectPage() {
             updated[targetIndex] = { 
               ...existing, 
               content: markdown, 
-              plan: { ...plan, _markdown: markdown || plan._markdown } 
+              plan: plan ? { ...plan, _markdown: markdown || plan._markdown } : existing.plan 
             };
           } else {
             // Find the most recently added user message that doesn't have an assistant response yet
@@ -412,7 +412,7 @@ export default function ProjectPage() {
                   ...last, 
                   id: eventMessageId || last.id,
                   content: markdown, 
-                  plan: { ...plan, _markdown: markdown || plan._markdown } 
+                  plan: plan ? { ...plan, _markdown: markdown || plan._markdown } : last.plan 
                 } as any;
             } else {
                 // Add brand new assistant message
@@ -420,7 +420,7 @@ export default function ProjectPage() {
                   id: eventMessageId || 'assistant-plan', 
                   role: 'assistant', 
                   content: markdown, 
-                  plan: { ...plan, _markdown: markdown || plan._markdown } 
+                  plan: plan ? { ...plan, _markdown: markdown || plan._markdown } : null 
                 } as any);
             }
           }
