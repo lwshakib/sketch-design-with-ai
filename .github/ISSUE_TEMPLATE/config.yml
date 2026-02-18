@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/lwshakib/sketch-design-with-ai/discussions
+    about: Use discussions for questions, ideas, and general chat.
+  - name: 📖 Documentation
+    url: https://github.com/lwshakib/sketch-design-with-ai/wiki
+    about: Check out the wiki for documentation and guides.

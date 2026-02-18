@@ -11,8 +11,7 @@
     "db:generate": "bun x prisma generate",
     "db:migrate": "bun x prisma generate && bun x prisma migrate dev --name init",
     "db:studio": "bun x prisma studio",
-    "db:reset": "bun x prisma migrate reset",
-    "inngest": "bun x inngest-cli@latest dev"
+    "db:reset": "bun x prisma migrate reset"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.2",
