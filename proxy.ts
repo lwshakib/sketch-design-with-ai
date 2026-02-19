@@ -8,14 +8,19 @@ import { headers } from "next/headers";
  * These routes do not require authentication
  * @type {string[]}
  */
-export const publicRoutes = ["/api/inngest", "/preview"];
+export const publicRoutes = [
+  "/api/inngest",
+  "/preview",
+  "/verify-email",
+  "/reset-password",
+];
 
 /**
  * An array of routes that are used for authentication
  * These routes will redirect logged in users to /
  * @type {string[]}
  */
-export const authRoutes = ["/sign-in", "/sign-up"];
+export const authRoutes = ["/sign-in", "/sign-up", "/forgot-password"];
 
 /**
  * The prefix for API authentication routes
