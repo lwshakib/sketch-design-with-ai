@@ -186,7 +186,7 @@ export default function Home() {
 
     try {
       const skip = isLoadMore ? projects.length : 0;
-      const res = await fetch(`/api/projects?limit=20&skip=${skip}`);
+      const res = await fetch(`/api/projects?limit=20&skip=${skip}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`);
       if (res.ok) {
         const data = await res.json();
         
@@ -231,6 +231,17 @@ export default function Home() {
       refreshPrompts();
     }
   }, [isMounted]);
+
+  // Handle Search Debounce
+  useEffect(() => {
+    if (!isMounted) return;
+    
+    const timer = setTimeout(() => {
+      fetchProjects();
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
 
   const onSubmit = async () => {
@@ -320,11 +331,7 @@ export default function Home() {
     setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
-  const filteredProjects = projects.filter(p => 
-    p.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  
-  const sections = groupProjectsByDate(filteredProjects);
+  const sections = groupProjectsByDate(projects);
 
   if (!isMounted) return null;
 

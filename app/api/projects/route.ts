@@ -16,11 +16,21 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const limit = parseInt(searchParams.get("limit") || "20");
     const skip = parseInt(searchParams.get("skip") || "0");
+    const search = searchParams.get("search") || "";
+
+    const where: any = {
+      userId: session.user.id,
+    };
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { screens: { some: { content: { contains: search, mode: 'insensitive' } } } }
+      ];
+    }
 
     const projects = await prisma.project.findMany({
-      where: {
-        userId: session.user.id,
-      },
+      where,
       select: {
         id: true,
         title: true,
