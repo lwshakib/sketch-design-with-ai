@@ -27,15 +27,34 @@ export async function GET(req: Request) {
         userId: true,
         createdAt: true,
         updatedAt: true,
+        screens: {
+          take: 1,
+          orderBy: {
+            createdAt: "asc"
+          },
+          select: {
+            id: true,
+            type: true,
+            content: true,
+          }
+        }
       },
       take: limit,
       skip: skip,
       orderBy: {
-        createdAt: "desc",
+        updatedAt: "desc",
       }
     });
 
-    return NextResponse.json(projects);
+    // Transform to include firstScreenType for easier consumption
+    const transformedProjects = projects.map(p => ({
+      ...p,
+      firstScreenType: p.screens?.[0]?.type || null,
+      firstScreenContent: p.screens?.[0]?.content || null,
+      screens: undefined
+    }));
+
+    return NextResponse.json(transformedProjects);
   } catch (error) {
     console.error("[PROJECTS_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });

@@ -16,7 +16,8 @@ import {
   X,
   Loader2,
   Zap,
-  RotateCcw
+  RotateCcw,
+  Layout
 } from "lucide-react";
 import NumberFlow from "@number-flow/react";
 import Link from "next/link";
@@ -139,9 +140,12 @@ const ProjectSkeleton = () => (
     <div className="h-3 w-20 bg-secondary animate-pulse rounded ml-2" />
     <div className="space-y-2">
       {[1, 2, 3].map(i => (
-        <div key={i} className="flex flex-col gap-1.5 p-3">
-           <div className="h-4 w-full bg-secondary animate-pulse rounded" />
-           <div className="h-3 w-1/3 bg-secondary animate-pulse rounded" />
+        <div key={i} className="flex items-center gap-4 p-3">
+           <div className="h-12 w-12 bg-secondary animate-pulse rounded-xl shrink-0" />
+           <div className="flex-1 space-y-2">
+             <div className="h-4 w-full bg-secondary animate-pulse rounded" />
+             <div className="h-3 w-1/3 bg-secondary animate-pulse rounded" />
+           </div>
         </div>
       ))}
     </div>
@@ -639,10 +643,42 @@ function MobileMenu({
                               setOpen(false);
                               router.push(`/project/${item.id}`);
                             }}
-                            className="w-full flex flex-col gap-1 p-4 rounded-2xl hover:bg-secondary transition-all text-left group border border-transparent hover:border-border"
+                            className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-secondary transition-all text-left group border border-transparent hover:border-border"
                           >
-                            <span className="text-base font-bold text-foreground truncate">{item.title}</span>
-                            <span className="text-xs font-medium text-muted-foreground">{getRelativeTime(item.updatedAt)}</span>
+                            {/* Project Preview Square */}
+                            <div className="h-12 w-12 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform overflow-hidden shadow-sm relative">
+                              {item.firstScreenContent ? (
+                                <div className="absolute inset-0 pointer-events-none origin-top-left" style={{ width: '1024px', height: '1024px', transform: 'scale(0.048)' }}>
+                                  <iframe
+                                    srcDoc={`
+                                      <style>
+                                        body { overflow: hidden; margin: 0; padding: 0; }
+                                        ::-webkit-scrollbar { display: none; }
+                                      </style>
+                                      ${item.firstScreenContent}
+                                    `}
+                                    className="w-full h-full border-none pointer-events-none"
+                                    title="preview"
+                                    tabIndex={-1}
+                                  />
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-center w-full h-full bg-zinc-50 dark:bg-zinc-950">
+                                  {item.firstScreenType === "web" ? (
+                                    <Monitor className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
+                                  ) : item.firstScreenType === "app" ? (
+                                    <Smartphone className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
+                                  ) : (
+                                    <Layout className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <span className="block text-base font-bold text-foreground truncate">{item.title}</span>
+                              <span className="block text-xs font-medium text-muted-foreground">{getRelativeTime(item.updatedAt)}</span>
+                            </div>
                           </button>
                        ))}
                     </div>

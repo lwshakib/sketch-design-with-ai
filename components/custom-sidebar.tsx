@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Search } from "lucide-react";
+import { Search, Monitor, Smartphone, Layout } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 
@@ -13,9 +13,12 @@ const ProjectSkeleton = () => (
     <div className="h-3 w-20 bg-secondary animate-pulse rounded ml-2" />
     <div className="space-y-2">
       {[1, 2, 3].map(i => (
-        <div key={i} className="flex flex-col gap-1.5 p-3">
-           <div className="h-3.5 w-full bg-secondary animate-pulse rounded" />
-           <div className="h-2.5 w-1/3 bg-secondary animate-pulse rounded" />
+        <div key={i} className="flex items-center gap-3 p-3">
+           <div className="h-10 w-10 bg-secondary animate-pulse rounded-lg shrink-0" />
+           <div className="flex-1 space-y-2">
+             <div className="h-3 w-full bg-secondary animate-pulse rounded" />
+             <div className="h-2 w-1/3 bg-secondary animate-pulse rounded" />
+           </div>
         </div>
       ))}
     </div>
@@ -62,7 +65,7 @@ export function Sidebar({
   }, [hasMore, isLoadingMore, loadMore, searchQuery]);
 
   return (
-    <aside className="w-[300px] h-screen bg-sidebar border-r border-sidebar-border hidden lg:flex flex-col transition-colors duration-300">
+    <aside className="w-[340px] h-screen bg-sidebar border-r border-sidebar-border hidden lg:flex flex-col transition-colors duration-300">
       {/* Search Header */}
       <div className="p-4 pt-6">
         <div className="relative group">
@@ -102,20 +105,53 @@ export function Sidebar({
                   {section.title}
                 </h3>
                 <div className="space-y-1">
-                  {section.items.map((item: any) => (
-                    <button
-                      key={item.id}
-                      onClick={() => router.push(`/project/${item.id}`)}
-                      className="w-full flex flex-col gap-1 p-3 rounded-xl hover:bg-secondary transition-all text-left group"
-                    >
-                      <span className="text-sm font-semibold text-foreground truncate transition-colors">
-                        {item.title}
-                      </span>
-                      <span className="text-[10px] font-medium text-muted-foreground">
-                        {getRelativeTime(item.updatedAt)}
-                      </span>
-                    </button>
-                  ))}
+                    {section.items.map((item: any) => (
+                      <button
+                        key={item.id}
+                        onClick={() => router.push(`/project/${item.id}`)}
+                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary transition-all text-left group"
+                      >
+                        {/* Project Preview Square */}
+                        <div className="h-10 w-10 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform overflow-hidden shadow-sm relative">
+                          {item.firstScreenContent ? (
+                            <div className="absolute inset-0 pointer-events-none origin-top-left" style={{ width: '1024px', height: '1024px', transform: 'scale(0.04)' }}>
+                              <iframe
+                                srcDoc={`
+                                  <style>
+                                    body { overflow: hidden; margin: 0; padding: 0; zoom: 1; }
+                                    /* Hide scrollbars */
+                                    ::-webkit-scrollbar { display: none; }
+                                  </style>
+                                  ${item.firstScreenContent}
+                                `}
+                                className="w-full h-full border-none pointer-events-none"
+                                title="preview"
+                                tabIndex={-1}
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center w-full h-full bg-zinc-50 dark:bg-zinc-950">
+                              {item.firstScreenType === "web" ? (
+                                <Monitor className="h-5 w-5 text-zinc-400 dark:text-zinc-500" />
+                              ) : item.firstScreenType === "app" ? (
+                                <Smartphone className="h-5 w-5 text-zinc-400 dark:text-zinc-500" />
+                              ) : (
+                                <Layout className="h-5 w-5 text-zinc-400 dark:text-zinc-500" />
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <span className="block text-sm font-semibold text-foreground truncate transition-colors">
+                            {item.title}
+                          </span>
+                          <span className="block text-[10px] font-medium text-muted-foreground">
+                            {getRelativeTime(item.updatedAt)}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
                 </div>
               </div>
             ))}
