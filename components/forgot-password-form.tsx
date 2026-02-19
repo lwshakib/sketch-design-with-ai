@@ -29,7 +29,7 @@ export function ForgotPasswordForm({
     setIsLoading(true);
 
     try {
-      const { error } = await authClient.forgetPassword({
+      const { error } = await authClient.requestPasswordReset({
         email,
         redirectTo: "/reset-password",
       });
