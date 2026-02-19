@@ -129,8 +129,6 @@ export function ChatSidebar({
     throttledArtifacts,
     is3xMode,
     setIs3xMode,
-    setWebsiteUrl,
-    websiteUrl,
     setAttachments,
     selectedArtifactIds,
     setSelectedArtifactIds,
@@ -142,9 +140,6 @@ export function ChatSidebar({
     fetchCredits();
   }, [fetchCredits]);
 
-  const [showUrlInput, setShowUrlInput] = React.useState(false);
-  const [urlTemp, setUrlTemp] = React.useState("");
-  const [isUrlValid, setIsUrlValid] = React.useState(true);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
@@ -157,23 +152,6 @@ export function ChatSidebar({
     const timer = setTimeout(scrollToBottom, 50);
     return () => clearTimeout(timer);
   }, [messages, isGenerating, realtimeStatus]);
-
-  const handleUrlSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!urlTemp.trim()) return;
-    
-    // Simple validation
-    try {
-      const urlToTest = urlTemp.startsWith('http') ? urlTemp : `https://${urlTemp}`;
-      new URL(urlToTest);
-      setWebsiteUrl(urlToTest.trim());
-      setUrlTemp("");
-      setShowUrlInput(false);
-      setIsUrlValid(true);
-    } catch (e) {
-      setIsUrlValid(false);
-    }
-  };
 
 
   if (!project) return null;
@@ -332,14 +310,12 @@ export function ChatSidebar({
                       {messages
                         .filter((m: any) => !m.isSilent)
                         .filter((m, i, self) => {
-                          if (m.role !== 'user' || !m.id.toString().startsWith('temp-')) return true;
-                          // It's a temp message. Check if a stable user message with same content exists.
-                          const text = m.content || "";
+                          const text = m.introductoryText || "";
                           const hasStable = self.some((other, j) => 
                             j !== i && 
                             other.role === 'user' && 
                             !other.id.toString().startsWith('temp-') && 
-                            (other.content === text || (other.parts && (other.parts as any[]).some(p => p.type === 'text' && p.text === text)))
+                            (other.introductoryText === text || (other.parts && (other.parts as any[]).some(p => p.type === 'text' && p.text === text)))
                           );
                           return !hasStable;
                         })
@@ -377,21 +353,11 @@ export function ChatSidebar({
                                     <div className="whitespace-pre-wrap">
                                       {message.role === 'assistant' ? (
                                         (() => {
-                                          const textContent = msg.content || (msg.parts ? (msg.parts as any[]).filter(p => p.type === 'text').map(p => p.text).join('') : "");
-                                          const isRawHtml = textContent.toLowerCase().includes('<!doctype') || textContent.toLowerCase().includes('<html');
+                                          const parts = (msg.parts as any[]) || [];
+                                          const textPart = parts.find(p => p.type === 'text')?.text || "";
+                                          const images = parts.filter(p => p.type === 'image');
+                                          const plan = msg.plan as any;
                                           
-                                          if (isRawHtml && extractArtifacts(textContent).length === 0) {
-                                            return (
-                                              <div className="flex flex-col gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl mt-2">
-                                                <div className="flex items-center gap-2 text-destructive font-bold text-[10px] uppercase tracking-wide">
-                                                  <X className="size-3" />
-                                                  Error
-                                                </div>
-                                                <p className="text-destructive/80 text-sm leading-relaxed">Engine error occurred. Please try a different prompt.</p>
-                                              </div>
-                                            );
-                                          }
-
                                           const hasPlan = !!msg.plan;
                                           const isPending = msg.status === 'pending';
                                           const isLastMessage = idx === messages.length - 1;
@@ -400,87 +366,88 @@ export function ChatSidebar({
                                           // Use message-specific status if available, fallback to global if it's the last message
                                           const statuses = (useProjectStore.getState().realtimeStatuses || {}) as any;
                                           const specificStatus = statuses[msg.id] || (isLastMessage ? realtimeStatus : null);
-                                          const plan = msg.plan;
                                           const planScreens = plan?.screens || [];
                                           const planScreenIds = (planScreens as any[]).map(s => s.id).filter(Boolean);
                                           
-                                          // Only show artifacts generated for this specific message in the generation status grid
-                                          // We match by generationMessageId OR if the artifact's ID is in the message's plan
                                           const messageArtifacts = throttledArtifacts.filter(a => 
                                             a.generationMessageId === msg.id || planScreenIds.includes(a.id)
                                           );
 
-                                          // Show status if it has a plan OR if it's pending OR if it's the latest and still generating
                                           const showStatus = hasPlan || isPending || (isLastMessage && isGenerating) || (specificStatus && !isComplete);
 
                                           return (
                                             <div className="flex flex-col gap-5">
-                                              {!showStatus && (
+                                              {/* Main text content - only show at the top for chat (no plan) */}
+                                              {!hasPlan && textPart && (
                                                 <div className="text-foreground/90 leading-relaxed text-[15px]">
-                                                  <MessageResponse>{stripArtifact(textContent)}</MessageResponse>
+                                                  <MessageResponse>{stripArtifact(textPart)}</MessageResponse>
                                                 </div>
                                               )}
-                                              
-                                              {showStatus && (
-                                                <div className="flex flex-col gap-6">
-                                                  <GenerationStatus 
-                                                    isComplete={isComplete}
-                                                    conclusionText={plan?.conclusionText}
-                                                    status={specificStatus?.status}
-                                                    planScreens={plan?.screens}
-                                                    projectArtifacts={messageArtifacts}
-                                                    currentScreenTitle={specificStatus?.currentScreen}
-                                                    error={specificStatus?.status === 'error' ? specificStatus?.message : undefined}
-                                                    isCreditError={specificStatus?.isCreditError}
-                                                  />
 
-                                                </div>
-                                              )}
-                                            </div>
-                                          );
-                                        })()
-                                      ) : (
-                                          <div className="flex flex-col gap-4">
-                                            <div className="text-foreground/90 leading-relaxed text-[15px]">
-                                              <MessageResponse>
-                                                {msg.content || (msg.parts ? (msg.parts as any[]).filter(p => p.type === 'text').map(p => p.text).join('') : "")}
-                                              </MessageResponse>
-                                            </div>
-
-                                            {/* Image Attachments */}
-                                            {(() => {
-                                              const images = msg.imageUrls || 
-                                                (msg.parts ? (msg.parts as any[]).filter(p => p.type === 'image' || p.type === 'file').map(p => p.url) : []);
-                                              
-                                              if (!images || images.length === 0) return null;
-                                              
-                                              return (
+                                              {/* Images in assistant chat */}
+                                              {images.length > 0 && (
                                                 <MessageAttachments>
-                                                  {images.map((url: string, imgIdx: number) => (
+                                                  {images.map((p, imgIdx) => (
                                                     <MessageAttachment 
                                                       key={imgIdx}
-                                                      data={{ url, mediaType: 'image/png', type: 'file' }} // Simple fallback mediaType
+                                                      data={{ url: p.url, mediaType: p.mediaType || 'image/png', type: 'file' }}
                                                     />
                                                   ))}
                                                 </MessageAttachments>
-                                              );
-                                            })()}
+                                              )}
+                                              
+                                              {showStatus && (
+                                              <div className="flex flex-col gap-6">
+                                                <GenerationStatus 
+                                                  isComplete={isComplete}
+                                                  conclusionText={textPart} // Use textPart as the "summary"
+                                                  status={specificStatus?.status}
+                                                  planScreens={plan?.screens}
+                                                  projectArtifacts={messageArtifacts}
+                                                  currentScreenTitle={specificStatus?.currentScreen}
+                                                  error={specificStatus?.status === 'error' ? specificStatus?.message : undefined}
+                                                  isCreditError={specificStatus?.isCreditError}
+                                                />
+                                              </div>
+                                            )}
+                                          </div>
+                                        );
+                                      })()
+                                    ) : (
+                                        <div className="flex flex-col gap-4">
+                                          <div className="text-foreground/90 leading-relaxed text-[15px]">
+                                            <MessageResponse>
+                                              {(msg.parts as any[])?.filter(p => p.type === 'text').map(p => p.text).join('\n\n')}
+                                            </MessageResponse>
+                                          </div>
+
+                                          {/* Image Attachments */}
+                                          {(() => {
+                                            const parts = (msg.parts as any[]) || [];
+                                            const images = parts.filter(p => p.type === 'image' || p.type === 'file');
+                                            
+                                            if (images.length === 0) return null;
+                                            
+                                            return (
+                                              <MessageAttachments>
+                                                {images.map((p: any, imgIdx: number) => (
+                                                  <MessageAttachment 
+                                                    key={imgIdx}
+                                                    data={{ url: p.url, mediaType: p.mediaType || 'image/png', type: 'file' }}
+                                                  />
+                                                ))}
+                                              </MessageAttachments>
+                                            );
+                                          })()}
                                           
                                           {/* Selected Screens Preview */}
                                           {(() => {
                                             const selectedScreens = msg.selectedScreens || msg.plan?.selectedScreens;
-                                            const websiteUrl = msg.websiteUrl || msg.plan?.websiteUrl;
                                             
-                                            if ((!selectedScreens || selectedScreens.length === 0) && !websiteUrl) return null;
+                                            if (!selectedScreens || selectedScreens.length === 0) return null;
                                             
                                             return (
                                               <div className="flex flex-col gap-3">
-                                                {websiteUrl && (
-                                                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/5 border border-primary/10 text-primary w-fit max-w-full">
-                                                     <Globe className="size-3 shrink-0" />
-                                                     <span className="text-[11px] font-bold truncate">{websiteUrl}</span>
-                                                   </div>
-                                                )}
 
                                                 {selectedScreens && selectedScreens.length > 0 && (
                                                   <div className="flex flex-wrap gap-3">
@@ -688,7 +655,7 @@ export function ChatSidebar({
                       className="w-full bg-transparent outline-none resize-none text-[15px] text-foreground placeholder:text-muted-foreground min-h-[56px] max-h-[200px] leading-relaxed"
                     />
 
-                {(attachments.length > 0 || websiteUrl || showUrlInput) && (
+                {attachments.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-3 mt-4">
                     {attachments.map((att, idx) => (
                       <div key={idx} className="relative group size-12 rounded-lg overflow-hidden border border-border bg-muted flex-shrink-0">
@@ -706,82 +673,20 @@ export function ChatSidebar({
                         )}
                       </div>
                     ))}
-
-                    {websiteUrl && !showUrlInput && (
-                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/5 border border-primary/10 text-primary max-w-[200px] group">
-                        <Globe className="size-3 shrink-0" />
-                        <span className="text-[11px] font-bold truncate">{websiteUrl}</span>
-                        <button 
-                          onClick={() => setWebsiteUrl(null)}
-                          className="size-4 shrink-0 hover:bg-primary/20 rounded-full flex items-center justify-center transition-colors"
-                        >
-                          <X className="size-2.5" />
-                        </button>
-                      </div>
-                    )}
-
-                    {showUrlInput && (
-                      <form 
-                        onSubmit={handleUrlSubmit} 
-                        className={cn(
-                          "flex-1 min-w-[200px] flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted/50 border transition-all duration-200 animate-in fade-in zoom-in",
-                          isUrlValid ? "border-border focus-within:border-primary/30 focus-within:ring-1 focus-within:ring-primary/20" : "border-destructive/50 ring-1 ring-destructive/20"
-                        )}
-                      >
-                        <Link className={cn("size-3", isUrlValid ? "text-muted-foreground" : "text-destructive")} />
-                        <input 
-                          autoFocus
-                          value={urlTemp}
-                          onChange={(e) => {
-                            setUrlTemp(e.target.value);
-                            if (!isUrlValid) setIsUrlValid(true);
-                          }}
-                          placeholder="Paste URL (e.g. google.com)"
-                          className="flex-1 bg-transparent outline-none text-[11px] text-foreground placeholder:text-muted-foreground"
-                        />
-                        <button type="submit" className="hidden" />
-                        <button 
-                          type="button"
-                          onClick={() => { setShowUrlInput(false); setUrlTemp(""); }}
-                          className="size-4 shrink-0 hover:bg-background/20 rounded flex items-center justify-center"
-                        >
-                          <X className="size-2 text-muted-foreground" />
-                        </button>
-                      </form>
-                    )}
                   </div>
                 )}
 
                 <div className="flex items-center justify-between mt-1">
                   <div className="flex items-center gap-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          disabled={false}
-                          className="h-9 w-9 rounded-full bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-border/50"
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-48 bg-popover border-border text-popover-foreground rounded-xl shadow-lg p-1.5">
-                        <DropdownMenuItem 
-                          onClick={() => fileInputRef.current?.click()}
-                          className="flex items-center gap-2 p-2 hover:bg-muted rounded-lg cursor-pointer transition-colors"
-                        >
-                          <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-[13px] font-medium">Upload Images</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => setShowUrlInput(true)}
-                          className="flex items-center gap-2 p-2 hover:bg-muted rounded-lg cursor-pointer transition-colors"
-                        >
-                          <Link className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-[13px] font-medium">Website URL</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button 
+                      onClick={() => fileInputRef.current?.click()}
+                      variant="ghost" 
+                      size="icon" 
+                      disabled={false}
+                      className="h-9 w-9 rounded-full bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-border/50"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
                     <input 
                       type="file" 
                       multiple 
@@ -852,7 +757,7 @@ export function ChatSidebar({
                   </div>
                 </div>
               </div>
-              <p className="text-[12px] text-center text-muted-foreground font-medium leading-relaxed">
+              <p className="text-[12px] text-center text-muted-foreground font-medium leading-relaxed mt-3">
                 Sketch can make mistakes. Please check its work.
               </p>
             </div>

@@ -342,7 +342,7 @@ export function MessageAttachment({
   return (
     <div
       className={cn(
-        "group relative size-24 overflow-hidden rounded-lg",
+        "group relative size-14 overflow-hidden rounded-lg",
         className
       )}
       {...props}
@@ -419,7 +419,7 @@ export function MessageAttachments({
   return (
     <div
       className={cn(
-        "ml-auto flex w-fit flex-wrap items-start gap-2",
+        "flex w-fit flex-wrap items-start gap-2",
         className
       )}
       {...props}

@@ -24,7 +24,6 @@ interface ProjectState {
   realtimeStatus: { message: string; status: string; currentScreen?: string; messageId?: string; isCreditError?: boolean } | null;
   realtimeStatuses: Record<string, { message: string; status: string; currentScreen?: string; isCreditError?: boolean }>;
   loading: boolean;
-  websiteUrl: string | null;
   messages: any[];
 
   // Canvas State
@@ -130,7 +129,6 @@ interface ProjectState {
   setIsPromptDialogOpen: (open: boolean) => void;
   setViewingPrompt: (prompt: string) => void;
   setIsSidebarVisible: (visible: boolean) => void;
-  setWebsiteUrl: (url: string | null) => void;
   setRegeneratingArtifactIds: (val: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
   setMessages: (val: any[] | ((prev: any[]) => any[])) => void;
   setIsCommandMenuOpen: (open: boolean) => void;
@@ -164,7 +162,6 @@ export const useProjectStore = create<ProjectState>((set) => ({
   realtimeStatus: null,
   realtimeStatuses: {},
   loading: true,
-  websiteUrl: null,
   messages: [],
 
   zoom: 1,
@@ -266,7 +263,6 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setIsPromptDialogOpen: (isPromptDialogOpen) => set({ isPromptDialogOpen }),
   setViewingPrompt: (viewingPrompt) => set({ viewingPrompt }),
   setIsSidebarVisible: (isSidebarVisible) => set({ isSidebarVisible }),
-  setWebsiteUrl: (websiteUrl) => set({ websiteUrl }),
   setRegeneratingArtifactIds: (val) => set((state) => ({ regeneratingArtifactIds: typeof val === 'function' ? val(state.regeneratingArtifactIds) : val })),
   setMessages: (val) => set((state) => ({ messages: typeof val === 'function' ? val(state.messages) : val })),
   setIsCommandMenuOpen: (isCommandMenuOpen) => set({ isCommandMenuOpen }),
@@ -317,7 +313,6 @@ export const useProjectStore = create<ProjectState>((set) => ({
     realtimeStatus: null,
     realtimeStatuses: {},
     loading: true,
-    websiteUrl: null,
     messages: [],
     zoom: 1,
     canvasOffset: { x: 0, y: 0 },

@@ -1,18 +1,22 @@
 import { 
   generateText as _generateText, 
   generateObject as _generateObject,
+  stepCountIs,
 } from "ai";
 import { GeminiModel } from "./model";
 import { MAXIMUM_OUTPUT_TOKENS } from "@/lib/constants";
 import { z } from "zod";
 import { google } from "@ai-sdk/google";
 
+import { extractHtml } from "./tools";
+
 export interface GenerateTextOptions {
   system?: string;
   messages: any[];
   temperature?: number;
   maxOutputTokens?: number;
-  stopWhen?: (options: { steps: any[] }) => boolean;
+  tools?: Record<string, any>;
+  stopWhen?: any;
 }
 
 export interface GenerateObjectOptions {
@@ -31,6 +35,7 @@ export async function generateText({
   messages,
   temperature = 0.7,
   maxOutputTokens = MAXIMUM_OUTPUT_TOKENS,
+  tools,
   stopWhen,
 }: GenerateTextOptions) {
   return await _generateText({
@@ -39,11 +44,7 @@ export async function generateText({
     messages,
     temperature,
     maxOutputTokens,
-    toolChoice: 'auto',
-    tools:{
-      googleSearch: google.tools.googleSearch({})
-    },
-    // @ts-ignore - handled by SDK
+    tools,
     stopWhen,
   });
 }

@@ -71,7 +71,6 @@ export default function ProjectPage() {
     isPlanDialogOpen, setIsPlanDialogOpen,
     isPromptDialogOpen, setIsPromptDialogOpen,
     viewingPrompt, setViewingPrompt,
-    websiteUrl, setWebsiteUrl,
     regeneratingArtifactIds, setRegeneratingArtifactIds,
     messages, setMessages,
     updateState, setActiveTool, resetProjectState,
@@ -112,7 +111,7 @@ export default function ProjectPage() {
   const chatError = null;
 
   const sendMessage = useCallback(async (params: { text: string; files?: any[] }, options?: any) => {
-    const { is3xMode, websiteUrl, messages, selectedArtifactIds, throttledArtifacts } = useProjectStore.getState();
+    const { is3xMode, messages, selectedArtifactIds, throttledArtifacts } = useProjectStore.getState();
     const isSilent = options?.body?.isSilent;
     
     // Inject context about selected screens if any
@@ -126,14 +125,14 @@ export default function ProjectPage() {
       contextualText = `[Context: User has selected the following screens: ${screenTitles}. Please refer to or modify these if applicable.]\n\n${params.text}`;
     }
 
+    const imageUrls = params.files?.map((f: any) => f.url).filter(Boolean) || [];
     const newUserMessage = {
       id: `u-${Date.now()}`,
       role: 'user' as const,
-      content: params.text, // Keep original text for UI
-      _contextualContent: contextualText, // Context for backend
+      parts: params.files?.length 
+        ? [{ type: 'text' as const, text: contextualText }, ...params.files.map(f => ({ type: 'image' as const, url: f.url, mediaType: f.mediaType || 'image/png' }))] 
+        : [{ type: 'text' as const, text: contextualText }],
       selectedScreens: selectedScreens.map(s => ({ id: s.id, title: s.title, content: s.content })),
-      websiteUrl: websiteUrl,
-      parts: params.files?.length ? [{ type: 'text', text: contextualText }, ...params.files] : [{ type: 'text', text: contextualText }],
       isSilent
     };
 
@@ -143,7 +142,8 @@ export default function ProjectPage() {
             const assistantPlaceholder = {
                 id: `pending-${newUserMessage.id}`,
                 role: 'assistant' as const,
-                content: "",
+                visionText: "",
+                parts: [],
                 status: 'pending' as any,
                 isSilent: false
             };
@@ -161,11 +161,11 @@ export default function ProjectPage() {
         projectId,
         messages: messagesForApi.map((m: any) => ({
           role: m.role,
-          content: (m as any)._contextualContent || m.content || (m.parts as any[])?.find(p => p.type === 'text')?.text || ""
+          parts: m.parts
         })),
+        imageUrls, // Send this to API
         selectedScreens: selectedScreens.map(s => ({ id: s.id, title: s.title, content: s.content })),
         is3xMode,
-        websiteUrl,
         ...options?.body
       };
 
@@ -194,7 +194,7 @@ export default function ProjectPage() {
     const { messages } = useProjectStore.getState();
     const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
     if (lastUserMessage) {
-      const textContent = lastUserMessage.content || (lastUserMessage.parts as any[])
+      const textContent = (lastUserMessage as any).introductoryText || (lastUserMessage.parts as any[])
         ?.filter((p: any) => p.type === 'text')
         .map((p: any) => p.text)
         .join('');
@@ -372,7 +372,7 @@ export default function ProjectPage() {
         let updated = [...prev];
         
         planEvents.forEach((planEvent: any) => {
-          const { plan, markdown, messageId: eventMessageId } = planEvent.data;
+          const { plan, markdown, messageId: eventMessageId, websiteUrls: eventWebsiteUrls } = planEvent.data;
           
           let targetIndex = eventMessageId 
             ? updated.findIndex(m => m.id === eventMessageId)
@@ -385,7 +385,8 @@ export default function ProjectPage() {
               updated[targetIndex] = { ...updated[targetIndex], id: eventMessageId };
             }
           }
-          
+
+          const updatedPlan = plan ? { ...plan, _markdown: markdown || plan._markdown } : null;
           if (plan?.themes) {
             setProject(prev => prev ? { ...prev, themes: plan.themes } : null);
           }
@@ -399,28 +400,30 @@ export default function ProjectPage() {
             const existing = updated[targetIndex] as any;
             updated[targetIndex] = { 
               ...existing, 
-              content: markdown, 
-              plan: plan ? { ...plan, _markdown: markdown || plan._markdown } : existing.plan 
+              parts: plan?.conclusionText 
+                ? [{ type: 'text', text: plan.conclusionText }] 
+                : (markdown ? [{ type: 'text', text: markdown }] : existing.parts),
+              plan: updatedPlan || existing.plan 
             };
           } else {
-            // Find the most recently added user message that doesn't have an assistant response yet
-            // Or just the last message if it's an assistant and has no ID
             const last = updated[updated.length - 1] as any;
-            
             if (last && last.role === 'assistant' && (last.id === 'assistant-plan' || !last.id)) {
                 updated[updated.length - 1] = { 
                   ...last, 
                   id: eventMessageId || last.id,
-                  content: markdown, 
-                  plan: plan ? { ...plan, _markdown: markdown || plan._markdown } : last.plan 
+                  parts: plan?.conclusionText 
+                    ? [{ type: 'text', text: plan.conclusionText }] 
+                    : (markdown ? [{ type: 'text', text: markdown }] : last.parts),
+                  plan: updatedPlan || last.plan 
                 } as any;
             } else {
-                // Add brand new assistant message
                 updated.push({ 
                   id: eventMessageId || 'assistant-plan', 
                   role: 'assistant', 
-                  content: markdown, 
-                  plan: plan ? { ...plan, _markdown: markdown || plan._markdown } : null 
+                  parts: plan?.conclusionText 
+                    ? [{ type: 'text', text: plan.conclusionText }] 
+                    : (markdown ? [{ type: 'text', text: markdown }] : []),
+                  plan: updatedPlan 
                 } as any);
             }
           }
@@ -501,10 +504,9 @@ export default function ProjectPage() {
         }
         const pendingPromptRaw = sessionStorage.getItem(`pending_prompt_${projectId}`);
         if (pendingPromptRaw) {
-          const { content, attachments: initialAttachments, websiteUrl: initialWebsiteUrl } = JSON.parse(pendingPromptRaw);
+          const { content, attachments: initialAttachments } = JSON.parse(pendingPromptRaw);
           sessionStorage.removeItem(`pending_prompt_${projectId}`);
           setIsGenerating(true);
-          if (initialWebsiteUrl) setWebsiteUrl(initialWebsiteUrl);
           sendMessage({ text: content, files: initialAttachments.map((url: string) => ({ type: "file" as const, url, mediaType: "image/*" })) });
         }
       } catch (error) {
@@ -528,9 +530,12 @@ export default function ProjectPage() {
       }
       return;
     }
-    const textContent = (lastAssistantMessage as any).content;
-    if (typeof textContent === 'string' && textContent.length > 0) {
-      const artifactData = extractArtifacts(textContent);
+    const combinedText = (Array.isArray((lastAssistantMessage as any).parts) 
+      ? (lastAssistantMessage as any).parts.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('\n\n')
+      : "");
+
+    if (combinedText.length > 0) {
+      const artifactData = extractArtifacts(combinedText);
       if (artifactData.length > 0) {
         const getNewX = (existingArtifacts: any[], newType: string) => {
           const lastArt = existingArtifacts[existingArtifacts.length - 1];
@@ -838,7 +843,7 @@ export default function ProjectPage() {
       text, 
       files: attachments?.map(a => ({ type: "file" as const, url: a.url, mediaType: "image/*" })),
     });
-    setAttachments([]); setInput(""); setWebsiteUrl(null);
+    setAttachments([]); setInput(""); 
   };
 
   const handleArtifactAction = (action: 'more' | 'regenerate' | 'variations', artifact: Artifact) => {

@@ -209,7 +209,7 @@ bun run db:studio
 In a separate terminal, run the Inngest dev server to handle background jobs and AI generation:
 
 ```bash
-bun run inngest
+npx --ignore-scripts=false inngest-cli@latest dev
 ```
 
 This will start the Inngest dashboard at [http://localhost:8288](http://localhost:8288).

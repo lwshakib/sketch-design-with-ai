@@ -18,7 +18,6 @@ export async function POST(req: Request) {
       messages, 
       projectId, 
       is3xMode, 
-      websiteUrls, 
       imageUrls, 
       isSilent, 
       selectedScreens,
@@ -53,27 +52,32 @@ export async function POST(req: Request) {
       data: {
         projectId: projectId,
         role: "user",
-        content: typeof lastMessage.content === 'string' 
-          ? lastMessage.content 
-          : lastMessage.parts?.find((p: any) => p.type === 'text')?.text || "",
+        parts: lastMessage.parts || [
+          { 
+            type: 'text', 
+            text: typeof lastMessage.content === 'string' 
+              ? lastMessage.content 
+              : lastMessage.parts?.find((p: any) => p.type === 'text')?.text || "" 
+          }
+        ],
         plan: selectedScreens ? { selectedScreens } : undefined,
-        websiteUrls: websiteUrls || [],
-        imageUrls: imageUrls || []
       },
     });
 
     // 2. Create Assistant Message Placeholder (if not silent)
     let assistantMessageId = null;
     if (!isSilent) {
+      const introText = screenId 
+        ? "*Architecting refactored layout...*" 
+        : isVariations 
+          ? `*Architecting variations...*`
+          : "*Analyzing your request and architecting project manifest...*";
+
       const assistantMsg = await prisma.message.create({
         data: {
           projectId: projectId,
           role: "assistant",
-          content: screenId 
-            ? "*Architecting refactored layout...*" 
-            : isVariations 
-              ? `*Architecting variations...*`
-              : "*Analyzing your request and architecting project manifest...*",
+          parts: [],
           status: "generating",
         },
       });
@@ -112,7 +116,7 @@ export async function POST(req: Request) {
         messages: normalizedMessages,
         projectId,
         is3xMode,
-        websiteUrls: websiteUrls || [],
+        imageUrls: imageUrls || [],
         isSilent,
         screenId,
         instructions,
