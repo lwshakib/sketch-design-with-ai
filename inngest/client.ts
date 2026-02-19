@@ -5,4 +5,6 @@ import { realtimeMiddleware } from "@inngest/realtime/middleware";
 export const inngest = new Inngest({
   id: "sketch-design-with-ai",
   middleware: [realtimeMiddleware()],
+  // On Production
+  eventKey: process.env.INNGEST_EVENT_KEY
 });
