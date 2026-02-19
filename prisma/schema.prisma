@@ -120,16 +120,14 @@ enum MESSAGE_STATUS {
 }
 
 model Message {
-  id          String   @id @default(cuid())
-  role        MESSAGE_ROLE @default(user)
-  content     String   @db.Text
-  plan        Json?
-  websiteUrls String[]
-  imageUrls   String[]
-  status      MESSAGE_STATUS @default(completed)
-  projectId   String
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
+  id               String   @id @default(cuid())
+  role             MESSAGE_ROLE @default(user)
+  parts            Json?    // Array of { type: 'text', text: string } | { type: 'image', url: string, mediaType: string }
+  plan             Json?
+  status           MESSAGE_STATUS @default(completed)
+  projectId        String
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt        DateTime @default(now())
 
   @@index([projectId])
   @@map("message")
