@@ -51,11 +51,9 @@ export async function POST(
           data: {
             projectId: project.id,
             role: msg.role,
-            content: msg.content || "",
+            parts: msg.parts || [],
             status: msg.status,
             plan: msg.plan || {},
-            websiteUrls: msg.websiteUrls || [],
-            imageUrls: msg.imageUrls || [],
           }
         });
         oldToNewMessageId.set(msg.id, newMsg.id);
