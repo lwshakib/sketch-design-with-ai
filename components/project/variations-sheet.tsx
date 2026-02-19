@@ -130,6 +130,12 @@ export function VariationsSheet({
               placeholder="e.g., Use a dark glassmorphism theme..."
               value={variationCustomInstructions}
               onChange={(e) => setVariationCustomInstructions(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleGenerateVariations();
+                }
+              }}
               className="min-h-[120px] bg-[#111] border border-white/5 rounded-2xl p-4 resize-none text-sm focus:ring-1 focus:ring-white/10 transition-all placeholder:text-zinc-700 leading-relaxed font-medium shadow-inner"
             />
           </div>
