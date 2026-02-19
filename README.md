@@ -3,8 +3,9 @@
 > Transform your sketches into stunning, production-ready designs using the power of AI.
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Next.js](https://img.shields.io/badge/Next.js-16.1-black)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19.2.3-61DAFB)](https://react.dev/)
 [![Prisma](https://img.shields.io/badge/Prisma-7.2-2D3748)](https://www.prisma.io/)
 
 ## 🚀 Overview
@@ -14,11 +15,11 @@
 - 🎨 **Text-to-Design**: Describe your idea in plain text and watch it come to life
 - 📸 **Screenshot-to-Code**: Upload a screenshot or wireframe to generate editable code
 - ✏️ **Sketch Integration**: Use the canvas to draw and iterate on concepts manually
-- 🤖 **AI-Powered Design**: Leverage Google Gemini AI to transform sketches into modern, aesthetically pleasing designs
-- 👁️ **Instant Preview**: See your design evolve in real-time with instant rendering
+- 🤖 **AI-Powered Design**: Leverage Google Gemini 2.0 Flash AI to transform sketches into modern, aesthetically pleasing designs
+- 👁️ **Instant Preview**: See your design evolve in real-time with instant rendering and live project thumbnails
+- 🎭 **Variations & Iteration**: Generate multiple design variations with automated retry logic for high-fidelity results
 - 💻 **Export to Code**: Get production-ready code (HTML/React/CSS) instantly
-- 🎭 **Theme Customization**: Apply and customize themes with glassmorphism, dark mode, and vibrant color palettes
-- 📱 **Responsive Design**: Generate designs that work seamlessly across all device sizes
+- 📱 **Responsive Design**: Generate designs that work seamlessly across all device sizes with mobile-first previews
 
 ## 🏗️ Architecture
 
@@ -89,10 +90,12 @@ graph TD
 - **Multi-Frame Workspace**: Work on multiple design variations simultaneously
 
 ### AI Capabilities
-- **Smart Design Generation**: AI understands context and generates pixel-perfect designs
+- **Smart Design Generation**: AI understands context and generates pixel-perfect designs using Gemini 2.0 Flash
+- **Design Variations**: Create multiple visual explorations from a single prompt or screen
+- **Auto-Retry & Validation**: Intelligent system that retries generation if output is incomplete or faulty
 - **Theme Application**: Automatically apply consistent themes across your designs
 - **Code Export**: Get clean, production-ready HTML, CSS, and React code
-- **Responsive Previews**: View designs in Mobile, Tablet, and Desktop modes
+- **Responsive Previews**: View designs in Mobile, Tablet, and Desktop modes with live sidebar thumbnails
 
 ### Project Management
 - **User Authentication**: Secure login with Better Auth
@@ -109,17 +112,17 @@ graph TD
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework**: [Next.js 16.1](https://nextjs.org/) with App Router
+- **Framework**: [Next.js 16.1.1](https://nextjs.org/) with App Router
 - **Language**: [TypeScript 5](https://www.typescriptlang.org/)
-- **UI Library**: [React 19.2](https://react.dev/)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) + Vanilla CSS
+- **UI Library**: [React 19.2.3](https://react.dev/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
 - **Animations**: [Framer Motion 12](https://www.framer.com/motion/)
 - **Components**: [Radix UI](https://www.radix-ui.com/) + [shadcn/ui](https://ui.shadcn.com/)
 
 ### Backend & Database
 - **Database**: [PostgreSQL](https://www.postgresql.org/) with [Prisma ORM 7.2](https://www.prisma.io/)
 - **Authentication**: [Better Auth 1.4](https://www.better-auth.com/)
-- **AI Integration**: [Google AI SDK](https://ai.google.dev/) with Gemini 2.5 Flash
+- **AI Integration**: [Google AI SDK](https://ai.google.dev/) with Gemini 2.0 Flash
 
 ### Additional Tools
 - **Canvas**: HTML5 Canvas API
@@ -237,8 +240,9 @@ sketch-design-with-ai/
 │   │   └── projects/       # Project CRUD operations
 │   ├── project/            # Project workspace
 │   │   └── [projectId]/    # Dynamic project page
+│   ├── account/            # User account settings
 │   ├── layout.tsx          # Root layout
-│   └── page.tsx            # Landing page
+│   └── page.tsx            # Main landing page & Project Selector
 ├── components/              # React components
 │   ├── ui/                 # Reusable UI components
 │   ├── logo.tsx            # App logo

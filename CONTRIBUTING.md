@@ -224,13 +224,12 @@ Add screenshots to help explain your changes.
 
 3. **Set up the database**:
    ```bash
-   bun run db:generate
    bun run db:migrate
    ```
 
 4. **Start the Inngest Dev Server**:
    ```bash
-   bun run inngest
+   npx --ignore-scripts=false inngest-cli@latest dev
    ```
 
 5. **Start the development server**:
@@ -238,18 +237,24 @@ Add screenshots to help explain your changes.
    bun dev
    ```
 
-6. **Open** [http://localhost:3000](http://localhost:3000) in your browser
+6. **Build for production**:
+   ```bash
+   bun run build
+   ```
+
+7. **Open** [http://localhost:3000](http://localhost:3000) in your browser
 
 ### Available Scripts
 
 ```bash
 # Development
-bun run inngest      # Start Inngest dev server
 bun dev              # Start dev server with hot reload
-bun build            # Build for production
+bun run build        # Build for production
 bun start            # Start production server
 bun lint             # Run ESLint
-bun lint:fix         # Fix ESLint errors automatically
+
+# Inngest
+npx inngest-cli dev  # Start Inngest dev server
 
 # Database
 bun run db:generate  # Generate Prisma Client
