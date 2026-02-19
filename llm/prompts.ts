@@ -257,6 +257,7 @@ export const CORE_DESIGN_PRINCIPLES = `### 💎 Elite Design Principles (VIBRANT
     - **Native Feel**: 9:19 Aspect Ratio is primary. Ensure the UI feels like a high-end app.
     - **Signature Bottom Bar**: Every App design MUST have a high-fidelity fixed bottom nav bar with an "Action" center button.
     - **Fluid Sections**: Use 'rounded-[2.5rem]' or 'rounded-[3rem]' for main sections.
+    - **Status Bar Ban (CRITICAL)**: NEVER include a mobile status bar (clock, battery, signal icons) unless the user explicitly requests one.
 
 8. **💎 Elite Aesthetics (NON-NEGOTIABLE)**:
    - **ABSOLUTE BAN ON PLAIN WHITE**: Unless explicitly requested as "clinical minimalism," NEVER output a design with a plain white background and black text. This is a failure.
