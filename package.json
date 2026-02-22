@@ -89,7 +89,7 @@
     "react-hook-form": "^7.69.0",
     "react-markdown": "^10.1.0",
     "react-resizable-panels": "2.1.9",
-    "recharts": "2.15.4",
+    "recharts": "3.7.0",
     "remark-gfm": "^4.0.1",
     "resend": "^6.9.2",
     "shiki": "^3.20.0",
