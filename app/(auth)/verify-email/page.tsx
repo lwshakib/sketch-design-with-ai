@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
@@ -18,13 +19,13 @@ function VerifyEmailContent() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!token) {
-      setStatus("error");
-      setError("Verification token is missing.");
-      return;
-    }
-
     const verify = async () => {
+      if (!token) {
+        setStatus("error");
+        setError("Verification token is missing.");
+        return;
+      }
+
       try {
         const { error } = await authClient.verifyEmail({
           query: {
@@ -124,9 +125,10 @@ export default function VerifyEmailPage() {
         </div>
       </div>
       <div className="bg-muted relative hidden lg:block">
-        <img
+        <Image
           src="/signin-bg.png"
           alt="Authentication Background"
+          fill
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
       </div>

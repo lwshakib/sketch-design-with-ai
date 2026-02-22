@@ -18,6 +18,18 @@ export type TextShimmerProps = {
   spread?: number;
 };
 
+const motionCache = new Map<any, any>();
+
+const getMotionComponent = (Component: ElementType) => {
+  if (!motionCache.has(Component)) {
+    motionCache.set(
+      Component,
+      motion.create(Component as keyof JSX.IntrinsicElements),
+    );
+  }
+  return motionCache.get(Component);
+};
+
 const ShimmerComponent = ({
   children,
   as: Component = "p",
@@ -25,8 +37,9 @@ const ShimmerComponent = ({
   duration = 2,
   spread = 2,
 }: TextShimmerProps) => {
-  const MotionComponent = motion.create(
-    Component as keyof JSX.IntrinsicElements,
+  const MotionComponent = useMemo(
+    () => getMotionComponent(Component),
+    [Component],
   );
 
   const dynamicSpread = useMemo(
@@ -35,6 +48,7 @@ const ShimmerComponent = ({
   );
 
   return (
+    // eslint-disable-next-line react-hooks/static-components
     <MotionComponent
       initial={{ backgroundPosition: "-120% center" }}
       animate={{ backgroundPosition: "120% center" }}

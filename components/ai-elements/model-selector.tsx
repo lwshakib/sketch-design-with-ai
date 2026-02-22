@@ -1,3 +1,4 @@
+import ImageNext from "next/image";
 import {
   Command,
   CommandDialog,
@@ -102,7 +103,7 @@ export const ModelSelectorSeparator = (props: ModelSelectorSeparatorProps) => (
 );
 
 export type ModelSelectorLogoProps = Omit<
-  ComponentProps<"img">,
+  ComponentProps<typeof ImageNext>,
   "src" | "alt"
 > & {
   provider:
@@ -170,13 +171,14 @@ export const ModelSelectorLogo = ({
   className,
   ...props
 }: ModelSelectorLogoProps) => (
-  <img
+  <ImageNext
     {...props}
     alt={`${provider} logo`}
     className={cn("size-3 dark:invert", className)}
     height={12}
     src={`https://models.dev/logos/${provider}.svg`}
     width={12}
+    unoptimized
   />
 );
 

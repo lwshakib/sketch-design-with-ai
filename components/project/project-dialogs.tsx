@@ -29,16 +29,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Zap,
-  RotateCcw,
-  Sparkles,
   Layout,
-  Share2,
   Download,
   Check,
   Clipboard,
-  Search,
-  Command,
+  Share2,
   Settings,
   LayoutGrid,
   Undo2,
@@ -110,12 +105,12 @@ export function ProjectDialogs({
     setIsSettingsDialogOpen,
     isSidebarVisible,
     setIsSidebarVisible,
-    secondarySidebarMode,
-    setSecondarySidebarMode,
+    secondarySidebarMode: _secondarySidebarMode,
+    setSecondarySidebarMode: _setSecondarySidebarMode,
     isGenerating,
     project,
   } = useProjectStore();
-  const { credits } = useWorkspaceStore();
+  const { credits: _credits } = useWorkspaceStore();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  const router = useRouter();
+  const _router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -182,9 +183,11 @@ export function SignUpForm({
             {socialLoading === "google" ? (
               <Loader2 className="mr-2 size-4 animate-spin" />
             ) : (
-              <img
+              <Image
                 src="https://www.svgrepo.com/show/475656/google-color.svg"
                 alt="Google"
+                width={16}
+                height={16}
                 className="size-4"
               />
             )}

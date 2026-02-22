@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import type { ChatStatus, FileUIPart } from "ai";
+import Image from "next/image";
 import {
   CornerDownLeftIcon,
   ImageIcon,
@@ -198,7 +199,9 @@ export function PromptInputProvider({
 
   // Keep a ref to attachments for cleanup on unmount (avoids stale closure)
   const attachmentsRef = useRef(attachmentFiles);
-  attachmentsRef.current = attachmentFiles;
+  useEffect(() => {
+    attachmentsRef.current = attachmentFiles;
+  }, [attachmentFiles]);
 
   // Cleanup blob URLs on unmount to prevent memory leaks
   useEffect(() => {
@@ -310,12 +313,13 @@ export function PromptInputAttachment({
           <div className="relative size-5 shrink-0">
             <div className="bg-background absolute inset-0 flex size-5 items-center justify-center overflow-hidden rounded transition-opacity group-hover:opacity-0">
               {isImage ? (
-                <img
+                <Image
                   alt={filename || "attachment"}
                   className="size-5 object-cover"
                   height={20}
                   src={data.url}
                   width={20}
+                  unoptimized
                 />
               ) : (
                 <div className="text-muted-foreground flex size-5 items-center justify-center">
@@ -345,12 +349,13 @@ export function PromptInputAttachment({
         <div className="w-auto space-y-3">
           {isImage && (
             <div className="flex max-h-96 w-96 items-center justify-center overflow-hidden rounded-md border">
-              <img
+              <Image
                 alt={filename || "attachment preview"}
                 className="max-h-full max-w-full object-contain"
                 height={384}
                 src={data.url}
                 width={448}
+                unoptimized
               />
             </div>
           )}
@@ -480,9 +485,10 @@ export const PromptInput = ({
   const [items, setItems] = useState<(FileUIPart & { id: string })[]>([]);
   const files = usingProvider ? controller.attachments.files : items;
 
-  // Keep a ref to files for cleanup on unmount (avoids stale closure)
   const filesRef = useRef(files);
-  filesRef.current = files;
+  useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
 
   const openFileDialogLocal = useCallback(() => {
     inputRef.current?.click();
@@ -666,7 +672,7 @@ export const PromptInput = ({
         }
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- cleanup only on unmount; filesRef always current
+    // cleanup only on unmount; filesRef always current
     [usingProvider],
   );
 
@@ -726,7 +732,7 @@ export const PromptInput = ({
 
     // Convert blob URLs to data URLs asynchronously
     Promise.all(
-      files.map(async ({ id, ...item }) => {
+      files.map(async ({ id: _, ...item }) => {
         if (item.url && item.url.startsWith("blob:")) {
           const dataUrl = await convertBlobUrlToDataUrl(item.url);
           // If conversion failed, keep the original blob URL
@@ -1176,14 +1182,14 @@ export const PromptInputSpeechButton = ({
       };
 
       recognitionRef.current = speechRecognition;
-      setRecognition(speechRecognition);
+      const timer = setTimeout(() => setRecognition(speechRecognition), 0);
+      return () => {
+        clearTimeout(timer);
+        if (recognitionRef.current) {
+          recognitionRef.current.stop();
+        }
+      };
     }
-
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-    };
   }, [textareaRef, onTranscriptionChange]);
 
   const toggleListening = useCallback(() => {

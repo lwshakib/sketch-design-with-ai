@@ -37,8 +37,8 @@ export default function NotFound() {
         </h2>
 
         <p className="mb-10 max-w-[320px] text-sm leading-relaxed text-zinc-500">
-          The screen you're looking for was either moved or never existed. Let's
-          get you back on track.
+          The screen you&apos;re looking for was either moved or never existed.
+          Let&apos;s get you back on track.
         </p>
 
         <div className="flex w-full flex-col justify-center gap-4 sm:flex-row">

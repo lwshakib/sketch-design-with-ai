@@ -49,7 +49,7 @@ export function GenerationStatus({
   conclusionText,
   planScreens = [],
   projectArtifacts = [],
-  currentScreenTitle,
+  currentScreenTitle: _currentScreenTitle,
   statusMessage,
   className,
   error,

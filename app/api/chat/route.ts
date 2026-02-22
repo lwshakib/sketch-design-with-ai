@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     }
 
     // 1. Create User Message
-    const userMsg = await prisma.message.create({
+    const _userMsg = await prisma.message.create({
       data: {
         projectId: projectId,
         role: "user",
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
     // 2. Create Assistant Message Placeholder (if not silent)
     let assistantMessageId = null;
     if (!isSilent) {
-      const introText = screenId
+      const _introText = screenId
         ? "*Architecting refactored layout...*"
         : isVariations
           ? `*Architecting variations...*`

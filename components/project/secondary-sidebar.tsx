@@ -45,7 +45,6 @@ export function SecondarySidebar({
           <ElementSettings
             selectedEl={selectedEl}
             setSelectedEl={setSelectedEl}
-            clearSelection={() => setSelectedEl(null)}
             onUpdate={commitEdits}
           />
         ) : (

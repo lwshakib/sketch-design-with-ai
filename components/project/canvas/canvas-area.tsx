@@ -18,38 +18,20 @@ import {
   Trash2,
   ThumbsUp,
   ThumbsDown,
-  RotateCw,
   Loader2,
   Cloud,
   Check,
   Sparkles,
-  MousePointer2,
-  Hand,
   ZoomIn,
   ZoomOut,
-  Menu,
   ChevronLeft,
   ChevronRight,
-  Settings,
-  Command,
-  Search,
-  LayoutGrid,
-  Undo2,
-  Redo2,
   Copy,
-  ClipboardPaste,
-  ArrowUpRight,
-  Files,
   ExternalLink,
   QrCode,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 import NumberFlow from "@number-flow/react";
 
@@ -60,11 +42,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-  DropdownMenuPortal,
-  DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { UserMenu } from "@/components/user-menu";
@@ -120,9 +97,9 @@ export function CanvasArea({
   deleteArtifact,
   setIsExportSheetOpen,
   setExportArtifactIndex,
-  handleDownloadFullProject,
-  handleDuplicateProject,
-  handleDeleteProject,
+  handleDownloadFullProject: _handleDownloadFullProject,
+  handleDuplicateProject: _handleDuplicateProject,
+  handleDeleteProject: _handleDeleteProject,
 }: CanvasAreaProps) {
   const {
     zoom,
@@ -133,23 +110,23 @@ export function CanvasArea({
     setFramePos,
     throttledArtifacts,
     setThrottledArtifacts,
-    artifacts,
+    artifacts: _artifacts,
     setArtifacts,
     selectedArtifactIds,
     setSelectedArtifactIds,
     selectionBox,
     isDraggingFrame,
     isResizing,
-    isGenerating,
-    realtimeStatus,
-    designPlan,
+    isGenerating: _isGenerating,
+    realtimeStatus: _realtimeStatus,
+    designPlan: _designPlan,
     artifactPreviewModes,
     setArtifactPreviewModes,
     dynamicFrameHeights,
     isSaving,
     hasUnsavedChanges,
-    leftSidebarMode,
-    setLeftSidebarMode,
+    leftSidebarMode: _leftSidebarMode,
+    setLeftSidebarMode: _setLeftSidebarMode,
     isPanning,
     secondarySidebarMode,
     setSecondarySidebarMode,
@@ -159,16 +136,17 @@ export function CanvasArea({
     isSidebarVisible,
     setIsSidebarVisible,
     regeneratingArtifactIds,
-    setIsCommandMenuOpen,
-    setIsSettingsDialogOpen,
-    setIsShareDialogOpen,
+    setIsCommandMenuOpen: _setIsCommandMenuOpen,
+    isSettingsDialogOpen: _isSettingsDialogOpen,
+    setIsSettingsDialogOpen: _setIsSettingsDialogOpen,
+    setIsShareDialogOpen: _setIsShareDialogOpen,
     project,
   } = useProjectStore();
 
   const { credits } = useWorkspaceStore();
 
   const isEditMode = secondarySidebarMode === "properties";
-  const status = isGenerating ? "streaming" : "ready"; // Simplification for UI checks
+  const _status = _isGenerating ? "streaming" : "ready"; // Simplification for UI checks
 
   const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
   const [qrCodeUrl, setQrCodeUrl] = React.useState("");

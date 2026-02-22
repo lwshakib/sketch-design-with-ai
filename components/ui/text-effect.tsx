@@ -26,8 +26,8 @@ export function TextEffect({
   children,
   className,
   as: Component = "p",
-  preset = "fade-in-blur",
-  per = "word",
+  preset: _preset = "fade-in-blur",
+  per: _per = "word",
   delay = 0,
   speedSegment = 0.05,
 }: TextEffectProps) {

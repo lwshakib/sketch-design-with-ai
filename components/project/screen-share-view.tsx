@@ -12,10 +12,8 @@ import {
   Smartphone,
   Tablet,
   Monitor,
-  LayoutGrid,
   ExternalLink,
   QrCode,
-  X,
   Copy,
   Check,
 } from "lucide-react";
@@ -23,12 +21,7 @@ import { Button } from "@/components/ui/button";
 import { ArtifactFrame } from "@/components/project/canvas/artifact-frame";
 import { Logo } from "@/components/logo";
 import { QRCodeSVG } from "qrcode.react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface ScreenShareViewProps {
   project: {
@@ -74,14 +67,18 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
 
   // Initialize
   useEffect(() => {
-    if (project.themes && project.themes.length > 0 && !appliedTheme) {
-      setAppliedTheme(project.themes[0]);
-    }
+    const timer = setTimeout(() => {
+      if (project.themes && project.themes.length > 0 && !appliedTheme) {
+        setAppliedTheme(project.themes[0]);
+      }
 
-    // Set initial viewport based on artifact type
-    if (artifact.type === "app") setViewportMode("mobile");
-    else setViewportMode("desktop");
-  }, [project.themes, artifact.type]);
+      // Set initial viewport based on artifact type
+      if (artifact.type === "app") setViewportMode("mobile");
+      else setViewportMode("desktop");
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [project.themes, artifact.type, appliedTheme]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {

@@ -5,17 +5,11 @@ import {
   Plus,
   ArrowRight,
   List,
-  ChevronDown,
-  Sparkles,
   Search,
-  MoreVertical,
   Smartphone,
   Monitor,
-  CheckCircle2,
-  Globe,
   X,
   Loader2,
-  Zap,
   RotateCcw,
   Layout,
 } from "lucide-react";
@@ -33,15 +27,9 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Link as LucideLink, ImageIcon } from "lucide-react";
+import Image from "next/image";
 import { uploadFileToCloudinary } from "@/lib/cloudinary-client";
 import { toast } from "sonner";
 
@@ -181,61 +169,67 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
-  const fetchProjects = async (isLoadMore = false) => {
-    if (isLoadMore && (isLoadingMore || !hasMore)) return;
+  const fetchProjects = React.useCallback(
+    async (isLoadMore = false) => {
+      if (isLoadMore && (isLoadingMore || !hasMore)) return;
 
-    if (isLoadMore) setIsLoadingMore(true);
-    else setLoadingProjects(true);
+      if (isLoadMore) setIsLoadingMore(true);
+      else setLoadingProjects(true);
 
-    try {
-      const skip = isLoadMore ? projects.length : 0;
-      const res = await fetch(
-        `/api/projects?limit=20&skip=${skip}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`,
-      );
-      if (res.ok) {
-        const data = await res.json();
+      try {
+        const skip = isLoadMore ? projects.length : 0;
+        const res = await fetch(
+          `/api/projects?limit=20&skip=${skip}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`,
+        );
+        if (res.ok) {
+          const data = await res.json();
 
-        if (data.length < 20) {
-          setHasMore(false);
-        } else {
-          setHasMore(true);
+          if (data.length < 20) {
+            setHasMore(false);
+          } else {
+            setHasMore(true);
+          }
+
+          if (isLoadMore) {
+            setProjects((prev) => [...prev, ...data]);
+          } else {
+            setProjects(data);
+          }
         }
-
-        if (isLoadMore) {
-          setProjects((prev) => [...prev, ...data]);
-        } else {
-          setProjects(data);
-        }
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+      } finally {
+        if (isLoadMore) setIsLoadingMore(false);
+        else setLoadingProjects(false);
       }
-    } catch (error) {
-      console.error("Failed to fetch projects:", error);
-    } finally {
-      if (isLoadMore) setIsLoadingMore(false);
-      else setLoadingProjects(false);
-    }
-  };
+    },
+    [hasMore, isLoadingMore, projects.length, searchQuery],
+  );
 
   const [shuffledPrompts, setShuffledPrompts] = useState<string[]>([]);
 
-  const refreshPrompts = () => {
+  const refreshPrompts = React.useCallback(() => {
     const allPrompts = [...PROMPTS.app, ...PROMPTS.web];
     const shuffled = allPrompts.sort(() => Math.random() - 0.5).slice(0, 3);
     setShuffledPrompts(shuffled);
-  };
+  }, []);
 
   useEffect(() => {
-    setIsMounted(true);
+    const timer = setTimeout(() => setIsMounted(true), 0);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     fetchProjects();
     fetchCredits();
-  }, []);
+  }, [fetchCredits, fetchProjects]);
 
   useEffect(() => {
     if (isMounted) {
       refreshPrompts();
     }
-  }, [isMounted]);
+  }, [isMounted, refreshPrompts]);
 
-  // Handle Search Debounce
   useEffect(() => {
     if (!isMounted) return;
 
@@ -244,7 +238,7 @@ export default function Home() {
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [fetchProjects, isMounted, searchQuery]);
 
   const onSubmit = async () => {
     if (!inputValue.trim() && attachments.length === 0) return;
@@ -433,9 +427,10 @@ export default function Home() {
                             key={i}
                             className="group/img relative h-20 w-20 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 shadow-sm dark:border-white/10 dark:bg-zinc-900"
                           >
-                            <img
+                            <Image
                               src={attr.url}
                               alt="Attachment"
+                              fill
                               className={cn(
                                 "h-full w-full object-cover",
                                 attr.isUploading && "opacity-40 blur-[2px]",
@@ -586,11 +581,9 @@ function MobileMenu({
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!isMobile) {
-      setOpen(false);
-    }
-  }, [isMobile]);
+  if (!isMobile && open) {
+    setOpen(false);
+  }
 
   useEffect(() => {
     const el = scrollRef.current;

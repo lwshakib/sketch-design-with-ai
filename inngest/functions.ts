@@ -1,9 +1,8 @@
 import { inngest } from "./client";
 import { NonRetriableError } from "inngest";
-import { stepCountIs } from "ai";
+import { stepCountIs as _stepCountIs } from "ai";
 import { generateText, generateObject } from "../llm/generate";
 import { z } from "zod";
-import { GeminiModel } from "../llm/model";
 import {
   PlanningPrompt,
   ScreenGenerationPrompt,
@@ -13,8 +12,8 @@ import { getAllExamples } from "../llm/helpers";
 import prisma from "../lib/prisma";
 import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
 import { extractArtifacts } from "../lib/artifact-renderer";
-import { extractHtml } from "../llm/tools";
-import { google } from "@ai-sdk/google";
+import { extractHtml as _extractHtml } from "../llm/tools";
+import { google as _google } from "@ai-sdk/google";
 import {
   hydrateImages,
   normalizeMessages,
@@ -53,7 +52,7 @@ export const generateDesign = inngest.createFunction(
         projectId,
         is3xMode,
         isSilent,
-        imageUrls,
+        imageUrls: _imageUrls,
         screenId,
         instructions,
         isVariations,
@@ -124,7 +123,6 @@ export const generateDesign = inngest.createFunction(
 
           return { success: true, chat: true };
         } else if (intent) {
-          const validIntent = intent;
           // If action is "generate", notify UI but with empty markdown
           // to avoid showing the vision text.
           await publishPlan({
@@ -293,7 +291,7 @@ export const generateDesign = inngest.createFunction(
         const generatedScreen = await step.run(
           "generate-new-code",
           async () => {
-            const inspiration = getAllExamples();
+            const _inspiration = getAllExamples();
             const systemPrompt =
               ScreenGenerationPrompt +
               "\n\nCRITICAL: You are REGENERATING/REFACTORING an existing screen. Rethink the layout and visual rhythm entirely while maintaining core functionality and branding.";
@@ -306,7 +304,7 @@ export const generateDesign = inngest.createFunction(
 
             let attempts = 0;
             const maxAttempts = 3;
-            let lastError = null;
+            const _lastError = null;
 
             while (attempts < maxAttempts) {
               attempts++;
@@ -333,10 +331,10 @@ export const generateDesign = inngest.createFunction(
                   },
                 ] as any,
                 tools: {
-                  googleSearch: google.tools.googleSearch({}),
-                  extractHtml: extractHtml,
+                  googleSearch: _google.tools.googleSearch({}),
+                  extractHtml: _extractHtml,
                 },
-                stopWhen: stepCountIs(5),
+                stopWhen: _stepCountIs(5),
                 maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
                 temperature: 0.8,
               });
@@ -389,7 +387,7 @@ export const generateDesign = inngest.createFunction(
           });
         });
 
-        const visionText = `*Architecting refactored layout for "${originalScreen.title}"...*`;
+        const _visionText = `*Architecting refactored layout for "${originalScreen.title}"...*`;
 
         // Update the assistant message
         await step.run("update-regeneration-message", async () => {
@@ -659,10 +657,10 @@ CRITICAL:
                     },
                   ] as any,
                   tools: {
-                    googleSearch: google.tools.googleSearch({}),
-                    extractHtml: extractHtml,
+                    googleSearch: _google.tools.googleSearch({}),
+                    extractHtml: _extractHtml,
                   },
-                  stopWhen: stepCountIs(5),
+                  stopWhen: _stepCountIs(5),
                   maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
                   temperature: 0.8,
                 });
@@ -969,7 +967,7 @@ CRITICAL:
 
         let finalScreens = object.screens as PlanScreen[];
         let finalConclusion = object.conclusionText;
-        let finalSuggestion = object.suggestion;
+        const finalSuggestion = object.suggestion;
 
         if (is3xMode) {
           finalScreens = object.screens.flatMap((screen: any) => [
@@ -1179,7 +1177,7 @@ CRITICAL:
 
               const inspiration = getAllExamples();
 
-              let systemPrompt =
+              const systemPrompt =
                 ScreenGenerationPrompt +
                 "\n\nCRITICAL: You are generating a highly detailed, production-ready screen. Do not use placeholders. Ensure all content is realistic and high-fidelity.";
 
@@ -1261,10 +1259,10 @@ CRITICAL INSTRUCTIONS:
                     },
                   ] as any,
                   tools: {
-                    googleSearch: google.tools.googleSearch({}),
-                    extractHtml: extractHtml,
+                    googleSearch: _google.tools.googleSearch({}),
+                    extractHtml: _extractHtml,
                   },
-                  stopWhen: stepCountIs(5),
+                  stopWhen: _stepCountIs(5),
                   maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
                   temperature: 0.7,
                 });
@@ -1345,7 +1343,7 @@ CRITICAL INSTRUCTIONS:
           if (!fullDesignMessageId) return;
 
           // Use intent response if available, otherwise default vision
-          const visionText = intent?.response
+          const _visionText = intent?.response
             ? `*${intent.response}*`
             : "*Analyzing your request and architecting project manifest...*";
 

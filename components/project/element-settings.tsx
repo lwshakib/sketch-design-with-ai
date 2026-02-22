@@ -1,13 +1,10 @@
 /** @jsxImportSource react */
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import {
-  X,
   RotateCcw,
   Copy,
-  Check,
   Type,
   Move,
   Palette,
@@ -23,7 +20,6 @@ import { cn } from "@/lib/utils";
 type Props = {
   selectedEl: HTMLElement | null;
   setSelectedEl: (el: HTMLElement | null) => void;
-  clearSelection: () => void;
   onUpdate: () => void;
 };
 
@@ -57,11 +53,10 @@ const lineHeights = [
 export function ElementSettings({
   selectedEl,
   setSelectedEl,
-  clearSelection,
   onUpdate,
 }: Props) {
-  const [classes, setClasses] = useState<string[]>([]);
-  const [newClass, setNewClass] = useState<string>("");
+  const [_classes, setClasses] = useState<string[]>([]);
+  const [_newClass, _setNewClass] = useState<string>("");
   const [align, setAlign] = useState<Align>("left");
   const [fontSize, setFontSize] = useState<string>("16px");
   const [fontWeight, setFontWeight] = useState<string>("400");
@@ -73,20 +68,20 @@ export function ElementSettings({
   const [margin, setMargin] = useState<string>("");
   const [width, setWidth] = useState<string>("");
   const [height, setHeight] = useState<string>("");
-  const [borderWidth, setBorderWidth] = useState<string>("");
-  const [borderColor, setBorderColor] = useState<string>("#e2e8f0");
-  const [borderStyle, setBorderStyle] = useState<string>("none");
+  const [_borderWidth, setBorderWidth] = useState<string>("");
+  const [_borderColor, setBorderColor] = useState<string>("#e2e8f0");
+  const [_borderStyle, setBorderStyle] = useState<string>("none");
   const [display, setDisplay] = useState<string>("block");
-  const [flexDirection, setFlexDirection] = useState<string>("row");
-  const [justifyContent, setJustifyContent] = useState<string>("flex-start");
-  const [alignItems, setAlignItems] = useState<string>("stretch");
-  const [gap, setGap] = useState<string>("");
+  const [_flexDirection, setFlexDirection] = useState<string>("row");
+  const [_justifyContent, setJustifyContent] = useState<string>("flex-start");
+  const [_alignItems, setAlignItems] = useState<string>("stretch");
+  const [_gap, setGap] = useState<string>("");
   const [zIndex, setZIndex] = useState<string>("");
   const [textContent, setTextContent] = useState<string>("");
   const [opacity, setOpacity] = useState<string>("1");
   const [boxShadow, setBoxShadow] = useState<string>("");
   const [initialInlineStyle, setInitialInlineStyle] = useState<string>("");
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">(
+  const [_copyState, _setCopyState] = useState<"idle" | "copied" | "error">(
     "idle",
   );
 
@@ -95,27 +90,28 @@ export function ElementSettings({
     return selectedEl.tagName.toLowerCase();
   }, [selectedEl]);
 
-  const debouncedUpdate = useMemo(() => {
-    let timeout: NodeJS.Timeout;
-    return () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        onUpdate();
-      }, 300);
-    };
+  const timeoutRef = React.useRef<NodeJS.Timeout>(null);
+  const debouncedUpdate = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      onUpdate();
+    }, 300);
   }, [onUpdate]);
 
   const applyStyle = (property: string, value: string) => {
-    if (!selectedEl) return;
+    const el = selectedEl;
+    if (!el) return;
+    const style = el.style;
     if (value === "") {
-      selectedEl.style.removeProperty(property);
+      style.removeProperty(property);
     } else {
-      selectedEl.style[property as any] = value;
+      // eslint-disable-next-line react-hooks/immutability
+      (style as any)[property] = value;
     }
     debouncedUpdate();
   };
 
-  const syncFromElement = (el: HTMLElement) => {
+  const syncFromElement = useCallback((el: HTMLElement) => {
     const computed = getComputedStyle(el);
     setAlign(
       (el.style.textAlign as Align) || (computed.textAlign as Align) || "left",
@@ -168,12 +164,12 @@ export function ElementSettings({
     );
     setTextContent(el.textContent || "");
     setInitialInlineStyle(el.getAttribute("style") || "");
-  };
+  }, []);
 
   useEffect(() => {
     if (!selectedEl) return;
     syncFromElement(selectedEl);
-  }, [selectedEl]);
+  }, [selectedEl, syncFromElement]);
 
   useEffect(() => {
     if (!selectedEl) return;
@@ -632,8 +628,9 @@ export function ElementSettings({
               className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full resize-none rounded-xl border p-3 text-xs focus:ring-1 focus:outline-none"
               value={textContent}
               onChange={(e) => {
-                setTextContent(e.target.value);
                 if (selectedEl) {
+                  setTextContent(e.target.value);
+                  // eslint-disable-next-line react-hooks/immutability
                   selectedEl.textContent = e.target.value;
                   debouncedUpdate();
                 }

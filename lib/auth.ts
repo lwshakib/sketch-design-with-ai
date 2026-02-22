@@ -20,7 +20,7 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     // Send password reset email via Resend
-    sendResetPassword: async ({ user, url, token }) => {
+    sendResetPassword: async ({ user, url: _url, token }) => {
       try {
         const resetPasswordUrl = `${process.env.BETTER_AUTH_URL}/reset-password?token=${token}`;
         const { error } = await resend.emails.send({
@@ -54,7 +54,7 @@ export const auth = betterAuth({
   // Enable email verification
   emailVerification: {
     sendOnSignUp: true,
-    sendVerificationEmail: async ({ user, url, token }, request) => {
+    sendVerificationEmail: async ({ user, url: _url, token }, _request) => {
       try {
         const verificationUrl = `${process.env.BETTER_AUTH_URL}/verify-email?token=${token}`;
         await resend.emails.send({

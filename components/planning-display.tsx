@@ -1,19 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Layout,
-  CheckCircle2,
-  Circle,
-  Clock,
-  ChevronRight,
-  ExternalLink,
-  Boxes,
-  Smartphone,
-  Monitor,
-} from "lucide-react";
+import { Clock, ChevronRight, Boxes, Smartphone, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface Screen {
   title: string;
@@ -43,7 +33,7 @@ export function PlanningDisplay({
         setSeconds((s) => s + 1);
       }, 1000);
     } else {
-      setSeconds(0);
+      setTimeout(() => setSeconds(0), 0);
     }
     return () => clearInterval(interval);
   }, [isPlanning]);

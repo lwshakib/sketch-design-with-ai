@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-import { Check, Palette, Sparkles, Layout, Type, Box, Zap } from "lucide-react";
+import { Sparkles, Type, Box, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -73,7 +73,7 @@ export function ThemeSettings({
     }),
   );
 
-  const combinedThemes = [...defaultThemes, ...projectThemes];
+  const _combinedThemes = [...defaultThemes, ...projectThemes];
 
   const handleGenerateTheme = async () => {
     if (!themePrompt.trim()) return;

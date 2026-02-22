@@ -11,7 +11,7 @@ export const extractHtml = tool({
   parameters: z.object({
     url: z.string().describe("The URL of the website to extract content from."),
   }),
-  // @ts-ignore
+  // @ts-expect-error - AI SDK tool execute type mismatch in some versions
   execute: async ({ url }: { url: string }) => {
     try {
       console.log(`[Tool] Extracting HTML from: ${url}`);

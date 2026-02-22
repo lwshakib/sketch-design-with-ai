@@ -4,11 +4,6 @@ import React, { useState, useEffect } from "react";
 import { type Artifact } from "@/lib/artifact-renderer";
 import { cn } from "@/lib/utils";
 import {
-  Smartphone,
-  Tablet,
-  Monitor,
-  LayoutGrid,
-  ExternalLink,
   QrCode,
   Copy,
   Check,
@@ -22,12 +17,7 @@ import { Button } from "@/components/ui/button";
 import { ArtifactFrame } from "@/components/project/canvas/artifact-frame";
 import { Logo } from "@/components/logo";
 import { QRCodeSVG } from "qrcode.react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface ProjectShareViewProps {
   project: {

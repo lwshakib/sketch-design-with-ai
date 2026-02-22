@@ -1,14 +1,10 @@
 import {
   generateText as _generateText,
   generateObject as _generateObject,
-  stepCountIs,
 } from "ai";
 import { GeminiModel } from "./model";
 import { MAXIMUM_OUTPUT_TOKENS } from "@/lib/constants";
 import { z } from "zod";
-import { google } from "@ai-sdk/google";
-
-import { extractHtml } from "./tools";
 
 export interface GenerateTextOptions {
   system?: string;

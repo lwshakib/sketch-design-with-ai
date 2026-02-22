@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 import {
   ArrowLeft,
@@ -9,20 +9,12 @@ import {
   History,
   Info,
   Zap,
-  Clock,
   RefreshCw,
   Loader2,
 } from "lucide-react";
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bar, BarChart, CartesianGrid, Cell, XAxis } from "recharts";
-import { cn } from "@/lib/utils";
 import NumberFlow from "@number-flow/react";
 import {
   ChartContainer,
@@ -31,7 +23,6 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { UserMenu } from "@/components/user-menu";
-import { Logo } from "@/components/logo";
 
 const chartConfig = {
   credits: {
@@ -45,12 +36,7 @@ export default function SettingsPage() {
   const [usageData, setUsageData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchCredits();
-    fetchUsageData();
-  }, []);
-
-  const fetchUsageData = async () => {
+  const fetchUsageData = useCallback(async () => {
     try {
       const res = await fetch("/api/user/credits/usage");
       const data = await res.json();
@@ -62,7 +48,12 @@ export default function SettingsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchCredits();
+    fetchUsageData();
+  }, [fetchCredits, fetchUsageData]);
 
   const getResetTimeString = () => {
     const now = new Date();

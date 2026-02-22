@@ -3,47 +3,24 @@
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
 import {
   Laptop,
   Monitor,
   Smartphone,
-  Trash2,
   LogOut,
   Loader2,
   ArrowLeft,
   CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  ShieldAlert,
   Github,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Logo } from "@/components/logo";
 import { UserMenu } from "@/components/user-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 
 export default function AccountPage() {
   const {
@@ -137,7 +114,7 @@ export default function AccountPage() {
       });
       toast.success("Profile updated");
       refetchSession();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to update profile");
     } finally {
       setIsUpdatingName(false);
@@ -176,7 +153,7 @@ export default function AccountPage() {
       });
       toast.success("Session revoked");
       fetchSessions();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to revoke session");
     } finally {
       setRevokingId(null);
@@ -189,7 +166,7 @@ export default function AccountPage() {
         provider,
         callbackURL: "/account",
       });
-    } catch (error) {
+    } catch (_error) {
       toast.error(`Failed to link ${provider} account`);
     }
   };
@@ -201,7 +178,7 @@ export default function AccountPage() {
       });
       toast.success("Account unlinked");
       fetchAccounts();
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to unlink account");
     }
   };
@@ -352,9 +329,11 @@ export default function AccountPage() {
                             <div className="flex items-center gap-4">
                               <div className="bg-background border-border flex h-10 w-10 items-center justify-center rounded-xl border shadow-sm">
                                 {provider === "google" ? (
-                                  <img
+                                  <Image
                                     src="https://www.svgrepo.com/show/475656/google-color.svg"
                                     alt="google"
+                                    width={20}
+                                    height={20}
                                     className="h-5 w-5"
                                   />
                                 ) : (

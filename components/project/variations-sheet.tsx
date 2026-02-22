@@ -40,7 +40,7 @@ export function VariationsSheet({
     isGenerating,
   } = useProjectStore();
 
-  const artifact =
+  const _artifact =
     variationsArtifactIndex !== null
       ? throttledArtifacts[variationsArtifactIndex]
       : null;

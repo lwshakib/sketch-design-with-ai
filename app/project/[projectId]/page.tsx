@@ -54,14 +54,14 @@ export default function ProjectPage() {
     dynamicFrameHeights,
     setDynamicFrameHeights,
     artifactPreviewModes,
-    setArtifactPreviewModes,
+    setArtifactPreviewModes: _setArtifactPreviewModes,
     selectedArtifactIds,
     setSelectedArtifactIds,
-    leftSidebarMode,
-    setLeftSidebarMode,
+    leftSidebarMode: _leftSidebarMode,
+    setLeftSidebarMode: _setLeftSidebarMode,
     secondarySidebarMode,
-    setSecondarySidebarMode,
-    activeThemeId,
+    setSecondarySidebarMode: _setSecondarySidebarMode,
+    activeThemeId: _activeThemeId,
     setActiveThemeId,
     appliedTheme,
     setAppliedTheme,
@@ -75,46 +75,46 @@ export default function ProjectPage() {
     setViewingCode,
     viewingTitle,
     setViewingTitle,
-    isRegenerateDialogOpen,
+    isRegenerateDialogOpen: _isRegenerateDialogOpen,
     setIsRegenerateDialogOpen,
     regenerateInstructions,
     setRegenerateInstructions,
-    isSaving,
+    isSaving: _isSaving,
     setIsSaving,
-    hasUnsavedChanges,
+    hasUnsavedChanges: _hasUnsavedChanges,
     setHasUnsavedChanges,
-    isEditTitleDialogOpen,
+    isEditTitleDialogOpen: _isEditTitleDialogOpen,
     setIsEditTitleDialogOpen,
-    editingTitle,
-    setEditingTitle,
-    isDeleteDialogOpen,
+    editingTitle: _editingTitle,
+    setEditingTitle: _setEditingTitle,
+    isDeleteDialogOpen: _isDeleteDialogOpen,
     setIsDeleteDialogOpen,
-    isExportSheetOpen,
+    isExportSheetOpen: _isExportSheetOpen,
     setIsExportSheetOpen,
-    exportArtifactIndex,
+    exportArtifactIndex: _exportArtifactIndex,
     setExportArtifactIndex,
     isSidebarVisible,
-    setIsSidebarVisible,
-    is3xMode,
-    hasCopied,
-    setHasCopied,
+    setIsSidebarVisible: _setIsSidebarVisible,
+    is3xMode: _is3xMode,
+    hasCopied: _hasCopied,
+    setHasCopied: _setHasCopied,
     designPlan,
     setDesignPlan,
-    realtimeStatus,
+    realtimeStatus: _realtimeStatus,
     setRealtimeStatus,
     setRealtimeStatuses,
-    isPlanDialogOpen,
-    setIsPlanDialogOpen,
-    isPromptDialogOpen,
-    setIsPromptDialogOpen,
-    viewingPrompt,
-    setViewingPrompt,
-    regeneratingArtifactIds,
+    isPlanDialogOpen: _isPlanDialogOpen,
+    setIsPlanDialogOpen: _setIsPlanDialogOpen,
+    isPromptDialogOpen: _isPromptDialogOpen,
+    setIsPromptDialogOpen: _setIsPromptDialogOpen,
+    viewingPrompt: _viewingPrompt,
+    setViewingPrompt: _setViewingPrompt,
+    regeneratingArtifactIds: _regeneratingArtifactIds,
     setRegeneratingArtifactIds,
     messages,
     setMessages,
-    updateState,
-    setActiveTool,
+    updateState: _updateState,
+    setActiveTool: _setActiveTool,
     resetProjectState,
     setIsVariationsSheetOpen,
     setVariationsArtifactIndex,
@@ -301,17 +301,10 @@ export default function ProjectPage() {
     if (newEvents.length === 0) return;
     processedCountRef.current = realtimeData.length;
 
-    let hasPlanUpdate = false;
-    let newPlan: any = null;
-    let newMarkdown: string = "";
-
     newEvents.forEach((event: any) => {
       if (event.topic === "plan") {
         const { plan, markdown } = event.data;
         if (plan?.screens) {
-          hasPlanUpdate = true;
-          newPlan = plan;
-          newMarkdown = markdown;
           setDesignPlan({
             screens: plan.screens,
             _markdown: markdown || plan._markdown,
@@ -524,14 +517,14 @@ export default function ProjectPage() {
 
     if (planEvents.length > 0) {
       setMessages((prev) => {
-        let updated = [...prev];
+        const updated = [...prev];
 
         planEvents.forEach((planEvent: any) => {
           const {
             plan,
             markdown,
             messageId: eventMessageId,
-            websiteUrls: eventWebsiteUrls,
+            websiteUrls: _eventWebsiteUrls,
           } = planEvent.data;
 
           let targetIndex = eventMessageId
@@ -624,6 +617,11 @@ export default function ProjectPage() {
     setArtifacts,
     setThrottledArtifacts,
     projectId,
+    fetchCredits,
+    setRegeneratingArtifactIds,
+    setProject,
+    setActiveThemeId,
+    setAppliedTheme,
   ]);
 
   useEffect(() => {
@@ -747,6 +745,7 @@ export default function ProjectPage() {
     setDesignPlan,
     setIsGenerating,
     fetchCredits,
+    resetProjectState, // Added missing dependency
   ]);
 
   useEffect(() => {
@@ -1021,6 +1020,7 @@ export default function ProjectPage() {
     }
     const doc = iframe.contentDocument;
     if (!doc || !doc.body) return;
+
     const handlePointerMove = (e: PointerEvent) => {
       const target = e.target as HTMLElement;
       if (!target || target === doc.body || target === doc.documentElement)
@@ -1084,10 +1084,16 @@ export default function ProjectPage() {
       if (selectedElRef.current)
         selectedElRef.current.classList.remove("edit-selected-highlight");
     };
-  }, [isEditMode, selectedArtifactIds, throttledArtifacts, setSelectedEl]);
+  }, [
+    isEditMode,
+    selectedArtifactIds,
+    throttledArtifacts,
+    setSelectedEl,
+    iframeRefs,
+  ]); // Added iframeRefs to dependencies
 
   const handleSave = useCallback(
-    async (showToast = true) => {
+    async (_showToast = true) => {
       if (!project) return;
       setIsSaving(true);
       try {
@@ -1343,25 +1349,28 @@ Reference the existing screen code provided in the context.`;
     toast.success("Screen removed");
   };
 
-  const captureFrameImage = async (index: number): Promise<string | null> => {
-    const artifact = throttledArtifacts[index];
-    const iframe = iframeRefs.current[artifact?.title];
-    if (!iframe?.contentDocument?.body) return null;
-    try {
-      if (iframe.contentDocument.fonts)
-        await iframe.contentDocument.fonts.ready;
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const canvas = await html2canvas(iframe.contentDocument.body, {
-        useCORS: true,
-        allowTaint: true,
-        scale: 2,
-      });
-      return canvas.toDataURL("image/png");
-    } catch (error) {
-      console.error("Capture error:", error);
-      return null;
-    }
-  };
+  const captureFrameImage = useCallback(
+    async (index: number): Promise<string | null> => {
+      const artifact = throttledArtifacts[index];
+      const iframe = iframeRefs.current[artifact?.title];
+      if (!iframe?.contentDocument?.body) return null;
+      try {
+        if (iframe.contentDocument.fonts)
+          await iframe.contentDocument.fonts.ready;
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const canvas = await html2canvas(iframe.contentDocument.body, {
+          useCORS: true,
+          allowTaint: true,
+          scale: 2,
+        });
+        return canvas.toDataURL("image/png");
+      } catch (error) {
+        console.error("Capture error:", error);
+        return null;
+      }
+    },
+    [throttledArtifacts, iframeRefs],
+  );
 
   const handleExportZip = async (index: number) => {
     const artifact = throttledArtifacts[index];
@@ -1413,7 +1422,7 @@ Reference the existing screen code provided in the context.`;
 
   const session = authClient.useSession();
 
-  const handleDownloadFullProject = async () => {
+  const handleDownloadFullProject = useCallback(async () => {
     toast.promise(
       async () => {
         const zip = new JSZip();
@@ -1445,7 +1454,7 @@ Reference the existing screen code provided in the context.`;
         error: "Failed to download project",
       },
     );
-  };
+  }, [throttledArtifacts, project?.title, captureFrameImage]);
 
   const handleDownloadFullProjectRef = useRef(handleDownloadFullProject);
   useEffect(() => {
@@ -1458,10 +1467,10 @@ Reference the existing screen code provided in the context.`;
     return () => document.removeEventListener("DOWNLOAD_PROJECT", handler);
   }, []);
 
-  const handleDuplicateProject = async () => {
+  const handleDuplicateProject = useCallback(async () => {
     toast.promise(
       async () => {
-        const res = await axios.post(`/api/projects/${projectId}/duplicate`);
+        await axios.post(`/api/projects/${projectId}/duplicate`);
         // User explicitly requested to stay on the current project, so no redirect.
       },
       {
@@ -1470,7 +1479,7 @@ Reference the existing screen code provided in the context.`;
         error: "Failed to duplicate project",
       },
     );
-  };
+  }, [projectId]);
 
   const handleDuplicateProjectRef = useRef(handleDuplicateProject);
   useEffect(() => {
@@ -1531,7 +1540,6 @@ Reference the existing screen code provided in the context.`;
             handleRetry={handleRetry}
             handleFileUpload={handleFileUpload}
             fileInputRef={fileInputRef}
-            commitEdits={commitEdits}
             applyTheme={applyTheme}
             session={session}
             status={chatStatus}

@@ -7,7 +7,7 @@ export const ModernShimmer = ({
   type?: "web" | "app" | string;
   appliedTheme?: any;
 }) => {
-  const isWeb = type === "web";
+  const _isWeb = type === "web";
   return (
     <div
       className="pointer-events-none absolute inset-0 z-50 flex flex-col gap-10 overflow-hidden p-10"

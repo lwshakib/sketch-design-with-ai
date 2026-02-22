@@ -4,22 +4,15 @@ import React, { RefObject } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus,
-  ChevronLeft,
   Trash2,
   Pencil,
   Sparkles,
-  User,
   X,
   RotateCcw,
-  Square,
   ArrowRight,
   Menu,
-  Lightbulb,
   Palette,
   CopyPlus,
-  Link,
-  Globe,
-  ImageIcon,
   LayoutGrid,
   Download,
   Files,
@@ -30,19 +23,11 @@ import {
   ClipboardPaste,
   Settings,
   Command,
-  Zap,
-  Search,
-  MoreVertical,
-  Smartphone,
-  Monitor,
-  Tablet,
-  ArrowUp,
-  Loader2,
-  Paperclip,
-  Send,
+  User,
 } from "lucide-react";
-import { uploadFileToCloudinary } from "@/lib/cloudinary-client";
+
 import { GenerationStatus } from "./generation-status";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -74,12 +59,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { extractArtifacts, stripArtifact } from "@/lib/artifact-renderer";
+import { stripArtifact } from "@/lib/artifact-renderer";
 import { useProjectStore } from "@/hooks/use-project-store";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
-import NumberFlow from "@number-flow/react";
+
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { toast } from "sonner";
 
 interface ChatSidebarProps {
   // Logic Handlers (passed from page.tsx)
@@ -87,7 +71,6 @@ interface ChatSidebarProps {
   handleRetry: () => void;
   handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   fileInputRef: RefObject<HTMLInputElement | null>;
-  commitEdits: () => void;
   applyTheme: (theme: any) => void;
   session: any;
   status: string; // from useChat
@@ -100,8 +83,7 @@ export function ChatSidebar({
   handleRetry,
   handleFileUpload: propHandleFileUpload, // Renamed to avoid conflict
   fileInputRef,
-  commitEdits,
-  applyTheme,
+  applyTheme: _applyTheme,
   session,
   status,
   messages,
@@ -109,8 +91,6 @@ export function ChatSidebar({
 }: ChatSidebarProps) {
   const router = useRouter();
   const {
-    leftSidebarMode,
-    setLeftSidebarMode,
     secondarySidebarMode,
     setSecondarySidebarMode,
     project,
@@ -119,14 +99,9 @@ export function ChatSidebar({
     attachments,
     isGenerating,
     realtimeStatus,
-    activeThemeId,
-    appliedTheme,
-    selectedEl,
-    setSelectedEl,
     setIsDeleteDialogOpen,
     setIsEditTitleDialogOpen,
     setEditingTitle,
-    isSidebarVisible,
     throttledArtifacts,
     is3xMode,
     setIs3xMode,
@@ -135,7 +110,7 @@ export function ChatSidebar({
     setSelectedArtifactIds,
   } = useProjectStore();
 
-  const { credits, fetchCredits } = useWorkspaceStore();
+  const { fetchCredits } = useWorkspaceStore();
 
   React.useEffect(() => {
     fetchCredits();
@@ -795,9 +770,13 @@ export function ChatSidebar({
                     key={idx}
                     className="group border-border bg-muted relative size-12 flex-shrink-0 overflow-hidden rounded-lg border"
                   >
-                    <img
+                    <Image
                       src={att.url}
+                      alt={`attachment-${idx}`}
                       className="h-full w-full object-cover opacity-80 transition-opacity group-hover:opacity-100"
+                      width={48}
+                      height={48}
+                      unoptimized
                     />
                     <button
                       onClick={() =>

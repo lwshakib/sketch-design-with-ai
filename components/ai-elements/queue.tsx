@@ -1,5 +1,6 @@
 "use client";
 
+import ImageNext from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -145,18 +146,20 @@ export const QueueItemAttachment = ({
   <div className={cn("mt-1 flex flex-wrap gap-2", className)} {...props} />
 );
 
-export type QueueItemImageProps = ComponentProps<"img">;
+export type QueueItemImageProps = ComponentProps<typeof ImageNext>;
 
 export const QueueItemImage = ({
   className,
+  alt = "",
   ...props
 }: QueueItemImageProps) => (
-  <img
-    alt=""
+  <ImageNext
+    alt={alt}
     className={cn("h-8 w-8 rounded border object-cover", className)}
     height={32}
     width={32}
     {...props}
+    unoptimized
   />
 );
 
