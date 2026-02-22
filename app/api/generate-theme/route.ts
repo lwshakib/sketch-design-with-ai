@@ -14,7 +14,9 @@ export async function POST(req: Request) {
       model: GeminiModel(),
       schema: z.object({
         name: z.string().describe("A short creative name for the theme"),
-        description: z.string().describe("A 1-sentence description of the design rationale"),
+        description: z
+          .string()
+          .describe("A 1-sentence description of the design rationale"),
         cssVars: z.object({
           background: z.string().describe("hex color"),
           foreground: z.string().describe("hex color"),
@@ -34,9 +36,15 @@ export async function POST(req: Request) {
           border: z.string().describe("hex color"),
           input: z.string().describe("hex color"),
           ring: z.string().describe("hex color"),
-          radius: z.string().describe("CSS radius value (e.g. 0.5rem, 1rem, 0rem)"),
-          fontSans: z.string().describe("One of these font stacks: 'Inter', 'sans-serif' OR 'Outfit', 'sans-serif' OR 'Plus Jakarta Sans', 'sans-serif' OR 'JetBrains Mono', 'monospace'")
-        })
+          radius: z
+            .string()
+            .describe("CSS radius value (e.g. 0.5rem, 1rem, 0rem)"),
+          fontSans: z
+            .string()
+            .describe(
+              "One of these font stacks: 'Inter', 'sans-serif' OR 'Outfit', 'sans-serif' OR 'Plus Jakarta Sans', 'sans-serif' OR 'JetBrains Mono', 'monospace'",
+            ),
+        }),
       }),
       system: `You are a high-end UI/UX Design tokens generator. 
       Your goal is to generate a comprehensive set of CSS variables (design tokens) for a professional application based on a user's prompt (mood, brand identity, or industry).

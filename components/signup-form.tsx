@@ -74,18 +74,24 @@ export function SignUpForm({
     return (
       <div className={cn("flex flex-col gap-6 text-center", className)}>
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <CheckCircle2 className="h-6 w-6 text-primary" />
+          <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-full">
+            <CheckCircle2 className="text-primary h-6 w-6" />
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-bold">Check your email</h1>
             <p className="text-muted-foreground text-sm text-balance">
-              We&apos;ve sent a verification link to <span className="font-medium text-foreground">{email}</span>. Please verify your email to continue.
+              We&apos;ve sent a verification link to{" "}
+              <span className="text-foreground font-medium">{email}</span>.
+              Please verify your email to continue.
             </p>
           </div>
-          <div className="flex flex-col gap-2 w-full mt-2">
+          <div className="mt-2 flex w-full flex-col gap-2">
             <Button asChild className="w-full">
-              <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://mail.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Go to Gmail
               </a>
             </Button>
@@ -113,7 +119,7 @@ export function SignUpForm({
         </div>
 
         {error && (
-          <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md text-center">
+          <div className="bg-destructive/10 text-destructive rounded-md p-3 text-center text-sm">
             {error}
           </div>
         )}
@@ -157,7 +163,7 @@ export function SignUpForm({
           <Button type="submit" disabled={isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="size-4 animate-spin mr-2" />
+                <Loader2 className="mr-2 size-4 animate-spin" />
                 Creating account...
               </>
             ) : (
@@ -174,7 +180,7 @@ export function SignUpForm({
             onClick={() => handleSocialSignUp("google")}
           >
             {socialLoading === "google" ? (
-              <Loader2 className="size-4 animate-spin mr-2" />
+              <Loader2 className="mr-2 size-4 animate-spin" />
             ) : (
               <img
                 src="https://www.svgrepo.com/show/475656/google-color.svg"

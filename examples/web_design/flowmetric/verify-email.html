@@ -1,90 +1,153 @@
-<!DOCTYPE html>
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Verify Your Account | FlowMetric</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#3c83f6",
-                        "background-light": "#f5f7f8",
-                        "background-dark": "#101722",
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "lg": "1rem",
-                        "xl": "1.5rem",
-                        "full": "9999px"
-                    },
-                },
+<!doctype html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Verify Your Account | FlowMetric</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3c83f6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101722",
             },
-        }
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "1rem",
+              xl: "1.5rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
     </script>
-<style type="text/tailwindcss">
-        .otp-input:focus {
-            @apply border-primary ring-2 ring-primary/20;
-        }
+    <style type="text/tailwindcss">
+      .otp-input:focus {
+        @apply border-primary ring-primary/20 ring-2;
+      }
     </style>
-</head>
-<body class="font-display bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-4">
-<div class="w-full max-w-md">
-<div class="flex flex-col items-center mb-8">
-<div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20 mb-4">
-<span class="material-icons text-white text-3xl">insights</span>
-</div>
-<h1 class="text-2xl font-bold text-slate-900 dark:text-white">FlowMetric</h1>
-</div>
-<div class="bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-8">
-<div class="text-center mb-8">
-<h2 class="text-xl font-semibold text-slate-900 dark:text-white">Verify your email</h2>
-<p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
-                    We sent a 6-digit code to your email. <br/>
-                    Please enter it below to verify your account.
-                </p>
-</div>
-<form action="#" class="space-y-8" method="POST">
-<div class="flex justify-between gap-2 sm:gap-4">
-<input autofocus="" class="w-12 h-14 text-center text-2xl font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg otp-input transition-all outline-none dark:text-white" maxlength="1" type="text"/>
-<input class="w-12 h-14 text-center text-2xl font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg otp-input transition-all outline-none dark:text-white" maxlength="1" type="text"/>
-<input class="w-12 h-14 text-center text-2xl font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg otp-input transition-all outline-none dark:text-white" maxlength="1" type="text"/>
-<input class="w-12 h-14 text-center text-2xl font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg otp-input transition-all outline-none dark:text-white" maxlength="1" type="text"/>
-<input class="w-12 h-14 text-center text-2xl font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg otp-input transition-all outline-none dark:text-white" maxlength="1" type="text"/>
-<input class="w-12 h-14 text-center text-2xl font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg otp-input transition-all outline-none dark:text-white" maxlength="1" type="text"/>
-</div>
-<button class="w-full bg-primary hover:bg-blue-600 text-white font-semibold py-3.5 px-4 rounded-lg shadow-md shadow-primary/25 transform active:scale-[0.98] transition-all duration-150" type="submit">
-                    Verify
-                </button>
-</form>
-<div class="mt-8 text-center">
-<p class="text-sm text-slate-500 dark:text-slate-400">
-                    Didn't receive the code? 
-                </p>
-<div class="mt-2">
-<span class="text-xs text-slate-400 dark:text-slate-500 block mb-2">Resend available in 0:54</span>
-<a class="text-sm font-semibold text-primary opacity-50 cursor-not-allowed pointer-events-none hover:text-primary/80 transition-colors" href="#">
-                        Resend code
-                    </a>
-</div>
-</div>
-</div>
-<p class="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
-            Wrong email address? 
-            <a class="font-semibold text-primary hover:text-primary/80 transition-colors" href="#">Change email</a>
-</p>
-<div class="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden opacity-50 dark:opacity-20">
-<div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[120px]"></div>
-<div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px]"></div>
-</div>
-</div>
-
-</body></html>
+  </head>
+  <body
+    class="font-display bg-background-light dark:bg-background-dark flex min-h-screen items-center justify-center p-4"
+  >
+    <div class="w-full max-w-md">
+      <div class="mb-8 flex flex-col items-center">
+        <div
+          class="bg-primary shadow-primary/20 mb-4 flex h-12 w-12 items-center justify-center rounded-lg shadow-lg"
+        >
+          <span class="material-icons text-3xl text-white">insights</span>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">
+          FlowMetric
+        </h1>
+      </div>
+      <div
+        class="rounded-xl border border-slate-200 bg-white p-8 shadow-xl dark:border-slate-700 dark:bg-slate-800"
+      >
+        <div class="mb-8 text-center">
+          <h2 class="text-xl font-semibold text-slate-900 dark:text-white">
+            Verify your email
+          </h2>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            We sent a 6-digit code to your email. <br />
+            Please enter it below to verify your account.
+          </p>
+        </div>
+        <form action="#" class="space-y-8" method="POST">
+          <div class="flex justify-between gap-2 sm:gap-4">
+            <input
+              autofocus=""
+              class="otp-input h-14 w-12 rounded-lg border border-slate-200 bg-slate-50 text-center text-2xl font-bold transition-all outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+              maxlength="1"
+              type="text"
+            />
+            <input
+              class="otp-input h-14 w-12 rounded-lg border border-slate-200 bg-slate-50 text-center text-2xl font-bold transition-all outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+              maxlength="1"
+              type="text"
+            />
+            <input
+              class="otp-input h-14 w-12 rounded-lg border border-slate-200 bg-slate-50 text-center text-2xl font-bold transition-all outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+              maxlength="1"
+              type="text"
+            />
+            <input
+              class="otp-input h-14 w-12 rounded-lg border border-slate-200 bg-slate-50 text-center text-2xl font-bold transition-all outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+              maxlength="1"
+              type="text"
+            />
+            <input
+              class="otp-input h-14 w-12 rounded-lg border border-slate-200 bg-slate-50 text-center text-2xl font-bold transition-all outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+              maxlength="1"
+              type="text"
+            />
+            <input
+              class="otp-input h-14 w-12 rounded-lg border border-slate-200 bg-slate-50 text-center text-2xl font-bold transition-all outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+              maxlength="1"
+              type="text"
+            />
+          </div>
+          <button
+            class="bg-primary shadow-primary/25 w-full transform rounded-lg px-4 py-3.5 font-semibold text-white shadow-md transition-all duration-150 hover:bg-blue-600 active:scale-[0.98]"
+            type="submit"
+          >
+            Verify
+          </button>
+        </form>
+        <div class="mt-8 text-center">
+          <p class="text-sm text-slate-500 dark:text-slate-400">
+            Didn't receive the code?
+          </p>
+          <div class="mt-2">
+            <span class="mb-2 block text-xs text-slate-400 dark:text-slate-500"
+              >Resend available in 0:54</span
+            >
+            <a
+              class="text-primary hover:text-primary/80 pointer-events-none cursor-not-allowed text-sm font-semibold opacity-50 transition-colors"
+              href="#"
+            >
+              Resend code
+            </a>
+          </div>
+        </div>
+      </div>
+      <p class="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
+        Wrong email address?
+        <a
+          class="text-primary hover:text-primary/80 font-semibold transition-colors"
+          href="#"
+          >Change email</a
+        >
+      </p>
+      <div
+        class="pointer-events-none fixed top-0 left-0 -z-10 h-full w-full overflow-hidden opacity-50 dark:opacity-20"
+      >
+        <div
+          class="bg-primary/10 absolute -top-[10%] -left-[10%] h-[40%] w-[40%] rounded-full blur-[120px]"
+        ></div>
+        <div
+          class="bg-primary/5 absolute -right-[10%] -bottom-[10%] h-[40%] w-[40%] rounded-full blur-[120px]"
+        ></div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,254 +1,491 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ParkPoint - Booking</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#3caff6",
-                        "background-light": "#f5f7f8",
-                        "background-dark": "#101b22",
-                    },
-                    fontFamily: {
-                        "display": ["Inter"]
-                    },
-                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
-                },
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ParkPoint - Booking</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3caff6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101b22",
             },
-        }
+            fontFamily: {
+              display: ["Inter"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
     </script>
-<style>
-        body { font-family: 'Inter', sans-serif; }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
     </style>
-</head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
-<!-- Top Navigation Bar -->
-<header class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-<div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-<div class="flex items-center gap-2">
-<div class="text-primary">
-<svg class="w-8 h-8" fill="currentColor" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-<path d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z"></path>
-</svg>
-</div>
-<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">ParkPoint</span>
-</div>
-<div class="flex items-center gap-4">
-<button class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-<div class="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
-<img class="w-full h-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDruuViqkc4xJmApjQXAZICXTuydT9EA8hsviKVjDY5lbHyFK8Pmj9DzpsLDJacX7sRXIW7CewRqHx2-rb-lDZrwTYBWlSfIK8KVYS56qeyu1ET3YnnPxvVrul-vA40nWk-o8gETnihW_I7RsFSB-3Ef6s4m3NtjZ_0pZqPr_FZYXJiNvFn77W1taB9KLKLulJ_6iQyjraAOBz9P9Ovlaqvg7PVh9xN5GI1Hy7PKZ1RbAU8QpKUVu8WaCHxF_nME70BsCQSmr3S74fO"/>
-</div>
-</div>
-</div>
-</header>
-<main class="max-w-4xl mx-auto px-4 py-8">
-<!-- Back Button & Breadcrumb -->
-<div class="flex items-center gap-2 mb-6">
-<button class="flex items-center text-sm font-medium text-slate-500 hover:text-primary transition-colors">
-<span class="material-symbols-outlined text-[18px] mr-1">arrow_back</span>
-                Back to results
-            </button>
-<span class="text-slate-300 dark:text-slate-700">/</span>
-<span class="text-sm font-medium text-slate-400">Booking Confirmation</span>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-<!-- Left Column: Details & Selection -->
-<div class="lg:col-span-2 space-y-6">
-<!-- Parking Summary -->
-<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-5">
-<div class="flex flex-col sm:flex-row gap-5">
-<div class="w-full sm:w-40 h-28 rounded-lg overflow-hidden shrink-0">
-<img class="w-full h-full object-cover" data-alt="Modern indoor parking garage with bright lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN42r5CGDCGnaOmJpFQ0axzA2gf6dpQ3hFt84ek1HUFiMi1dDlV-qLbcwDEVAGUtVBBjFnkeCBnACcBXoRiF9VAUZvlnGY_sMF89mvUq3wbY-7sVZjFACrpgFcjioR19kuUMFeiKKkhdMtahYlISErYDQbZYSLrl4XjdqnM5afsxTK9hSaNjYl04AQvrU3dFpV6U-3DuTF-P4zm-A74XnnF12SXcViBwaxWhpdCtIY6q6k2xswP4AuAMrsF1tKfCQBtoPU3oO9hzuM"/>
-</div>
-<div class="flex flex-col justify-between py-1">
-<div>
-<h2 class="text-xl font-bold text-slate-900 dark:text-white mb-1">Grand Central Parking</h2>
-<div class="flex items-center text-slate-500 dark:text-slate-400 text-sm">
-<span class="material-symbols-outlined text-[16px] mr-1">location_on</span>
-                                    123 Park Ave, New York, NY 10017
-                                </div>
-</div>
-<div class="mt-4 flex gap-2">
-<span class="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded uppercase tracking-wider">Secure</span>
-<span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold rounded uppercase tracking-wider">EV Charging</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Scheduling Section -->
-<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-<h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-<span class="material-symbols-outlined text-primary">calendar_today</span>
-                        Schedule Parking
-                    </h3>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-<div class="space-y-2">
-<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Arrival</label>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">event</span>
-<input class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" type="date" value="2023-10-05"/>
-</div>
-<div class="relative mt-2">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">schedule</span>
-<select class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none appearance-none">
-<option>09:00 AM</option>
-<option>10:00 AM</option>
-<option>11:00 AM</option>
-</select>
-</div>
-</div>
-<div class="space-y-2">
-<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Departure</label>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">event</span>
-<input class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" type="date" value="2023-10-05"/>
-</div>
-<div class="relative mt-2">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">schedule</span>
-<select class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none appearance-none">
-<option>01:00 PM</option>
-<option selected="">05:00 PM</option>
-<option>09:00 PM</option>
-</select>
-</div>
-</div>
-</div>
-<div class="mt-8">
-<label class="text-sm font-medium text-slate-700 dark:text-slate-300 block mb-4">Quick Duration Selector</label>
-<div class="flex flex-wrap gap-3">
-<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-medium hover:border-primary hover:text-primary transition-colors">2 Hours</button>
-<button class="px-4 py-2 rounded-full border border-primary bg-primary/10 text-primary text-sm font-bold">4 Hours</button>
-<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-medium hover:border-primary hover:text-primary transition-colors">8 Hours</button>
-<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 text-sm font-medium hover:border-primary hover:text-primary transition-colors">Full Day</button>
-</div>
-</div>
-</div>
-<!-- Payment Methods -->
-<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-<h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-<span class="material-symbols-outlined text-primary">payments</span>
-                        Payment Method
-                    </h3>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-<button class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-primary bg-primary/5 transition-all group">
-<span class="material-symbols-outlined text-primary mb-2 text-[32px]">credit_card</span>
-<span class="text-sm font-bold text-slate-900 dark:text-white">Credit Card</span>
-</button>
-<button class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-all group">
-<span class="material-symbols-outlined text-slate-400 group-hover:text-primary/70 mb-2 text-[32px]">account_balance_wallet</span>
-<span class="text-sm font-medium text-slate-600 dark:text-slate-400">PayPal</span>
-</button>
-<button class="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-all group">
-<span class="material-symbols-outlined text-slate-400 group-hover:text-primary/70 mb-2 text-[32px]">devices</span>
-<span class="text-sm font-medium text-slate-600 dark:text-slate-400">Apple Pay</span>
-</button>
-</div>
-<div class="mt-6 space-y-4">
-<div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">person</span>
-<input class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-primary" placeholder="Cardholder Name" type="text"/>
-</div>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">credit_card</span>
-<input class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-primary" placeholder="Card Number" type="text"/>
-</div>
-<div class="grid grid-cols-2 gap-4">
-<input class="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-primary" placeholder="MM/YY" type="text"/>
-<input class="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-primary" placeholder="CVC" type="text"/>
-</div>
-</div>
-</div>
-</div>
-<!-- Right Column: Price Calculation Panel -->
-<div class="lg:col-span-1">
-<div class="sticky top-24 space-y-4">
-<div class="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
-<div class="p-6">
-<h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6">Order Summary</h3>
-<div class="space-y-4 text-sm">
-<div class="flex justify-between text-slate-600 dark:text-slate-400">
-<span>Base Rate ($5.00/hr)</span>
-<span class="font-medium text-slate-900 dark:text-white">$20.00</span>
-</div>
-<div class="flex justify-between text-slate-600 dark:text-slate-400">
-<span>Platform Fee</span>
-<span class="font-medium text-slate-900 dark:text-white">$1.50</span>
-</div>
-<div class="flex justify-between text-slate-600 dark:text-slate-400">
-<span>Tax (8.25%)</span>
-<span class="font-medium text-slate-900 dark:text-white">$1.77</span>
-</div>
-<div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-end">
-<div class="flex flex-col">
-<span class="text-slate-500 text-xs uppercase font-bold tracking-wider">Total Amount</span>
-<span class="text-3xl font-black text-slate-900 dark:text-white">$23.27</span>
-</div>
-<span class="text-green-600 text-xs font-bold bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded">USD</span>
-</div>
-</div>
-<div class="mt-8 space-y-3">
-<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/25 transition-all flex items-center justify-center gap-2">
-<span class="material-symbols-outlined">lock</span>
-                                    Confirm Booking
-                                </button>
-<p class="text-[11px] text-center text-slate-400 px-4">
-                                    By clicking confirm, you agree to our Terms of Service and Cancellation Policy.
-                                </p>
-</div>
-</div>
-<!-- Mini Map Preview -->
-<div class="h-32 w-full relative">
-<img class="w-full h-full object-cover grayscale opacity-50" data-alt="Abstract aerial map pattern in blue and gray tones" data-location="New York" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsB5bCwZVXSNVoeRJl6487jQKSA-AuZs46FXr-Fnf2oz-cWWsOhn-Pl070neBspBmxPiszMMzl42mEkz2dID40aXE-S-PDBP-Bv74gg9xzicJgHrFWrIlOup99GWLtvvuP3SFuXNzUy4rpIViJfil3M5aE6pNJKWbWaBe3FLLCoDHt3s6LmTZQ2ABBJIekN6qUvVD6C69CcJHb-uFoGDWqWqKyvcEfQQTvpd3o8cbKJS8WW3x2BlnT4W3wLPUoF8stS9lysBBf5-wB"/>
-<div class="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-900 to-transparent"></div>
-<div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-<span class="material-symbols-outlined text-[14px]">map</span>
-                                View in Maps
-                            </div>
-</div>
-</div>
-<!-- Help Card -->
-<div class="bg-primary/5 dark:bg-primary/10 rounded-xl p-4 border border-primary/20 flex items-start gap-3">
-<span class="material-symbols-outlined text-primary">info</span>
-<div>
-<p class="text-xs font-bold text-primary uppercase tracking-tight">Need help?</p>
-<p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mt-1">Our support team is available 24/7 for booking assistance.</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</main>
-<footer class="max-w-4xl mx-auto px-4 py-12 border-t border-slate-200 dark:border-slate-800">
-<div class="flex flex-col md:flex-row justify-between items-center gap-6">
-<div class="flex items-center gap-2 grayscale opacity-50">
-<div class="text-slate-900 dark:text-white">
-<svg class="w-6 h-6" fill="currentColor" viewbox="0 0 48 48">
-<path d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z"></path>
-</svg>
-</div>
-<span class="font-bold tracking-tight text-slate-900 dark:text-white">ParkPoint</span>
-</div>
-<div class="flex gap-8 text-sm font-medium text-slate-500">
-<a class="hover:text-primary" href="#">Support</a>
-<a class="hover:text-primary" href="#">Privacy</a>
-<a class="hover:text-primary" href="#">Terms</a>
-<a class="hover:text-primary" href="#">Refund Policy</a>
-</div>
-<p class="text-sm text-slate-400">© 2023 ParkPoint Inc.</p>
-</div>
-</footer>
-</body></html>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark min-h-screen text-slate-900 dark:text-slate-100"
+  >
+    <!-- Top Navigation Bar -->
+    <header
+      class="dark:bg-background-dark/80 sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md dark:border-slate-800"
+    >
+      <div
+        class="mx-auto flex h-16 max-w-5xl items-center justify-between px-4"
+      >
+        <div class="flex items-center gap-2">
+          <div class="text-primary">
+            <svg
+              class="h-8 w-8"
+              fill="currentColor"
+              viewbox="0 0 48 48"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z"
+              ></path>
+            </svg>
+          </div>
+          <span
+            class="text-xl font-bold tracking-tight text-slate-900 dark:text-white"
+            >ParkPoint</span
+          >
+        </div>
+        <div class="flex items-center gap-4">
+          <button
+            class="rounded-lg bg-slate-100 p-2 text-slate-600 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
+          >
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <div
+            class="bg-primary/20 border-primary/30 flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border"
+          >
+            <img
+              class="h-full w-full object-cover"
+              data-alt="User profile avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDruuViqkc4xJmApjQXAZICXTuydT9EA8hsviKVjDY5lbHyFK8Pmj9DzpsLDJacX7sRXIW7CewRqHx2-rb-lDZrwTYBWlSfIK8KVYS56qeyu1ET3YnnPxvVrul-vA40nWk-o8gETnihW_I7RsFSB-3Ef6s4m3NtjZ_0pZqPr_FZYXJiNvFn77W1taB9KLKLulJ_6iQyjraAOBz9P9Ovlaqvg7PVh9xN5GI1Hy7PKZ1RbAU8QpKUVu8WaCHxF_nME70BsCQSmr3S74fO"
+            />
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="mx-auto max-w-4xl px-4 py-8">
+      <!-- Back Button & Breadcrumb -->
+      <div class="mb-6 flex items-center gap-2">
+        <button
+          class="hover:text-primary flex items-center text-sm font-medium text-slate-500 transition-colors"
+        >
+          <span class="material-symbols-outlined mr-1 text-[18px]"
+            >arrow_back</span
+          >
+          Back to results
+        </button>
+        <span class="text-slate-300 dark:text-slate-700">/</span>
+        <span class="text-sm font-medium text-slate-400"
+          >Booking Confirmation</span
+        >
+      </div>
+      <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <!-- Left Column: Details & Selection -->
+        <div class="space-y-6 lg:col-span-2">
+          <!-- Parking Summary -->
+          <div
+            class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div class="flex flex-col gap-5 sm:flex-row">
+              <div
+                class="h-28 w-full shrink-0 overflow-hidden rounded-lg sm:w-40"
+              >
+                <img
+                  class="h-full w-full object-cover"
+                  data-alt="Modern indoor parking garage with bright lights"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN42r5CGDCGnaOmJpFQ0axzA2gf6dpQ3hFt84ek1HUFiMi1dDlV-qLbcwDEVAGUtVBBjFnkeCBnACcBXoRiF9VAUZvlnGY_sMF89mvUq3wbY-7sVZjFACrpgFcjioR19kuUMFeiKKkhdMtahYlISErYDQbZYSLrl4XjdqnM5afsxTK9hSaNjYl04AQvrU3dFpV6U-3DuTF-P4zm-A74XnnF12SXcViBwaxWhpdCtIY6q6k2xswP4AuAMrsF1tKfCQBtoPU3oO9hzuM"
+                />
+              </div>
+              <div class="flex flex-col justify-between py-1">
+                <div>
+                  <h2
+                    class="mb-1 text-xl font-bold text-slate-900 dark:text-white"
+                  >
+                    Grand Central Parking
+                  </h2>
+                  <div
+                    class="flex items-center text-sm text-slate-500 dark:text-slate-400"
+                  >
+                    <span class="material-symbols-outlined mr-1 text-[16px]"
+                      >location_on</span
+                    >
+                    123 Park Ave, New York, NY 10017
+                  </div>
+                </div>
+                <div class="mt-4 flex gap-2">
+                  <span
+                    class="rounded bg-green-100 px-2 py-1 text-xs font-semibold tracking-wider text-green-700 uppercase dark:bg-green-900/30 dark:text-green-400"
+                    >Secure</span
+                  >
+                  <span
+                    class="rounded bg-slate-100 px-2 py-1 text-xs font-semibold tracking-wider text-slate-600 uppercase dark:bg-slate-800 dark:text-slate-400"
+                    >EV Charging</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Scheduling Section -->
+          <div
+            class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          >
+            <h3
+              class="mb-6 flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white"
+            >
+              <span class="material-symbols-outlined text-primary"
+                >calendar_today</span
+              >
+              Schedule Parking
+            </h3>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div class="space-y-2">
+                <label
+                  class="text-sm font-medium text-slate-700 dark:text-slate-300"
+                  >Arrival</label
+                >
+                <div class="relative">
+                  <span
+                    class="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-[20px] text-slate-400"
+                    >event</span
+                  >
+                  <input
+                    class="focus:ring-primary/20 focus:border-primary w-full rounded-lg border border-slate-200 bg-white py-3 pr-4 pl-10 transition-all outline-none focus:ring-2 dark:border-slate-700 dark:bg-slate-800"
+                    type="date"
+                    value="2023-10-05"
+                  />
+                </div>
+                <div class="relative mt-2">
+                  <span
+                    class="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-[20px] text-slate-400"
+                    >schedule</span
+                  >
+                  <select
+                    class="focus:ring-primary/20 focus:border-primary w-full appearance-none rounded-lg border border-slate-200 bg-white py-3 pr-4 pl-10 transition-all outline-none focus:ring-2 dark:border-slate-700 dark:bg-slate-800"
+                  >
+                    <option>09:00 AM</option>
+                    <option>10:00 AM</option>
+                    <option>11:00 AM</option>
+                  </select>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label
+                  class="text-sm font-medium text-slate-700 dark:text-slate-300"
+                  >Departure</label
+                >
+                <div class="relative">
+                  <span
+                    class="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-[20px] text-slate-400"
+                    >event</span
+                  >
+                  <input
+                    class="focus:ring-primary/20 focus:border-primary w-full rounded-lg border border-slate-200 bg-white py-3 pr-4 pl-10 transition-all outline-none focus:ring-2 dark:border-slate-700 dark:bg-slate-800"
+                    type="date"
+                    value="2023-10-05"
+                  />
+                </div>
+                <div class="relative mt-2">
+                  <span
+                    class="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-[20px] text-slate-400"
+                    >schedule</span
+                  >
+                  <select
+                    class="focus:ring-primary/20 focus:border-primary w-full appearance-none rounded-lg border border-slate-200 bg-white py-3 pr-4 pl-10 transition-all outline-none focus:ring-2 dark:border-slate-700 dark:bg-slate-800"
+                  >
+                    <option>01:00 PM</option>
+                    <option selected="">05:00 PM</option>
+                    <option>09:00 PM</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="mt-8">
+              <label
+                class="mb-4 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                >Quick Duration Selector</label
+              >
+              <div class="flex flex-wrap gap-3">
+                <button
+                  class="hover:border-primary hover:text-primary rounded-full border border-slate-200 px-4 py-2 text-sm font-medium transition-colors dark:border-slate-700"
+                >
+                  2 Hours
+                </button>
+                <button
+                  class="border-primary bg-primary/10 text-primary rounded-full border px-4 py-2 text-sm font-bold"
+                >
+                  4 Hours
+                </button>
+                <button
+                  class="hover:border-primary hover:text-primary rounded-full border border-slate-200 px-4 py-2 text-sm font-medium transition-colors dark:border-slate-700"
+                >
+                  8 Hours
+                </button>
+                <button
+                  class="hover:border-primary hover:text-primary rounded-full border border-slate-200 px-4 py-2 text-sm font-medium transition-colors dark:border-slate-700"
+                >
+                  Full Day
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Payment Methods -->
+          <div
+            class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          >
+            <h3
+              class="mb-6 flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white"
+            >
+              <span class="material-symbols-outlined text-primary"
+                >payments</span
+              >
+              Payment Method
+            </h3>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <button
+                class="border-primary bg-primary/5 group flex flex-col items-center justify-center rounded-xl border-2 p-4 transition-all"
+              >
+                <span
+                  class="material-symbols-outlined text-primary mb-2 text-[32px]"
+                  >credit_card</span
+                >
+                <span class="text-sm font-bold text-slate-900 dark:text-white"
+                  >Credit Card</span
+                >
+              </button>
+              <button
+                class="hover:border-primary/50 group flex flex-col items-center justify-center rounded-xl border border-slate-200 p-4 transition-all dark:border-slate-800"
+              >
+                <span
+                  class="material-symbols-outlined group-hover:text-primary/70 mb-2 text-[32px] text-slate-400"
+                  >account_balance_wallet</span
+                >
+                <span
+                  class="text-sm font-medium text-slate-600 dark:text-slate-400"
+                  >PayPal</span
+                >
+              </button>
+              <button
+                class="hover:border-primary/50 group flex flex-col items-center justify-center rounded-xl border border-slate-200 p-4 transition-all dark:border-slate-800"
+              >
+                <span
+                  class="material-symbols-outlined group-hover:text-primary/70 mb-2 text-[32px] text-slate-400"
+                  >devices</span
+                >
+                <span
+                  class="text-sm font-medium text-slate-600 dark:text-slate-400"
+                  >Apple Pay</span
+                >
+              </button>
+            </div>
+            <div class="mt-6 space-y-4">
+              <div class="relative">
+                <span
+                  class="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+                  >person</span
+                >
+                <input
+                  class="focus:border-primary w-full rounded-lg border border-slate-200 bg-white py-3 pr-4 pl-10 outline-none dark:border-slate-700 dark:bg-slate-800"
+                  placeholder="Cardholder Name"
+                  type="text"
+                />
+              </div>
+              <div class="relative">
+                <span
+                  class="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+                  >credit_card</span
+                >
+                <input
+                  class="focus:border-primary w-full rounded-lg border border-slate-200 bg-white py-3 pr-4 pl-10 outline-none dark:border-slate-700 dark:bg-slate-800"
+                  placeholder="Card Number"
+                  type="text"
+                />
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <input
+                  class="focus:border-primary w-full rounded-lg border border-slate-200 bg-white px-4 py-3 outline-none dark:border-slate-700 dark:bg-slate-800"
+                  placeholder="MM/YY"
+                  type="text"
+                />
+                <input
+                  class="focus:border-primary w-full rounded-lg border border-slate-200 bg-white px-4 py-3 outline-none dark:border-slate-700 dark:bg-slate-800"
+                  placeholder="CVC"
+                  type="text"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Right Column: Price Calculation Panel -->
+        <div class="lg:col-span-1">
+          <div class="sticky top-24 space-y-4">
+            <div
+              class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900"
+            >
+              <div class="p-6">
+                <h3
+                  class="mb-6 text-lg font-bold text-slate-900 dark:text-white"
+                >
+                  Order Summary
+                </h3>
+                <div class="space-y-4 text-sm">
+                  <div
+                    class="flex justify-between text-slate-600 dark:text-slate-400"
+                  >
+                    <span>Base Rate ($5.00/hr)</span>
+                    <span class="font-medium text-slate-900 dark:text-white"
+                      >$20.00</span
+                    >
+                  </div>
+                  <div
+                    class="flex justify-between text-slate-600 dark:text-slate-400"
+                  >
+                    <span>Platform Fee</span>
+                    <span class="font-medium text-slate-900 dark:text-white"
+                      >$1.50</span
+                    >
+                  </div>
+                  <div
+                    class="flex justify-between text-slate-600 dark:text-slate-400"
+                  >
+                    <span>Tax (8.25%)</span>
+                    <span class="font-medium text-slate-900 dark:text-white"
+                      >$1.77</span
+                    >
+                  </div>
+                  <div
+                    class="flex items-end justify-between border-t border-slate-100 pt-4 dark:border-slate-800"
+                  >
+                    <div class="flex flex-col">
+                      <span
+                        class="text-xs font-bold tracking-wider text-slate-500 uppercase"
+                        >Total Amount</span
+                      >
+                      <span
+                        class="text-3xl font-black text-slate-900 dark:text-white"
+                        >$23.27</span
+                      >
+                    </div>
+                    <span
+                      class="rounded bg-green-50 px-2 py-1 text-xs font-bold text-green-600 dark:bg-green-900/20"
+                      >USD</span
+                    >
+                  </div>
+                </div>
+                <div class="mt-8 space-y-3">
+                  <button
+                    class="bg-primary hover:bg-primary/90 shadow-primary/25 flex w-full items-center justify-center gap-2 rounded-xl py-4 font-bold text-white shadow-lg transition-all"
+                  >
+                    <span class="material-symbols-outlined">lock</span>
+                    Confirm Booking
+                  </button>
+                  <p class="px-4 text-center text-[11px] text-slate-400">
+                    By clicking confirm, you agree to our Terms of Service and
+                    Cancellation Policy.
+                  </p>
+                </div>
+              </div>
+              <!-- Mini Map Preview -->
+              <div class="relative h-32 w-full">
+                <img
+                  class="h-full w-full object-cover opacity-50 grayscale"
+                  data-alt="Abstract aerial map pattern in blue and gray tones"
+                  data-location="New York"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsB5bCwZVXSNVoeRJl6487jQKSA-AuZs46FXr-Fnf2oz-cWWsOhn-Pl070neBspBmxPiszMMzl42mEkz2dID40aXE-S-PDBP-Bv74gg9xzicJgHrFWrIlOup99GWLtvvuP3SFuXNzUy4rpIViJfil3M5aE6pNJKWbWaBe3FLLCoDHt3s6LmTZQ2ABBJIekN6qUvVD6C69CcJHb-uFoGDWqWqKyvcEfQQTvpd3o8cbKJS8WW3x2BlnT4W3wLPUoF8stS9lysBBf5-wB"
+                />
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-white to-transparent dark:from-slate-900"
+                ></div>
+                <div
+                  class="absolute bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase"
+                >
+                  <span class="material-symbols-outlined text-[14px]">map</span>
+                  View in Maps
+                </div>
+              </div>
+            </div>
+            <!-- Help Card -->
+            <div
+              class="bg-primary/5 dark:bg-primary/10 border-primary/20 flex items-start gap-3 rounded-xl border p-4"
+            >
+              <span class="material-symbols-outlined text-primary">info</span>
+              <div>
+                <p
+                  class="text-primary text-xs font-bold tracking-tight uppercase"
+                >
+                  Need help?
+                </p>
+                <p
+                  class="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400"
+                >
+                  Our support team is available 24/7 for booking assistance.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer
+      class="mx-auto max-w-4xl border-t border-slate-200 px-4 py-12 dark:border-slate-800"
+    >
+      <div class="flex flex-col items-center justify-between gap-6 md:flex-row">
+        <div class="flex items-center gap-2 opacity-50 grayscale">
+          <div class="text-slate-900 dark:text-white">
+            <svg class="h-6 w-6" fill="currentColor" viewbox="0 0 48 48">
+              <path
+                d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z"
+              ></path>
+            </svg>
+          </div>
+          <span class="font-bold tracking-tight text-slate-900 dark:text-white"
+            >ParkPoint</span
+          >
+        </div>
+        <div class="flex gap-8 text-sm font-medium text-slate-500">
+          <a class="hover:text-primary" href="#">Support</a>
+          <a class="hover:text-primary" href="#">Privacy</a>
+          <a class="hover:text-primary" href="#">Terms</a>
+          <a class="hover:text-primary" href="#">Refund Policy</a>
+        </div>
+        <p class="text-sm text-slate-400">© 2023 ParkPoint Inc.</p>
+      </div>
+    </footer>
+  </body>
+</html>

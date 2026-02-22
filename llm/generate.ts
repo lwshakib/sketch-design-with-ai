@@ -1,5 +1,5 @@
-import { 
-  generateText as _generateText, 
+import {
+  generateText as _generateText,
   generateObject as _generateObject,
   stepCountIs,
 } from "ai";

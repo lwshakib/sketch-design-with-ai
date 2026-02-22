@@ -5,11 +5,11 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ projectId: string }> }
+  { params }: { params: Promise<{ projectId: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
-      headers: await headers()
+      headers: await headers(),
     });
 
     if (!session) {
@@ -27,14 +27,14 @@ export async function GET(
         messages: {
           orderBy: {
             createdAt: "asc",
-          }
+          },
         },
         screens: {
           orderBy: {
             createdAt: "asc",
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     if (!project) {
@@ -50,11 +50,11 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ projectId: string }> }
+  { params }: { params: Promise<{ projectId: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
-      headers: await headers()
+      headers: await headers(),
     });
 
     if (!session) {
@@ -74,7 +74,7 @@ export async function PATCH(
         canvasData,
         title,
         selectedTheme,
-      }
+      },
     });
 
     return NextResponse.json(project);
@@ -86,11 +86,11 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ projectId: string }> }
+  { params }: { params: Promise<{ projectId: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
-      headers: await headers()
+      headers: await headers(),
     });
 
     if (!session) {

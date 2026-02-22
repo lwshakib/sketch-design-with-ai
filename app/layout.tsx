@@ -3,7 +3,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
-
 export const metadata: Metadata = {
   title: {
     default: "Sketch - AI-Powered Design Tool",
@@ -54,7 +53,7 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
- icons: {
+  icons: {
     icon: [
       {
         url: "/favicon_io/favicon-16x16.png",

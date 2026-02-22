@@ -5,11 +5,11 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ screenId: string }> }
+  { params }: { params: Promise<{ screenId: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
-      headers: await headers()
+      headers: await headers(),
     });
 
     if (!session) {
@@ -21,9 +21,9 @@ export async function PATCH(
     const { action } = body; // 'like' | 'dislike' | 'none'
 
     let data = {};
-    if (action === 'like') {
+    if (action === "like") {
       data = { isLiked: true, isDisliked: false };
-    } else if (action === 'dislike') {
+    } else if (action === "dislike") {
       data = { isLiked: false, isDisliked: true };
     } else {
       data = { isLiked: false, isDisliked: false };
@@ -33,10 +33,10 @@ export async function PATCH(
       where: {
         id: screenId,
         project: {
-          userId: session.user.id
-        }
+          userId: session.user.id,
+        },
       },
-      data
+      data,
     });
 
     return NextResponse.json(screen);

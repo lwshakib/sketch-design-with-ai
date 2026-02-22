@@ -7,19 +7,19 @@ import { inngest } from "@/inngest/client";
 export async function POST(req: Request) {
   try {
     const session = await auth.api.getSession({
-      headers: await headers()
+      headers: await headers(),
     });
 
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { 
-      messages, 
-      projectId, 
-      is3xMode, 
-      imageUrls, 
-      isSilent, 
+    const {
+      messages,
+      projectId,
+      is3xMode,
+      imageUrls,
+      isSilent,
       selectedScreens,
       screenId,
       instructions,
@@ -28,13 +28,13 @@ export async function POST(req: Request) {
       optionsCount,
       variationCreativeRange,
       variationCustomInstructions,
-      variationAspects
+      variationAspects,
     } = await req.json();
 
     if (!projectId) {
       return NextResponse.json(
         { error: "projectId is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     if (!lastMessage || lastMessage.role !== "user") {
       return NextResponse.json(
         { error: "Last message must be from user" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -53,12 +53,14 @@ export async function POST(req: Request) {
         projectId: projectId,
         role: "user",
         parts: lastMessage.parts || [
-          { 
-            type: 'text', 
-            text: typeof lastMessage.content === 'string' 
-              ? lastMessage.content 
-              : lastMessage.parts?.find((p: any) => p.type === 'text')?.text || "" 
-          }
+          {
+            type: "text",
+            text:
+              typeof lastMessage.content === "string"
+                ? lastMessage.content
+                : lastMessage.parts?.find((p: any) => p.type === "text")
+                    ?.text || "",
+          },
         ],
         plan: selectedScreens ? { selectedScreens } : undefined,
       },
@@ -67,9 +69,9 @@ export async function POST(req: Request) {
     // 2. Create Assistant Message Placeholder (if not silent)
     let assistantMessageId = null;
     if (!isSilent) {
-      const introText = screenId 
-        ? "*Architecting refactored layout...*" 
-        : isVariations 
+      const introText = screenId
+        ? "*Architecting refactored layout...*"
+        : isVariations
           ? `*Architecting variations...*`
           : "*Analyzing your request and architecting project manifest...*";
 
@@ -85,29 +87,34 @@ export async function POST(req: Request) {
     }
 
     // Normalize messages for Inngest
-    const normalizedMessages = (messages || []).map((msg: any) => {
-      // Handle simple string content
-      if (typeof msg.content === 'string' && !msg.parts) {
-        return { role: msg.role, content: msg.content };
-      }
+    const normalizedMessages = (messages || [])
+      .map((msg: any) => {
+        // Handle simple string content
+        if (typeof msg.content === "string" && !msg.parts) {
+          return { role: msg.role, content: msg.content };
+        }
 
-      // Handle multipart content
-      if (msg.parts && Array.isArray(msg.parts)) {
-        const content = msg.parts.map((p: any) => {
-          if (p.type === 'text') return { type: 'text', text: p.text };
-          if (p.type === 'image' || p.type === 'file') return { type: 'image', image: p.url };
-          return null;
-        }).filter(Boolean);
-        
-        return { role: msg.role, content };
-      }
+        // Handle multipart content
+        if (msg.parts && Array.isArray(msg.parts)) {
+          const content = msg.parts
+            .map((p: any) => {
+              if (p.type === "text") return { type: "text", text: p.text };
+              if (p.type === "image" || p.type === "file")
+                return { type: "image", image: p.url };
+              return null;
+            })
+            .filter(Boolean);
 
-      // Fallback
-      return { role: msg.role, content: msg.content || "" };
-    }).filter((msg: any) => {
-       if (Array.isArray(msg.content)) return msg.content.length > 0;
-       return !!msg.content;
-    });
+          return { role: msg.role, content };
+        }
+
+        // Fallback
+        return { role: msg.role, content: msg.content || "" };
+      })
+      .filter((msg: any) => {
+        if (Array.isArray(msg.content)) return msg.content.length > 0;
+        return !!msg.content;
+      });
 
     // Trigger Inngest function
     await inngest.send({
@@ -126,13 +133,16 @@ export async function POST(req: Request) {
         optionsCount,
         variationCreativeRange,
         variationCustomInstructions,
-        variationAspects
+        variationAspects,
       },
     });
 
     return NextResponse.json({ success: true, assistantMessageId });
   } catch (error) {
     console.error("[CHAT]", error);
-    return NextResponse.json({ error: "Failed to start design generation" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to start design generation" },
+      { status: 500 },
+    );
   }
 }

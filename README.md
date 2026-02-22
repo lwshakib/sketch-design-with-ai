@@ -30,18 +30,18 @@ graph TD
         UI[User Interface]
         Canvas[Infinite Canvas]
     end
-    
+
     subgraph Server ["Server Side (Next.js API Routes)"]
         Auth[Better Auth]
         InngestAPI[Inngest Functions]
         ProjectAPI[Project API]
     end
-    
+
     subgraph Services ["External Services"]
         Gemini[Google Gemini AI]
         InngestCloud[Inngest Dev Server / Cloud]
     end
-    
+
     subgraph Data ["Data Layer"]
         DB[(PostgreSQL)]
     end
@@ -50,14 +50,14 @@ graph TD
     UI -->|Draws/Edits| Canvas
     UI -->|Authenticates| Auth
     UI -->|API Requests| ProjectAPI
-    
+
     ProjectAPI -->|CRUD| DB
     ProjectAPI -->|Trigger Event| InngestCloud
-    
+
     InngestCloud -->|Execute Function| InngestAPI
     InngestAPI -->|Generate Content| Gemini
     InngestAPI -->|Store Result| DB
-    
+
     Auth -->|Persist Session| DB
 ```
 
@@ -84,12 +84,14 @@ graph TD
 ## ✨ Key Features
 
 ### Design Creation
+
 - **Prompt Interface**: Robust text input for describing complex UI requirements
 - **Image Upload**: Upload screenshots, mood boards, or existing sketches for reference
 - **Interactive Canvas**: Intuitive drawing tools for manual adjustments
 - **Multi-Frame Workspace**: Work on multiple design variations simultaneously
 
 ### AI Capabilities
+
 - **Smart Design Generation**: AI understands context and generates pixel-perfect designs using Gemini 2.0 Flash
 - **Design Variations**: Create multiple visual explorations from a single prompt or screen
 - **Auto-Retry & Validation**: Intelligent system that retries generation if output is incomplete or faulty
@@ -98,12 +100,14 @@ graph TD
 - **Responsive Previews**: View designs in Mobile, Tablet, and Desktop modes with live sidebar thumbnails
 
 ### Project Management
+
 - **User Authentication**: Secure login with Better Auth
 - **Project Organization**: Create and manage multiple design projects
 - **Version History**: Track all design iterations through message history
 - **Cloud Storage**: All projects saved to PostgreSQL database
 
 ### Developer Experience
+
 - **Modern Tech Stack**: Built with Next.js 16, React 19, and TypeScript
 - **Component Library**: Extensive UI components with Radix UI
 - **Code Editor**: Monaco Editor integration for code viewing/editing
@@ -112,6 +116,7 @@ graph TD
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Framework**: [Next.js 16.1.1](https://nextjs.org/) with App Router
 - **Language**: [TypeScript 5](https://www.typescriptlang.org/)
 - **UI Library**: [React 19.2.3](https://react.dev/)
@@ -120,11 +125,13 @@ graph TD
 - **Components**: [Radix UI](https://www.radix-ui.com/) + [shadcn/ui](https://ui.shadcn.com/)
 
 ### Backend & Database
+
 - **Database**: [PostgreSQL](https://www.postgresql.org/) with [Prisma ORM 7.2](https://www.prisma.io/)
 - **Authentication**: [Better Auth 1.4](https://www.better-auth.com/)
 - **AI Integration**: [Google AI SDK](https://ai.google.dev/) with Gemini 2.0 Flash
 
 ### Additional Tools
+
 - **Canvas**: HTML5 Canvas API
 - **Code Editor**: [Monaco Editor](https://microsoft.github.io/monaco-editor/)
 - **Image Processing**: [html2canvas](https://html2canvas.hertzen.com/)
@@ -152,11 +159,13 @@ cd sketch-design-with-ai
 ### 2. Install Dependencies
 
 Using Bun (recommended):
+
 ```bash
 bun install
 ```
 
 Or using npm:
+
 ```bash
 npm install
 ```
@@ -189,6 +198,7 @@ CLOUDINARY_API_SECRET="your_api_secret"
 ```
 
 **Getting API Keys:**
+
 - **Google Gemini API**: Get your free API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
 - **Cloudinary** (Optional): Sign up at [Cloudinary](https://cloudinary.com/) for image hosting
 
@@ -272,7 +282,7 @@ sketch-design-with-ai/
 1. **Sign Up/Login**: Create an account or sign in
 2. **Create Project**: Click "New Project" on the dashboard
 3. **Sketch Your Idea**: Use the canvas to sketch your UI concept
-4. **AI Generation**: 
+4. **AI Generation**:
    - Type a prompt describing your design (e.g., "Create a modern landing page with hero section")
    - Or upload a sketch image
    - Click "Generate Design"
@@ -319,6 +329,7 @@ See `prisma/schema.prisma` for the complete schema.
 ### Database Hosting
 
 For production, use a managed PostgreSQL service:
+
 - [Vercel Postgres](https://vercel.com/storage/postgres)
 - [Supabase](https://supabase.com/)
 - [Neon](https://neon.tech/)

@@ -7,7 +7,7 @@ import { headers } from "next/headers";
 
 export async function fetchInngestToken(projectId: string) {
   const session = await auth.api.getSession({
-    headers: await headers()
+    headers: await headers(),
   });
 
   if (!session) {

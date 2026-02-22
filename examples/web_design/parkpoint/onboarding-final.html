@@ -1,129 +1,226 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Onboarding - Final Step - ParkPoint</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              colors: {
-                "primary": "#3caff6",
-                "background-light": "#f5f7f8",
-                "background-dark": "#101b22",
-              },
-              fontFamily: {
-                "display": ["Inter", "sans-serif"]
-              },
-              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Onboarding - Final Step - ParkPoint</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3caff6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101b22",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
             },
           },
-        }
+        },
+      };
     </script>
-<style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
     </style>
-</head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display">
-<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-<div class="layout-container flex h-full grow flex-col">
-<!-- Navigation / Header Bar -->
-<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 px-6 py-4 bg-white dark:bg-slate-900/50">
-<div class="flex items-center gap-3">
-<div class="text-primary">
-<svg class="size-8" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-<path d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z" fill="currentColor"></path>
-</svg>
-</div>
-<h2 class="text-lg font-bold tracking-tight">ParkPoint Onboarding</h2>
-</div>
-<div class="flex items-center gap-4">
-<div class="bg-primary/10 rounded-full p-1 border border-primary/20">
-<img class="size-8 rounded-full" data-alt="User profile avatar placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6iP2sVTrIMpIeCkWjGFBgcZkZPUD_WmnrHpBLw5dG-YtqrNXNIwmJsu4KcgU49cVSSRgTbn7Y94n2ECky_nvBw6d_hxBoCxRLv_UlFvTXJEFyyf1_cIpdSpjvOwQ98ll9z4yb5Ket0b7NvdnXXTMrUC-USd9suSXhlt8Whxeo8CNu-beB_mjug6-3V8Ru4M68Hl_5jX24yZw3k36R8EEu2NlukMVWT9qKpdYLshorO76gESXMi4qybvEF1fTCNOui6qQLl7ACEFYc"/>
-</div>
-</div>
-</header>
-<main class="flex-1 flex flex-col items-center justify-center px-4 py-12">
-<div class="w-full max-w-[560px] bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 md:p-12">
-<!-- Progress Section -->
-<div class="flex flex-col gap-3 mb-10">
-<div class="flex justify-between items-end">
-<span class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">Step 4 of 4: Finalize Your Profile</span>
-<span class="text-primary text-sm font-bold">100%</span>
-</div>
-<div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-<div class="h-full bg-primary rounded-full transition-all duration-500" style="width: 100%;"></div>
-</div>
-<p class="text-slate-400 dark:text-slate-500 text-xs text-center mt-2">All set! You're ready to start parking.</p>
-</div>
-<!-- Hero Section -->
-<div class="text-center mb-10">
-<h1 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white mb-4">
-                            Maximize Your Experience
-                        </h1>
-<p class="text-slate-500 dark:text-slate-400 text-lg">
-                            Unlock full access and enjoy a personalized journey.
-                        </p>
-</div>
-<!-- Benefits List -->
-<div class="space-y-4 mb-10">
-<div class="flex items-start gap-4 p-4 rounded-lg border border-slate-100 dark:border-slate-800 bg-background-light/50 dark:bg-slate-800/30 transition-colors hover:border-primary/30">
-<div class="bg-primary/10 text-primary p-2 rounded-lg flex items-center justify-center">
-<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
-</div>
-<div>
-<h3 class="font-bold text-slate-900 dark:text-white">Saved Spots</h3>
-<p class="text-sm text-slate-500 dark:text-slate-400">Keep track of your favorite locations instantly.</p>
-</div>
-</div>
-<div class="flex items-start gap-4 p-4 rounded-lg border border-slate-100 dark:border-slate-800 bg-background-light/50 dark:bg-slate-800/30 transition-colors hover:border-primary/30">
-<div class="bg-primary/10 text-primary p-2 rounded-lg flex items-center justify-center">
-<span class="material-symbols-outlined" data-icon="history">history</span>
-</div>
-<div>
-<h3 class="font-bold text-slate-900 dark:text-white">History</h3>
-<p class="text-sm text-slate-500 dark:text-slate-400">Never lose track of your previous activity.</p>
-</div>
-</div>
-<div class="flex items-start gap-4 p-4 rounded-lg border border-slate-100 dark:border-slate-800 bg-background-light/50 dark:bg-slate-800/30 transition-colors hover:border-primary/30">
-<div class="bg-primary/10 text-primary p-2 rounded-lg flex items-center justify-center">
-<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
-</div>
-<div>
-<h3 class="font-bold text-slate-900 dark:text-white">Faster Booking</h3>
-<p class="text-sm text-slate-500 dark:text-slate-400">Checkout in seconds with saved preferences.</p>
-</div>
-</div>
-</div>
-<!-- Action Buttons -->
-<div class="flex flex-col gap-4">
-<button class="w-full bg-primary hover:bg-primary/90 text-white h-14 rounded-lg font-bold text-lg transition-all shadow-lg shadow-primary/20 active:scale-[0.98]">
-                            Go to Dashboard
-                        </button>
-<button class="w-full bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 h-12 rounded-lg font-medium transition-colors">
-                            Skip for now
-                        </button>
-</div>
-<!-- Footer Info -->
-<p class="mt-8 text-center text-xs text-slate-400 dark:text-slate-600 px-6">
-                        By continuing, you agree to our Terms of Service and Privacy Policy.
-                    </p>
-</div>
-</main>
-<footer class="py-6 text-center text-slate-400 dark:text-slate-600 text-sm">
-                © 2024 ParkPoint Technologies. All rights reserved.
-            </footer>
-</div>
-</div>
-</body></html>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark font-display min-h-screen text-slate-900 dark:text-slate-100"
+  >
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+      <div class="layout-container flex h-full grow flex-col">
+        <!-- Navigation / Header Bar -->
+        <header
+          class="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 dark:border-slate-800 dark:bg-slate-900/50"
+        >
+          <div class="flex items-center gap-3">
+            <div class="text-primary">
+              <svg
+                class="size-8"
+                fill="none"
+                viewbox="0 0 48 48"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold tracking-tight">
+              ParkPoint Onboarding
+            </h2>
+          </div>
+          <div class="flex items-center gap-4">
+            <div
+              class="bg-primary/10 border-primary/20 rounded-full border p-1"
+            >
+              <img
+                class="size-8 rounded-full"
+                data-alt="User profile avatar placeholder"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6iP2sVTrIMpIeCkWjGFBgcZkZPUD_WmnrHpBLw5dG-YtqrNXNIwmJsu4KcgU49cVSSRgTbn7Y94n2ECky_nvBw6d_hxBoCxRLv_UlFvTXJEFyyf1_cIpdSpjvOwQ98ll9z4yb5Ket0b7NvdnXXTMrUC-USd9suSXhlt8Whxeo8CNu-beB_mjug6-3V8Ru4M68Hl_5jX24yZw3k36R8EEu2NlukMVWT9qKpdYLshorO76gESXMi4qybvEF1fTCNOui6qQLl7ACEFYc"
+              />
+            </div>
+          </div>
+        </header>
+        <main
+          class="flex flex-1 flex-col items-center justify-center px-4 py-12"
+        >
+          <div
+            class="w-full max-w-[560px] rounded-xl border border-slate-200 bg-white p-8 shadow-sm md:p-12 dark:border-slate-800 dark:bg-slate-900"
+          >
+            <!-- Progress Section -->
+            <div class="mb-10 flex flex-col gap-3">
+              <div class="flex items-end justify-between">
+                <span
+                  class="text-sm font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400"
+                  >Step 4 of 4: Finalize Your Profile</span
+                >
+                <span class="text-primary text-sm font-bold">100%</span>
+              </div>
+              <div
+                class="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+              >
+                <div
+                  class="bg-primary h-full rounded-full transition-all duration-500"
+                  style="width: 100%"
+                ></div>
+              </div>
+              <p
+                class="mt-2 text-center text-xs text-slate-400 dark:text-slate-500"
+              >
+                All set! You're ready to start parking.
+              </p>
+            </div>
+            <!-- Hero Section -->
+            <div class="mb-10 text-center">
+              <h1
+                class="mb-4 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl dark:text-white"
+              >
+                Maximize Your Experience
+              </h1>
+              <p class="text-lg text-slate-500 dark:text-slate-400">
+                Unlock full access and enjoy a personalized journey.
+              </p>
+            </div>
+            <!-- Benefits List -->
+            <div class="mb-10 space-y-4">
+              <div
+                class="bg-background-light/50 hover:border-primary/30 flex items-start gap-4 rounded-lg border border-slate-100 p-4 transition-colors dark:border-slate-800 dark:bg-slate-800/30"
+              >
+                <div
+                  class="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2"
+                >
+                  <span class="material-symbols-outlined" data-icon="favorite"
+                    >favorite</span
+                  >
+                </div>
+                <div>
+                  <h3 class="font-bold text-slate-900 dark:text-white">
+                    Saved Spots
+                  </h3>
+                  <p class="text-sm text-slate-500 dark:text-slate-400">
+                    Keep track of your favorite locations instantly.
+                  </p>
+                </div>
+              </div>
+              <div
+                class="bg-background-light/50 hover:border-primary/30 flex items-start gap-4 rounded-lg border border-slate-100 p-4 transition-colors dark:border-slate-800 dark:bg-slate-800/30"
+              >
+                <div
+                  class="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2"
+                >
+                  <span class="material-symbols-outlined" data-icon="history"
+                    >history</span
+                  >
+                </div>
+                <div>
+                  <h3 class="font-bold text-slate-900 dark:text-white">
+                    History
+                  </h3>
+                  <p class="text-sm text-slate-500 dark:text-slate-400">
+                    Never lose track of your previous activity.
+                  </p>
+                </div>
+              </div>
+              <div
+                class="bg-background-light/50 hover:border-primary/30 flex items-start gap-4 rounded-lg border border-slate-100 p-4 transition-colors dark:border-slate-800 dark:bg-slate-800/30"
+              >
+                <div
+                  class="bg-primary/10 text-primary flex items-center justify-center rounded-lg p-2"
+                >
+                  <span class="material-symbols-outlined" data-icon="bolt"
+                    >bolt</span
+                  >
+                </div>
+                <div>
+                  <h3 class="font-bold text-slate-900 dark:text-white">
+                    Faster Booking
+                  </h3>
+                  <p class="text-sm text-slate-500 dark:text-slate-400">
+                    Checkout in seconds with saved preferences.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-4">
+              <button
+                class="bg-primary hover:bg-primary/90 shadow-primary/20 h-14 w-full rounded-lg text-lg font-bold text-white shadow-lg transition-all active:scale-[0.98]"
+              >
+                Go to Dashboard
+              </button>
+              <button
+                class="h-12 w-full rounded-lg bg-transparent font-medium text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+              >
+                Skip for now
+              </button>
+            </div>
+            <!-- Footer Info -->
+            <p
+              class="mt-8 px-6 text-center text-xs text-slate-400 dark:text-slate-600"
+            >
+              By continuing, you agree to our Terms of Service and Privacy
+              Policy.
+            </p>
+          </div>
+        </main>
+        <footer
+          class="py-6 text-center text-sm text-slate-400 dark:text-slate-600"
+        >
+          © 2024 ParkPoint Technologies. All rights reserved.
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>

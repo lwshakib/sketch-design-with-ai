@@ -3,11 +3,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { type Artifact } from "@/lib/artifact-renderer";
 import { cn } from "@/lib/utils";
-import { 
-  ZoomIn, 
-  ZoomOut, 
-  Hand, 
-  MousePointer2, 
+import {
+  ZoomIn,
+  ZoomOut,
+  Hand,
+  MousePointer2,
   RotateCcw,
   Smartphone,
   Tablet,
@@ -17,13 +17,18 @@ import {
   QrCode,
   X,
   Copy,
-  Check
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ArtifactFrame } from "@/components/project/canvas/artifact-frame";
 import { Logo } from "@/components/logo";
 import { QRCodeSVG } from "qrcode.react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ScreenShareViewProps {
   project: {
@@ -36,16 +41,20 @@ interface ScreenShareViewProps {
 }
 
 export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
-  const [viewportMode, setViewportMode] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
-  const [appliedTheme, setAppliedTheme] = useState<any>(project.appliedTheme || project.themes?.[0] || null);
+  const [viewportMode, setViewportMode] = useState<
+    "mobile" | "tablet" | "desktop"
+  >("desktop");
+  const [appliedTheme, setAppliedTheme] = useState<any>(
+    project.appliedTheme || project.themes?.[0] || null,
+  );
   const [showQrDialog, setShowQrDialog] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
   const [dynamicHeight, setDynamicHeight] = useState<number | null>(null);
-  
+
   // Canvas State
   const [zoom, setZoom] = useState(1);
   const [canvasOffset, setCanvasOffset] = useState({ x: 0, y: 0 });
-  const [activeTool, setActiveTool] = useState<'select' | 'hand'>('select');
+  const [activeTool, setActiveTool] = useState<"select" | "hand">("select");
   const [isPanning, setIsPanning] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
 
@@ -58,7 +67,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
     zoomRef.current = zoom;
     canvasOffsetRef.current = canvasOffset;
   }, [zoom, canvasOffset]);
-  
+
   const previewRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -68,23 +77,26 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
     if (project.themes && project.themes.length > 0 && !appliedTheme) {
       setAppliedTheme(project.themes[0]);
     }
-    
+
     // Set initial viewport based on artifact type
-    if (artifact.type === 'app') setViewportMode('mobile');
-    else setViewportMode('desktop');
+    if (artifact.type === "app") setViewportMode("mobile");
+    else setViewportMode("desktop");
   }, [project.themes, artifact.type]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'HEIGHT_UPDATE' && typeof event.data.height === 'number') {
+      if (
+        event.data.type === "HEIGHT_UPDATE" &&
+        typeof event.data.height === "number"
+      ) {
         const sourceWindow = event.source as Window;
         if (iframeRef.current?.contentWindow === sourceWindow) {
           setDynamicHeight(event.data.height);
         }
       }
     };
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
   }, []);
 
   // Zoom and Pan Handlers (Shared with ProjectShareView)
@@ -92,7 +104,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
     const prevZoom = zoomRef.current;
     const prevOffset = canvasOffsetRef.current;
     const nextZoom = Math.min(Math.max(newScale, 0.1), 5);
-    
+
     if (nextZoom === prevZoom) return;
 
     const dx = (mx - prevOffset.x) / prevZoom;
@@ -115,44 +127,44 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
         e.preventDefault();
         const scaleFactor = Math.pow(1.2, -e.deltaY / 120);
         const rect = element.getBoundingClientRect();
-        
+
         // Calculate mouse position relative to the center of the viewport
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-        const mx = (e.clientX - rect.left) - centerX;
-        const my = (e.clientY - rect.top) - centerY;
+        const mx = e.clientX - rect.left - centerX;
+        const my = e.clientY - rect.top - centerY;
 
         handleZoom(zoomRef.current * scaleFactor, mx, my);
       } else {
         const prevOffset = canvasOffsetRef.current;
         const newOffset = {
           x: prevOffset.x - e.deltaX,
-          y: prevOffset.y - e.deltaY
+          y: prevOffset.y - e.deltaY,
         };
         setCanvasOffset(newOffset);
         currentOffset.current = newOffset; // Sync ref
       }
     };
 
-    element.addEventListener('wheel', handleWheel, { passive: false });
-    return () => element.removeEventListener('wheel', handleWheel);
+    element.addEventListener("wheel", handleWheel, { passive: false });
+    return () => element.removeEventListener("wheel", handleWheel);
   }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === ' ' && activeTool !== 'hand') setActiveTool('hand');
-      if (e.key.toLowerCase() === 'v') setActiveTool('select');
-      if (e.key.toLowerCase() === 'h') setActiveTool('hand');
+      if (e.key === " " && activeTool !== "hand") setActiveTool("hand");
+      if (e.key.toLowerCase() === "v") setActiveTool("select");
+      if (e.key.toLowerCase() === "h") setActiveTool("hand");
 
       // Zooming with keyboard uses center of viewport (0,0 relative to center)
       if (e.ctrlKey || e.metaKey) {
-        if (e.key === '=' || e.key === '+') {
+        if (e.key === "=" || e.key === "+") {
           e.preventDefault();
           handleZoom(zoomRef.current * 1.2, 0, 0); // Center is 0,0
-        } else if (e.key === '-') {
+        } else if (e.key === "-") {
           e.preventDefault();
           handleZoom(zoomRef.current / 1.2, 0, 0);
-        } else if (e.key === '0') {
+        } else if (e.key === "0") {
           e.preventDefault();
           setZoom(1);
           setCanvasOffset({ x: 0, y: 0 });
@@ -161,21 +173,24 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
       }
     };
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === ' ') setActiveTool('select');
+      if (e.key === " ") setActiveTool("select");
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
   }, [activeTool]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (activeTool === 'hand' || e.button === 1) {
+    if (activeTool === "hand" || e.button === 1) {
       setIsPanning(true);
-      dragStart.current = { x: e.clientX - canvasOffset.x, y: e.clientY - canvasOffset.y };
+      dragStart.current = {
+        x: e.clientX - canvasOffset.x,
+        y: e.clientY - canvasOffset.y,
+      };
     }
   };
 
@@ -184,7 +199,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
       e.preventDefault(); // Prevent text selection
       const dx = e.clientX - dragStart.current.x;
       const dy = e.clientY - dragStart.current.y;
-      
+
       currentOffset.current = { x: dx, y: dy };
 
       requestAnimationFrame(() => {
@@ -203,8 +218,8 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
   };
 
   const getWidth = () => {
-    if (viewportMode === 'mobile') return 380;
-    if (viewportMode === 'tablet') return 768;
+    if (viewportMode === "mobile") return 380;
+    if (viewportMode === "tablet") return 768;
     return 1280;
   };
 
@@ -216,80 +231,84 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-zinc-950 text-white font-sans">
+    <div className="flex min-h-screen w-full flex-col bg-zinc-950 font-sans text-white">
       {/* Header */}
-      <header className="h-16 border-b border-zinc-800 flex items-center justify-between px-6 bg-zinc-950/80 backdrop-blur-xl z-50 sticky top-0">
+      <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-zinc-800 bg-zinc-950/80 px-6 backdrop-blur-xl">
         <div className="flex items-center gap-4">
           <Logo textSize="1.2rem" iconSize={28} className="text-white" />
           <div className="h-4 w-[1px] bg-zinc-800" />
-          <h1 className="text-sm font-medium text-zinc-400 truncate max-w-[200px]">
+          <h1 className="max-w-[200px] truncate text-sm font-medium text-zinc-400">
             {project.title}
           </h1>
         </div>
 
         {/* Center Controls */}
-        <div className="flex items-center gap-1 bg-zinc-900/50 p-1 rounded-xl border border-zinc-800/50">
-           <Button
-             variant={viewportMode === 'mobile' ? "secondary" : "ghost"}
-             size="icon"
-             className="h-9 w-9 rounded-lg"
-             onClick={() => setViewportMode('mobile')}
-             title="Mobile View"
-           >
-             <Smartphone className="h-4 w-4" />
-           </Button>
-           <Button
-             variant={viewportMode === 'tablet' ? "secondary" : "ghost"}
-             size="icon"
-             className="h-9 w-9 rounded-lg"
-             onClick={() => setViewportMode('tablet')}
-             title="Tablet View"
-           >
-             <Tablet className="h-4 w-4" />
-           </Button>
-           <Button
-             variant={viewportMode === 'desktop' ? "secondary" : "ghost"}
-             size="icon"
-             className="h-9 w-9 rounded-lg"
-             onClick={() => setViewportMode('desktop')}
-             title="Desktop View"
-           >
-             <Monitor className="h-4 w-4" />
-           </Button>
-           <div className="w-[1px] h-4 bg-zinc-800 mx-1" />
-           <Button
-             variant="ghost"
-             size="icon"
-             className="h-9 w-9 rounded-lg text-zinc-400 hover:text-white"
-             onClick={() => window.open(window.location.href, '_blank')}
-             title="Open in New Tab"
-           >
-             <ExternalLink className="h-4 w-4" />
-           </Button>
-           <Button
-             variant="ghost"
-             size="icon"
-             className="h-9 w-9 rounded-lg text-zinc-400 hover:text-white"
-             onClick={() => setShowQrDialog(true)}
-             title="Show QR Code"
-           >
-             <QrCode className="h-4 w-4" />
-           </Button>
+        <div className="flex items-center gap-1 rounded-xl border border-zinc-800/50 bg-zinc-900/50 p-1">
+          <Button
+            variant={viewportMode === "mobile" ? "secondary" : "ghost"}
+            size="icon"
+            className="h-9 w-9 rounded-lg"
+            onClick={() => setViewportMode("mobile")}
+            title="Mobile View"
+          >
+            <Smartphone className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={viewportMode === "tablet" ? "secondary" : "ghost"}
+            size="icon"
+            className="h-9 w-9 rounded-lg"
+            onClick={() => setViewportMode("tablet")}
+            title="Tablet View"
+          >
+            <Tablet className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={viewportMode === "desktop" ? "secondary" : "ghost"}
+            size="icon"
+            className="h-9 w-9 rounded-lg"
+            onClick={() => setViewportMode("desktop")}
+            title="Desktop View"
+          >
+            <Monitor className="h-4 w-4" />
+          </Button>
+          <div className="mx-1 h-4 w-[1px] bg-zinc-800" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 rounded-lg text-zinc-400 hover:text-white"
+            onClick={() => window.open(window.location.href, "_blank")}
+            title="Open in New Tab"
+          >
+            <ExternalLink className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 rounded-lg text-zinc-400 hover:text-white"
+            onClick={() => setShowQrDialog(true)}
+            title="Show QR Code"
+          >
+            <QrCode className="h-4 w-4" />
+          </Button>
         </div>
 
-         <div className="flex items-center gap-3 w-[200px] justify-end">
-            <Button 
-                onClick={handleCopyLink}
-                className="bg-white text-black hover:bg-zinc-200 rounded-full px-4 h-9 text-xs font-semibold gap-2"
-            >
-                {hasCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                {hasCopied ? "Copied" : "Copy Link"}
-            </Button>
-         </div>
+        <div className="flex w-[200px] items-center justify-end gap-3">
+          <Button
+            onClick={handleCopyLink}
+            className="h-9 gap-2 rounded-full bg-white px-4 text-xs font-semibold text-black hover:bg-zinc-200"
+          >
+            {hasCopied ? (
+              <Check className="h-3.5 w-3.5" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" />
+            )}
+            {hasCopied ? "Copied" : "Copy Link"}
+          </Button>
+        </div>
       </header>
 
       {/* Main Content Area */}
-      <main 
+      <main
         ref={previewRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -299,75 +318,86 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
           if (e.target === e.currentTarget) setIsSelected(false);
         }}
         className={cn(
-          "flex-1 relative bg-[#09090b] overflow-hidden select-none",
-          activeTool === 'hand' ? (isPanning ? "cursor-grabbing" : "cursor-grab") : "cursor-default"
+          "relative flex-1 overflow-hidden bg-[#09090b] select-none",
+          activeTool === "hand"
+            ? isPanning
+              ? "cursor-grabbing"
+              : "cursor-grab"
+            : "cursor-default",
         )}
       >
         {/* Grid Background */}
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-[0.03]"
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: `radial-gradient(circle, #fff 1px, transparent 1px)`,
             backgroundSize: `${20 * zoom}px ${20 * zoom}px`,
-            backgroundAttachment: 'fixed',
-            transform: `translate(${canvasOffset.x % (20 * zoom)}px, ${canvasOffset.y % (20 * zoom)}px)`
+            backgroundAttachment: "fixed",
+            transform: `translate(${canvasOffset.x % (20 * zoom)}px, ${canvasOffset.y % (20 * zoom)}px)`,
           }}
         />
 
-        <div 
+        <div
           className={cn(
             "absolute inset-0 flex items-start justify-center pt-36",
-            !isPanning && "transition-transform duration-75 ease-out"
+            !isPanning && "transition-transform duration-75 ease-out",
           )}
         >
-          <div 
+          <div
             ref={contentRef}
             className={cn(
-              "relative shadow-[0_40px_100px_rgba(0,0,0,0.5)] flex flex-col group",
-              isSelected && "ring-2 ring-blue-500 ring-offset-4 ring-offset-zinc-950 shadow-[0_60px_120px_rgba(0,0,0,0.6)]"
+              "group relative flex flex-col shadow-[0_40px_100px_rgba(0,0,0,0.5)]",
+              isSelected &&
+                "shadow-[0_60px_120px_rgba(0,0,0,0.6)] ring-2 ring-blue-500 ring-offset-4 ring-offset-zinc-950",
             )}
-            style={{ 
+            style={{
               transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom * 0.5})`,
-              transformOrigin: 'center top',
+              transformOrigin: "center top",
               width: getWidth(),
-              height: dynamicHeight || (viewportMode === 'mobile' ? 800 : (viewportMode === 'tablet' ? 900 : 800)),
-              border: `1px solid ${appliedTheme?.cssVars?.border || '#27272a'}`,
+              height:
+                dynamicHeight ||
+                (viewportMode === "mobile"
+                  ? 800
+                  : viewportMode === "tablet"
+                    ? 900
+                    : 800),
+              border: `1px solid ${appliedTheme?.cssVars?.border || "#27272a"}`,
               borderRadius: 12,
-              overflow: 'hidden',
-              backgroundColor: appliedTheme?.cssVars?.background || '#09090b',
+              overflow: "hidden",
+              backgroundColor: appliedTheme?.cssVars?.background || "#09090b",
             }}
             onMouseDown={(e) => {
-              if (activeTool === 'select') {
+              if (activeTool === "select") {
                 e.stopPropagation();
                 setIsSelected(true);
               }
             }}
           >
             <ArtifactFrame
-               artifact={{...artifact, width: getWidth(), height: undefined}}
-               index={0}
-               isEditMode={false}
-               activeTool={activeTool}
-               isDraggingFrame={false}
-               appliedTheme={appliedTheme}
-               onRef={(i, el) => iframeRef.current = el}
-             />
+              artifact={{ ...artifact, width: getWidth(), height: undefined }}
+              index={0}
+              isEditMode={false}
+              activeTool={activeTool}
+              isDraggingFrame={false}
+              appliedTheme={appliedTheme}
+              onRef={(i, el) => (iframeRef.current = el)}
+            />
           </div>
         </div>
       </main>
 
       {/* Bottom Toolbar */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-auto flex items-center gap-4">
-        <div className="flex items-center gap-1 p-1 bg-zinc-900/80 backdrop-blur-xl border border-zinc-800 rounded-2xl shadow-2xl">
+      <div className="pointer-events-auto absolute bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4">
+        <div className="flex items-center gap-1 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-1 shadow-2xl backdrop-blur-xl">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setActiveTool('select')}
+            onClick={() => setActiveTool("select")}
             className={cn(
               "h-10 w-10 rounded-xl transition-all",
-              activeTool === 'select' 
-                ? "bg-white/10 text-white shadow-inner" 
-                : "text-zinc-500 hover:text-white hover:bg-transparent"
+              activeTool === "select"
+                ? "bg-white/10 text-white shadow-inner"
+                : "text-zinc-500 hover:bg-transparent hover:text-white",
             )}
             title="Select (V)"
           >
@@ -376,12 +406,12 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setActiveTool('hand')}
+            onClick={() => setActiveTool("hand")}
             className={cn(
               "h-10 w-10 rounded-xl transition-all",
-              activeTool === 'hand' 
-                ? "bg-white/10 text-white shadow-inner" 
-                : "text-zinc-500 hover:text-white hover:bg-transparent"
+              activeTool === "hand"
+                ? "bg-white/10 text-white shadow-inner"
+                : "text-zinc-500 hover:bg-transparent hover:text-white",
             )}
             title="Hand (H / Space)"
           >
@@ -391,12 +421,12 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
       </div>
 
       {/* Bottom Right Controls */}
-      <div className="absolute bottom-6 right-6 z-50 flex items-center gap-1 p-1 bg-zinc-900/80 backdrop-blur-xl border border-zinc-800 rounded-2xl shadow-2xl pointer-events-auto">
+      <div className="pointer-events-auto absolute right-6 bottom-6 z-50 flex items-center gap-1 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-1 shadow-2xl backdrop-blur-xl">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => handleZoom(Math.max(0.1, zoom - 0.1), 0, 0)}
-          className="h-10 w-10 rounded-xl text-zinc-500 hover:text-white hover:bg-transparent transition-all"
+          className="h-10 w-10 rounded-xl text-zinc-500 transition-all hover:bg-transparent hover:text-white"
           title="Zoom Out"
         >
           <ZoomOut className="h-5 w-5" />
@@ -408,12 +438,12 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
           variant="ghost"
           size="icon"
           onClick={() => handleZoom(Math.min(5, zoom + 0.1), 0, 0)}
-          className="h-10 w-10 rounded-xl text-zinc-500 hover:text-white hover:bg-transparent transition-all"
+          className="h-10 w-10 rounded-xl text-zinc-500 transition-all hover:bg-transparent hover:text-white"
           title="Zoom In"
         >
           <ZoomIn className="h-5 w-5" />
         </Button>
-        <div className="w-[1px] h-4 bg-zinc-800 mx-1" />
+        <div className="mx-1 h-4 w-[1px] bg-zinc-800" />
         <Button
           variant="ghost"
           size="icon"
@@ -421,7 +451,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
             setZoom(1);
             setCanvasOffset({ x: 0, y: 0 });
           }}
-          className="h-10 w-10 rounded-xl text-zinc-500 hover:text-white hover:bg-transparent transition-all"
+          className="h-10 w-10 rounded-xl text-zinc-500 transition-all hover:bg-transparent hover:text-white"
           title="Reset View"
         >
           <RotateCcw className="h-5 w-5" />
@@ -430,27 +460,40 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
 
       {/* QR Code Dialog */}
       <Dialog open={showQrDialog} onOpenChange={setShowQrDialog}>
-        <DialogContent className="bg-zinc-950 border-zinc-800 text-white sm:max-w-sm p-0 overflow-hidden">
-          <div className="flex flex-col items-center justify-center p-8 gap-8">
+        <DialogContent className="overflow-hidden border-zinc-800 bg-zinc-950 p-0 text-white sm:max-w-sm">
+          <div className="flex flex-col items-center justify-center gap-8 p-8">
             <div className="flex flex-col items-center gap-2">
-              <h2 className="text-lg font-semibold tracking-tight">Scan for mobile</h2>
-              <p className="text-xs text-zinc-500">Open this screen on your device</p>
+              <h2 className="text-lg font-semibold tracking-tight">
+                Scan for mobile
+              </h2>
+              <p className="text-xs text-zinc-500">
+                Open this screen on your device
+              </p>
             </div>
 
-            <div className="p-4 bg-white rounded-2xl shadow-2xl">
-               <QRCodeSVG value={typeof window !== 'undefined' ? window.location.href : ''} size={180} />
+            <div className="rounded-2xl bg-white p-4 shadow-2xl">
+              <QRCodeSVG
+                value={
+                  typeof window !== "undefined" ? window.location.href : ""
+                }
+                size={180}
+              />
             </div>
-            
-            <div className="flex flex-col gap-3 w-full">
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-3 text-[11px] text-zinc-400 font-mono break-all leading-relaxed">
-                {typeof window !== 'undefined' ? window.location.href : ''}
+
+            <div className="flex w-full flex-col gap-3">
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 font-mono text-[11px] leading-relaxed break-all text-zinc-400">
+                {typeof window !== "undefined" ? window.location.href : ""}
               </div>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={handleCopyLink}
-                className="w-full border-zinc-800 bg-zinc-900 hover:bg-zinc-800 hover:text-white rounded-xl h-11 text-xs font-medium gap-2"
+                className="h-11 w-full gap-2 rounded-xl border-zinc-800 bg-zinc-900 text-xs font-medium hover:bg-zinc-800 hover:text-white"
               >
-                {hasCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                {hasCopied ? (
+                  <Check className="h-3.5 w-3.5" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
                 {hasCopied ? "Copied" : "Copy Link"}
               </Button>
             </div>

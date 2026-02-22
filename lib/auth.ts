@@ -27,7 +27,10 @@ export const auth = betterAuth({
           from: "Sketch <noreply@lwshakib.site>", // Replace with your verified domain in production
           to: user.email,
           subject: "Reset your password",
-          react: AuthEmailTemplate({ type: "forgot-password", url: resetPasswordUrl }),
+          react: AuthEmailTemplate({
+            type: "forgot-password",
+            url: resetPasswordUrl,
+          }),
         });
 
         if (error) {
@@ -38,7 +41,7 @@ export const auth = betterAuth({
         console.error("Resend error:", err);
         throw err;
       }
-    }
+    },
   },
   // Configure OAuth providers (e.g., Google).
   socialProviders: {
@@ -46,7 +49,7 @@ export const auth = betterAuth({
       enabled: true,
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    }
+    },
   },
   // Enable email verification
   emailVerification: {
@@ -58,7 +61,10 @@ export const auth = betterAuth({
           from: "Sketch <noreply@lwshakib.site>",
           to: user.email,
           subject: "Verify your email address",
-          react: AuthEmailTemplate({ type: "email-verification", url: verificationUrl }),
+          react: AuthEmailTemplate({
+            type: "email-verification",
+            url: verificationUrl,
+          }),
         });
       } catch (err) {
         console.error("Verification email error:", err);

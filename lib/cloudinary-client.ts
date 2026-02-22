@@ -1,5 +1,7 @@
-
-export const uploadFileToCloudinary = async (file: File, signal?: AbortSignal) => {
+export const uploadFileToCloudinary = async (
+  file: File,
+  signal?: AbortSignal,
+) => {
   const sigRes = await fetch("/api/cloudinary-signature");
   if (!sigRes.ok) {
     throw new Error("Failed to get upload signature");

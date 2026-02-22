@@ -6,5 +6,5 @@ export const inngest = new Inngest({
   id: "sketch-design-with-ai",
   middleware: [realtimeMiddleware()],
   // On Production
-  eventKey: process.env.INNGEST_EVENT_KEY
+  eventKey: process.env.INNGEST_EVENT_KEY,
 });

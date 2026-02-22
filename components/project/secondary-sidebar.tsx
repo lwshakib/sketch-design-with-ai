@@ -12,7 +12,10 @@ interface SecondarySidebarProps {
   applyTheme: (theme: any) => void;
 }
 
-export function SecondarySidebar({ commitEdits, applyTheme }: SecondarySidebarProps) {
+export function SecondarySidebar({
+  commitEdits,
+  applyTheme,
+}: SecondarySidebarProps) {
   const {
     secondarySidebarMode,
     setSecondarySidebarMode,
@@ -25,19 +28,19 @@ export function SecondarySidebar({ commitEdits, applyTheme }: SecondarySidebarPr
   if (secondarySidebarMode === "none") return null;
 
   return (
-    <aside className="absolute inset-0 flex flex-col bg-sidebar z-30 transition-all duration-300 shadow-2xl">
+    <aside className="bg-sidebar absolute inset-0 z-30 flex flex-col shadow-2xl transition-all duration-300">
       <div className="absolute top-3 right-3 z-30">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setSecondarySidebarMode("none")}
-          className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full"
+          className="text-muted-foreground hover:text-foreground hover:bg-muted/50 h-8 w-8 rounded-full"
         >
           <X className="h-4 w-4" />
         </Button>
       </div>
 
-      <div className="flex-1 overflow-hidden flex flex-col">
+      <div className="flex flex-1 flex-col overflow-hidden">
         {secondarySidebarMode === "properties" ? (
           <ElementSettings
             selectedEl={selectedEl}

@@ -12,40 +12,40 @@ We pledge to act and interact in ways that contribute to an open, welcoming, div
 
 Examples of behavior that contributes to a positive environment for our community include:
 
-* **Being Respectful**: Demonstrating empathy and kindness toward other people
-* **Constructive Feedback**: Giving and gracefully accepting constructive criticism
-* **Inclusive Language**: Using welcoming and inclusive language
-* **Community Focus**: Focusing on what is best for the overall community
-* **Acknowledging Mistakes**: Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience
-* **Diverse Perspectives**: Being respectful of differing opinions, viewpoints, and experiences
-* **Collaboration**: Working together to solve problems and improve the project
-* **Mentorship**: Helping newcomers feel welcome and supporting their growth
-* **Recognition**: Acknowledging and celebrating the contributions of others
+- **Being Respectful**: Demonstrating empathy and kindness toward other people
+- **Constructive Feedback**: Giving and gracefully accepting constructive criticism
+- **Inclusive Language**: Using welcoming and inclusive language
+- **Community Focus**: Focusing on what is best for the overall community
+- **Acknowledging Mistakes**: Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience
+- **Diverse Perspectives**: Being respectful of differing opinions, viewpoints, and experiences
+- **Collaboration**: Working together to solve problems and improve the project
+- **Mentorship**: Helping newcomers feel welcome and supporting their growth
+- **Recognition**: Acknowledging and celebrating the contributions of others
 
 ### Unacceptable Behavior
 
 Examples of unacceptable behavior include:
 
-* **Harassment**: The use of sexualized language or imagery, and sexual attention or advances of any kind
-* **Trolling**: Trolling, insulting or derogatory comments, and personal or political attacks
-* **Discrimination**: Public or private harassment based on any protected characteristic
-* **Privacy Violations**: Publishing others' private information, such as a physical or email address, without their explicit permission
-* **Unprofessional Conduct**: Other conduct which could reasonably be considered inappropriate in a professional setting
-* **Intimidation**: Deliberate intimidation, stalking, or following (online or in person)
-* **Disruption**: Sustained disruption of community events, including talks and presentations
-* **Unwelcome Contact**: Unwelcome sexual attention or unwanted physical contact
-* **Doxxing**: Publishing or threatening to publish private information about others
-* **Spam**: Excessive self-promotion or spam in issues, pull requests, or discussions
+- **Harassment**: The use of sexualized language or imagery, and sexual attention or advances of any kind
+- **Trolling**: Trolling, insulting or derogatory comments, and personal or political attacks
+- **Discrimination**: Public or private harassment based on any protected characteristic
+- **Privacy Violations**: Publishing others' private information, such as a physical or email address, without their explicit permission
+- **Unprofessional Conduct**: Other conduct which could reasonably be considered inappropriate in a professional setting
+- **Intimidation**: Deliberate intimidation, stalking, or following (online or in person)
+- **Disruption**: Sustained disruption of community events, including talks and presentations
+- **Unwelcome Contact**: Unwelcome sexual attention or unwanted physical contact
+- **Doxxing**: Publishing or threatening to publish private information about others
+- **Spam**: Excessive self-promotion or spam in issues, pull requests, or discussions
 
 ## Scope
 
 This Code of Conduct applies within all community spaces, including but not limited to:
 
-* GitHub repositories (issues, pull requests, discussions, code reviews)
-* Project communication channels (Discord, Slack, email lists)
-* Social media when representing the project
-* Online or offline events when representing the project
-* One-on-one communications in the context of community business
+- GitHub repositories (issues, pull requests, discussions, code reviews)
+- Project communication channels (Discord, Slack, email lists)
+- Social media when representing the project
+- Online or offline events when representing the project
+- One-on-one communications in the context of community business
 
 This Code of Conduct also applies when an individual is officially representing the community in public spaces. Examples of representing our community include using an official email address, posting via an official social media account, or acting as an appointed representative at an online or offline event.
 
@@ -69,13 +69,13 @@ All reports will be handled with discretion and confidentiality.
 
 When reporting, please include:
 
-* Your contact information
-* Names (real, nicknames, or pseudonyms) of any individuals involved
-* Description of the incident, including specific behaviors
-* Date and time of the incident
-* Location/context where it occurred (GitHub issue, Discord, etc.)
-* Any additional context or screenshots that may be helpful
-* Whether you believe this is ongoing
+- Your contact information
+- Names (real, nicknames, or pseudonyms) of any individuals involved
+- Description of the incident, including specific behaviors
+- Date and time of the incident
+- Location/context where it occurred (GitHub issue, Discord, etc.)
+- Any additional context or screenshots that may be helpful
+- Whether you believe this is ongoing
 
 ### What Happens Next
 
@@ -121,19 +121,19 @@ If you believe you have been unfairly accused of violating this Code of Conduct,
 
 ### For Contributors
 
-* **Be Patient**: Remember that everyone was a beginner once
-* **Be Helpful**: Offer assistance to those who need it
-* **Stay On Topic**: Keep discussions relevant to the project
-* **Search First**: Before asking questions, search existing issues and documentation
-* **Provide Context**: When reporting bugs or requesting features, provide detailed information
+- **Be Patient**: Remember that everyone was a beginner once
+- **Be Helpful**: Offer assistance to those who need it
+- **Stay On Topic**: Keep discussions relevant to the project
+- **Search First**: Before asking questions, search existing issues and documentation
+- **Provide Context**: When reporting bugs or requesting features, provide detailed information
 
 ### For Maintainers
 
-* **Be Responsive**: Respond to issues and pull requests in a timely manner
-* **Be Transparent**: Communicate decisions and reasoning clearly
-* **Be Fair**: Apply the Code of Conduct consistently and fairly
-* **Be Welcoming**: Help newcomers feel valued and supported
-* **Be Collaborative**: Work with contributors to improve their contributions
+- **Be Responsive**: Respond to issues and pull requests in a timely manner
+- **Be Transparent**: Communicate decisions and reasoning clearly
+- **Be Fair**: Apply the Code of Conduct consistently and fairly
+- **Be Welcoming**: Help newcomers feel valued and supported
+- **Be Collaborative**: Work with contributors to improve their contributions
 
 ## Acknowledgment
 
@@ -147,8 +147,8 @@ For answers to common questions about this code of conduct, see the FAQ at [http
 
 If you have questions about this Code of Conduct, please reach out to the project maintainer:
 
-* **GitHub**: [@lwshakib](https://github.com/lwshakib)
-* **Email**: [lwshakib@gmail.com](mailto:lwshakib@gmail.com)
+- **GitHub**: [@lwshakib](https://github.com/lwshakib)
+- **Email**: [lwshakib@gmail.com](mailto:lwshakib@gmail.com)
 
 ---
 

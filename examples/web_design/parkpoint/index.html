@@ -1,359 +1,694 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="scroll-smooth" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ParkPoint | Find Parking Instantly</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#3caff6",
-                        "background-light": "#f5f7f8",
-                        "background-dark": "#101b22",
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
+<html class="scroll-smooth" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ParkPoint | Find Parking Instantly</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3caff6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101b22",
             },
-        }
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
     </script>
-<style>
-        body { font-family: 'Inter', sans-serif; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
     </style>
-</head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased font-display">
-<!-- Sticky Header -->
-<header class="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:bg-background-dark/80 dark:border-slate-800">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="flex h-16 items-center justify-between">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-primary text-3xl">local_parking</span>
-<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">ParkPoint</span>
-</div>
-<nav class="hidden md:flex items-center gap-8">
-<a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors" href="#features">Features</a>
-<a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors" href="#how-it-works">How it Works</a>
-<a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors" href="#testimonials">Testimonials</a>
-</nav>
-<div class="flex items-center gap-3">
-<button class="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-primary transition-colors dark:text-slate-300">Sign In</button>
-<button class="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all">Get Started</button>
-</div>
-</div>
-</div>
-</header>
-<main>
-<!-- Hero Section -->
-<section class="relative overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-32">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-<div class="text-center max-w-3xl mx-auto mb-12">
-<h1 class="text-4xl sm:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight mb-6">
-                        Find Parking Instantly, <span class="text-primary">Anywhere</span>
-</h1>
-<p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Real-time availability and easy reservations. Join thousands of drivers saving time and fuel every day with ParkPoint.
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 antialiased dark:text-slate-100"
+  >
+    <!-- Sticky Header -->
+    <header
+      class="dark:bg-background-dark/80 sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-slate-800"
+    >
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-3xl"
+              >local_parking</span
+            >
+            <span
+              class="text-xl font-bold tracking-tight text-slate-900 dark:text-white"
+              >ParkPoint</span
+            >
+          </div>
+          <nav class="hidden items-center gap-8 md:flex">
+            <a
+              class="hover:text-primary dark:hover:text-primary text-sm font-medium text-slate-600 transition-colors dark:text-slate-400"
+              href="#features"
+              >Features</a
+            >
+            <a
+              class="hover:text-primary dark:hover:text-primary text-sm font-medium text-slate-600 transition-colors dark:text-slate-400"
+              href="#how-it-works"
+              >How it Works</a
+            >
+            <a
+              class="hover:text-primary dark:hover:text-primary text-sm font-medium text-slate-600 transition-colors dark:text-slate-400"
+              href="#testimonials"
+              >Testimonials</a
+            >
+          </nav>
+          <div class="flex items-center gap-3">
+            <button
+              class="hover:text-primary px-4 py-2 text-sm font-semibold text-slate-700 transition-colors dark:text-slate-300"
+            >
+              Sign In
+            </button>
+            <button
+              class="bg-primary hover:bg-primary/90 rounded-lg px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all"
+            >
+              Get Started
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <!-- Hero Section -->
+      <section class="relative overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-32">
+        <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="mx-auto mb-12 max-w-3xl text-center">
+            <h1
+              class="mb-6 text-4xl leading-[1.1] font-black tracking-tight text-slate-900 sm:text-6xl dark:text-white"
+            >
+              Find Parking Instantly, <span class="text-primary">Anywhere</span>
+            </h1>
+            <p
+              class="text-lg leading-relaxed text-slate-600 dark:text-slate-400"
+            >
+              Real-time availability and easy reservations. Join thousands of
+              drivers saving time and fuel every day with ParkPoint.
+            </p>
+          </div>
+          <div
+            class="mx-auto max-w-2xl rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div class="flex flex-col gap-2 sm:flex-row">
+              <div class="relative flex-1">
+                <span
+                  class="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+                  >location_on</span
+                >
+                <input
+                  class="w-full border-none bg-transparent py-3 pr-4 pl-10 text-slate-900 placeholder:text-slate-400 focus:ring-0 dark:text-white"
+                  placeholder="Enter city, landmark, or address..."
+                  type="text"
+                />
+              </div>
+              <button
+                class="bg-primary hover:bg-primary/90 flex items-center justify-center gap-2 rounded-lg px-8 py-3 font-bold text-white transition-all"
+              >
+                <span class="material-symbols-outlined text-xl">search</span>
+                Find Parking
+              </button>
+            </div>
+          </div>
+          <div class="mt-8 flex justify-center gap-4">
+            <button
+              class="flex items-center gap-2 rounded-full border border-slate-200 px-6 py-2 text-sm font-medium transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
+            >
+              <span class="material-symbols-outlined text-primary text-xl"
+                >person_add</span
+              >
+              Sign Up Now
+            </button>
+          </div>
+        </div>
+        <!-- Abstract background shape -->
+        <div
+          class="pointer-events-none absolute top-0 left-1/2 -z-0 h-full w-full -translate-x-1/2 opacity-10"
+        >
+          <div
+            class="bg-primary absolute top-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full blur-[120px]"
+          ></div>
+          <div
+            class="bg-primary absolute right-[-10%] bottom-[-10%] h-[40%] w-[40%] rounded-full blur-[120px]"
+          ></div>
+        </div>
+      </section>
+      <!-- How It Works -->
+      <section class="bg-slate-50 py-20 dark:bg-slate-900/50" id="how-it-works">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="mb-16 text-center">
+            <h2 class="mb-4 text-3xl font-bold text-slate-900 dark:text-white">
+              How It Works
+            </h2>
+            <p class="text-slate-600 dark:text-slate-400">
+              Get your spot in three simple steps
+            </p>
+          </div>
+          <div class="grid gap-8 md:grid-cols-3">
+            <!-- Step 1 -->
+            <div
+              class="rounded-2xl border border-slate-200 bg-white p-8 transition-shadow hover:shadow-lg dark:border-slate-800 dark:bg-slate-900"
+            >
+              <div
+                class="bg-primary/10 mb-6 flex h-14 w-14 items-center justify-center rounded-xl"
+              >
+                <span class="material-symbols-outlined text-primary text-3xl"
+                  >search_insights</span
+                >
+              </div>
+              <h3 class="mb-3 text-xl font-bold text-slate-900 dark:text-white">
+                Search Location
+              </h3>
+              <p class="leading-relaxed text-slate-600 dark:text-slate-400">
+                Enter your destination to see all nearby parking options with
+                real-time occupancy data.
+              </p>
+            </div>
+            <!-- Step 2 -->
+            <div
+              class="rounded-2xl border border-slate-200 bg-white p-8 transition-shadow hover:shadow-lg dark:border-slate-800 dark:bg-slate-900"
+            >
+              <div
+                class="bg-primary/10 mb-6 flex h-14 w-14 items-center justify-center rounded-xl"
+              >
+                <span class="material-symbols-outlined text-primary text-3xl"
+                  >visibility</span
+                >
+              </div>
+              <h3 class="mb-3 text-xl font-bold text-slate-900 dark:text-white">
+                View Available Spots
+              </h3>
+              <p class="leading-relaxed text-slate-600 dark:text-slate-400">
+                Compare prices, amenities, and walking distance to choose the
+                perfect spot for your needs.
+              </p>
+            </div>
+            <!-- Step 3 -->
+            <div
+              class="rounded-2xl border border-slate-200 bg-white p-8 transition-shadow hover:shadow-lg dark:border-slate-800 dark:bg-slate-900"
+            >
+              <div
+                class="bg-primary/10 mb-6 flex h-14 w-14 items-center justify-center rounded-xl"
+              >
+                <span class="material-symbols-outlined text-primary text-3xl"
+                  >near_me</span
+                >
+              </div>
+              <h3 class="mb-3 text-xl font-bold text-slate-900 dark:text-white">
+                Reserve or Navigate
+              </h3>
+              <p class="leading-relaxed text-slate-600 dark:text-slate-400">
+                Book your spot instantly and get turn-by-turn directions
+                directly to your reserved space.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Live Map Preview Section -->
+      <section class="dark:bg-background-dark bg-white py-20">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="flex flex-col items-center gap-12 lg:flex-row">
+            <div class="flex-1">
+              <h2
+                class="mb-6 text-3xl font-bold text-slate-900 dark:text-white"
+              >
+                Live Map Experience
+              </h2>
+              <p class="mb-8 text-lg text-slate-600 dark:text-slate-400">
+                Experience our intuitive interface. Filter by your specific
+                needs and see live pricing across the city.
+              </p>
+              <div class="space-y-4">
+                <div
+                  class="flex items-start gap-4 rounded-xl bg-slate-50 p-4 dark:bg-slate-900"
+                >
+                  <span class="material-symbols-outlined text-primary"
+                    >filter_list</span
+                  >
+                  <div>
+                    <h4 class="font-bold text-slate-900 dark:text-white">
+                      Smart Filters
+                    </h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                      Sort by price, distance, or specialized needs like EV
+                      charging.
                     </p>
-</div>
-<div class="max-w-2xl mx-auto bg-white dark:bg-slate-900 p-2 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800">
-<div class="flex flex-col sm:flex-row gap-2">
-<div class="relative flex-1">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">location_on</span>
-<input class="w-full pl-10 pr-4 py-3 bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white placeholder:text-slate-400" placeholder="Enter city, landmark, or address..." type="text"/>
-</div>
-<button class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2">
-<span class="material-symbols-outlined text-xl">search</span>
-                            Find Parking
-                        </button>
-</div>
-</div>
-<div class="mt-8 flex justify-center gap-4">
-<button class="flex items-center gap-2 px-6 py-2 border border-slate-200 dark:border-slate-800 rounded-full text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-<span class="material-symbols-outlined text-primary text-xl">person_add</span>
-                        Sign Up Now
-                    </button>
-</div>
-</div>
-<!-- Abstract background shape -->
-<div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-0 pointer-events-none opacity-10">
-<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary rounded-full blur-[120px]"></div>
-<div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary rounded-full blur-[120px]"></div>
-</div>
-</section>
-<!-- How It Works -->
-<section class="py-20 bg-slate-50 dark:bg-slate-900/50" id="how-it-works">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="text-center mb-16">
-<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">How It Works</h2>
-<p class="text-slate-600 dark:text-slate-400">Get your spot in three simple steps</p>
-</div>
-<div class="grid md:grid-cols-3 gap-8">
-<!-- Step 1 -->
-<div class="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow">
-<div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
-<span class="material-symbols-outlined text-primary text-3xl">search_insights</span>
-</div>
-<h3 class="text-xl font-bold mb-3 text-slate-900 dark:text-white">Search Location</h3>
-<p class="text-slate-600 dark:text-slate-400 leading-relaxed">Enter your destination to see all nearby parking options with real-time occupancy data.</p>
-</div>
-<!-- Step 2 -->
-<div class="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow">
-<div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
-<span class="material-symbols-outlined text-primary text-3xl">visibility</span>
-</div>
-<h3 class="text-xl font-bold mb-3 text-slate-900 dark:text-white">View Available Spots</h3>
-<p class="text-slate-600 dark:text-slate-400 leading-relaxed">Compare prices, amenities, and walking distance to choose the perfect spot for your needs.</p>
-</div>
-<!-- Step 3 -->
-<div class="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-lg transition-shadow">
-<div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
-<span class="material-symbols-outlined text-primary text-3xl">near_me</span>
-</div>
-<h3 class="text-xl font-bold mb-3 text-slate-900 dark:text-white">Reserve or Navigate</h3>
-<p class="text-slate-600 dark:text-slate-400 leading-relaxed">Book your spot instantly and get turn-by-turn directions directly to your reserved space.</p>
-</div>
-</div>
-</div>
-</section>
-<!-- Live Map Preview Section -->
-<section class="py-20 bg-white dark:bg-background-dark">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="flex flex-col lg:flex-row gap-12 items-center">
-<div class="flex-1">
-<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-6">Live Map Experience</h2>
-<p class="text-lg text-slate-600 dark:text-slate-400 mb-8">
-                            Experience our intuitive interface. Filter by your specific needs and see live pricing across the city.
-                        </p>
-<div class="space-y-4">
-<div class="flex items-start gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900">
-<span class="material-symbols-outlined text-primary">filter_list</span>
-<div>
-<h4 class="font-bold text-slate-900 dark:text-white">Smart Filters</h4>
-<p class="text-sm text-slate-600 dark:text-slate-400">Sort by price, distance, or specialized needs like EV charging.</p>
-</div>
-</div>
-<div class="flex items-start gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900">
-<span class="material-symbols-outlined text-primary">update</span>
-<div>
-<h4 class="font-bold text-slate-900 dark:text-white">Live Updates</h4>
-<p class="text-sm text-slate-600 dark:text-slate-400">Data refreshes every 30 seconds to ensure spot availability.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="flex-1 w-full relative">
-<div class="rounded-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 h-[450px] relative group">
-<!-- Simulated Map -->
-<div class="w-full h-full bg-slate-200 dark:bg-slate-800 bg-cover bg-center" data-alt="Interactive map showing blue parking pins across a city grid" data-location="New York City" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBGXlNR-MO0xy-X1dk-msE0Rfsj-N85pCxNKlYYL9KUdnu5_G25esvLvOp7rXQKUK2nOkufXHOHrmuLwG9bFN-BbJnomNndXYoptdPzQAlk-sl9ofsUypN30lYvlQPNiNmhUy0IUEu1w2VJLRJ_coT45M_vIo_X7URnPCY038PdLn3FF97qq94KaXPjRc_-Siku1ZX7wjazoUcxeaGPw7QxV2VVWzPOcfYQ_-_VZnJAg-SJp7Orc0aV1_-l2YsmY-DNFCpomISyUUSQ');">
-<!-- Simulated Markers -->
-<div class="absolute top-1/4 left-1/3 w-8 h-8 bg-primary rounded-full border-2 border-white flex items-center justify-center text-white font-bold shadow-lg transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform cursor-pointer">$12</div>
-<div class="absolute top-1/2 left-2/3 w-8 h-8 bg-primary rounded-full border-2 border-white flex items-center justify-center text-white font-bold shadow-lg transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform cursor-pointer">$15</div>
-<div class="absolute bottom-1/4 left-1/2 w-8 h-8 bg-primary rounded-full border-2 border-white flex items-center justify-center text-white font-bold shadow-lg transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform cursor-pointer">$8</div>
-</div>
-<!-- Overlays -->
-<div class="absolute top-4 left-4 right-4 flex gap-2">
-<div class="flex-1 bg-white dark:bg-slate-900 rounded-lg shadow-md px-3 py-2 flex items-center justify-between text-xs font-semibold border border-slate-200 dark:border-slate-800">
-<span class="text-slate-500">Price: <span class="text-slate-900 dark:text-white">All</span></span>
-<span class="material-symbols-outlined text-sm">expand_more</span>
-</div>
-<div class="flex-1 bg-white dark:bg-slate-900 rounded-lg shadow-md px-3 py-2 flex items-center justify-between text-xs font-semibold border border-slate-200 dark:border-slate-800">
-<span class="text-slate-500">Distance: <span class="text-slate-900 dark:text-white">1km</span></span>
-<span class="material-symbols-outlined text-sm">expand_more</span>
-</div>
-<div class="flex-1 bg-primary text-white rounded-lg shadow-md px-3 py-2 flex items-center justify-between text-xs font-semibold">
-<span>EV Only</span>
-<span class="material-symbols-outlined text-sm">bolt</span>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Features Grid -->
-<section class="py-20 bg-slate-50 dark:bg-slate-900/50" id="features">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="text-center mb-16">
-<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Powerful Features</h2>
-<p class="text-slate-600 dark:text-slate-400">Everything you need for a stress-free parking experience</p>
-</div>
-<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-<!-- Feature 1 -->
-<div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col items-start gap-4">
-<span class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">speed</span>
-<h4 class="font-bold text-slate-900 dark:text-white">Real-time Availability</h4>
-<p class="text-sm text-slate-600 dark:text-slate-400">See exactly how many spots are left in any garage or street segment at this very second.</p>
-</div>
-<!-- Feature 2 -->
-<div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col items-start gap-4">
-<span class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">verified_user</span>
-<h4 class="font-bold text-slate-900 dark:text-white">Secure Booking</h4>
-<p class="text-sm text-slate-600 dark:text-slate-400">Guaranteed spots when you reserve ahead. No more circling the block in frustration.</p>
-</div>
-<!-- Feature 3 -->
-<div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col items-start gap-4">
-<span class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">payments</span>
-<h4 class="font-bold text-slate-900 dark:text-white">Payment Integration</h4>
-<p class="text-sm text-slate-600 dark:text-slate-400">Pay via Apple Pay, Google Pay, or Credit Card directly in the app. Automatic receipts.</p>
-</div>
-<!-- Feature 4 -->
-<div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col items-start gap-4">
-<span class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">bookmarks</span>
-<h4 class="font-bold text-slate-900 dark:text-white">Saved Locations</h4>
-<p class="text-sm text-slate-600 dark:text-slate-400">Save your home, office, or favorite gym to find parking even faster next time.</p>
-</div>
-<!-- Feature 5 -->
-<div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col items-start gap-4">
-<span class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">history</span>
-<h4 class="font-bold text-slate-900 dark:text-white">Parking History</h4>
-<p class="text-sm text-slate-600 dark:text-slate-400">Keep track of your spending and frequent spots with detailed usage reports.</p>
-</div>
-<!-- Feature 6 -->
-<div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col items-start gap-4">
-<span class="material-symbols-outlined text-primary bg-primary/10 p-3 rounded-lg">auto_awesome</span>
-<h4 class="font-bold text-slate-900 dark:text-white">Smart Recommendations</h4>
-<p class="text-sm text-slate-600 dark:text-slate-400">Our AI suggests the best value spots based on your typical walking pace and budget.</p>
-</div>
-</div>
-</div>
-</section>
-<!-- Testimonials -->
-<section class="py-20 bg-white dark:bg-background-dark" id="testimonials">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="text-center mb-16">
-<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">What Our Users Say</h2>
-<p class="text-slate-600 dark:text-slate-400">Over 50,000 happy drivers across 15 cities</p>
-</div>
-<div class="grid md:grid-cols-3 gap-8">
-<!-- Testimonial 1 -->
-<div class="bg-slate-50 dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800">
-<div class="flex gap-1 text-primary mb-4">
-<span class="material-symbols-outlined">star</span>
-<span class="material-symbols-outlined">star</span>
-<span class="material-symbols-outlined">star</span>
-<span class="material-symbols-outlined">star</span>
-<span class="material-symbols-outlined">star</span>
-</div>
-<p class="text-slate-700 dark:text-slate-300 italic mb-6">"ParkPoint changed my daily commute. I no longer stress about finding a spot near my office. Highly recommended!"</p>
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 rounded-full bg-slate-300 overflow-hidden">
-<img alt="Sarah J" data-alt="User avatar of a smiling woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWktSNFvkWXnxLXzUFycdU5LLQoMptjTYlUA8klOyy5kVOhOUyNQ6cYOwnKaBZTcQylzvm5HtoHEQ6yq57Oi0x4030rsx3pn7ce4i_1DUDd1aNfN0XEikhiGvUal6DNyPxELuk1XfuNw8MRwgoHRFkgHQQp4g-y9TP6rEczfUJJXHJ7QPrSy9zKztiJP4AT63OQhWJPskcJlSN10lmiQ4YhEwlgUzO7_b1xmd_zy3cl09zWN_LwMJ7STYhEs72dzCxivg97qVQSqmQ"/>
-</div>
-<div>
-<h5 class="font-bold text-slate-900 dark:text-white">Sarah J.</h5>
-<p class="text-xs text-slate-500">Downtown NY</p>
-</div>
-</div>
-</div>
-<!-- Testimonial 2 -->
-<div class="bg-slate-50 dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800">
-<div class="flex gap-1 text-primary mb-4">
-<span class="material-symbols-outlined">star</span>
-<span class="material-symbols-outlined">star</span>
-<span class="material-symbols-outlined">star</span>
-<span class="material-symbols-outlined">star</span>
-<span class="material-symbols-outlined">star_half</span>
-</div>
-<p class="text-slate-700 dark:text-slate-300 italic mb-6">"The EV charging filter is a lifesaver. Finding a garage with available chargers used to be a nightmare."</p>
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 rounded-full bg-slate-300 overflow-hidden">
-<img alt="Marcus T" data-alt="User avatar of a professional man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJxInfV1Ohyq5OGrosXgpdi20wduRCsWDZmbiVc9T5YlCwk1DMxKnJHP1aF6SPpnKeVCiQkOw3xSFfQNzShcJEa9w94-4FjImkMx7ERbEKrGbRcT83-zRzZ2krXShTC3X_AJQA-dTXkZ8uacsLU8YXYPuFd6PNIUIkuipCLk_LPSiwOT14n_d1C5abs6X9goEd0pHMaImrjz8TPrRqJ_54FvQiEbsekS-4lG3ph0LGKZ0z985pNHJv8MuNR0gdOpinU0VhaBosB1Qw"/>
-</div>
-<div>
-<h5 class="font-bold text-slate-900 dark:text-white">Marcus T.</h5>
-<p class="text-xs text-slate-500">San Francisco, CA</p>
-</div>
-</div>
-</div>
-<!-- Testimonial 3 -->
-<div class="bg-slate-50 dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800">
-<div class="flex gap-1 text-primary mb-4">
-<span class="material-symbols-outlined">star</span>
-<span class="material-symbols-outlined">star</span>
-<span class="material-symbols-outlined">star</span>
-<span class="material-symbols-outlined">star</span>
-<span class="material-symbols-outlined">star</span>
-</div>
-<p class="text-slate-700 dark:text-slate-300 italic mb-6">"Simple, fast, and accurate. The navigation takes me straight to the gate. Worth every penny for the convenience."</p>
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 rounded-full bg-slate-300 overflow-hidden">
-<img alt="Elena R" data-alt="User avatar of a happy traveler" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEZQ-IUoYsQbWlytPGlZsTRG3BlOggG3diS3O36RdI_D-ruy245Lo7ViHV_e6OcpdmOnkS42eEXl8HEVSqcna3hyKeKdcsXYs2ix1IybbOb46ic52lDKjXwReVm6JR_VY-qKIk2N8E7ulY1ajhzlMcMb6WsJFda3vyaOOEF_2qSpG7LVYOzMtrOrv2U72g4Vgmo4_hWS-5F8reyiwGZ3L7QRkUsQI1wsglIqq4UNJsWCzvl95pa3M0jBZWCPYlg92Wq6lBJ0YVYnQ8"/>
-</div>
-<div>
-<h5 class="font-bold text-slate-900 dark:text-white">Elena R.</h5>
-<p class="text-xs text-slate-500">London, UK</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="bg-slate-900 text-slate-400 py-16">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="grid md:grid-cols-4 gap-12 mb-12">
-<div class="col-span-1">
-<div class="flex items-center gap-2 text-white mb-6">
-<span class="material-symbols-outlined text-primary text-3xl">local_parking</span>
-<span class="text-xl font-bold tracking-tight">ParkPoint</span>
-</div>
-<p class="text-sm leading-relaxed mb-6">
-                        Making city life easier by solving the parking puzzle one spot at a time. Available in over 15 major cities worldwide.
+                  </div>
+                </div>
+                <div
+                  class="flex items-start gap-4 rounded-xl bg-slate-50 p-4 dark:bg-slate-900"
+                >
+                  <span class="material-symbols-outlined text-primary"
+                    >update</span
+                  >
+                  <div>
+                    <h4 class="font-bold text-slate-900 dark:text-white">
+                      Live Updates
+                    </h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                      Data refreshes every 30 seconds to ensure spot
+                      availability.
                     </p>
-<div class="flex gap-4">
-<a class="hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">share</span></a>
-<a class="hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">public</span></a>
-<a class="hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
-</div>
-</div>
-<div>
-<h5 class="text-white font-bold mb-6">Quick Links</h5>
-<ul class="space-y-4 text-sm">
-<li><a class="hover:text-white transition-colors" href="#">Find Parking</a></li>
-<li><a class="hover:text-white transition-colors" href="#">List your Garage</a></li>
-<li><a class="hover:text-white transition-colors" href="#">Corporate Accounts</a></li>
-<li><a class="hover:text-white transition-colors" href="#">Mobile App</a></li>
-</ul>
-</div>
-<div>
-<h5 class="text-white font-bold mb-6">Support</h5>
-<ul class="space-y-4 text-sm">
-<li><a class="hover:text-white transition-colors" href="#">Help Center</a></li>
-<li><a class="hover:text-white transition-colors" href="#">Privacy Policy</a></li>
-<li><a class="hover:text-white transition-colors" href="#">Terms of Service</a></li>
-<li><a class="hover:text-white transition-colors" href="#">Cookie Policy</a></li>
-</ul>
-</div>
-<div>
-<h5 class="text-white font-bold mb-6">Newsletter</h5>
-<p class="text-sm mb-4">Stay updated with the latest parking spots and features.</p>
-<form class="flex gap-2">
-<input class="bg-slate-800 border-none rounded-lg text-sm px-4 py-2 w-full focus:ring-1 focus:ring-primary text-white" placeholder="Your email" type="email"/>
-<button class="bg-primary text-white p-2 rounded-lg hover:bg-primary/90 transition-colors">
-<span class="material-symbols-outlined">send</span>
-</button>
-</form>
-</div>
-</div>
-<div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
-<p>© 2024 ParkPoint Technologies Inc. All rights reserved.</p>
-<p>Designed for the urban explorer.</p>
-</div>
-</div>
-</footer>
-</body></html>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="relative w-full flex-1">
+              <div
+                class="group relative h-[450px] overflow-hidden rounded-2xl border border-slate-200 shadow-2xl dark:border-slate-800"
+              >
+                <!-- Simulated Map -->
+                <div
+                  class="h-full w-full bg-slate-200 bg-cover bg-center dark:bg-slate-800"
+                  data-alt="Interactive map showing blue parking pins across a city grid"
+                  data-location="New York City"
+                  style="
+                    background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuBGXlNR-MO0xy-X1dk-msE0Rfsj-N85pCxNKlYYL9KUdnu5_G25esvLvOp7rXQKUK2nOkufXHOHrmuLwG9bFN-BbJnomNndXYoptdPzQAlk-sl9ofsUypN30lYvlQPNiNmhUy0IUEu1w2VJLRJ_coT45M_vIo_X7URnPCY038PdLn3FF97qq94KaXPjRc_-Siku1ZX7wjazoUcxeaGPw7QxV2VVWzPOcfYQ_-_VZnJAg-SJp7Orc0aV1_-l2YsmY-DNFCpomISyUUSQ&quot;);
+                  "
+                >
+                  <!-- Simulated Markers -->
+                  <div
+                    class="bg-primary absolute top-1/4 left-1/3 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full border-2 border-white font-bold text-white shadow-lg transition-transform hover:scale-110"
+                  >
+                    $12
+                  </div>
+                  <div
+                    class="bg-primary absolute top-1/2 left-2/3 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full border-2 border-white font-bold text-white shadow-lg transition-transform hover:scale-110"
+                  >
+                    $15
+                  </div>
+                  <div
+                    class="bg-primary absolute bottom-1/4 left-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full border-2 border-white font-bold text-white shadow-lg transition-transform hover:scale-110"
+                  >
+                    $8
+                  </div>
+                </div>
+                <!-- Overlays -->
+                <div class="absolute top-4 right-4 left-4 flex gap-2">
+                  <div
+                    class="flex flex-1 items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold shadow-md dark:border-slate-800 dark:bg-slate-900"
+                  >
+                    <span class="text-slate-500"
+                      >Price:
+                      <span class="text-slate-900 dark:text-white"
+                        >All</span
+                      ></span
+                    >
+                    <span class="material-symbols-outlined text-sm"
+                      >expand_more</span
+                    >
+                  </div>
+                  <div
+                    class="flex flex-1 items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold shadow-md dark:border-slate-800 dark:bg-slate-900"
+                  >
+                    <span class="text-slate-500"
+                      >Distance:
+                      <span class="text-slate-900 dark:text-white"
+                        >1km</span
+                      ></span
+                    >
+                    <span class="material-symbols-outlined text-sm"
+                      >expand_more</span
+                    >
+                  </div>
+                  <div
+                    class="bg-primary flex flex-1 items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold text-white shadow-md"
+                  >
+                    <span>EV Only</span>
+                    <span class="material-symbols-outlined text-sm">bolt</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Features Grid -->
+      <section class="bg-slate-50 py-20 dark:bg-slate-900/50" id="features">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="mb-16 text-center">
+            <h2 class="mb-4 text-3xl font-bold text-slate-900 dark:text-white">
+              Powerful Features
+            </h2>
+            <p class="text-slate-600 dark:text-slate-400">
+              Everything you need for a stress-free parking experience
+            </p>
+          </div>
+          <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <!-- Feature 1 -->
+            <div
+              class="flex flex-col items-start gap-4 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+            >
+              <span
+                class="material-symbols-outlined text-primary bg-primary/10 rounded-lg p-3"
+                >speed</span
+              >
+              <h4 class="font-bold text-slate-900 dark:text-white">
+                Real-time Availability
+              </h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">
+                See exactly how many spots are left in any garage or street
+                segment at this very second.
+              </p>
+            </div>
+            <!-- Feature 2 -->
+            <div
+              class="flex flex-col items-start gap-4 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+            >
+              <span
+                class="material-symbols-outlined text-primary bg-primary/10 rounded-lg p-3"
+                >verified_user</span
+              >
+              <h4 class="font-bold text-slate-900 dark:text-white">
+                Secure Booking
+              </h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">
+                Guaranteed spots when you reserve ahead. No more circling the
+                block in frustration.
+              </p>
+            </div>
+            <!-- Feature 3 -->
+            <div
+              class="flex flex-col items-start gap-4 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+            >
+              <span
+                class="material-symbols-outlined text-primary bg-primary/10 rounded-lg p-3"
+                >payments</span
+              >
+              <h4 class="font-bold text-slate-900 dark:text-white">
+                Payment Integration
+              </h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">
+                Pay via Apple Pay, Google Pay, or Credit Card directly in the
+                app. Automatic receipts.
+              </p>
+            </div>
+            <!-- Feature 4 -->
+            <div
+              class="flex flex-col items-start gap-4 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+            >
+              <span
+                class="material-symbols-outlined text-primary bg-primary/10 rounded-lg p-3"
+                >bookmarks</span
+              >
+              <h4 class="font-bold text-slate-900 dark:text-white">
+                Saved Locations
+              </h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">
+                Save your home, office, or favorite gym to find parking even
+                faster next time.
+              </p>
+            </div>
+            <!-- Feature 5 -->
+            <div
+              class="flex flex-col items-start gap-4 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+            >
+              <span
+                class="material-symbols-outlined text-primary bg-primary/10 rounded-lg p-3"
+                >history</span
+              >
+              <h4 class="font-bold text-slate-900 dark:text-white">
+                Parking History
+              </h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">
+                Keep track of your spending and frequent spots with detailed
+                usage reports.
+              </p>
+            </div>
+            <!-- Feature 6 -->
+            <div
+              class="flex flex-col items-start gap-4 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+            >
+              <span
+                class="material-symbols-outlined text-primary bg-primary/10 rounded-lg p-3"
+                >auto_awesome</span
+              >
+              <h4 class="font-bold text-slate-900 dark:text-white">
+                Smart Recommendations
+              </h4>
+              <p class="text-sm text-slate-600 dark:text-slate-400">
+                Our AI suggests the best value spots based on your typical
+                walking pace and budget.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Testimonials -->
+      <section class="dark:bg-background-dark bg-white py-20" id="testimonials">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="mb-16 text-center">
+            <h2 class="mb-4 text-3xl font-bold text-slate-900 dark:text-white">
+              What Our Users Say
+            </h2>
+            <p class="text-slate-600 dark:text-slate-400">
+              Over 50,000 happy drivers across 15 cities
+            </p>
+          </div>
+          <div class="grid gap-8 md:grid-cols-3">
+            <!-- Testimonial 1 -->
+            <div
+              class="rounded-2xl border border-slate-200 bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-900"
+            >
+              <div class="text-primary mb-4 flex gap-1">
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+              </div>
+              <p class="mb-6 text-slate-700 italic dark:text-slate-300">
+                "ParkPoint changed my daily commute. I no longer stress about
+                finding a spot near my office. Highly recommended!"
+              </p>
+              <div class="flex items-center gap-4">
+                <div
+                  class="h-12 w-12 overflow-hidden rounded-full bg-slate-300"
+                >
+                  <img
+                    alt="Sarah J"
+                    data-alt="User avatar of a smiling woman"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWktSNFvkWXnxLXzUFycdU5LLQoMptjTYlUA8klOyy5kVOhOUyNQ6cYOwnKaBZTcQylzvm5HtoHEQ6yq57Oi0x4030rsx3pn7ce4i_1DUDd1aNfN0XEikhiGvUal6DNyPxELuk1XfuNw8MRwgoHRFkgHQQp4g-y9TP6rEczfUJJXHJ7QPrSy9zKztiJP4AT63OQhWJPskcJlSN10lmiQ4YhEwlgUzO7_b1xmd_zy3cl09zWN_LwMJ7STYhEs72dzCxivg97qVQSqmQ"
+                  />
+                </div>
+                <div>
+                  <h5 class="font-bold text-slate-900 dark:text-white">
+                    Sarah J.
+                  </h5>
+                  <p class="text-xs text-slate-500">Downtown NY</p>
+                </div>
+              </div>
+            </div>
+            <!-- Testimonial 2 -->
+            <div
+              class="rounded-2xl border border-slate-200 bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-900"
+            >
+              <div class="text-primary mb-4 flex gap-1">
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star_half</span>
+              </div>
+              <p class="mb-6 text-slate-700 italic dark:text-slate-300">
+                "The EV charging filter is a lifesaver. Finding a garage with
+                available chargers used to be a nightmare."
+              </p>
+              <div class="flex items-center gap-4">
+                <div
+                  class="h-12 w-12 overflow-hidden rounded-full bg-slate-300"
+                >
+                  <img
+                    alt="Marcus T"
+                    data-alt="User avatar of a professional man"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJxInfV1Ohyq5OGrosXgpdi20wduRCsWDZmbiVc9T5YlCwk1DMxKnJHP1aF6SPpnKeVCiQkOw3xSFfQNzShcJEa9w94-4FjImkMx7ERbEKrGbRcT83-zRzZ2krXShTC3X_AJQA-dTXkZ8uacsLU8YXYPuFd6PNIUIkuipCLk_LPSiwOT14n_d1C5abs6X9goEd0pHMaImrjz8TPrRqJ_54FvQiEbsekS-4lG3ph0LGKZ0z985pNHJv8MuNR0gdOpinU0VhaBosB1Qw"
+                  />
+                </div>
+                <div>
+                  <h5 class="font-bold text-slate-900 dark:text-white">
+                    Marcus T.
+                  </h5>
+                  <p class="text-xs text-slate-500">San Francisco, CA</p>
+                </div>
+              </div>
+            </div>
+            <!-- Testimonial 3 -->
+            <div
+              class="rounded-2xl border border-slate-200 bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-900"
+            >
+              <div class="text-primary mb-4 flex gap-1">
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+              </div>
+              <p class="mb-6 text-slate-700 italic dark:text-slate-300">
+                "Simple, fast, and accurate. The navigation takes me straight to
+                the gate. Worth every penny for the convenience."
+              </p>
+              <div class="flex items-center gap-4">
+                <div
+                  class="h-12 w-12 overflow-hidden rounded-full bg-slate-300"
+                >
+                  <img
+                    alt="Elena R"
+                    data-alt="User avatar of a happy traveler"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEZQ-IUoYsQbWlytPGlZsTRG3BlOggG3diS3O36RdI_D-ruy245Lo7ViHV_e6OcpdmOnkS42eEXl8HEVSqcna3hyKeKdcsXYs2ix1IybbOb46ic52lDKjXwReVm6JR_VY-qKIk2N8E7ulY1ajhzlMcMb6WsJFda3vyaOOEF_2qSpG7LVYOzMtrOrv2U72g4Vgmo4_hWS-5F8reyiwGZ3L7QRkUsQI1wsglIqq4UNJsWCzvl95pa3M0jBZWCPYlg92Wq6lBJ0YVYnQ8"
+                  />
+                </div>
+                <div>
+                  <h5 class="font-bold text-slate-900 dark:text-white">
+                    Elena R.
+                  </h5>
+                  <p class="text-xs text-slate-500">London, UK</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-slate-900 py-16 text-slate-400">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-12 grid gap-12 md:grid-cols-4">
+          <div class="col-span-1">
+            <div class="mb-6 flex items-center gap-2 text-white">
+              <span class="material-symbols-outlined text-primary text-3xl"
+                >local_parking</span
+              >
+              <span class="text-xl font-bold tracking-tight">ParkPoint</span>
+            </div>
+            <p class="mb-6 text-sm leading-relaxed">
+              Making city life easier by solving the parking puzzle one spot at
+              a time. Available in over 15 major cities worldwide.
+            </p>
+            <div class="flex gap-4">
+              <a class="hover:text-primary transition-colors" href="#"
+                ><span class="material-symbols-outlined">share</span></a
+              >
+              <a class="hover:text-primary transition-colors" href="#"
+                ><span class="material-symbols-outlined">public</span></a
+              >
+              <a class="hover:text-primary transition-colors" href="#"
+                ><span class="material-symbols-outlined"
+                  >alternate_email</span
+                ></a
+              >
+            </div>
+          </div>
+          <div>
+            <h5 class="mb-6 font-bold text-white">Quick Links</h5>
+            <ul class="space-y-4 text-sm">
+              <li>
+                <a class="transition-colors hover:text-white" href="#"
+                  >Find Parking</a
+                >
+              </li>
+              <li>
+                <a class="transition-colors hover:text-white" href="#"
+                  >List your Garage</a
+                >
+              </li>
+              <li>
+                <a class="transition-colors hover:text-white" href="#"
+                  >Corporate Accounts</a
+                >
+              </li>
+              <li>
+                <a class="transition-colors hover:text-white" href="#"
+                  >Mobile App</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h5 class="mb-6 font-bold text-white">Support</h5>
+            <ul class="space-y-4 text-sm">
+              <li>
+                <a class="transition-colors hover:text-white" href="#"
+                  >Help Center</a
+                >
+              </li>
+              <li>
+                <a class="transition-colors hover:text-white" href="#"
+                  >Privacy Policy</a
+                >
+              </li>
+              <li>
+                <a class="transition-colors hover:text-white" href="#"
+                  >Terms of Service</a
+                >
+              </li>
+              <li>
+                <a class="transition-colors hover:text-white" href="#"
+                  >Cookie Policy</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h5 class="mb-6 font-bold text-white">Newsletter</h5>
+            <p class="mb-4 text-sm">
+              Stay updated with the latest parking spots and features.
+            </p>
+            <form class="flex gap-2">
+              <input
+                class="focus:ring-primary w-full rounded-lg border-none bg-slate-800 px-4 py-2 text-sm text-white focus:ring-1"
+                placeholder="Your email"
+                type="email"
+              />
+              <button
+                class="bg-primary hover:bg-primary/90 rounded-lg p-2 text-white transition-colors"
+              >
+                <span class="material-symbols-outlined">send</span>
+              </button>
+            </form>
+          </div>
+        </div>
+        <div
+          class="flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 text-xs md:flex-row"
+        >
+          <p>© 2024 ParkPoint Technologies Inc. All rights reserved.</p>
+          <p>Designed for the urban explorer.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

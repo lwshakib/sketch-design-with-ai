@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Layout, 
-  CheckCircle2, 
-  Circle, 
-  Clock, 
+import {
+  Layout,
+  CheckCircle2,
+  Circle,
+  Clock,
   ChevronRight,
   ExternalLink,
   Boxes,
   Smartphone,
-  Monitor
+  Monitor,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,14 +28,19 @@ interface PlanningDisplayProps {
   className?: string;
 }
 
-export function PlanningDisplay({ plan, isPlanning, onClick, className }: PlanningDisplayProps) {
+export function PlanningDisplay({
+  plan,
+  isPlanning,
+  onClick,
+  className,
+}: PlanningDisplayProps) {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isPlanning) {
       interval = setInterval(() => {
-        setSeconds(s => s + 1);
+        setSeconds((s) => s + 1);
       }, 1000);
     } else {
       setSeconds(0);
@@ -46,42 +51,55 @@ export function PlanningDisplay({ plan, isPlanning, onClick, className }: Planni
   const formatTime = (s: number) => {
     const mins = Math.floor(s / 60);
     const secs = s % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   if (isPlanning) {
     return (
-      <div className={cn("flex flex-col gap-4 p-5 bg-card/40 border border-primary/20 rounded-[2rem] animate-pulse relative overflow-hidden", className)}>
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
-        
-        <div className="flex items-center justify-between relative z-10">
+      <div
+        className={cn(
+          "bg-card/40 border-primary/20 relative flex animate-pulse flex-col gap-4 overflow-hidden rounded-[2rem] border p-5",
+          className,
+        )}
+      >
+        <div className="from-primary/5 pointer-events-none absolute inset-0 bg-gradient-to-br to-transparent" />
+
+        <div className="relative z-10 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="absolute inset-0 bg-primary/20 blur-md rounded-full animate-ping" />
-              <div className="size-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center relative z-10">
-                <Boxes className="size-5 text-primary" />
+              <div className="bg-primary/20 absolute inset-0 animate-ping rounded-full blur-md" />
+              <div className="bg-primary/10 border-primary/20 relative z-10 flex size-10 items-center justify-center rounded-2xl border">
+                <Boxes className="text-primary size-5" />
               </div>
             </div>
             <div className="flex flex-col gap-0.5">
-              <span className="text-[12px] font-black uppercase tracking-[0.15em] text-primary">Architecting Vision</span>
-              <span className="text-[10px] text-primary/60 font-black uppercase tracking-widest animate-pulse">Computing Manifest...</span>
+              <span className="text-primary text-[12px] font-black tracking-[0.15em] uppercase">
+                Architecting Vision
+              </span>
+              <span className="text-primary/60 animate-pulse text-[10px] font-black tracking-widest uppercase">
+                Computing Manifest...
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
-            <Clock className="size-3 text-primary" />
-            <span className="text-[10px] font-mono font-bold text-primary">{formatTime(seconds)}</span>
+          <div className="bg-primary/10 border-primary/20 flex items-center gap-1.5 rounded-full border px-3 py-1">
+            <Clock className="text-primary size-3" />
+            <span className="text-primary font-mono text-[10px] font-bold">
+              {formatTime(seconds)}
+            </span>
           </div>
         </div>
 
-        <div className="space-y-3 relative z-10">
-          <div className="h-1.5 bg-primary/10 rounded-full w-full overflow-hidden">
-            <motion.div 
-              className="h-full bg-primary"
+        <div className="relative z-10 space-y-3">
+          <div className="bg-primary/10 h-1.5 w-full overflow-hidden rounded-full">
+            <motion.div
+              className="bg-primary h-full"
               animate={{ x: ["-100%", "100%"] }}
               transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
             />
           </div>
-          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.1em] text-center">Developing screen manifests & style inheritance...</p>
+          <p className="text-muted-foreground text-center text-[10px] font-bold tracking-[0.1em] uppercase">
+            Developing screen manifests & style inheritance...
+          </p>
         </div>
       </div>
     );
@@ -90,55 +108,69 @@ export function PlanningDisplay({ plan, isPlanning, onClick, className }: Planni
   if (!plan || !plan.screens || plan.screens.length === 0) return null;
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col gap-4 p-5 bg-gradient-to-br from-card/80 to-card border border-border/50 rounded-[2rem] hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5 transition-all cursor-pointer overflow-hidden backdrop-blur-xl",
-        className
+        "group from-card/80 to-card border-border/50 hover:border-primary/40 hover:shadow-primary/5 relative flex cursor-pointer flex-col gap-4 overflow-hidden rounded-[2rem] border bg-gradient-to-br p-5 backdrop-blur-xl transition-all hover:shadow-2xl",
+        className,
       )}
     >
       {/* Background Glow */}
-      <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-32 h-32 bg-primary/5 blur-[60px] rounded-full pointer-events-none group-hover:bg-primary/10 transition-colors" />
+      <div className="bg-primary/5 group-hover:bg-primary/10 pointer-events-none absolute top-0 right-0 h-32 w-32 translate-x-1/2 -translate-y-1/2 rounded-full blur-[60px] transition-colors" />
 
-      <div className="flex items-start justify-between relative z-10">
+      <div className="relative z-10 flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="size-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-            <Boxes className="size-5 text-primary" />
+          <div className="bg-primary/10 border-primary/20 flex size-10 items-center justify-center rounded-2xl border transition-transform group-hover:scale-110">
+            <Boxes className="text-primary size-5" />
           </div>
           <div className="flex flex-col gap-0.5">
-            <span className="text-[12px] font-black uppercase tracking-[0.15em] text-foreground/90">Project Manifest</span>
+            <span className="text-foreground/90 text-[12px] font-black tracking-[0.15em] uppercase">
+              Project Manifest
+            </span>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-primary font-bold uppercase tracking-wider">{plan.screens.length} Screens Defined</span>
+              <span className="text-primary text-[10px] font-bold tracking-wider uppercase">
+                {plan.screens.length} Screens Defined
+              </span>
             </div>
           </div>
         </div>
-        <div className="p-2 opacity-0 group-hover:opacity-100 transition-all translate-x-1 group-hover:translate-x-0">
-          <ChevronRight className="size-4 text-primary" />
+        <div className="translate-x-1 p-2 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100">
+          <ChevronRight className="text-primary size-4" />
         </div>
       </div>
 
       <div className="relative z-10">
-        <p className="text-[13px] text-muted-foreground line-clamp-2 leading-relaxed font-medium">
-          {plan.screens[0]?.description || "Detailed architecture and screen flow plan for this high-fidelity project."}
+        <p className="text-muted-foreground line-clamp-2 text-[13px] leading-relaxed font-medium">
+          {plan.screens[0]?.description ||
+            "Detailed architecture and screen flow plan for this high-fidelity project."}
         </p>
       </div>
 
-      <div className="relative z-10 pt-3 flex items-center gap-2">
+      <div className="relative z-10 flex items-center gap-2 pt-3">
         <div className="flex -space-x-2">
           {plan.screens.slice(0, 3).map((screen, i) => (
-            <div key={i} className="size-6 rounded-lg bg-muted border-2 border-card flex items-center justify-center shadow-sm">
-                {screen.type === 'web' ? <Monitor className="size-3 text-zinc-500" /> : <Smartphone className="size-3 text-zinc-500" />}
+            <div
+              key={i}
+              className="bg-muted border-card flex size-6 items-center justify-center rounded-lg border-2 shadow-sm"
+            >
+              {screen.type === "web" ? (
+                <Monitor className="size-3 text-zinc-500" />
+              ) : (
+                <Smartphone className="size-3 text-zinc-500" />
+              )}
             </div>
           ))}
           {plan.screens.length > 3 && (
-            <div className="size-6 rounded-lg bg-primary/10 border-2 border-card flex items-center justify-center text-[8px] font-black text-primary">
-                +{plan.screens.length - 3}
+            <div className="bg-primary/10 border-card text-primary flex size-6 items-center justify-center rounded-lg border-2 text-[8px] font-black">
+              +{plan.screens.length - 3}
             </div>
           )}
         </div>
-        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest pl-1">Review Architecture</span>
+        <span className="text-muted-foreground pl-1 text-[10px] font-bold tracking-widest uppercase">
+          Review Architecture
+        </span>
       </div>
     </motion.div>
   );

@@ -4,9 +4,9 @@ import { ScreenShareView } from "@/components/project/screen-share-view";
 import { notFound } from "next/navigation";
 
 export default async function SingleScreenPreviewPage({
-  params
+  params,
 }: {
-  params: Promise<{ screenId: string, token: string }>
+  params: Promise<{ screenId: string; token: string }>;
 }) {
   const { screenId, token } = await params;
 
@@ -16,15 +16,15 @@ export default async function SingleScreenPreviewPage({
 
   const project = await prisma.project.findUnique({
     where: {
-      shareToken: token
+      shareToken: token,
     },
     include: {
       screens: {
         where: {
-          id: screenId
-        }
-      }
-    }
+          id: screenId,
+        },
+      },
+    },
   });
 
   if (!project || project.screens.length === 0) {
@@ -44,20 +44,21 @@ export default async function SingleScreenPreviewPage({
     width: screen.width || undefined,
     height: screen.height || undefined,
     status: screen.status as any,
-    isComplete: true
+    isComplete: true,
   };
 
   // Extract applied theme: prefer project-level selectedTheme, fallback to canvasData
   const canvasData = project.canvasData as any;
-  const appliedTheme = (project as any).selectedTheme || canvasData?.appliedTheme || null;
+  const appliedTheme =
+    (project as any).selectedTheme || canvasData?.appliedTheme || null;
 
   return (
-    <ScreenShareView 
+    <ScreenShareView
       project={{
         title: project.title,
         shareToken: project.shareToken || "",
         themes: project.themes as any,
-        appliedTheme
+        appliedTheme,
       }}
       artifact={artifact}
     />

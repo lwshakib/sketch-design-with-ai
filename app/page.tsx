@@ -17,7 +17,7 @@ import {
   Loader2,
   Zap,
   RotateCcw,
-  Layout
+  Layout,
 } from "lucide-react";
 import NumberFlow from "@number-flow/react";
 import Link from "next/link";
@@ -109,7 +109,7 @@ const PROMPTS = {
     "Gaming news site with game reviews, trailers, and platform filters.",
     "Architect firm portfolio with high-res project photos and blueprints.",
     "Yoga studio website with class schedule and instructor introductions.",
-  ]
+  ],
 };
 
 // Helper to group projects by date
@@ -121,31 +121,34 @@ const groupProjectsByDate = (projects: any[]) => {
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
 
-  const todayItems = projects.filter(p => new Date(p.updatedAt) >= today);
-  const yesterdayItems = projects.filter(p => {
+  const todayItems = projects.filter((p) => new Date(p.updatedAt) >= today);
+  const yesterdayItems = projects.filter((p) => {
     const d = new Date(p.updatedAt);
     return d >= yesterday && d < today;
   });
-  const olderItems = projects.filter(p => new Date(p.updatedAt) < yesterday);
+  const olderItems = projects.filter((p) => new Date(p.updatedAt) < yesterday);
 
-  if (todayItems.length > 0) sections.push({ title: "Today", items: todayItems });
-  if (yesterdayItems.length > 0) sections.push({ title: "Yesterday", items: yesterdayItems });
-  if (olderItems.length > 0) sections.push({ title: "Previous", items: olderItems });
+  if (todayItems.length > 0)
+    sections.push({ title: "Today", items: todayItems });
+  if (yesterdayItems.length > 0)
+    sections.push({ title: "Yesterday", items: yesterdayItems });
+  if (olderItems.length > 0)
+    sections.push({ title: "Previous", items: olderItems });
 
   return sections;
 };
 
 const ProjectSkeleton = () => (
   <div className="space-y-4">
-    <div className="h-3 w-20 bg-secondary animate-pulse rounded ml-2" />
+    <div className="bg-secondary ml-2 h-3 w-20 animate-pulse rounded" />
     <div className="space-y-2">
-      {[1, 2, 3].map(i => (
+      {[1, 2, 3].map((i) => (
         <div key={i} className="flex items-center gap-4 p-3">
-           <div className="h-12 w-12 bg-secondary animate-pulse rounded-xl shrink-0" />
-           <div className="flex-1 space-y-2">
-             <div className="h-4 w-full bg-secondary animate-pulse rounded" />
-             <div className="h-3 w-1/3 bg-secondary animate-pulse rounded" />
-           </div>
+          <div className="bg-secondary h-12 w-12 shrink-0 animate-pulse rounded-xl" />
+          <div className="flex-1 space-y-2">
+            <div className="bg-secondary h-4 w-full animate-pulse rounded" />
+            <div className="bg-secondary h-3 w-1/3 animate-pulse rounded" />
+          </div>
         </div>
       ))}
     </div>
@@ -180,16 +183,18 @@ export default function Home() {
 
   const fetchProjects = async (isLoadMore = false) => {
     if (isLoadMore && (isLoadingMore || !hasMore)) return;
-    
+
     if (isLoadMore) setIsLoadingMore(true);
     else setLoadingProjects(true);
 
     try {
       const skip = isLoadMore ? projects.length : 0;
-      const res = await fetch(`/api/projects?limit=20&skip=${skip}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`);
+      const res = await fetch(
+        `/api/projects?limit=20&skip=${skip}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`,
+      );
       if (res.ok) {
         const data = await res.json();
-        
+
         if (data.length < 20) {
           setHasMore(false);
         } else {
@@ -197,7 +202,7 @@ export default function Home() {
         }
 
         if (isLoadMore) {
-          setProjects(prev => [...prev, ...data]);
+          setProjects((prev) => [...prev, ...data]);
         } else {
           setProjects(data);
         }
@@ -214,9 +219,7 @@ export default function Home() {
 
   const refreshPrompts = () => {
     const allPrompts = [...PROMPTS.app, ...PROMPTS.web];
-    const shuffled = allPrompts
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3);
+    const shuffled = allPrompts.sort(() => Math.random() - 0.5).slice(0, 3);
     setShuffledPrompts(shuffled);
   };
 
@@ -235,7 +238,7 @@ export default function Home() {
   // Handle Search Debounce
   useEffect(() => {
     if (!isMounted) return;
-    
+
     const timer = setTimeout(() => {
       fetchProjects();
     }, 400);
@@ -243,16 +246,15 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-
   const onSubmit = async () => {
     if (!inputValue.trim() && attachments.length === 0) return;
-    
+
     if (credits !== null && credits < 10000) {
       toast.error("Insufficient credits (10k required)");
       return;
     }
 
-    if (attachments.some(a => a.isUploading)) {
+    if (attachments.some((a) => a.isUploading)) {
       toast.error("Please wait for images to finish uploading");
       return;
     }
@@ -262,8 +264,8 @@ export default function Home() {
       const response = await fetch("/api/projects", {
         method: "POST",
         body: JSON.stringify({
-          title: inputValue.slice(0, 30) || "Untitled Design"
-        })
+          title: inputValue.slice(0, 30) || "Untitled Design",
+        }),
       });
 
       if (!response.ok) {
@@ -271,13 +273,16 @@ export default function Home() {
       }
 
       const project = await response.json();
-      
+
       // Store initial prompt for the project page to pick up
       if (inputValue.trim() || attachments.length > 0) {
-        sessionStorage.setItem(`pending_prompt_${project.id}`, JSON.stringify({
-          content: inputValue,
-          attachments: attachments.map(a => a.url)
-        }));
+        sessionStorage.setItem(
+          `pending_prompt_${project.id}`,
+          JSON.stringify({
+            content: inputValue,
+            attachments: attachments.map((a) => a.url),
+          }),
+        );
       }
 
       router.push(`/project/${project.id}`);
@@ -298,37 +303,39 @@ export default function Home() {
       return;
     }
 
-    const newAttachments = Array.from(files).map(file => ({
+    const newAttachments = Array.from(files).map((file) => ({
       file,
       url: URL.createObjectURL(file),
       type: file.type,
-      isUploading: true
+      isUploading: true,
     }));
 
-    setAttachments(prev => [...prev, ...newAttachments]);
+    setAttachments((prev) => [...prev, ...newAttachments]);
 
     // Process uploads
     for (let i = 0; i < newAttachments.length; i++) {
-        const attachment = newAttachments[i];
-        try {
-            const result = await uploadFileToCloudinary(attachment.file);
-            setAttachments(prev => prev.map(a => 
-                a.url === attachment.url 
-                ? { ...a, url: result.secureUrl, isUploading: false }
-                : a
-            ));
-        } catch (error) {
-            console.error("Upload failed", error);
-            toast.error(`Failed to upload ${attachment.file.name}`);
-            setAttachments(prev => prev.filter(a => a.url !== attachment.url));
-        }
+      const attachment = newAttachments[i];
+      try {
+        const result = await uploadFileToCloudinary(attachment.file);
+        setAttachments((prev) =>
+          prev.map((a) =>
+            a.url === attachment.url
+              ? { ...a, url: result.secureUrl, isUploading: false }
+              : a,
+          ),
+        );
+      } catch (error) {
+        console.error("Upload failed", error);
+        toast.error(`Failed to upload ${attachment.file.name}`);
+        setAttachments((prev) => prev.filter((a) => a.url !== attachment.url));
+      }
     }
 
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const removeAttachment = (index: number) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   const sections = groupProjectsByDate(projects);
@@ -336,10 +343,10 @@ export default function Home() {
   if (!isMounted) return null;
 
   return (
-    <div className="flex h-screen w-full bg-background text-foreground overflow-hidden font-sans transition-colors duration-500">
-      <Sidebar 
-        sections={sections} 
-        loading={loadingProjects} 
+    <div className="bg-background text-foreground flex h-screen w-full overflow-hidden font-sans transition-colors duration-500">
+      <Sidebar
+        sections={sections}
+        loading={loadingProjects}
         isLoadingMore={isLoadingMore}
         hasMore={hasMore}
         loadMore={() => fetchProjects(true)}
@@ -347,22 +354,30 @@ export default function Home() {
         setSearchQuery={setSearchQuery}
       />
 
-      <main className="flex-1 flex flex-col relative overflow-hidden bg-background">
+      <main className="bg-background relative flex flex-1 flex-col overflow-hidden">
         {/* Top Header */}
-        <header className="flex items-center justify-between px-6 py-4 z-40 bg-transparent">
+        <header className="z-40 flex items-center justify-between bg-transparent px-6 py-4">
           <div className="flex items-center gap-4">
             <Logo textSize="1.6rem" />
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/settings" className="flex items-center px-4 py-2 rounded-2xl bg-zinc-100/50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-white/10 transition-all hover:bg-zinc-200/50 dark:hover:bg-zinc-800/80 shadow-sm group">
-              <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
-                <NumberFlow 
-                  value={(credits || 0) / 1000} 
+            <Link
+              href="/settings"
+              className="group flex items-center rounded-2xl border border-zinc-200 bg-zinc-100/50 px-4 py-2 shadow-sm transition-all hover:bg-zinc-200/50 dark:border-white/10 dark:bg-zinc-900/40 dark:hover:bg-zinc-800/80"
+            >
+              <span className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                <NumberFlow
+                  value={(credits || 0) / 1000}
                   className="font-bold text-zinc-900 dark:text-zinc-100"
-                  format={{ minimumFractionDigits: 1, maximumFractionDigits: 1 }}
+                  format={{
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 1,
+                  }}
                 />
-                <span className="text-zinc-500 dark:text-zinc-500">k credits remaining</span>
+                <span className="text-zinc-500 dark:text-zinc-500">
+                  k credits remaining
+                </span>
               </span>
             </Link>
             <UserMenu />
@@ -370,9 +385,9 @@ export default function Home() {
         </header>
 
         {/* Mobile Page Header */}
-        <div className="lg:hidden absolute top-20 right-6 z-50">
-          <MobileMenu 
-            sections={sections} 
+        <div className="absolute top-20 right-6 z-50 lg:hidden">
+          <MobileMenu
+            sections={sections}
             loading={loadingProjects}
             isLoadingMore={isLoadingMore}
             hasMore={hasMore}
@@ -383,27 +398,27 @@ export default function Home() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex flex-1 overflow-hidden">
           {/* Center Workspace */}
-          <div className="flex-1 flex flex-col items-center justify-center px-6 overflow-y-auto pb-20 relative">
-            <div className="w-full max-w-2xl space-y-12 mb-12 pt-10">
-              
+          <div className="relative flex flex-1 flex-col items-center justify-center overflow-y-auto px-6 pb-20">
+            <div className="mb-12 w-full max-w-2xl space-y-12 pt-10">
               {/* Main Title Row */}
-              <div className="flex flex-col items-center text-center space-y-4">
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground leading-tight">
+              <div className="flex flex-col items-center space-y-4 text-center">
+                <h1 className="text-foreground text-4xl leading-tight font-black tracking-tight md:text-5xl">
                   Start a new UI design
                 </h1>
-                <p className="text-sm text-muted-foreground max-w-md font-medium">
-                  Transform your ideas into high-fidelity prototypes instantly using our neural design engine.
+                <p className="text-muted-foreground max-w-md text-sm font-medium">
+                  Transform your ideas into high-fidelity prototypes instantly
+                  using our neural design engine.
                 </p>
               </div>
 
               {/* Premium Chat Input */}
-              <div className="relative group w-full">
+              <div className="group relative w-full">
                 {/* Outer Glow Overlay */}
-                <div className="absolute -inset-[1px] rounded-[24px] opacity-0 group-focus-within:opacity-100 transition-all duration-700 blur-2xl pointer-events-none bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10" />
+                <div className="from-primary/10 via-accent/10 to-primary/10 pointer-events-none absolute -inset-[1px] rounded-[24px] bg-gradient-to-r opacity-0 blur-2xl transition-all duration-700 group-focus-within:opacity-100" />
 
-                <div className="relative bg-white dark:bg-zinc-950 rounded-[24px] p-6 space-y-4 border border-zinc-200 dark:border-white/5 transition-all duration-500 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] group-focus-within:border-primary/20 group-focus-within:shadow-[0_0_60px_-10px_rgba(var(--primary-rgb),0.2)]">
+                <div className="group-focus-within:border-primary/20 relative space-y-4 rounded-[24px] border border-zinc-200 bg-white p-6 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] transition-all duration-500 group-focus-within:shadow-[0_0_60px_-10px_rgba(var(--primary-rgb),0.2)] dark:border-white/5 dark:bg-zinc-950 dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
                   {/* Image Previews & Website URL */}
                   <AnimatePresence>
                     {attachments.length > 0 && (
@@ -416,31 +431,29 @@ export default function Home() {
                         {attachments.map((attr, i) => (
                           <div
                             key={i}
-                            className="relative group/img h-20 w-20 rounded-xl overflow-hidden border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900 shadow-sm"
+                            className="group/img relative h-20 w-20 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 shadow-sm dark:border-white/10 dark:bg-zinc-900"
                           >
                             <img
                               src={attr.url}
                               alt="Attachment"
                               className={cn(
                                 "h-full w-full object-cover",
-                                attr.isUploading && "opacity-40 blur-[2px]"
+                                attr.isUploading && "opacity-40 blur-[2px]",
                               )}
                             />
                             {attr.isUploading && (
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <Loader2 className="h-5 w-5 text-zinc-500 animate-spin" />
+                                <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
                               </div>
                             )}
                             <button
                               onClick={() => removeAttachment(i)}
-                              className="absolute top-1 right-1 h-5 w-5 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover/img:opacity-100 transition-opacity"
+                              className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover/img:opacity-100"
                             >
                               <X className="h-3 w-3" />
                             </button>
                           </div>
                         ))}
-
-
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -449,17 +462,17 @@ export default function Home() {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
+                      if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
                         onSubmit();
                       }
                     }}
                     placeholder="Describe your design vision..."
-                    className="w-full h-24 bg-transparent outline-none resize-none text-lg text-foreground placeholder:text-zinc-400 dark:placeholder:text-zinc-600 font-medium leading-relaxed hide-scrollbar"
+                    className="text-foreground hide-scrollbar h-24 w-full resize-none bg-transparent text-lg leading-relaxed font-medium outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
                   />
 
                   <div className="flex flex-col items-end gap-3 pt-2">
-                    <div className="flex items-center justify-between w-full">
+                    <div className="flex w-full items-center justify-between">
                       <div className="flex items-center gap-2">
                         <input
                           type="file"
@@ -473,28 +486,34 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
-                          className="h-10 w-10 rounded-full bg-zinc-50 dark:bg-zinc-900/50 text-zinc-500 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-white/5 transition-colors flex items-center justify-center outline-none"
+                          className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 text-zinc-500 transition-colors outline-none hover:text-zinc-900 dark:border-white/5 dark:bg-zinc-900/50 dark:hover:text-white"
                         >
                           <Plus className="h-5 w-5" />
                         </button>
 
-                        <div className="h-4 w-[1px] bg-zinc-200 dark:bg-white/10 mx-1" />
+                        <div className="mx-1 h-4 w-[1px] bg-zinc-200 dark:bg-white/10" />
 
-                        <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-600 uppercase tracking-widest hidden sm:block">
+                        <p className="hidden text-[10px] font-bold tracking-widest text-zinc-400 uppercase sm:block dark:text-zinc-600">
                           Press Enter to Generate
                         </p>
                       </div>
-                      
-                      <Button 
+
+                      <Button
                         onClick={onSubmit}
-                        disabled={(!inputValue.trim() && attachments.length === 0) || attachments.some(a => a.isUploading) || isSubmitting}
-                        className="h-10 px-5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 border border-black/5 dark:border-white/10 shadow-xl transition-all"
+                        disabled={
+                          (!inputValue.trim() && attachments.length === 0) ||
+                          attachments.some((a) => a.isUploading) ||
+                          isSubmitting
+                        }
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground h-10 rounded-full border border-black/5 px-5 shadow-xl transition-all disabled:opacity-30 dark:border-white/10"
                       >
                         {isSubmitting ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-sm tracking-tight">Generate</span>
+                            <span className="text-sm font-semibold tracking-tight">
+                              Generate
+                            </span>
                             <ArrowRight className="h-3.5 w-3.5" />
                           </div>
                         )}
@@ -506,37 +525,37 @@ export default function Home() {
 
               {/* Prompt Suggestions */}
               <div className="space-y-4">
-                 <div className="flex items-center justify-between px-1">
-                   <h3 className="text-sm font-medium text-zinc-500 dark:text-muted-foreground capitalize">Try these prompts</h3>
-                   <button 
-                     onClick={refreshPrompts}
-                     className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
-                     title="Refresh prompts"
-                   >
-                     <RotateCcw className="size-4" />
-                   </button>
-                 </div>
-                 <div className="flex flex-col gap-2">
-                    {shuffledPrompts.map((prompt: string, i: number) => (
-                      <button
-                        key={i}
-                        onClick={() => {
-                          setInputValue(prompt);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="p-4 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-white/5 text-left text-xs text-zinc-500 dark:text-zinc-400 font-medium hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-primary/20 transition-all leading-relaxed shadow-sm active:scale-[0.98] group"
-                      >
-                        <span className="group-hover:text-zinc-900 dark:group-hover:text-zinc-200 transition-colors">
-                          {prompt}
-                        </span>
-                      </button>
-                    ))}
-                 </div>
+                <div className="flex items-center justify-between px-1">
+                  <h3 className="dark:text-muted-foreground text-sm font-medium text-zinc-500 capitalize">
+                    Try these prompts
+                  </h3>
+                  <button
+                    onClick={refreshPrompts}
+                    className="rounded-full p-2 text-zinc-400 transition-colors hover:bg-black/5 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-white/5 dark:hover:text-zinc-300"
+                    title="Refresh prompts"
+                  >
+                    <RotateCcw className="size-4" />
+                  </button>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {shuffledPrompts.map((prompt: string, i: number) => (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        setInputValue(prompt);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="dark:hover:border-primary/20 group rounded-xl border border-zinc-200 bg-white p-4 text-left text-xs leading-relaxed font-medium text-zinc-500 shadow-sm transition-all hover:border-zinc-300 hover:bg-zinc-50 active:scale-[0.98] dark:border-white/5 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-900/50"
+                    >
+                      <span className="transition-colors group-hover:text-zinc-900 dark:group-hover:text-zinc-200">
+                        {prompt}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-
-
         </div>
       </main>
     </div>
@@ -553,14 +572,14 @@ interface MobileMenuProps {
   setSearchQuery: (q: string) => void;
 }
 
-function MobileMenu({ 
-  sections, 
-  loading, 
+function MobileMenu({
+  sections,
+  loading,
   isLoadingMore,
   hasMore,
   loadMore,
-  searchQuery, 
-  setSearchQuery 
+  searchQuery,
+  setSearchQuery,
 }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -579,7 +598,7 @@ function MobileMenu({
 
     const onScroll = () => {
       if (!hasMore || isLoadingMore || searchQuery) return;
-      
+
       const { scrollTop, scrollHeight, clientHeight } = el;
       if (scrollTop + clientHeight >= scrollHeight - 50) {
         loadMore();
@@ -593,108 +612,128 @@ function MobileMenu({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <div className="lg:hidden p-2 bg-secondary rounded-lg border border-border cursor-pointer hover:bg-secondary/80 transition-all shadow-lg">
-          <List className="h-6 w-6 text-foreground" />
+        <div className="bg-secondary border-border hover:bg-secondary/80 cursor-pointer rounded-lg border p-2 shadow-lg transition-all lg:hidden">
+          <List className="text-foreground h-6 w-6" />
         </div>
       </DrawerTrigger>
       <DrawerContent className="bg-background border-border text-foreground max-h-[90vh]">
-        <DrawerHeader className="px-6 py-5 flex flex-row items-center justify-between border-none">
-          <DrawerTitle className="text-left font-black text-xl uppercase tracking-tighter">
+        <DrawerHeader className="flex flex-row items-center justify-between border-none px-6 py-5">
+          <DrawerTitle className="text-left text-xl font-black tracking-tighter uppercase">
             Design History
           </DrawerTitle>
-          <Button variant="ghost" size="icon" onClick={() => setOpen(false)} className="rounded-full text-muted-foreground hover:text-foreground">
-             <X className="h-5 w-5" />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setOpen(false)}
+            className="text-muted-foreground hover:text-foreground rounded-full"
+          >
+            <X className="h-5 w-5" />
           </Button>
         </DrawerHeader>
 
         {/* Search Bar matching Sidebar style */}
         <div className="p-6 pb-2">
-          <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-foreground transition-colors" />
+          <div className="group relative">
+            <Search className="text-muted-foreground group-focus-within:text-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search projects"
-              className="w-full bg-secondary/50 border border-border rounded-lg py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-border transition-all font-medium"
+              className="bg-secondary/50 border-border text-foreground placeholder:text-muted-foreground focus:border-border w-full rounded-lg border py-2.5 pr-4 pl-10 text-sm font-medium transition-all outline-none"
             />
           </div>
         </div>
 
-        <div 
+        <div
           ref={scrollRef}
-          className="px-4 py-8 space-y-8 overflow-y-auto min-h-[300px]"
+          className="min-h-[300px] space-y-8 overflow-y-auto px-4 py-8"
         >
           {loading ? (
             <div className="space-y-8">
-               <ProjectSkeleton />
-               <ProjectSkeleton />
+              <ProjectSkeleton />
+              <ProjectSkeleton />
             </div>
           ) : sections.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center space-y-2">
-               <div className="h-12 w-12 rounded-full bg-secondary flex items-center justify-center">
-                  <Search className="h-6 w-6 text-muted-foreground" />
-               </div>
-               <p className="text-sm font-medium text-muted-foreground">No projects found</p>
+            <div className="flex flex-col items-center justify-center space-y-2 py-20 text-center">
+              <div className="bg-secondary flex h-12 w-12 items-center justify-center rounded-full">
+                <Search className="text-muted-foreground h-6 w-6" />
+              </div>
+              <p className="text-muted-foreground text-sm font-medium">
+                No projects found
+              </p>
             </div>
           ) : (
             <>
               {sections.map((section) => (
-                 <div key={section.title} className="space-y-4">
-                    <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-2">{section.title}</h4>
-                    <div className="space-y-2">
-                       {section.items.map((item: any) => (
-                          <button 
-                            key={item.id} 
-                            onClick={() => {
-                              setOpen(false);
-                              router.push(`/project/${item.id}`);
-                            }}
-                            className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-secondary transition-all text-left group border border-transparent hover:border-border"
-                          >
-                            {/* Project Preview Square */}
-                            <div className="h-12 w-12 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform overflow-hidden shadow-sm relative">
-                              {item.firstScreenContent ? (
-                                <div className="absolute inset-0 pointer-events-none origin-top-left" style={{ width: '1024px', height: '1024px', transform: 'scale(0.048)' }}>
-                                  <iframe
-                                    srcDoc={`
+                <div key={section.title} className="space-y-4">
+                  <h4 className="text-muted-foreground px-2 text-[10px] font-black tracking-widest uppercase">
+                    {section.title}
+                  </h4>
+                  <div className="space-y-2">
+                    {section.items.map((item: any) => (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setOpen(false);
+                          router.push(`/project/${item.id}`);
+                        }}
+                        className="hover:bg-secondary group hover:border-border flex w-full items-center gap-4 rounded-2xl border border-transparent p-4 text-left transition-all"
+                      >
+                        {/* Project Preview Square */}
+                        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-transform group-hover:scale-110 dark:border-zinc-800 dark:bg-zinc-900">
+                          {item.firstScreenContent ? (
+                            <div
+                              className="pointer-events-none absolute inset-0 origin-top-left"
+                              style={{
+                                width: "1024px",
+                                height: "1024px",
+                                transform: "scale(0.048)",
+                              }}
+                            >
+                              <iframe
+                                srcDoc={`
                                       <style>
                                         body { overflow: hidden; margin: 0; padding: 0; }
                                         ::-webkit-scrollbar { display: none; }
                                       </style>
                                       ${item.firstScreenContent}
                                     `}
-                                    className="w-full h-full border-none pointer-events-none"
-                                    title="preview"
-                                    tabIndex={-1}
-                                  />
-                                </div>
+                                className="pointer-events-none h-full w-full border-none"
+                                title="preview"
+                                tabIndex={-1}
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+                              {item.firstScreenType === "web" ? (
+                                <Monitor className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
+                              ) : item.firstScreenType === "app" ? (
+                                <Smartphone className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
                               ) : (
-                                <div className="flex items-center justify-center w-full h-full bg-zinc-50 dark:bg-zinc-950">
-                                  {item.firstScreenType === "web" ? (
-                                    <Monitor className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
-                                  ) : item.firstScreenType === "app" ? (
-                                    <Smartphone className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
-                                  ) : (
-                                    <Layout className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
-                                  )}
-                                </div>
+                                <Layout className="h-6 w-6 text-zinc-400 dark:text-zinc-500" />
                               )}
                             </div>
+                          )}
+                        </div>
 
-                            <div className="flex-1 min-w-0">
-                              <span className="block text-base font-bold text-foreground truncate">{item.title}</span>
-                              <span className="block text-xs font-medium text-muted-foreground">{getRelativeTime(item.updatedAt)}</span>
-                            </div>
-                          </button>
-                       ))}
-                    </div>
-                 </div>
+                        <div className="min-w-0 flex-1">
+                          <span className="text-foreground block truncate text-base font-bold">
+                            {item.title}
+                          </span>
+                          <span className="text-muted-foreground block text-xs font-medium">
+                            {getRelativeTime(item.updatedAt)}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
-              
+
               {isLoadingMore && (
                 <div className="flex justify-center p-4">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
                 </div>
               )}
             </>
@@ -716,8 +755,10 @@ function getRelativeTime(dateString: string): string {
   const diffDays = Math.floor(diffHours / 24);
 
   if (diffSecs < 60) return "just now";
-  if (diffMins < 60) return `${diffMins} ${diffMins === 1 ? "minute" : "minutes"} ago`;
-  if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
+  if (diffMins < 60)
+    return `${diffMins} ${diffMins === 1 ? "minute" : "minutes"} ago`;
+  if (diffHours < 24)
+    return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
   if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
   if (diffDays < 30) {
     const weeks = Math.floor(diffDays / 7);

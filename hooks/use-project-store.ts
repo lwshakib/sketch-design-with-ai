@@ -14,15 +14,29 @@ interface ProjectState {
   // Project Info
   projectId: string | null;
   project: Project | null;
-  
+
   // Content State
   artifacts: Artifact[];
   throttledArtifacts: Artifact[];
   attachments: { url: string; isUploading: boolean }[];
   input: string;
-  designPlan: { screens: any[], _markdown?: string };
-  realtimeStatus: { message: string; status: string; currentScreen?: string; messageId?: string; isCreditError?: boolean } | null;
-  realtimeStatuses: Record<string, { message: string; status: string; currentScreen?: string; isCreditError?: boolean }>;
+  designPlan: { screens: any[]; _markdown?: string };
+  realtimeStatus: {
+    message: string;
+    status: string;
+    currentScreen?: string;
+    messageId?: string;
+    isCreditError?: boolean;
+  } | null;
+  realtimeStatuses: Record<
+    string,
+    {
+      message: string;
+      status: string;
+      currentScreen?: string;
+      isCreditError?: boolean;
+    }
+  >;
   loading: boolean;
   messages: any[];
 
@@ -31,20 +45,20 @@ interface ProjectState {
   canvasOffset: { x: number; y: number };
   framePos: { x: number; y: number };
   dynamicFrameHeights: Record<string, number>;
-  artifactPreviewModes: Record<string, 'app' | 'web' | 'tablet' | null>;
+  artifactPreviewModes: Record<string, "app" | "web" | "tablet" | null>;
   selectedArtifactIds: Set<string>;
   selectionBox: { x1: number; y1: number; x2: number; y2: number } | null;
 
   // Interaction State
-  activeTool: 'select' | 'hand' | 'interact';
+  activeTool: "select" | "hand" | "interact";
   isPanning: boolean;
   isDraggingFrame: boolean;
   isResizing: boolean;
   resizingHandle: string | null;
 
   // UI State
-  leftSidebarMode: 'chat';
-  secondarySidebarMode: 'none' | 'properties' | 'theme';
+  leftSidebarMode: "chat";
+  secondarySidebarMode: "none" | "properties" | "theme";
   isCodeViewerOpen: boolean;
   isGenerating: boolean;
   viewingCode: string;
@@ -72,7 +86,7 @@ interface ProjectState {
   isVariationsSheetOpen: boolean;
   variationsArtifactIndex: number | null;
   variationOptions: number;
-  variationCreativeRange: 'refine' | 'explore' | 'reimagine';
+  variationCreativeRange: "refine" | "explore" | "reimagine";
   variationCustomInstructions: string;
   variationAspects: string[];
 
@@ -83,33 +97,77 @@ interface ProjectState {
 
   // Actions
   setProjectId: (id: string | null) => void;
-  setProject: (val: Project | null | ((prev: Project | null) => Project | null)) => void;
+  setProject: (
+    val: Project | null | ((prev: Project | null) => Project | null),
+  ) => void;
   setArtifacts: (val: Artifact[] | ((prev: Artifact[]) => Artifact[])) => void;
-  setThrottledArtifacts: (val: Artifact[] | ((prev: Artifact[]) => Artifact[])) => void;
-  setAttachments: (val: { url: string; isUploading: boolean }[] | ((prev: { url: string; isUploading: boolean }[]) => { url: string; isUploading: boolean }[])) => void;
+  setThrottledArtifacts: (
+    val: Artifact[] | ((prev: Artifact[]) => Artifact[]),
+  ) => void;
+  setAttachments: (
+    val:
+      | { url: string; isUploading: boolean }[]
+      | ((
+          prev: { url: string; isUploading: boolean }[],
+        ) => { url: string; isUploading: boolean }[]),
+  ) => void;
   setInput: (input: string) => void;
-  setDesignPlan: (designPlan: { screens: any[], _markdown?: string }) => void;
-  setRealtimeStatus: (status: { message: string; status: string; currentScreen?: string; messageId?: string; isCreditError?: boolean } | null) => void;
-  setRealtimeStatuses: (val: Record<string, any> | ((prev: Record<string, any>) => Record<string, any>)) => void;
+  setDesignPlan: (designPlan: { screens: any[]; _markdown?: string }) => void;
+  setRealtimeStatus: (
+    status: {
+      message: string;
+      status: string;
+      currentScreen?: string;
+      messageId?: string;
+      isCreditError?: boolean;
+    } | null,
+  ) => void;
+  setRealtimeStatuses: (
+    val:
+      | Record<string, any>
+      | ((prev: Record<string, any>) => Record<string, any>),
+  ) => void;
   setLoading: (loading: boolean) => void;
   setIs3xMode: (mode: boolean) => void;
 
   setZoom: (val: number | ((prev: number) => number)) => void;
-  setCanvasOffset: (val: { x: number; y: number } | ((prev: { x: number; y: number }) => { x: number; y: number })) => void;
-  setFramePos: (val: { x: number; y: number } | ((prev: { x: number; y: number }) => { x: number; y: number })) => void;
-  setDynamicFrameHeights: (val: Record<string, number> | ((prev: Record<string, number>) => Record<string, number>)) => void;
-  setArtifactPreviewModes: (val: Record<string, 'app' | 'web' | 'tablet' | null> | ((prev: Record<string, 'app' | 'web' | 'tablet' | null>) => Record<string, 'app' | 'web' | 'tablet' | null>)) => void;
-  setSelectedArtifactIds: (val: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
-  setSelectionBox: (box: { x1: number; y1: number; x2: number; y2: number } | null) => void;
+  setCanvasOffset: (
+    val:
+      | { x: number; y: number }
+      | ((prev: { x: number; y: number }) => { x: number; y: number }),
+  ) => void;
+  setFramePos: (
+    val:
+      | { x: number; y: number }
+      | ((prev: { x: number; y: number }) => { x: number; y: number }),
+  ) => void;
+  setDynamicFrameHeights: (
+    val:
+      | Record<string, number>
+      | ((prev: Record<string, number>) => Record<string, number>),
+  ) => void;
+  setArtifactPreviewModes: (
+    val:
+      | Record<string, "app" | "web" | "tablet" | null>
+      | ((
+          prev: Record<string, "app" | "web" | "tablet" | null>,
+        ) => Record<string, "app" | "web" | "tablet" | null>),
+  ) => void;
+  setSelectedArtifactIds: (
+    val: Set<string> | ((prev: Set<string>) => Set<string>),
+  ) => void;
+  setSelectionBox: (
+    box: { x1: number; y1: number; x2: number; y2: number } | null,
+  ) => void;
 
-  setActiveTool: (tool: 'select' | 'hand' | 'interact') => void;
+  setActiveTool: (tool: "select" | "hand" | "interact") => void;
   setIsPanning: (isPanning: boolean) => void;
   setIsDraggingFrame: (isDraggingFrame: boolean) => void;
   setIsResizing: (isResizing: boolean) => void;
   setResizingHandle: (handle: string | null) => void;
 
-  setLeftSidebarMode: (mode: 'chat') => void;
-  setSecondarySidebarMode: (mode: 'none' | 'properties' | 'theme') => void;
+  setLeftSidebarMode: (mode: "chat") => void;
+  setSecondarySidebarMode: (mode: "none" | "properties" | "theme") => void;
   setIsCodeViewerOpen: (open: boolean) => void;
   setIsGenerating: (generating: boolean) => void;
   setViewingCode: (code: string) => void;
@@ -129,7 +187,9 @@ interface ProjectState {
   setIsPromptDialogOpen: (open: boolean) => void;
   setViewingPrompt: (prompt: string) => void;
   setIsSidebarVisible: (visible: boolean) => void;
-  setRegeneratingArtifactIds: (val: Set<string> | ((prev: Set<string>) => Set<string>)) => void;
+  setRegeneratingArtifactIds: (
+    val: Set<string> | ((prev: Set<string>) => Set<string>),
+  ) => void;
   setMessages: (val: any[] | ((prev: any[]) => any[])) => void;
   setIsCommandMenuOpen: (open: boolean) => void;
   setIsSettingsDialogOpen: (open: boolean) => void;
@@ -137,14 +197,18 @@ interface ProjectState {
   setIsVariationsSheetOpen: (open: boolean) => void;
   setVariationsArtifactIndex: (index: number | null) => void;
   setVariationOptions: (val: number | ((prev: number) => number)) => void;
-  setVariationCreativeRange: (range: 'refine' | 'explore' | 'reimagine') => void;
+  setVariationCreativeRange: (
+    range: "refine" | "explore" | "reimagine",
+  ) => void;
   setVariationCustomInstructions: (instructions: string) => void;
   setVariationAspects: (val: string[] | ((prev: string[]) => string[])) => void;
 
   setActiveThemeId: (id: string | null) => void;
   setAppliedTheme: (theme: any | null) => void;
-  setSelectedEl: (el: HTMLElement | null | ((prev: HTMLElement | null) => HTMLElement | null)) => void;
-  
+  setSelectedEl: (
+    el: HTMLElement | null | ((prev: HTMLElement | null) => HTMLElement | null),
+  ) => void;
+
   focusArtifact: (title: string) => void;
   updateState: (updates: Partial<ProjectState>) => void;
   resetProjectState: () => void;
@@ -172,14 +236,14 @@ export const useProjectStore = create<ProjectState>((set) => ({
   selectedArtifactIds: new Set(),
   selectionBox: null,
 
-  activeTool: 'select',
+  activeTool: "select",
   isPanning: false,
   isDraggingFrame: false,
   isResizing: false,
   resizingHandle: null,
 
-  leftSidebarMode: 'chat',
-  secondarySidebarMode: 'none',
+  leftSidebarMode: "chat",
+  secondarySidebarMode: "none",
   isCodeViewerOpen: false,
   isGenerating: false,
   viewingCode: "",
@@ -207,7 +271,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   isVariationsSheetOpen: false,
   variationsArtifactIndex: null,
   variationOptions: 3,
-  variationCreativeRange: 'explore',
+  variationCreativeRange: "explore",
   variationCustomInstructions: "",
   variationAspects: [],
 
@@ -217,23 +281,61 @@ export const useProjectStore = create<ProjectState>((set) => ({
 
   // Actions
   setProjectId: (projectId) => set({ projectId }),
-  setProject: (val) => set((state) => ({ project: typeof val === 'function' ? val(state.project) : val })),
-  setArtifacts: (val) => set((state) => ({ artifacts: typeof val === 'function' ? val(state.artifacts) : val })),
-  setThrottledArtifacts: (val) => set((state) => ({ throttledArtifacts: typeof val === 'function' ? val(state.throttledArtifacts) : val })),
-  setAttachments: (val) => set((state) => ({ attachments: typeof val === 'function' ? val(state.attachments) : val })),
+  setProject: (val) =>
+    set((state) => ({
+      project: typeof val === "function" ? val(state.project) : val,
+    })),
+  setArtifacts: (val) =>
+    set((state) => ({
+      artifacts: typeof val === "function" ? val(state.artifacts) : val,
+    })),
+  setThrottledArtifacts: (val) =>
+    set((state) => ({
+      throttledArtifacts:
+        typeof val === "function" ? val(state.throttledArtifacts) : val,
+    })),
+  setAttachments: (val) =>
+    set((state) => ({
+      attachments: typeof val === "function" ? val(state.attachments) : val,
+    })),
   setInput: (input) => set({ input }),
   setDesignPlan: (designPlan) => set({ designPlan }),
   setRealtimeStatus: (realtimeStatus) => set({ realtimeStatus }),
-  setRealtimeStatuses: (val) => set((state) => ({ realtimeStatuses: typeof val === 'function' ? val(state.realtimeStatuses) : val })),
+  setRealtimeStatuses: (val) =>
+    set((state) => ({
+      realtimeStatuses:
+        typeof val === "function" ? val(state.realtimeStatuses) : val,
+    })),
   setLoading: (loading) => set({ loading }),
   setIs3xMode: (is3xMode) => set({ is3xMode }),
 
-  setZoom: (val) => set((state) => ({ zoom: typeof val === 'function' ? val(state.zoom) : val })),
-  setCanvasOffset: (val) => set((state) => ({ canvasOffset: typeof val === 'function' ? val(state.canvasOffset) : val })),
-  setFramePos: (val) => set((state) => ({ framePos: typeof val === 'function' ? val(state.framePos) : val })),
-  setDynamicFrameHeights: (val) => set((state) => ({ dynamicFrameHeights: typeof val === 'function' ? val(state.dynamicFrameHeights) : val })),
-  setArtifactPreviewModes: (val) => set((state) => ({ artifactPreviewModes: typeof val === 'function' ? val(state.artifactPreviewModes) : val })),
-  setSelectedArtifactIds: (val) => set((state) => ({ selectedArtifactIds: typeof val === 'function' ? val(state.selectedArtifactIds) : val })),
+  setZoom: (val) =>
+    set((state) => ({
+      zoom: typeof val === "function" ? val(state.zoom) : val,
+    })),
+  setCanvasOffset: (val) =>
+    set((state) => ({
+      canvasOffset: typeof val === "function" ? val(state.canvasOffset) : val,
+    })),
+  setFramePos: (val) =>
+    set((state) => ({
+      framePos: typeof val === "function" ? val(state.framePos) : val,
+    })),
+  setDynamicFrameHeights: (val) =>
+    set((state) => ({
+      dynamicFrameHeights:
+        typeof val === "function" ? val(state.dynamicFrameHeights) : val,
+    })),
+  setArtifactPreviewModes: (val) =>
+    set((state) => ({
+      artifactPreviewModes:
+        typeof val === "function" ? val(state.artifactPreviewModes) : val,
+    })),
+  setSelectedArtifactIds: (val) =>
+    set((state) => ({
+      selectedArtifactIds:
+        typeof val === "function" ? val(state.selectedArtifactIds) : val,
+    })),
   setSelectionBox: (selectionBox) => set({ selectionBox }),
 
   setActiveTool: (activeTool) => set({ activeTool }),
@@ -243,16 +345,20 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setResizingHandle: (resizingHandle) => set({ resizingHandle }),
 
   setLeftSidebarMode: (leftSidebarMode) => set({ leftSidebarMode }),
-  setSecondarySidebarMode: (secondarySidebarMode) => set({ secondarySidebarMode }),
+  setSecondarySidebarMode: (secondarySidebarMode) =>
+    set({ secondarySidebarMode }),
   setIsCodeViewerOpen: (isCodeViewerOpen) => set({ isCodeViewerOpen }),
   setIsGenerating: (isGenerating) => set({ isGenerating }),
   setViewingCode: (viewingCode) => set({ viewingCode }),
   setViewingTitle: (viewingTitle) => set({ viewingTitle }),
-  setIsRegenerateDialogOpen: (isRegenerateDialogOpen) => set({ isRegenerateDialogOpen }),
-  setRegenerateInstructions: (regenerateInstructions) => set({ regenerateInstructions }),
+  setIsRegenerateDialogOpen: (isRegenerateDialogOpen) =>
+    set({ isRegenerateDialogOpen }),
+  setRegenerateInstructions: (regenerateInstructions) =>
+    set({ regenerateInstructions }),
   setIsSaving: (isSaving) => set({ isSaving }),
   setHasUnsavedChanges: (hasUnsavedChanges) => set({ hasUnsavedChanges }),
-  setIsEditTitleDialogOpen: (isEditTitleDialogOpen) => set({ isEditTitleDialogOpen }),
+  setIsEditTitleDialogOpen: (isEditTitleDialogOpen) =>
+    set({ isEditTitleDialogOpen }),
   setEditingTitle: (editingTitle) => set({ editingTitle }),
   setIsDeleteDialogOpen: (isDeleteDialogOpen) => set({ isDeleteDialogOpen }),
   setIsExportSheetOpen: (isExportSheetOpen) => set({ isExportSheetOpen }),
@@ -263,25 +369,54 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setIsPromptDialogOpen: (isPromptDialogOpen) => set({ isPromptDialogOpen }),
   setViewingPrompt: (viewingPrompt) => set({ viewingPrompt }),
   setIsSidebarVisible: (isSidebarVisible) => set({ isSidebarVisible }),
-  setRegeneratingArtifactIds: (val) => set((state) => ({ regeneratingArtifactIds: typeof val === 'function' ? val(state.regeneratingArtifactIds) : val })),
-  setMessages: (val) => set((state) => ({ messages: typeof val === 'function' ? val(state.messages) : val })),
+  setRegeneratingArtifactIds: (val) =>
+    set((state) => ({
+      regeneratingArtifactIds:
+        typeof val === "function" ? val(state.regeneratingArtifactIds) : val,
+    })),
+  setMessages: (val) =>
+    set((state) => ({
+      messages: typeof val === "function" ? val(state.messages) : val,
+    })),
   setIsCommandMenuOpen: (isCommandMenuOpen) => set({ isCommandMenuOpen }),
-  setIsSettingsDialogOpen: (isSettingsDialogOpen) => set({ isSettingsDialogOpen }),
+  setIsSettingsDialogOpen: (isSettingsDialogOpen) =>
+    set({ isSettingsDialogOpen }),
   setIsShareDialogOpen: (isShareDialogOpen) => set({ isShareDialogOpen }),
-  setIsVariationsSheetOpen: (isVariationsSheetOpen) => set({ isVariationsSheetOpen }),
-  setVariationsArtifactIndex: (variationsArtifactIndex) => set({ variationsArtifactIndex }),
-  setVariationOptions: (val) => set((state) => ({ variationOptions: typeof val === 'function' ? val(state.variationOptions) : val })),
-  setVariationCreativeRange: (variationCreativeRange) => set({ variationCreativeRange }),
-  setVariationCustomInstructions: (variationCustomInstructions) => set({ variationCustomInstructions }),
-  setVariationAspects: (val) => set((state) => ({ variationAspects: typeof val === 'function' ? val(state.variationAspects) : val })),
+  setIsVariationsSheetOpen: (isVariationsSheetOpen) =>
+    set({ isVariationsSheetOpen }),
+  setVariationsArtifactIndex: (variationsArtifactIndex) =>
+    set({ variationsArtifactIndex }),
+  setVariationOptions: (val) =>
+    set((state) => ({
+      variationOptions:
+        typeof val === "function" ? val(state.variationOptions) : val,
+    })),
+  setVariationCreativeRange: (variationCreativeRange) =>
+    set({ variationCreativeRange }),
+  setVariationCustomInstructions: (variationCustomInstructions) =>
+    set({ variationCustomInstructions }),
+  setVariationAspects: (val) =>
+    set((state) => ({
+      variationAspects:
+        typeof val === "function" ? val(state.variationAspects) : val,
+    })),
 
   setActiveThemeId: (activeThemeId) => set({ activeThemeId }),
   setAppliedTheme: (appliedTheme) => set({ appliedTheme }),
-  setSelectedEl: (val) => set((state) => ({ selectedEl: typeof val === 'function' ? val(state.selectedEl) : val })),
-  
+  setSelectedEl: (val) =>
+    set((state) => ({
+      selectedEl: typeof val === "function" ? val(state.selectedEl) : val,
+    })),
+
   focusArtifact: (title) => {
-    const { throttledArtifacts, framePos, setZoom, setCanvasOffset, setSelectedArtifactIds } = useProjectStore.getState();
-    const artifact = throttledArtifacts.find(a => a.title === title);
+    const {
+      throttledArtifacts,
+      framePos,
+      setZoom,
+      setCanvasOffset,
+      setSelectedArtifactIds,
+    } = useProjectStore.getState();
+    const artifact = throttledArtifacts.find((a) => a.title === title);
     if (!artifact) return;
 
     const targetZoom = 1.2;
@@ -289,68 +424,75 @@ export const useProjectStore = create<ProjectState>((set) => ({
     if (artifact.id) setSelectedArtifactIds(new Set([artifact.id]));
 
     const effectiveScale = targetZoom * 0.5;
-    const mainHeight = typeof window !== 'undefined' ? window.innerHeight : 1000;
-    const topPadding = 144; 
+    const mainHeight =
+      typeof window !== "undefined" ? window.innerHeight : 1000;
+    const topPadding = 144;
 
-    const artifactWidth = artifact.width || (artifact.type === 'app' ? 380 : 1024);
+    const artifactWidth =
+      artifact.width || (artifact.type === "app" ? 380 : 1024);
     const artifactHeight = artifact.height || 800;
 
-    const targetX = - (framePos.x + (artifact.x || 0) + artifactWidth / 2) * effectiveScale;
-    const targetY = (mainHeight / 2) - topPadding - (framePos.y + (artifact.y || 0) + artifactHeight / 2) * effectiveScale;
+    const targetX =
+      -(framePos.x + (artifact.x || 0) + artifactWidth / 2) * effectiveScale;
+    const targetY =
+      mainHeight / 2 -
+      topPadding -
+      (framePos.y + (artifact.y || 0) + artifactHeight / 2) * effectiveScale;
 
     setCanvasOffset({ x: targetX, y: targetY });
   },
 
   updateState: (updates) => set((state) => ({ ...state, ...updates })),
-  resetProjectState: () => set({
-    projectId: null,
-    project: null,
-    artifacts: [],
-    throttledArtifacts: [],
-    attachments: [],
-    input: "",
-    designPlan: { screens: [] },
-    realtimeStatus: null,
-    realtimeStatuses: {},
-    loading: true,
-    messages: [],
-    zoom: 1,
-    canvasOffset: { x: 0, y: 0 },
-    framePos: { x: 0, y: 0 },
-    dynamicFrameHeights: {},
-    artifactPreviewModes: {},
-    selectedArtifactIds: new Set(),
-    selectionBox: null,
-    activeTool: 'select',
-    isPanning: false,
-    isDraggingFrame: false,
-    isResizing: false,
-    resizingHandle: null,
-    leftSidebarMode: 'chat',
-    secondarySidebarMode: 'none',
-    isCodeViewerOpen: false,
-    isGenerating: false,
-    viewingCode: "",
-    viewingTitle: "",
-    isRegenerateDialogOpen: false,
-    regenerateInstructions: "",
-    isSaving: false,
-    hasUnsavedChanges: false,
-    isEditTitleDialogOpen: false,
-    editingTitle: "",
-    isDeleteDialogOpen: false,
-    isExportSheetOpen: false,
-    exportArtifactIndex: null,
-    hasCopied: false,
-    isPlanDialogOpen: false,
-    viewingPlan: null,
-    isPromptDialogOpen: false,
-    viewingPrompt: "",
-    isSidebarVisible: true,
-    is3xMode: false,
-    activeThemeId: null,
-    appliedTheme: null,
-    selectedEl: null,
-    regeneratingArtifactIds: new Set(),
-  }),
+  resetProjectState: () =>
+    set({
+      projectId: null,
+      project: null,
+      artifacts: [],
+      throttledArtifacts: [],
+      attachments: [],
+      input: "",
+      designPlan: { screens: [] },
+      realtimeStatus: null,
+      realtimeStatuses: {},
+      loading: true,
+      messages: [],
+      zoom: 1,
+      canvasOffset: { x: 0, y: 0 },
+      framePos: { x: 0, y: 0 },
+      dynamicFrameHeights: {},
+      artifactPreviewModes: {},
+      selectedArtifactIds: new Set(),
+      selectionBox: null,
+      activeTool: "select",
+      isPanning: false,
+      isDraggingFrame: false,
+      isResizing: false,
+      resizingHandle: null,
+      leftSidebarMode: "chat",
+      secondarySidebarMode: "none",
+      isCodeViewerOpen: false,
+      isGenerating: false,
+      viewingCode: "",
+      viewingTitle: "",
+      isRegenerateDialogOpen: false,
+      regenerateInstructions: "",
+      isSaving: false,
+      hasUnsavedChanges: false,
+      isEditTitleDialogOpen: false,
+      editingTitle: "",
+      isDeleteDialogOpen: false,
+      isExportSheetOpen: false,
+      exportArtifactIndex: null,
+      hasCopied: false,
+      isPlanDialogOpen: false,
+      viewingPlan: null,
+      isPromptDialogOpen: false,
+      viewingPrompt: "",
+      isSidebarVisible: true,
+      is3xMode: false,
+      activeThemeId: null,
+      appliedTheme: null,
+      selectedEl: null,
+      regeneratingArtifactIds: new Set(),
+    }),
 }));

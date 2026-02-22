@@ -1,7 +1,9 @@
-
 export const getInjectedHTML = (html: string) => {
   // Prevent duplicate injection if the HTML already contains our script
-  if (html.includes('id="sketch-injected-script"') || html.includes("id='sketch-injected-script'")) {
+  if (
+    html.includes('id="sketch-injected-script"') ||
+    html.includes("id='sketch-injected-script'")
+  ) {
     return html;
   }
 
@@ -421,30 +423,35 @@ export const getInjectedHTML = (html: string) => {
 
   let processedHtml = html;
   if (/<head\b[^>]*>/i.test(processedHtml)) {
-    processedHtml = processedHtml.replace(/(<head\b[^>]*>)/i, '$1' + headInjections);
+    processedHtml = processedHtml.replace(
+      /(<head\b[^>]*>)/i,
+      "$1" + headInjections,
+    );
   } else if (/<html\b[^>]*>/i.test(processedHtml)) {
-    processedHtml = processedHtml.replace(/(<html\b[^>]*>)/i, '$1<head>' + headInjections + '</head>');
+    processedHtml = processedHtml.replace(
+      /(<html\b[^>]*>)/i,
+      "$1<head>" + headInjections + "</head>",
+    );
   } else {
-    processedHtml = '<head>' + headInjections + '</head>' + processedHtml;
+    processedHtml = "<head>" + headInjections + "</head>" + processedHtml;
   }
 
-  if (processedHtml.toLowerCase().includes('</body>')) {
-    return processedHtml.replace(/<\/body>/i, scriptLogic + '</body>');
+  if (processedHtml.toLowerCase().includes("</body>")) {
+    return processedHtml.replace(/<\/body>/i, scriptLogic + "</body>");
   }
   return processedHtml + scriptLogic;
 };
-
 
 export const sanitizeDocumentHtml = (doc: Document, originalHtml: string) => {
   const root = doc.documentElement;
   if (!root) return originalHtml;
 
   const clone = root.cloneNode(true) as HTMLElement;
-  
+
   // Remove injected script and style
-  const injectedScript = clone.querySelector('#sketch-injected-script');
+  const injectedScript = clone.querySelector("#sketch-injected-script");
   if (injectedScript) injectedScript.remove();
-  const injectedStyle = clone.querySelector('#sketch-injected-style');
+  const injectedStyle = clone.querySelector("#sketch-injected-style");
   if (injectedStyle) injectedStyle.remove();
 
   const walker = doc.createTreeWalker(clone, NodeFilter.SHOW_ELEMENT);
@@ -452,10 +459,10 @@ export const sanitizeDocumentHtml = (doc: Document, originalHtml: string) => {
   let current = walker.currentNode as HTMLElement | null;
   while (current) {
     if (current.style) {
-      current.classList.remove('edit-hover-highlight');
-      current.classList.remove('edit-selected-highlight');
+      current.classList.remove("edit-hover-highlight");
+      current.classList.remove("edit-selected-highlight");
       if (current.classList.length === 0) {
-        current.removeAttribute('class');
+        current.removeAttribute("class");
       }
     }
     if (current.getAttribute("contenteditable") === "true") {

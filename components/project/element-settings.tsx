@@ -3,7 +3,21 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { X, RotateCcw, Copy, Check, Type, Move, Palette, Box, AlignLeft, AlignCenter, AlignRight, Layout, Trash2 } from "lucide-react";
+import {
+  X,
+  RotateCcw,
+  Copy,
+  Check,
+  Type,
+  Move,
+  Palette,
+  Box,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Layout,
+  Trash2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -16,10 +30,36 @@ type Props = {
 type Align = "left" | "center" | "right";
 
 const fontSizes = Array.from({ length: 12 }, (_, i) => 12 + i * 4); // 12..56
-const fontWeights = ["100", "200", "300", "400", "500", "600", "700", "800", "900"];
-const lineHeights = ["normal", "1", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.8", "2"];
+const fontWeights = [
+  "100",
+  "200",
+  "300",
+  "400",
+  "500",
+  "600",
+  "700",
+  "800",
+  "900",
+];
+const lineHeights = [
+  "normal",
+  "1",
+  "1.1",
+  "1.2",
+  "1.3",
+  "1.4",
+  "1.5",
+  "1.6",
+  "1.8",
+  "2",
+];
 
-export function ElementSettings({ selectedEl, setSelectedEl, clearSelection, onUpdate }: Props) {
+export function ElementSettings({
+  selectedEl,
+  setSelectedEl,
+  clearSelection,
+  onUpdate,
+}: Props) {
   const [classes, setClasses] = useState<string[]>([]);
   const [newClass, setNewClass] = useState<string>("");
   const [align, setAlign] = useState<Align>("left");
@@ -46,7 +86,9 @@ export function ElementSettings({ selectedEl, setSelectedEl, clearSelection, onU
   const [opacity, setOpacity] = useState<string>("1");
   const [boxShadow, setBoxShadow] = useState<string>("");
   const [initialInlineStyle, setInitialInlineStyle] = useState<string>("");
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">(
+    "idle",
+  );
 
   const label = useMemo(() => {
     if (!selectedEl) return "";
@@ -75,36 +117,55 @@ export function ElementSettings({ selectedEl, setSelectedEl, clearSelection, onU
 
   const syncFromElement = (el: HTMLElement) => {
     const computed = getComputedStyle(el);
-    setAlign((el.style.textAlign as Align) || (computed.textAlign as Align) || "left");
+    setAlign(
+      (el.style.textAlign as Align) || (computed.textAlign as Align) || "left",
+    );
     setFontSize(el.style.fontSize || computed.fontSize || "16px");
     setFontWeight(el.style.fontWeight || computed.fontWeight || "400");
     setLineHeight(el.style.lineHeight || computed.lineHeight || "1.4");
-    
+
     const toHex = (rgb: string) => {
-        if (!rgb || rgb === "transparent") return "#000000";
-        const res = rgb.match(/\d+/g);
-        if (!res || res.length < 3) return "#000000";
-        return "#" + res.slice(0, 3).map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
+      if (!rgb || rgb === "transparent") return "#000000";
+      const res = rgb.match(/\d+/g);
+      if (!res || res.length < 3) return "#000000";
+      return (
+        "#" +
+        res
+          .slice(0, 3)
+          .map((x) => parseInt(x).toString(16).padStart(2, "0"))
+          .join("")
+      );
     };
 
     setColor(toHex(el.style.color || computed.color));
     setBackground(toHex(el.style.backgroundColor || computed.backgroundColor));
-    setBorderRadius(el.style.borderRadius || (computed.borderRadius !== '0px' ? computed.borderRadius : ""));
+    setBorderRadius(
+      el.style.borderRadius ||
+        (computed.borderRadius !== "0px" ? computed.borderRadius : ""),
+    );
     setPadding(el.style.padding || "");
     setMargin(el.style.margin || "");
     setWidth(el.style.width || "");
     setHeight(el.style.height || "");
-    setBorderWidth(el.style.borderWidth || (computed.borderWidth !== '0px' ? computed.borderWidth : ""));
+    setBorderWidth(
+      el.style.borderWidth ||
+        (computed.borderWidth !== "0px" ? computed.borderWidth : ""),
+    );
     setBorderStyle(el.style.borderStyle || computed.borderStyle || "none");
     setBorderColor(toHex(el.style.borderColor || computed.borderColor));
     setDisplay(el.style.display || computed.display || "block");
     setFlexDirection(el.style.flexDirection || computed.flexDirection || "row");
-    setJustifyContent(el.style.justifyContent || computed.justifyContent || "flex-start");
+    setJustifyContent(
+      el.style.justifyContent || computed.justifyContent || "flex-start",
+    );
     setAlignItems(el.style.alignItems || computed.alignItems || "stretch");
     setGap(el.style.gap || "");
     setZIndex(el.style.zIndex || computed.zIndex || "");
     setOpacity(el.style.opacity || computed.opacity || "1");
-    setBoxShadow(el.style.boxShadow || (computed.boxShadow !== 'none' ? computed.boxShadow : ""));
+    setBoxShadow(
+      el.style.boxShadow ||
+        (computed.boxShadow !== "none" ? computed.boxShadow : ""),
+    );
     setTextContent(el.textContent || "");
     setInitialInlineStyle(el.getAttribute("style") || "");
   };
@@ -117,36 +178,45 @@ export function ElementSettings({ selectedEl, setSelectedEl, clearSelection, onU
   useEffect(() => {
     if (!selectedEl) return;
     const observer = new MutationObserver(() => {
-      const classNameStr = typeof selectedEl.className === 'string' ? selectedEl.className : (selectedEl.className as any)?.baseVal || '';
+      const classNameStr =
+        typeof selectedEl.className === "string"
+          ? selectedEl.className
+          : (selectedEl.className as any)?.baseVal || "";
       setClasses(classNameStr.split(" ").filter(Boolean));
     });
-    observer.observe(selectedEl, { attributes: true, attributeFilter: ["class"] });
+    observer.observe(selectedEl, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
     return () => observer.disconnect();
   }, [selectedEl]);
 
   const selectParent = () => {
-    if (selectedEl?.parentElement && selectedEl.parentElement !== selectedEl.ownerDocument.body) {
-        const parent = selectedEl.parentElement;
-        selectedEl.classList.remove('edit-selected-highlight');
-        parent.classList.add('edit-selected-highlight');
-        setSelectedEl(parent);
+    if (
+      selectedEl?.parentElement &&
+      selectedEl.parentElement !== selectedEl.ownerDocument.body
+    ) {
+      const parent = selectedEl.parentElement;
+      selectedEl.classList.remove("edit-selected-highlight");
+      parent.classList.add("edit-selected-highlight");
+      setSelectedEl(parent);
     }
   };
 
   const deleteElement = () => {
     if (selectedEl) {
-        selectedEl.remove();
-        setSelectedEl(null);
-        onUpdate();
+      selectedEl.remove();
+      setSelectedEl(null);
+      onUpdate();
     }
   };
 
   const duplicateElement = () => {
     if (selectedEl) {
-        const clone = selectedEl.cloneNode(true) as HTMLElement;
-        clone.classList.remove('edit-selected-highlight');
-        selectedEl.after(clone);
-        onUpdate();
+      const clone = selectedEl.cloneNode(true) as HTMLElement;
+      clone.classList.remove("edit-selected-highlight");
+      selectedEl.after(clone);
+      onUpdate();
     }
   };
 
@@ -157,214 +227,419 @@ export function ElementSettings({ selectedEl, setSelectedEl, clearSelection, onU
     onUpdate();
   };
 
-  if (!selectedEl) return (
-    <div className="h-full flex flex-col items-center justify-center p-8 text-center gap-4 text-muted-foreground">
-        <div className="size-16 rounded-full bg-muted border border-border flex items-center justify-center">
-            <Move className="size-6 opacity-20" />
+  if (!selectedEl)
+    return (
+      <div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
+        <div className="bg-muted border-border flex size-16 items-center justify-center rounded-full border">
+          <Move className="size-6 opacity-20" />
         </div>
         <div className="space-y-1">
-            <p className="text-sm font-bold text-foreground">No element selected</p>
-            <p className="text-[11px] leading-relaxed">Click any component in the preview to adjust its properties.</p>
+          <p className="text-foreground text-sm font-bold">
+            No element selected
+          </p>
+          <p className="text-[11px] leading-relaxed">
+            Click any component in the preview to adjust its properties.
+          </p>
         </div>
-    </div>
-  );
+      </div>
+    );
 
   return (
-    <div className="h-full flex flex-col bg-sidebar animate-in fade-in duration-300">
-      <div className="p-4 border-b border-border flex items-center justify-between bg-sidebar/50">
+    <div className="bg-sidebar animate-in fade-in flex h-full flex-col duration-300">
+      <div className="border-border bg-sidebar/50 flex items-center justify-between border-b p-4">
         <div className="flex flex-col">
-            <span className="text-[10px] font-black text-primary uppercase tracking-widest mb-0.5">Properties</span>
-            <span className="text-[13px] font-bold text-foreground truncate max-w-[180px]">{label}</span>
+          <span className="text-primary mb-0.5 text-[10px] font-black tracking-widest uppercase">
+            Properties
+          </span>
+          <span className="text-foreground max-w-[180px] truncate text-[13px] font-bold">
+            {label}
+          </span>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-6">
-        <div className="flex gap-2 p-2 bg-muted/30 rounded-xl border border-border">
-            <button onClick={selectParent} className="flex-1 flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-all">
-                <Move className="size-3.5" />
-                <span className="text-[9px] font-bold uppercase">Parent</span>
-            </button>
-            <button onClick={duplicateElement} className="flex-1 flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-all">
-                <Copy className="size-3.5" />
-                <span className="text-[9px] font-bold uppercase">Clone</span>
-            </button>
-            <button onClick={deleteElement} className="flex-1 flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all">
-                <Trash2 className="size-3.5" />
-                <span className="text-[9px] font-bold uppercase">Delete</span>
-            </button>
-            <button onClick={resetInlineStyles} className="flex-1 flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-all">
-                <RotateCcw className="size-3.5" />
-                <span className="text-[9px] font-bold uppercase">Reset</span>
-            </button>
+      <div className="scrollbar-hide flex-1 space-y-6 overflow-y-auto p-4">
+        <div className="bg-muted/30 border-border flex gap-2 rounded-xl border p-2">
+          <button
+            onClick={selectParent}
+            className="hover:bg-muted text-muted-foreground hover:text-foreground flex flex-1 flex-col items-center gap-1.5 rounded-lg p-2 transition-all"
+          >
+            <Move className="size-3.5" />
+            <span className="text-[9px] font-bold uppercase">Parent</span>
+          </button>
+          <button
+            onClick={duplicateElement}
+            className="hover:bg-muted text-muted-foreground hover:text-foreground flex flex-1 flex-col items-center gap-1.5 rounded-lg p-2 transition-all"
+          >
+            <Copy className="size-3.5" />
+            <span className="text-[9px] font-bold uppercase">Clone</span>
+          </button>
+          <button
+            onClick={deleteElement}
+            className="hover:bg-destructive/10 text-muted-foreground hover:text-destructive flex flex-1 flex-col items-center gap-1.5 rounded-lg p-2 transition-all"
+          >
+            <Trash2 className="size-3.5" />
+            <span className="text-[9px] font-bold uppercase">Delete</span>
+          </button>
+          <button
+            onClick={resetInlineStyles}
+            className="hover:bg-muted text-muted-foreground hover:text-foreground flex flex-1 flex-col items-center gap-1.5 rounded-lg p-2 transition-all"
+          >
+            <RotateCcw className="size-3.5" />
+            <span className="text-[9px] font-bold uppercase">Reset</span>
+          </button>
         </div>
 
         <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-                <Type className="size-3.5 text-muted-foreground" />
-                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Typography</span>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Size</label>
-                    <select
-                        className="w-full bg-muted/50 border border-input rounded-xl p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20"
-                        value={fontSize}
-                        onChange={(e) => { setFontSize(e.target.value); applyStyle("fontSize", e.target.value); }}
-                    >
-                        {fontSizes.map((size) => <option key={size} value={`${size}px`}>{size}px</option>)}
-                    </select>
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Weight</label>
-                    <select
-                        className="w-full bg-muted/50 border border-input rounded-xl p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20"
-                        value={fontWeight}
-                        onChange={(e) => { setFontWeight(e.target.value); applyStyle("fontWeight", e.target.value); }}
-                    >
-                        {fontWeights.map((weight) => <option key={weight} value={weight}>{weight}</option>)}
-                    </select>
-                </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Line Height</label>
-                    <select
-                        className="w-full bg-muted/50 border border-input rounded-xl p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20"
-                        value={lineHeight}
-                        onChange={(e) => { setLineHeight(e.target.value); applyStyle("lineHeight", e.target.value); }}
-                    >
-                        {lineHeights.map((lh) => <option key={lh} value={lh}>{lh}</option>)}
-                    </select>
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Alignment</label>
-                    <div className="flex bg-muted/50 border border-input rounded-xl p-1 gap-1">
-                        {(["left", "center", "right"] as Align[]).map((dir) => (
-                            <button
-                                key={dir}
-                                onClick={() => { setAlign(dir); applyStyle("textAlign", dir); }}
-                                className={cn("flex-1 flex items-center justify-center rounded-lg p-1.5 transition-all text-muted-foreground hover:text-foreground", align === dir ? "bg-background shadow-sm text-foreground font-medium" : "hover:bg-background/50")}
-                            >
-                                {dir === "left" ? <AlignLeft className="size-3.5" /> : dir === "center" ? <AlignCenter className="size-3.5" /> : <AlignRight className="size-3.5" />}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-                <Palette className="size-3.5 text-muted-foreground" />
-                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Colors</span>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Text</label>
-                    <div className="relative">
-                        <input type="color" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" value={color} onInput={(e) => { const val = (e.target as HTMLInputElement).value; setColor(val); applyStyle("color", val); }} />
-                        <div className="w-full h-9 bg-muted/50 border border-input rounded-xl flex items-center px-3 gap-2">
-                            <div className="size-4 rounded-full border border-border" style={{ backgroundColor: color }} />
-                            <span className="text-[10px] font-mono text-muted-foreground uppercase">{color}</span>
-                        </div>
-                    </div>
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Background</label>
-                    <div className="relative">
-                        <input type="color" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" value={background} onInput={(e) => { const val = (e.target as HTMLInputElement).value; setBackground(val); applyStyle("backgroundColor", val); }} />
-                        <div className="w-full h-9 bg-muted/50 border border-input rounded-xl flex items-center px-3 gap-2">
-                            <div className="size-4 rounded-full border border-border" style={{ backgroundColor: background }} />
-                            <span className="text-[10px] font-mono text-muted-foreground uppercase">{background}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-                <Layout className="size-3.5 text-muted-foreground" />
-                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Layout</span>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Width</label>
-                    <input type="text" className="w-full bg-muted/50 border border-input rounded-xl p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20" value={width} onChange={(e) => { setWidth(e.target.value); applyStyle("width", e.target.value); }} placeholder="auto" />
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Height</label>
-                    <input type="text" className="w-full bg-muted/50 border border-input rounded-xl p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20" value={height} onChange={(e) => { setHeight(e.target.value); applyStyle("height", e.target.value); }} placeholder="auto" />
-                </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Padding</label>
-                    <input type="text" className="w-full bg-muted/50 border border-input rounded-xl p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20" value={padding} onChange={(e) => { setPadding(e.target.value); applyStyle("padding", e.target.value); }} placeholder="0px" />
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Margin</label>
-                    <input type="text" className="w-full bg-muted/50 border border-input rounded-xl p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20" value={margin} onChange={(e) => { setMargin(e.target.value); applyStyle("margin", e.target.value); }} placeholder="0px" />
-                </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Display</label>
-                    <select className="w-full bg-muted/50 border border-input rounded-xl p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20" value={display} onChange={(e) => { setDisplay(e.target.value); applyStyle("display", e.target.value); }}>
-                        <option value="block">Block</option>
-                        <option value="flex">Flex</option>
-                        <option value="inline-block">Inline-Block</option>
-                        <option value="grid">Grid</option>
-                        <option value="none">Hidden</option>
-                    </select>
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Z-Index</label>
-                    <input type="text" className="w-full bg-muted/50 border border-input rounded-xl p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20" value={zIndex} onChange={(e) => { setZIndex(e.target.value); applyStyle("zIndex", e.target.value); }} placeholder="auto" />
-                </div>
-            </div>
-        </div>
-
-        <div className="space-y-4 pt-2 border-t border-border">
-            <div className="flex items-center gap-2 mb-2">
-                <Box className="size-3.5 text-muted-foreground" />
-                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Borders & Effects</span>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Radius</label>
-                    <input type="text" className="w-full bg-muted/50 border border-input rounded-xl p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20" value={borderRadius} onChange={(e) => { setBorderRadius(e.target.value); applyStyle("borderRadius", e.target.value); }} placeholder="0px" />
-                </div>
-                <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold text-muted-foreground ml-1">Opacity</label>
-                    <input type="range" min="0" max="1" step="0.1" className="w-full accent-primary mt-2" value={opacity} onChange={(e) => { setOpacity(e.target.value); applyStyle("opacity", e.target.value); }} />
-                </div>
+          <div className="mb-2 flex items-center gap-2">
+            <Type className="text-muted-foreground size-3.5" />
+            <span className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
+              Typography
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Size
+              </label>
+              <select
+                className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full rounded-xl border p-2 text-xs focus:ring-1 focus:outline-none"
+                value={fontSize}
+                onChange={(e) => {
+                  setFontSize(e.target.value);
+                  applyStyle("fontSize", e.target.value);
+                }}
+              >
+                {fontSizes.map((size) => (
+                  <option key={size} value={`${size}px`}>
+                    {size}px
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-muted-foreground ml-1">Shadow</label>
-                <input type="text" className="w-full bg-muted/50 border border-input rounded-xl p-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20" value={boxShadow} onChange={(e) => { setBoxShadow(e.target.value); applyStyle("boxShadow", e.target.value); }} placeholder="none" />
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Weight
+              </label>
+              <select
+                className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full rounded-xl border p-2 text-xs focus:ring-1 focus:outline-none"
+                value={fontWeight}
+                onChange={(e) => {
+                  setFontWeight(e.target.value);
+                  applyStyle("fontWeight", e.target.value);
+                }}
+              >
+                {fontWeights.map((weight) => (
+                  <option key={weight} value={weight}>
+                    {weight}
+                  </option>
+                ))}
+              </select>
             </div>
-        </div>
-
-        <div className="space-y-4 pt-2 border-t border-border">
-            <div className="flex items-center gap-2 mb-2">
-                <Type className="size-3.5 text-muted-foreground" />
-                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Content</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Line Height
+              </label>
+              <select
+                className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full rounded-xl border p-2 text-xs focus:ring-1 focus:outline-none"
+                value={lineHeight}
+                onChange={(e) => {
+                  setLineHeight(e.target.value);
+                  applyStyle("lineHeight", e.target.value);
+                }}
+              >
+                {lineHeights.map((lh) => (
+                  <option key={lh} value={lh}>
+                    {lh}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="space-y-1.5">
-                <textarea
-                    rows={3}
-                    className="w-full bg-muted/50 border border-input rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20 resize-none"
-                    value={textContent}
-                    onChange={(e) => {
-                        setTextContent(e.target.value);
-                        if (selectedEl) {
-                            selectedEl.textContent = e.target.value;
-                            debouncedUpdate();
-                        }
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Alignment
+              </label>
+              <div className="bg-muted/50 border-input flex gap-1 rounded-xl border p-1">
+                {(["left", "center", "right"] as Align[]).map((dir) => (
+                  <button
+                    key={dir}
+                    onClick={() => {
+                      setAlign(dir);
+                      applyStyle("textAlign", dir);
                     }}
-                />
+                    className={cn(
+                      "text-muted-foreground hover:text-foreground flex flex-1 items-center justify-center rounded-lg p-1.5 transition-all",
+                      align === dir
+                        ? "bg-background text-foreground font-medium shadow-sm"
+                        : "hover:bg-background/50",
+                    )}
+                  >
+                    {dir === "left" ? (
+                      <AlignLeft className="size-3.5" />
+                    ) : dir === "center" ? (
+                      <AlignCenter className="size-3.5" />
+                    ) : (
+                      <AlignRight className="size-3.5" />
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="mb-2 flex items-center gap-2">
+            <Palette className="text-muted-foreground size-3.5" />
+            <span className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
+              Colors
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Text
+              </label>
+              <div className="relative">
+                <input
+                  type="color"
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  value={color}
+                  onInput={(e) => {
+                    const val = (e.target as HTMLInputElement).value;
+                    setColor(val);
+                    applyStyle("color", val);
+                  }}
+                />
+                <div className="bg-muted/50 border-input flex h-9 w-full items-center gap-2 rounded-xl border px-3">
+                  <div
+                    className="border-border size-4 rounded-full border"
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="text-muted-foreground font-mono text-[10px] uppercase">
+                    {color}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Background
+              </label>
+              <div className="relative">
+                <input
+                  type="color"
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  value={background}
+                  onInput={(e) => {
+                    const val = (e.target as HTMLInputElement).value;
+                    setBackground(val);
+                    applyStyle("backgroundColor", val);
+                  }}
+                />
+                <div className="bg-muted/50 border-input flex h-9 w-full items-center gap-2 rounded-xl border px-3">
+                  <div
+                    className="border-border size-4 rounded-full border"
+                    style={{ backgroundColor: background }}
+                  />
+                  <span className="text-muted-foreground font-mono text-[10px] uppercase">
+                    {background}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="mb-2 flex items-center gap-2">
+            <Layout className="text-muted-foreground size-3.5" />
+            <span className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
+              Layout
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Width
+              </label>
+              <input
+                type="text"
+                className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full rounded-xl border p-2 text-xs focus:ring-1 focus:outline-none"
+                value={width}
+                onChange={(e) => {
+                  setWidth(e.target.value);
+                  applyStyle("width", e.target.value);
+                }}
+                placeholder="auto"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Height
+              </label>
+              <input
+                type="text"
+                className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full rounded-xl border p-2 text-xs focus:ring-1 focus:outline-none"
+                value={height}
+                onChange={(e) => {
+                  setHeight(e.target.value);
+                  applyStyle("height", e.target.value);
+                }}
+                placeholder="auto"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Padding
+              </label>
+              <input
+                type="text"
+                className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full rounded-xl border p-2 text-xs focus:ring-1 focus:outline-none"
+                value={padding}
+                onChange={(e) => {
+                  setPadding(e.target.value);
+                  applyStyle("padding", e.target.value);
+                }}
+                placeholder="0px"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Margin
+              </label>
+              <input
+                type="text"
+                className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full rounded-xl border p-2 text-xs focus:ring-1 focus:outline-none"
+                value={margin}
+                onChange={(e) => {
+                  setMargin(e.target.value);
+                  applyStyle("margin", e.target.value);
+                }}
+                placeholder="0px"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Display
+              </label>
+              <select
+                className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full rounded-xl border p-2 text-xs focus:ring-1 focus:outline-none"
+                value={display}
+                onChange={(e) => {
+                  setDisplay(e.target.value);
+                  applyStyle("display", e.target.value);
+                }}
+              >
+                <option value="block">Block</option>
+                <option value="flex">Flex</option>
+                <option value="inline-block">Inline-Block</option>
+                <option value="grid">Grid</option>
+                <option value="none">Hidden</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Z-Index
+              </label>
+              <input
+                type="text"
+                className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full rounded-xl border p-2 text-xs focus:ring-1 focus:outline-none"
+                value={zIndex}
+                onChange={(e) => {
+                  setZIndex(e.target.value);
+                  applyStyle("zIndex", e.target.value);
+                }}
+                placeholder="auto"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="border-border space-y-4 border-t pt-2">
+          <div className="mb-2 flex items-center gap-2">
+            <Box className="text-muted-foreground size-3.5" />
+            <span className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
+              Borders & Effects
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Radius
+              </label>
+              <input
+                type="text"
+                className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full rounded-xl border p-2 text-xs focus:ring-1 focus:outline-none"
+                value={borderRadius}
+                onChange={(e) => {
+                  setBorderRadius(e.target.value);
+                  applyStyle("borderRadius", e.target.value);
+                }}
+                placeholder="0px"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+                Opacity
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                className="accent-primary mt-2 w-full"
+                value={opacity}
+                onChange={(e) => {
+                  setOpacity(e.target.value);
+                  applyStyle("opacity", e.target.value);
+                }}
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-muted-foreground ml-1 text-[11px] font-bold">
+              Shadow
+            </label>
+            <input
+              type="text"
+              className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full rounded-xl border p-2 text-xs focus:ring-1 focus:outline-none"
+              value={boxShadow}
+              onChange={(e) => {
+                setBoxShadow(e.target.value);
+                applyStyle("boxShadow", e.target.value);
+              }}
+              placeholder="none"
+            />
+          </div>
+        </div>
+
+        <div className="border-border space-y-4 border-t pt-2">
+          <div className="mb-2 flex items-center gap-2">
+            <Type className="text-muted-foreground size-3.5" />
+            <span className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
+              Content
+            </span>
+          </div>
+          <div className="space-y-1.5">
+            <textarea
+              rows={3}
+              className="bg-muted/50 border-input text-foreground focus:ring-primary/20 w-full resize-none rounded-xl border p-3 text-xs focus:ring-1 focus:outline-none"
+              value={textContent}
+              onChange={(e) => {
+                setTextContent(e.target.value);
+                if (selectedEl) {
+                  selectedEl.textContent = e.target.value;
+                  debouncedUpdate();
+                }
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>

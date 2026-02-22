@@ -1,99 +1,215 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>BioPulse - Verification</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#13ec6d",
-                        "background-light": "#f6f8f7",
-                        "background-dark": "#0a120d",
-                        "surface": "#141e17",
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "lg": "1rem",
-                        "xl": "1.5rem",
-                        "2xl": "2rem",
-                        "full": "9999px"
-                    },
-                },
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>BioPulse - Verification</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#13ec6d",
+              "background-light": "#f6f8f7",
+              "background-dark": "#0a120d",
+              surface: "#141e17",
             },
-        }
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "1rem",
+              xl: "1.5rem",
+              "2xl": "2rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
     </script>
-<style>
-        body { font-family: 'Inter', sans-serif; }
-        .glass-input {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-        }
-        .neon-glow { filter: drop-shadow(0 0 15px rgba(19, 236, 109, 0.4)); }
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .glass-input {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+      }
+      .neon-glow {
+        filter: drop-shadow(0 0 15px rgba(19, 236, 109, 0.4));
+      }
     </style>
-</head>
-<body class="bg-background-dark text-white min-h-screen flex flex-col items-center p-0">
-<div class="w-full max-w-[430px] min-h-screen bg-background-dark flex flex-col overflow-hidden relative border-x border-white/5 px-8 py-12">
-<!-- Background Glows -->
-<div class="absolute bottom-[-10%] left-[-20%] size-80 bg-primary/10 blur-[120px] rounded-full"></div>
-<!-- Back Button -->
-<button class="size-12 rounded-2xl glass-input flex items-center justify-center mb-10 self-start hover:bg-white/10 transition-all" onclick="history.back()">
-<span class="material-symbols-outlined">arrow_back</span>
-</button>
-<!-- Header -->
-<div class="mb-12">
-<div class="inline-flex items-center justify-center p-4 rounded-3xl bg-primary/10 mb-6 neon-glow">
-<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1">verified_user</span>
-</div>
-<h1 class="text-4xl font-black tracking-tight mb-2">Verify Identity</h1>
-<p class="text-white/40 font-medium">Enter the 4-digit security code sent to your device.</p>
-</div>
-<!-- OTP Inputs -->
-<form action="#" class="space-y-12" onsubmit="event.preventDefault(); window.location.href='dashboard.html'">
-<div class="flex justify-between gap-4">
-<input class="w-16 h-20 glass-input rounded-2xl text-center text-3xl font-black focus:ring-4 focus:ring-primary/20 focus:border-primary outline-none transition-all" maxlength="1" type="text" value="7"/>
-<input class="w-16 h-20 glass-input rounded-2xl text-center text-3xl font-black focus:ring-4 focus:ring-primary/20 focus:border-primary outline-none transition-all" maxlength="1" type="text" value="2"/>
-<input class="w-16 h-20 glass-input rounded-2xl text-center text-3xl font-black focus:ring-4 focus:ring-primary/20 focus:border-primary outline-none transition-all" maxlength="1" type="text" placeholder="•"/>
-<input class="w-16 h-20 glass-input rounded-2xl text-center text-3xl font-black focus:ring-4 focus:ring-primary/20 focus:border-primary outline-none transition-all" maxlength="1" type="text" placeholder="•"/>
-</div>
-<!-- Simulated Keypad -->
-<div class="grid grid-cols-3 gap-6 pt-12">
-<button class="h-16 rounded-2xl glass-input flex items-center justify-center text-xl font-bold hover:bg-white/5 active:scale-90 transition-all" type="button">1</button>
-<button class="h-16 rounded-2xl glass-input flex items-center justify-center text-xl font-bold hover:bg-white/5 active:scale-90 transition-all" type="button">2</button>
-<button class="h-16 rounded-2xl glass-input flex items-center justify-center text-xl font-bold hover:bg-white/5 active:scale-90 transition-all" type="button">3</button>
-<button class="h-16 rounded-2xl glass-input flex items-center justify-center text-xl font-bold hover:bg-white/5 active:scale-90 transition-all" type="button">4</button>
-<button class="h-16 rounded-2xl glass-input flex items-center justify-center text-xl font-bold hover:bg-white/5 active:scale-90 transition-all" type="button">5</button>
-<button class="h-16 rounded-2xl glass-input flex items-center justify-center text-xl font-bold hover:bg-white/5 active:scale-90 transition-all" type="button">6</button>
-<button class="h-16 rounded-2xl glass-input flex items-center justify-center text-xl font-bold hover:bg-white/5 active:scale-90 transition-all" type="button">7</button>
-<button class="h-16 rounded-2xl glass-input flex items-center justify-center text-xl font-bold hover:bg-white/5 active:scale-90 transition-all" type="button">8</button>
-<button class="h-16 rounded-2xl glass-input flex items-center justify-center text-xl font-bold hover:bg-white/5 active:scale-90 transition-all" type="button">9</button>
-<div class="h-16"></div>
-<button class="h-16 rounded-2xl glass-input flex items-center justify-center text-xl font-bold hover:bg-white/5 active:scale-90 transition-all" type="button">0</button>
-<button class="h-16 rounded-2xl flex items-center justify-center text-white/40 hover:text-white transition-all" type="button">
-<span class="material-symbols-outlined text-2xl">backspace</span>
-</button>
-</div>
-<!-- Resend -->
-<div class="text-center pt-8">
-<p class="text-xs font-bold text-white/20 uppercase tracking-widest">
-                    Didn't receive code? 
-                    <button class="text-primary font-black ml-1 hover:underline" type="button">Resend Code</button>
-</p>
-</div>
-<!-- Submit -->
-<button class="w-full h-16 bg-primary text-background-dark font-black text-sm uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-primary/10 flex items-center justify-center mt-12 hover:brightness-110 active:scale-[0.98] transition-all">
-                    Complete Sync
-</button>
-</form>
-</div>
-</body></html>
+  </head>
+  <body
+    class="bg-background-dark flex min-h-screen flex-col items-center p-0 text-white"
+  >
+    <div
+      class="bg-background-dark relative flex min-h-screen w-full max-w-[430px] flex-col overflow-hidden border-x border-white/5 px-8 py-12"
+    >
+      <!-- Background Glows -->
+      <div
+        class="bg-primary/10 absolute bottom-[-10%] left-[-20%] size-80 rounded-full blur-[120px]"
+      ></div>
+      <!-- Back Button -->
+      <button
+        class="glass-input mb-10 flex size-12 items-center justify-center self-start rounded-2xl transition-all hover:bg-white/10"
+        onclick="history.back()"
+      >
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <!-- Header -->
+      <div class="mb-12">
+        <div
+          class="bg-primary/10 neon-glow mb-6 inline-flex items-center justify-center rounded-3xl p-4"
+        >
+          <span
+            class="material-symbols-outlined text-primary text-4xl"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+            >verified_user</span
+          >
+        </div>
+        <h1 class="mb-2 text-4xl font-black tracking-tight">Verify Identity</h1>
+        <p class="font-medium text-white/40">
+          Enter the 4-digit security code sent to your device.
+        </p>
+      </div>
+      <!-- OTP Inputs -->
+      <form
+        action="#"
+        class="space-y-12"
+        onsubmit="
+          event.preventDefault();
+          window.location.href = 'dashboard.html';
+        "
+      >
+        <div class="flex justify-between gap-4">
+          <input
+            class="glass-input focus:ring-primary/20 focus:border-primary h-20 w-16 rounded-2xl text-center text-3xl font-black transition-all outline-none focus:ring-4"
+            maxlength="1"
+            type="text"
+            value="7"
+          />
+          <input
+            class="glass-input focus:ring-primary/20 focus:border-primary h-20 w-16 rounded-2xl text-center text-3xl font-black transition-all outline-none focus:ring-4"
+            maxlength="1"
+            type="text"
+            value="2"
+          />
+          <input
+            class="glass-input focus:ring-primary/20 focus:border-primary h-20 w-16 rounded-2xl text-center text-3xl font-black transition-all outline-none focus:ring-4"
+            maxlength="1"
+            type="text"
+            placeholder="•"
+          />
+          <input
+            class="glass-input focus:ring-primary/20 focus:border-primary h-20 w-16 rounded-2xl text-center text-3xl font-black transition-all outline-none focus:ring-4"
+            maxlength="1"
+            type="text"
+            placeholder="•"
+          />
+        </div>
+        <!-- Simulated Keypad -->
+        <div class="grid grid-cols-3 gap-6 pt-12">
+          <button
+            class="glass-input flex h-16 items-center justify-center rounded-2xl text-xl font-bold transition-all hover:bg-white/5 active:scale-90"
+            type="button"
+          >
+            1
+          </button>
+          <button
+            class="glass-input flex h-16 items-center justify-center rounded-2xl text-xl font-bold transition-all hover:bg-white/5 active:scale-90"
+            type="button"
+          >
+            2
+          </button>
+          <button
+            class="glass-input flex h-16 items-center justify-center rounded-2xl text-xl font-bold transition-all hover:bg-white/5 active:scale-90"
+            type="button"
+          >
+            3
+          </button>
+          <button
+            class="glass-input flex h-16 items-center justify-center rounded-2xl text-xl font-bold transition-all hover:bg-white/5 active:scale-90"
+            type="button"
+          >
+            4
+          </button>
+          <button
+            class="glass-input flex h-16 items-center justify-center rounded-2xl text-xl font-bold transition-all hover:bg-white/5 active:scale-90"
+            type="button"
+          >
+            5
+          </button>
+          <button
+            class="glass-input flex h-16 items-center justify-center rounded-2xl text-xl font-bold transition-all hover:bg-white/5 active:scale-90"
+            type="button"
+          >
+            6
+          </button>
+          <button
+            class="glass-input flex h-16 items-center justify-center rounded-2xl text-xl font-bold transition-all hover:bg-white/5 active:scale-90"
+            type="button"
+          >
+            7
+          </button>
+          <button
+            class="glass-input flex h-16 items-center justify-center rounded-2xl text-xl font-bold transition-all hover:bg-white/5 active:scale-90"
+            type="button"
+          >
+            8
+          </button>
+          <button
+            class="glass-input flex h-16 items-center justify-center rounded-2xl text-xl font-bold transition-all hover:bg-white/5 active:scale-90"
+            type="button"
+          >
+            9
+          </button>
+          <div class="h-16"></div>
+          <button
+            class="glass-input flex h-16 items-center justify-center rounded-2xl text-xl font-bold transition-all hover:bg-white/5 active:scale-90"
+            type="button"
+          >
+            0
+          </button>
+          <button
+            class="flex h-16 items-center justify-center rounded-2xl text-white/40 transition-all hover:text-white"
+            type="button"
+          >
+            <span class="material-symbols-outlined text-2xl">backspace</span>
+          </button>
+        </div>
+        <!-- Resend -->
+        <div class="pt-8 text-center">
+          <p class="text-xs font-bold tracking-widest text-white/20 uppercase">
+            Didn't receive code?
+            <button
+              class="text-primary ml-1 font-black hover:underline"
+              type="button"
+            >
+              Resend Code
+            </button>
+          </p>
+        </div>
+        <!-- Submit -->
+        <button
+          class="bg-primary text-background-dark shadow-primary/10 mt-12 flex h-16 w-full items-center justify-center rounded-2xl text-sm font-black tracking-[0.2em] uppercase shadow-xl transition-all hover:brightness-110 active:scale-[0.98]"
+        >
+          Complete Sync
+        </button>
+      </form>
+    </div>
+  </body>
+</html>

@@ -4,9 +4,9 @@ import { ProjectShareView } from "@/components/project/project-share-view";
 import { notFound } from "next/navigation";
 
 export default async function ProjectPreviewPage({
-  params
+  params,
 }: {
-  params: Promise<{ projectId: string, token: string }>
+  params: Promise<{ projectId: string; token: string }>;
 }) {
   const { projectId, token } = await params;
 
@@ -17,15 +17,15 @@ export default async function ProjectPreviewPage({
   const project = await prisma.project.findUnique({
     where: {
       id: projectId,
-      shareToken: token
+      shareToken: token,
     },
     include: {
       screens: {
         orderBy: {
-          x: 'asc'
-        }
-      }
-    }
+          x: "asc",
+        },
+      },
+    },
   });
 
   if (!project) {
@@ -33,7 +33,7 @@ export default async function ProjectPreviewPage({
   }
 
   // Map database screens to Artifact type
-  const artifacts: Artifact[] = project.screens.map(screen => ({
+  const artifacts: Artifact[] = project.screens.map((screen) => ({
     id: screen.id,
     title: screen.title,
     content: screen.content,
@@ -43,20 +43,21 @@ export default async function ProjectPreviewPage({
     width: screen.width || undefined,
     height: screen.height || undefined,
     status: screen.status as any,
-    isComplete: true
+    isComplete: true,
   }));
 
   // Extract applied theme: prefer project-level selectedTheme, fallback to canvasData
   const canvasData = project.canvasData as any;
-  const appliedTheme = (project as any).selectedTheme || canvasData?.appliedTheme || null;
+  const appliedTheme =
+    (project as any).selectedTheme || canvasData?.appliedTheme || null;
 
   return (
-    <ProjectShareView 
+    <ProjectShareView
       project={{
         title: project.title,
         shareToken: project.shareToken || "",
         themes: project.themes as any,
-        appliedTheme
+        appliedTheme,
       }}
       artifacts={artifacts}
     />

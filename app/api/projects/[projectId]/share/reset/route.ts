@@ -6,11 +6,11 @@ import { nanoid } from "nanoid";
 
 export async function POST(
   req: Request,
-  { params }: { params: Promise<{ projectId: string }> }
+  { params }: { params: Promise<{ projectId: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
-      headers: await headers()
+      headers: await headers(),
     });
 
     if (!session) {
@@ -23,8 +23,8 @@ export async function POST(
     const project = await prisma.project.findUnique({
       where: {
         id: projectId,
-        userId: session.user.id
-      }
+        userId: session.user.id,
+      },
     });
 
     if (!project) {
@@ -35,7 +35,7 @@ export async function POST(
 
     const updated = await prisma.project.update({
       where: { id: projectId },
-      data: { shareToken }
+      data: { shareToken },
     });
 
     return NextResponse.json(updated);

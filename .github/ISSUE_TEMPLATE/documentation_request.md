@@ -1,10 +1,9 @@
 ---
 name: Documentation Request
 about: Suggest improvements or report issues with documentation
-title: '[Docs]: '
+title: "[Docs]: "
 labels: documentation
-assignees: ''
-
+assignees: ""
 ---
 
 **What part of the documentation is missing or incorrect?**

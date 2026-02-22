@@ -1,7 +1,7 @@
 export interface Artifact {
   id?: string;
   content: string;
-  type: 'web' | 'app';
+  type: "web" | "app";
   isComplete: boolean;
   title: string;
   x?: number;
@@ -10,7 +10,7 @@ export interface Artifact {
   height?: number;
   isLiked?: boolean;
   isDisliked?: boolean;
-  status?: 'generating' | 'completed';
+  status?: "generating" | "completed";
   generationMessageId?: string;
 }
 
@@ -20,10 +20,11 @@ export interface Artifact {
  */
 export function extractArtifacts(text: string): Artifact[] {
   const artifacts: Artifact[] = [];
-  
+
   // Regex to find any of the opening tags and their content
   // Matches <web_artifact title="..."> or <web_artifact>
-  const tagPattern = /<(web_artifact|app_artifact|artifact)([^>]*)>([\s\S]*?)(?:<\/\1\s*>|$)/gi;
+  const tagPattern =
+    /<(web_artifact|app_artifact|artifact)([^>]*)>([\s\S]*?)(?:<\/\1\s*>|$)/gi;
   let match;
 
   while ((match = tagPattern.exec(text)) !== null) {
@@ -33,17 +34,18 @@ export function extractArtifacts(text: string): Artifact[] {
 
     // Simple title attribute parser
     const titleMatch = attributes.match(/title=["']([^"']+)["']/i);
-    const defaultTitle = tagName === 'web_artifact' ? 'Web Design' : 'App Design';
+    const defaultTitle =
+      tagName === "web_artifact" ? "Web Design" : "App Design";
     const title = titleMatch ? titleMatch[1] : defaultTitle;
 
     // Parse type attribute if present
     const typeMatch = attributes.match(/type=["']([^"']+)["']/i);
-    let type: 'web' | 'app' = tagName === 'web_artifact' ? 'web' : 'app';
-    
+    let type: "web" | "app" = tagName === "web_artifact" ? "web" : "app";
+
     if (typeMatch) {
       const val = typeMatch[1].toLowerCase();
-      if (val === 'web' || val === 'app') {
-        type = val as 'web' | 'app';
+      if (val === "web" || val === "app") {
+        type = val as "web" | "app";
       }
     }
 
@@ -52,25 +54,31 @@ export function extractArtifacts(text: string): Artifact[] {
         content,
         type,
         isComplete: text.toLowerCase().includes(`</${tagName}>`, match.index),
-        title
+        title,
       });
     }
   }
 
   // Fallback for raw HTML without tags
   if (artifacts.length === 0) {
-    const htmlMarkers = ['<!doctype html>', '<html', '<body', '<script', '<style'];
+    const htmlMarkers = [
+      "<!doctype html>",
+      "<html",
+      "<body",
+      "<script",
+      "<style",
+    ];
     const lowerText = text.toLowerCase();
-    const hasHtml = htmlMarkers.some(marker => lowerText.includes(marker));
-    
+    const hasHtml = htmlMarkers.some((marker) => lowerText.includes(marker));
+
     if (hasHtml && text.length > 50) {
-      const type: 'web' | 'app' = lowerText.includes('app') ? 'app' : 'web';
+      const type: "web" | "app" = lowerText.includes("app") ? "app" : "web";
 
       artifacts.push({
         content: text.trim(),
         type,
         isComplete: false,
-        title: "Untitled Design"
+        title: "Untitled Design",
       });
     }
   }
@@ -82,11 +90,16 @@ export function extractArtifacts(text: string): Artifact[] {
  * Removes all types of artifact blocks from text for display
  */
 export function stripArtifact(text: string): string {
-  return text
-    .replace(/<(web_artifact|app_artifact|artifact)[^>]*>([\s\S]*?)<\/\1\s*>/gi, '')
-    // Also remove partial tags at the end
-    .replace(/<(web_artifact|app_artifact|artifact)[^>]*>[\s\S]*$/gi, '')
-    .trim();
+  return (
+    text
+      .replace(
+        /<(web_artifact|app_artifact|artifact)[^>]*>([\s\S]*?)<\/\1\s*>/gi,
+        "",
+      )
+      // Also remove partial tags at the end
+      .replace(/<(web_artifact|app_artifact|artifact)[^>]*>[\s\S]*$/gi, "")
+      .trim()
+  );
 }
 
 /**
@@ -94,16 +107,16 @@ export function stripArtifact(text: string): string {
  */
 export function renderHTMLToCanvas(
   canvas: HTMLCanvasElement,
-  htmlContent: string
+  htmlContent: string,
 ): void {
   // Create an off-screen iframe to render the HTML
-  const iframe = document.createElement('iframe');
-  iframe.style.position = 'absolute';
-  iframe.style.left = '-9999px';
-  iframe.style.width = '1920px';
-  iframe.style.height = '1080px';
-  iframe.sandbox.add('allow-scripts');
-  
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "absolute";
+  iframe.style.left = "-9999px";
+  iframe.style.width = "1920px";
+  iframe.style.height = "1080px";
+  iframe.sandbox.add("allow-scripts");
+
   document.body.appendChild(iframe);
 
   // Write the HTML content to the iframe
@@ -132,14 +145,14 @@ export function renderHTMLToCanvas(
           body.offsetWidth,
           html.clientWidth,
           html.scrollWidth,
-          html.offsetWidth
+          html.offsetWidth,
         );
         const height = Math.max(
           body.scrollHeight,
           body.offsetHeight,
           html.clientHeight,
           html.scrollHeight,
-          html.offsetWidth
+          html.offsetWidth,
         );
 
         // Set iframe to actual content size
@@ -148,14 +161,11 @@ export function renderHTMLToCanvas(
 
         // Use html2canvas or similar library to capture the iframe
         // For now, we'll use a simple approach with canvas drawing
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
         // Scale canvas to fit content
-        const scale = Math.min(
-          canvas.width / width,
-          canvas.height / height
-        );
+        const scale = Math.min(canvas.width / width, canvas.height / height);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.save();
@@ -164,10 +174,10 @@ export function renderHTMLToCanvas(
         // Note: Direct iframe to canvas rendering requires additional libraries
         // This is a placeholder for the actual implementation
         // You would typically use html2canvas or similar here
-        
+
         ctx.restore();
       } catch (error) {
-        console.error('Error rendering HTML to canvas:', error);
+        console.error("Error rendering HTML to canvas:", error);
       } finally {
         // Clean up
         document.body.removeChild(iframe);
@@ -181,12 +191,12 @@ export function renderHTMLToCanvas(
  * This provides better interactivity and fidelity
  */
 export function createPreviewIframe(htmlContent: string): HTMLIFrameElement {
-  const iframe = document.createElement('iframe');
-  iframe.style.width = '100%';
-  iframe.style.height = '100%';
-  iframe.style.border = 'none';
-  iframe.sandbox.add('allow-scripts', 'allow-same-origin');
-  
+  const iframe = document.createElement("iframe");
+  iframe.style.width = "100%";
+  iframe.style.height = "100%";
+  iframe.style.border = "none";
+  iframe.sandbox.add("allow-scripts", "allow-same-origin");
+
   // Write content after iframe is in DOM
   setTimeout(() => {
     const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;

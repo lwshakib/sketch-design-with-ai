@@ -5,11 +5,11 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ screenId: string }> }
+  { params }: { params: Promise<{ screenId: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
-      headers: await headers()
+      headers: await headers(),
     });
 
     if (!session) {
@@ -24,8 +24,8 @@ export async function PATCH(
       where: {
         id: screenId,
         project: {
-            userId: session.user.id
-        }
+          userId: session.user.id,
+        },
       },
       data: {
         x: x !== undefined ? x : undefined,
@@ -33,7 +33,7 @@ export async function PATCH(
         width: width !== undefined ? width : undefined,
         height: height !== undefined ? height : undefined,
         content: content !== undefined ? content : undefined,
-      }
+      },
     });
 
     return NextResponse.json(screen);

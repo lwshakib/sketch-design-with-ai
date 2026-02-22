@@ -1,402 +1,742 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>FlowMetric Performance Dashboard</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#3c83f6",
-                        "background-light": "#f5f7f8",
-                        "background-dark": "#101722",
-                    },
-                    fontFamily: {
-                        "display": ["Inter"]
-                    },
-                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
-                },
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>FlowMetric Performance Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Round"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3c83f6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101722",
             },
-        }
+            fontFamily: {
+              display: ["Inter"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "1rem",
+              xl: "1.5rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
     </script>
-<style>
-        body { font-family: 'Inter', sans-serif; }
-        .chart-gradient-focus { background: linear-gradient(180deg, rgba(60, 131, 246, 0.1) 0%, rgba(60, 131, 246, 0) 100%); }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .chart-gradient-focus {
+        background: linear-gradient(
+          180deg,
+          rgba(60, 131, 246, 0.1) 0%,
+          rgba(60, 131, 246, 0) 100%
+        );
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
     </style>
-</head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-200">
-<div class="flex min-h-screen overflow-hidden">
-<!-- Collapsible Sidebar -->
-<aside class="w-20 hover:w-64 group transition-all duration-300 ease-in-out bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-50">
-<div class="p-6 flex items-center gap-4">
-<div class="bg-primary h-8 w-8 rounded flex items-center justify-center shrink-0">
-<span class="material-icons-round text-white text-xl">auto_graph</span>
-</div>
-<span class="font-bold text-xl tracking-tight opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">FlowMetric</span>
-</div>
-<nav class="flex-1 px-4 space-y-2 mt-4">
-<a class="flex items-center gap-4 p-3 rounded-lg bg-primary/10 text-primary transition-colors" href="#">
-<span class="material-icons-round">dashboard</span>
-<span class="opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-medium">Dashboard</span>
-</a>
-<a class="flex items-center gap-4 p-3 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
-<span class="material-icons-round">analytics</span>
-<span class="opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-medium">Analytics</span>
-</a>
-<a class="flex items-center gap-4 p-3 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
-<span class="material-icons-round">checklist</span>
-<span class="opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-medium">Tasks</span>
-</a>
-<a class="flex items-center gap-4 p-3 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
-<span class="material-icons-round">timer</span>
-<span class="opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-medium">Sessions</span>
-</a>
-<a class="flex items-center gap-4 p-3 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
-<span class="material-icons-round">people</span>
-<span class="opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-medium">Team</span>
-</a>
-</nav>
-<div class="p-4 border-t border-slate-100 dark:border-slate-800">
-<a class="flex items-center gap-4 p-3 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
-<span class="material-icons-round">settings</span>
-<span class="opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-medium">Settings</span>
-</a>
-</div>
-</aside>
-<!-- Main Content Area -->
-<main class="flex-1 flex flex-col min-w-0 overflow-hidden">
-<!-- Top Search Bar -->
-<header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-40">
-<div class="relative w-full max-w-xl">
-<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-<input class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-primary/50 text-sm" placeholder="Search metrics, tasks, or reports..." type="text"/>
-</div>
-<div class="flex items-center gap-4 ml-4">
-<button class="p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg relative">
-<span class="material-icons-round">notifications_none</span>
-<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-</button>
-<div class="h-8 w-px bg-slate-200 dark:border-slate-800 mx-2"></div>
-<div class="flex items-center gap-3">
-<div class="text-right hidden sm:block">
-<p class="text-xs font-semibold">Alex Rivera</p>
-<p class="text-[10px] text-slate-500 uppercase tracking-wider">Pro Plan</p>
-</div>
-<img class="w-9 h-9 rounded-full object-cover" data-alt="Portrait of a smiling professional man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDr0Fwe3KnsHA9JhrAT9J-a-1XlHcqkje6YdH-7D3iwvHO7GnHn982g_g9BZdqFFYCcz4OQZeMI7WkwUkNDgjx2ThZ1AMjCYiI60Jv_2B9B8g1fnQtw-b85VKW-pP2jVtDqJoon9RXKgjWTTjpK1YNqQIhvWMphq5FEUlfh8ufB09POyk9_RCiYhmmOVOEBCatZdweUC8Jp5MgTC0LeMugbnll_3e_qxFWI6T529REduC_wla5NpncGbwJuB8bw6te3QidH8_-qZQA"/>
-</div>
-</div>
-</header>
-<!-- Dashboard Content -->
-<div class="flex-1 overflow-y-auto p-8 space-y-8 hide-scrollbar">
-<!-- KPI Scorecards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-<!-- KPI 1 -->
-<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 group">
-<div class="flex justify-between items-start mb-4">
-<div class="p-2 bg-primary/10 rounded-lg text-primary">
-<span class="material-icons-round">bolt</span>
-</div>
-<span class="text-emerald-500 text-xs font-bold flex items-center">
-<span class="material-icons-round text-sm mr-1">trending_up</span>+12%
-                            </span>
-</div>
-<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Focus Score</p>
-<div class="flex items-end gap-2 mt-1">
-<h3 class="text-3xl font-bold tracking-tight">84</h3>
-<span class="text-slate-400 text-sm mb-1 pb-1">/100</span>
-</div>
-</div>
-<!-- KPI 2 -->
-<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 group">
-<div class="flex justify-between items-start mb-4">
-<div class="p-2 bg-primary/10 rounded-lg text-primary">
-<span class="material-icons-round">schedule</span>
-</div>
-<span class="text-emerald-500 text-xs font-bold flex items-center">
-<span class="material-icons-round text-sm mr-1">trending_up</span>+4h
-                            </span>
-</div>
-<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Deep Work Hours</p>
-<div class="flex items-end gap-2 mt-1">
-<h3 class="text-3xl font-bold tracking-tight">32h</h3>
-<span class="text-slate-400 text-sm mb-1 pb-1">this week</span>
-</div>
-</div>
-<!-- KPI 3 -->
-<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 group">
-<div class="flex justify-between items-start mb-4">
-<div class="p-2 bg-primary/10 rounded-lg text-primary">
-<span class="material-icons-round">task_alt</span>
-</div>
-<span class="text-amber-500 text-xs font-bold flex items-center">
-<span class="material-icons-round text-sm mr-1">horizontal_rule</span>0%
-                            </span>
-</div>
-<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Tasks Completed</p>
-<div class="flex items-end gap-2 mt-1">
-<h3 class="text-3xl font-bold tracking-tight">145</h3>
-<span class="text-slate-400 text-sm mb-1 pb-1">items</span>
-</div>
-</div>
-<!-- KPI 4 -->
-<div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 group">
-<div class="flex justify-between items-start mb-4">
-<div class="p-2 bg-primary/10 rounded-lg text-primary">
-<span class="material-icons-round">psychology</span>
-</div>
-<span class="text-emerald-500 text-xs font-bold flex items-center">
-<span class="material-icons-round text-sm mr-1">trending_up</span>+2%
-                            </span>
-</div>
-<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Productivity Trend</p>
-<div class="flex items-end gap-2 mt-1">
-<h3 class="text-3xl font-bold tracking-tight">8.2</h3>
-<span class="text-slate-400 text-sm mb-1 pb-1">avg/day</span>
-</div>
-</div>
-</div>
-<!-- Main Grid -->
-<div class="grid grid-cols-12 gap-6">
-<!-- Area Chart: Focus over Time -->
-<div class="col-span-12 lg:col-span-8 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 p-6">
-<div class="flex items-center justify-between mb-8">
-<div>
-<h4 class="font-bold text-lg">Focus Levels</h4>
-<p class="text-sm text-slate-500">Weekly performance metrics</p>
-</div>
-<select class="bg-slate-50 dark:bg-slate-800 border-none rounded-lg text-xs font-semibold py-1.5 pl-3 pr-8 focus:ring-1 focus:ring-primary">
-<option>Last 7 Days</option>
-<option>Last 30 Days</option>
-</select>
-</div>
-<!-- Mock Area Chart -->
-<div class="relative h-[300px] flex items-end justify-between gap-1">
-<!-- Chart Grid Lines -->
-<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
-<div class="w-full border-t border-slate-100 dark:border-slate-800/50"></div>
-<div class="w-full border-t border-slate-100 dark:border-slate-800/50"></div>
-<div class="w-full border-t border-slate-100 dark:border-slate-800/50"></div>
-<div class="w-full border-t border-slate-100 dark:border-slate-800/50"></div>
-</div>
-<!-- Mock Data Points -->
-<div class="flex-1 flex flex-col justify-end items-center group h-full">
-<div class="w-full bg-primary/10 group-hover:bg-primary/20 transition-colors rounded-t h-[40%] relative">
-<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(60,131,246,0.5)]"></div>
-</div>
-<span class="text-[10px] text-slate-400 font-semibold mt-4">MON</span>
-</div>
-<div class="flex-1 flex flex-col justify-end items-center group h-full">
-<div class="w-full bg-primary/10 group-hover:bg-primary/20 transition-colors rounded-t h-[65%] relative">
-<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rounded-full"></div>
-</div>
-<span class="text-[10px] text-slate-400 font-semibold mt-4">TUE</span>
-</div>
-<div class="flex-1 flex flex-col justify-end items-center group h-full">
-<div class="w-full bg-primary/10 group-hover:bg-primary/20 transition-colors rounded-t h-[55%] relative">
-<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rounded-full"></div>
-</div>
-<span class="text-[10px] text-slate-400 font-semibold mt-4">WED</span>
-</div>
-<div class="flex-1 flex flex-col justify-end items-center group h-full">
-<div class="w-full bg-primary/20 group-hover:bg-primary/30 transition-colors rounded-t h-[85%] relative">
-<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rounded-full shadow-[0_0_12px_rgba(60,131,246,0.8)] scale-125"></div>
-</div>
-<span class="text-[10px] text-primary font-bold mt-4">THU</span>
-</div>
-<div class="flex-1 flex flex-col justify-end items-center group h-full">
-<div class="w-full bg-primary/10 group-hover:bg-primary/20 transition-colors rounded-t h-[45%] relative">
-<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rounded-full"></div>
-</div>
-<span class="text-[10px] text-slate-400 font-semibold mt-4">FRI</span>
-</div>
-<div class="flex-1 flex flex-col justify-end items-center group h-full">
-<div class="w-full bg-primary/10 group-hover:bg-primary/20 transition-colors rounded-t h-[30%] relative">
-<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rounded-full"></div>
-</div>
-<span class="text-[10px] text-slate-400 font-semibold mt-4">SAT</span>
-</div>
-<div class="flex-1 flex flex-col justify-end items-center group h-full">
-<div class="w-full bg-primary/10 group-hover:bg-primary/20 transition-colors rounded-t h-[20%] relative">
-<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rounded-full"></div>
-</div>
-<span class="text-[10px] text-slate-400 font-semibold mt-4">SUN</span>
-</div>
-</div>
-</div>
-<!-- Task Distribution -->
-<div class="col-span-12 lg:col-span-4 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 p-6">
-<h4 class="font-bold text-lg mb-1">Time Distribution</h4>
-<p class="text-sm text-slate-500 mb-8">Activity by category</p>
-<div class="space-y-6">
-<div>
-<div class="flex justify-between text-xs font-semibold mb-2 uppercase tracking-wider">
-<span class="text-slate-500">Coding</span>
-<span class="text-slate-900 dark:text-white">42%</span>
-</div>
-<div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-<div class="h-full bg-primary rounded-full" style="width: 42%"></div>
-</div>
-</div>
-<div>
-<div class="flex justify-between text-xs font-semibold mb-2 uppercase tracking-wider">
-<span class="text-slate-500">Research</span>
-<span class="text-slate-900 dark:text-white">28%</span>
-</div>
-<div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-<div class="h-full bg-indigo-400 rounded-full" style="width: 28%"></div>
-</div>
-</div>
-<div>
-<div class="flex justify-between text-xs font-semibold mb-2 uppercase tracking-wider">
-<span class="text-slate-500">Meetings</span>
-<span class="text-slate-900 dark:text-white">18%</span>
-</div>
-<div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-<div class="h-full bg-emerald-400 rounded-full" style="width: 18%"></div>
-</div>
-</div>
-<div>
-<div class="flex justify-between text-xs font-semibold mb-2 uppercase tracking-wider">
-<span class="text-slate-500">Admin</span>
-<span class="text-slate-900 dark:text-white">12%</span>
-</div>
-<div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-<div class="h-full bg-slate-400 rounded-full" style="width: 12%"></div>
-</div>
-</div>
-</div>
-<div class="mt-10 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg flex items-center gap-4">
-<div class="h-10 w-10 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-sm">
-<span class="material-icons-round text-primary text-xl">tips_and_updates</span>
-</div>
-<div>
-<p class="text-[11px] font-bold text-slate-400 uppercase tracking-tight">Insight</p>
-<p class="text-xs text-slate-700 dark:text-slate-300">Your coding sessions are 20% longer on Thursdays.</p>
-</div>
-</div>
-</div>
-<!-- Weekly Calendar / Heatmap -->
-<div class="col-span-12 lg:col-span-7 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 p-6">
-<div class="flex items-center justify-between mb-6">
-<h4 class="font-bold text-lg">Weekly Consistency</h4>
-<div class="flex gap-2">
-<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded"><span class="material-icons-round text-sm">chevron_left</span></button>
-<span class="text-xs font-semibold self-center">October 2023</span>
-<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded"><span class="material-icons-round text-sm">chevron_right</span></button>
-</div>
-</div>
-<div class="grid grid-cols-7 gap-4">
-<!-- Labels -->
-<div class="text-center text-[10px] font-bold text-slate-400 uppercase">Mon</div>
-<div class="text-center text-[10px] font-bold text-slate-400 uppercase">Tue</div>
-<div class="text-center text-[10px] font-bold text-slate-400 uppercase">Wed</div>
-<div class="text-center text-[10px] font-bold text-slate-400 uppercase">Thu</div>
-<div class="text-center text-[10px] font-bold text-slate-400 uppercase">Fri</div>
-<div class="text-center text-[10px] font-bold text-slate-400 uppercase">Sat</div>
-<div class="text-center text-[10px] font-bold text-slate-400 uppercase">Sun</div>
-<!-- Calendar Days -->
-<div class="aspect-square bg-slate-100 dark:bg-slate-800 rounded-lg flex flex-col items-center justify-center border-b-2 border-emerald-400">
-<span class="text-xs font-bold">16</span>
-<div class="flex gap-0.5 mt-1">
-<div class="w-1 h-1 bg-emerald-400 rounded-full"></div>
-<div class="w-1 h-1 bg-emerald-400 rounded-full"></div>
-</div>
-</div>
-<div class="aspect-square bg-slate-100 dark:bg-slate-800 rounded-lg flex flex-col items-center justify-center border-b-2 border-emerald-400">
-<span class="text-xs font-bold">17</span>
-<div class="flex gap-0.5 mt-1">
-<div class="w-1 h-1 bg-emerald-400 rounded-full"></div>
-</div>
-</div>
-<div class="aspect-square bg-slate-100 dark:bg-slate-800 rounded-lg flex flex-col items-center justify-center border-b-2 border-amber-400">
-<span class="text-xs font-bold">18</span>
-</div>
-<div class="aspect-square bg-primary/10 border-2 border-primary rounded-lg flex flex-col items-center justify-center scale-110 shadow-lg shadow-primary/10 relative z-10">
-<span class="text-xs font-black text-primary">19</span>
-<div class="flex gap-0.5 mt-1">
-<div class="w-1 h-1 bg-primary rounded-full"></div>
-<div class="w-1 h-1 bg-primary rounded-full"></div>
-<div class="w-1 h-1 bg-primary rounded-full"></div>
-</div>
-</div>
-<div class="aspect-square bg-slate-100 dark:bg-slate-800 rounded-lg flex flex-col items-center justify-center">
-<span class="text-xs font-bold">20</span>
-</div>
-<div class="aspect-square bg-slate-50 dark:bg-slate-800/40 rounded-lg flex flex-col items-center justify-center text-slate-400">
-<span class="text-xs font-bold">21</span>
-</div>
-<div class="aspect-square bg-slate-50 dark:bg-slate-800/40 rounded-lg flex flex-col items-center justify-center text-slate-400">
-<span class="text-xs font-bold">22</span>
-</div>
-</div>
-</div>
-<!-- Activity Feed -->
-<div class="col-span-12 lg:col-span-5 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 p-6">
-<div class="flex items-center justify-between mb-6">
-<h4 class="font-bold text-lg">Recent Flow</h4>
-<button class="text-xs font-bold text-primary hover:underline">View All</button>
-</div>
-<div class="space-y-6">
-<div class="flex gap-4 group">
-<div class="flex flex-col items-center">
-<div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-500 shrink-0">
-<span class="material-icons-round text-lg">check_circle</span>
-</div>
-<div class="flex-1 w-0.5 bg-slate-100 dark:bg-slate-800 my-1"></div>
-</div>
-<div class="pb-2">
-<p class="text-sm font-semibold">Completed: Project Alpha Design</p>
-<p class="text-xs text-slate-500">24 mins ago • <span class="text-indigo-500">Deep Work</span></p>
-</div>
-</div>
-<div class="flex gap-4 group">
-<div class="flex flex-col items-center">
-<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-<span class="material-icons-round text-lg">military_tech</span>
-</div>
-<div class="flex-1 w-0.5 bg-slate-100 dark:bg-slate-800 my-1"></div>
-</div>
-<div class="pb-2">
-<p class="text-sm font-semibold">Reached 4h Deep Work streak</p>
-<p class="text-xs text-slate-500">2 hours ago • Milestone achieved</p>
-</div>
-</div>
-<div class="flex gap-4 group">
-<div class="flex flex-col items-center">
-<div class="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-500 shrink-0">
-<span class="material-icons-round text-lg">summarize</span>
-</div>
-<div class="flex-1 w-0.5 bg-slate-100 dark:bg-slate-800 my-1"></div>
-</div>
-<div class="pb-2">
-<p class="text-sm font-semibold">Weekly Report is ready</p>
-<p class="text-xs text-slate-500">Today, 09:15 AM • Analytics</p>
-</div>
-</div>
-<div class="flex gap-4 group">
-<div class="flex flex-col items-center">
-<div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0">
-<span class="material-icons-round text-lg">history</span>
-</div>
-</div>
-<div>
-<p class="text-sm font-semibold">Session started: Code Review</p>
-<p class="text-xs text-slate-500">Yesterday • 1h 45m duration</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</main>
-</div>
-</body></html>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 transition-colors duration-200 dark:text-slate-100"
+  >
+    <div class="flex min-h-screen overflow-hidden">
+      <!-- Collapsible Sidebar -->
+      <aside
+        class="group z-50 flex w-20 flex-col border-r border-slate-200 bg-white transition-all duration-300 ease-in-out hover:w-64 dark:border-slate-800 dark:bg-slate-900"
+      >
+        <div class="flex items-center gap-4 p-6">
+          <div
+            class="bg-primary flex h-8 w-8 shrink-0 items-center justify-center rounded"
+          >
+            <span class="material-icons-round text-xl text-white"
+              >auto_graph</span
+            >
+          </div>
+          <span
+            class="text-xl font-bold tracking-tight whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100"
+            >FlowMetric</span
+          >
+        </div>
+        <nav class="mt-4 flex-1 space-y-2 px-4">
+          <a
+            class="bg-primary/10 text-primary flex items-center gap-4 rounded-lg p-3 transition-colors"
+            href="#"
+          >
+            <span class="material-icons-round">dashboard</span>
+            <span
+              class="font-medium whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100"
+              >Dashboard</span
+            >
+          </a>
+          <a
+            class="flex items-center gap-4 rounded-lg p-3 text-slate-500 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+            href="#"
+          >
+            <span class="material-icons-round">analytics</span>
+            <span
+              class="font-medium whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100"
+              >Analytics</span
+            >
+          </a>
+          <a
+            class="flex items-center gap-4 rounded-lg p-3 text-slate-500 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+            href="#"
+          >
+            <span class="material-icons-round">checklist</span>
+            <span
+              class="font-medium whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100"
+              >Tasks</span
+            >
+          </a>
+          <a
+            class="flex items-center gap-4 rounded-lg p-3 text-slate-500 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+            href="#"
+          >
+            <span class="material-icons-round">timer</span>
+            <span
+              class="font-medium whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100"
+              >Sessions</span
+            >
+          </a>
+          <a
+            class="flex items-center gap-4 rounded-lg p-3 text-slate-500 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+            href="#"
+          >
+            <span class="material-icons-round">people</span>
+            <span
+              class="font-medium whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100"
+              >Team</span
+            >
+          </a>
+        </nav>
+        <div class="border-t border-slate-100 p-4 dark:border-slate-800">
+          <a
+            class="flex items-center gap-4 rounded-lg p-3 text-slate-500 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+            href="#"
+          >
+            <span class="material-icons-round">settings</span>
+            <span
+              class="font-medium whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100"
+              >Settings</span
+            >
+          </a>
+        </div>
+      </aside>
+      <!-- Main Content Area -->
+      <main class="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <!-- Top Search Bar -->
+        <header
+          class="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8 dark:border-slate-800 dark:bg-slate-900"
+        >
+          <div class="relative w-full max-w-xl">
+            <span
+              class="material-icons-round absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+              >search</span
+            >
+            <input
+              class="focus:ring-primary/50 w-full rounded-lg border-none bg-slate-50 py-2 pr-4 pl-10 text-sm focus:ring-2 dark:bg-slate-800"
+              placeholder="Search metrics, tasks, or reports..."
+              type="text"
+            />
+          </div>
+          <div class="ml-4 flex items-center gap-4">
+            <button
+              class="relative rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              <span class="material-icons-round">notifications_none</span>
+              <span
+                class="absolute top-2 right-2 h-2 w-2 rounded-full border-2 border-white bg-red-500 dark:border-slate-900"
+              ></span>
+            </button>
+            <div class="mx-2 h-8 w-px bg-slate-200 dark:border-slate-800"></div>
+            <div class="flex items-center gap-3">
+              <div class="hidden text-right sm:block">
+                <p class="text-xs font-semibold">Alex Rivera</p>
+                <p class="text-[10px] tracking-wider text-slate-500 uppercase">
+                  Pro Plan
+                </p>
+              </div>
+              <img
+                class="h-9 w-9 rounded-full object-cover"
+                data-alt="Portrait of a smiling professional man"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDr0Fwe3KnsHA9JhrAT9J-a-1XlHcqkje6YdH-7D3iwvHO7GnHn982g_g9BZdqFFYCcz4OQZeMI7WkwUkNDgjx2ThZ1AMjCYiI60Jv_2B9B8g1fnQtw-b85VKW-pP2jVtDqJoon9RXKgjWTTjpK1YNqQIhvWMphq5FEUlfh8ufB09POyk9_RCiYhmmOVOEBCatZdweUC8Jp5MgTC0LeMugbnll_3e_qxFWI6T529REduC_wla5NpncGbwJuB8bw6te3QidH8_-qZQA"
+              />
+            </div>
+          </div>
+        </header>
+        <!-- Dashboard Content -->
+        <div class="hide-scrollbar flex-1 space-y-8 overflow-y-auto p-8">
+          <!-- KPI Scorecards -->
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <!-- KPI 1 -->
+            <div
+              class="group rounded-xl border border-slate-200/50 bg-white p-6 shadow-sm dark:border-slate-800/50 dark:bg-slate-900"
+            >
+              <div class="mb-4 flex items-start justify-between">
+                <div class="bg-primary/10 text-primary rounded-lg p-2">
+                  <span class="material-icons-round">bolt</span>
+                </div>
+                <span
+                  class="flex items-center text-xs font-bold text-emerald-500"
+                >
+                  <span class="material-icons-round mr-1 text-sm"
+                    >trending_up</span
+                  >+12%
+                </span>
+              </div>
+              <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
+                Focus Score
+              </p>
+              <div class="mt-1 flex items-end gap-2">
+                <h3 class="text-3xl font-bold tracking-tight">84</h3>
+                <span class="mb-1 pb-1 text-sm text-slate-400">/100</span>
+              </div>
+            </div>
+            <!-- KPI 2 -->
+            <div
+              class="group rounded-xl border border-slate-200/50 bg-white p-6 shadow-sm dark:border-slate-800/50 dark:bg-slate-900"
+            >
+              <div class="mb-4 flex items-start justify-between">
+                <div class="bg-primary/10 text-primary rounded-lg p-2">
+                  <span class="material-icons-round">schedule</span>
+                </div>
+                <span
+                  class="flex items-center text-xs font-bold text-emerald-500"
+                >
+                  <span class="material-icons-round mr-1 text-sm"
+                    >trending_up</span
+                  >+4h
+                </span>
+              </div>
+              <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
+                Deep Work Hours
+              </p>
+              <div class="mt-1 flex items-end gap-2">
+                <h3 class="text-3xl font-bold tracking-tight">32h</h3>
+                <span class="mb-1 pb-1 text-sm text-slate-400">this week</span>
+              </div>
+            </div>
+            <!-- KPI 3 -->
+            <div
+              class="group rounded-xl border border-slate-200/50 bg-white p-6 shadow-sm dark:border-slate-800/50 dark:bg-slate-900"
+            >
+              <div class="mb-4 flex items-start justify-between">
+                <div class="bg-primary/10 text-primary rounded-lg p-2">
+                  <span class="material-icons-round">task_alt</span>
+                </div>
+                <span
+                  class="flex items-center text-xs font-bold text-amber-500"
+                >
+                  <span class="material-icons-round mr-1 text-sm"
+                    >horizontal_rule</span
+                  >0%
+                </span>
+              </div>
+              <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
+                Tasks Completed
+              </p>
+              <div class="mt-1 flex items-end gap-2">
+                <h3 class="text-3xl font-bold tracking-tight">145</h3>
+                <span class="mb-1 pb-1 text-sm text-slate-400">items</span>
+              </div>
+            </div>
+            <!-- KPI 4 -->
+            <div
+              class="group rounded-xl border border-slate-200/50 bg-white p-6 shadow-sm dark:border-slate-800/50 dark:bg-slate-900"
+            >
+              <div class="mb-4 flex items-start justify-between">
+                <div class="bg-primary/10 text-primary rounded-lg p-2">
+                  <span class="material-icons-round">psychology</span>
+                </div>
+                <span
+                  class="flex items-center text-xs font-bold text-emerald-500"
+                >
+                  <span class="material-icons-round mr-1 text-sm"
+                    >trending_up</span
+                  >+2%
+                </span>
+              </div>
+              <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
+                Productivity Trend
+              </p>
+              <div class="mt-1 flex items-end gap-2">
+                <h3 class="text-3xl font-bold tracking-tight">8.2</h3>
+                <span class="mb-1 pb-1 text-sm text-slate-400">avg/day</span>
+              </div>
+            </div>
+          </div>
+          <!-- Main Grid -->
+          <div class="grid grid-cols-12 gap-6">
+            <!-- Area Chart: Focus over Time -->
+            <div
+              class="col-span-12 rounded-xl border border-slate-200/50 bg-white p-6 shadow-sm lg:col-span-8 dark:border-slate-800/50 dark:bg-slate-900"
+            >
+              <div class="mb-8 flex items-center justify-between">
+                <div>
+                  <h4 class="text-lg font-bold">Focus Levels</h4>
+                  <p class="text-sm text-slate-500">
+                    Weekly performance metrics
+                  </p>
+                </div>
+                <select
+                  class="focus:ring-primary rounded-lg border-none bg-slate-50 py-1.5 pr-8 pl-3 text-xs font-semibold focus:ring-1 dark:bg-slate-800"
+                >
+                  <option>Last 7 Days</option>
+                  <option>Last 30 Days</option>
+                </select>
+              </div>
+              <!-- Mock Area Chart -->
+              <div
+                class="relative flex h-[300px] items-end justify-between gap-1"
+              >
+                <!-- Chart Grid Lines -->
+                <div
+                  class="pointer-events-none absolute inset-0 flex flex-col justify-between"
+                >
+                  <div
+                    class="w-full border-t border-slate-100 dark:border-slate-800/50"
+                  ></div>
+                  <div
+                    class="w-full border-t border-slate-100 dark:border-slate-800/50"
+                  ></div>
+                  <div
+                    class="w-full border-t border-slate-100 dark:border-slate-800/50"
+                  ></div>
+                  <div
+                    class="w-full border-t border-slate-100 dark:border-slate-800/50"
+                  ></div>
+                </div>
+                <!-- Mock Data Points -->
+                <div
+                  class="group flex h-full flex-1 flex-col items-center justify-end"
+                >
+                  <div
+                    class="bg-primary/10 group-hover:bg-primary/20 relative h-[40%] w-full rounded-t transition-colors"
+                  >
+                    <div
+                      class="bg-primary absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full shadow-[0_0_10px_rgba(60,131,246,0.5)]"
+                    ></div>
+                  </div>
+                  <span class="mt-4 text-[10px] font-semibold text-slate-400"
+                    >MON</span
+                  >
+                </div>
+                <div
+                  class="group flex h-full flex-1 flex-col items-center justify-end"
+                >
+                  <div
+                    class="bg-primary/10 group-hover:bg-primary/20 relative h-[65%] w-full rounded-t transition-colors"
+                  >
+                    <div
+                      class="bg-primary absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full"
+                    ></div>
+                  </div>
+                  <span class="mt-4 text-[10px] font-semibold text-slate-400"
+                    >TUE</span
+                  >
+                </div>
+                <div
+                  class="group flex h-full flex-1 flex-col items-center justify-end"
+                >
+                  <div
+                    class="bg-primary/10 group-hover:bg-primary/20 relative h-[55%] w-full rounded-t transition-colors"
+                  >
+                    <div
+                      class="bg-primary absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full"
+                    ></div>
+                  </div>
+                  <span class="mt-4 text-[10px] font-semibold text-slate-400"
+                    >WED</span
+                  >
+                </div>
+                <div
+                  class="group flex h-full flex-1 flex-col items-center justify-end"
+                >
+                  <div
+                    class="bg-primary/20 group-hover:bg-primary/30 relative h-[85%] w-full rounded-t transition-colors"
+                  >
+                    <div
+                      class="bg-primary absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 scale-125 rounded-full shadow-[0_0_12px_rgba(60,131,246,0.8)]"
+                    ></div>
+                  </div>
+                  <span class="text-primary mt-4 text-[10px] font-bold"
+                    >THU</span
+                  >
+                </div>
+                <div
+                  class="group flex h-full flex-1 flex-col items-center justify-end"
+                >
+                  <div
+                    class="bg-primary/10 group-hover:bg-primary/20 relative h-[45%] w-full rounded-t transition-colors"
+                  >
+                    <div
+                      class="bg-primary absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full"
+                    ></div>
+                  </div>
+                  <span class="mt-4 text-[10px] font-semibold text-slate-400"
+                    >FRI</span
+                  >
+                </div>
+                <div
+                  class="group flex h-full flex-1 flex-col items-center justify-end"
+                >
+                  <div
+                    class="bg-primary/10 group-hover:bg-primary/20 relative h-[30%] w-full rounded-t transition-colors"
+                  >
+                    <div
+                      class="bg-primary absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full"
+                    ></div>
+                  </div>
+                  <span class="mt-4 text-[10px] font-semibold text-slate-400"
+                    >SAT</span
+                  >
+                </div>
+                <div
+                  class="group flex h-full flex-1 flex-col items-center justify-end"
+                >
+                  <div
+                    class="bg-primary/10 group-hover:bg-primary/20 relative h-[20%] w-full rounded-t transition-colors"
+                  >
+                    <div
+                      class="bg-primary absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full"
+                    ></div>
+                  </div>
+                  <span class="mt-4 text-[10px] font-semibold text-slate-400"
+                    >SUN</span
+                  >
+                </div>
+              </div>
+            </div>
+            <!-- Task Distribution -->
+            <div
+              class="col-span-12 rounded-xl border border-slate-200/50 bg-white p-6 shadow-sm lg:col-span-4 dark:border-slate-800/50 dark:bg-slate-900"
+            >
+              <h4 class="mb-1 text-lg font-bold">Time Distribution</h4>
+              <p class="mb-8 text-sm text-slate-500">Activity by category</p>
+              <div class="space-y-6">
+                <div>
+                  <div
+                    class="mb-2 flex justify-between text-xs font-semibold tracking-wider uppercase"
+                  >
+                    <span class="text-slate-500">Coding</span>
+                    <span class="text-slate-900 dark:text-white">42%</span>
+                  </div>
+                  <div
+                    class="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+                  >
+                    <div
+                      class="bg-primary h-full rounded-full"
+                      style="width: 42%"
+                    ></div>
+                  </div>
+                </div>
+                <div>
+                  <div
+                    class="mb-2 flex justify-between text-xs font-semibold tracking-wider uppercase"
+                  >
+                    <span class="text-slate-500">Research</span>
+                    <span class="text-slate-900 dark:text-white">28%</span>
+                  </div>
+                  <div
+                    class="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+                  >
+                    <div
+                      class="h-full rounded-full bg-indigo-400"
+                      style="width: 28%"
+                    ></div>
+                  </div>
+                </div>
+                <div>
+                  <div
+                    class="mb-2 flex justify-between text-xs font-semibold tracking-wider uppercase"
+                  >
+                    <span class="text-slate-500">Meetings</span>
+                    <span class="text-slate-900 dark:text-white">18%</span>
+                  </div>
+                  <div
+                    class="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+                  >
+                    <div
+                      class="h-full rounded-full bg-emerald-400"
+                      style="width: 18%"
+                    ></div>
+                  </div>
+                </div>
+                <div>
+                  <div
+                    class="mb-2 flex justify-between text-xs font-semibold tracking-wider uppercase"
+                  >
+                    <span class="text-slate-500">Admin</span>
+                    <span class="text-slate-900 dark:text-white">12%</span>
+                  </div>
+                  <div
+                    class="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+                  >
+                    <div
+                      class="h-full rounded-full bg-slate-400"
+                      style="width: 12%"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="mt-10 flex items-center gap-4 rounded-lg bg-slate-50 p-4 dark:bg-slate-800/50"
+              >
+                <div
+                  class="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm dark:bg-slate-800"
+                >
+                  <span class="material-icons-round text-primary text-xl"
+                    >tips_and_updates</span
+                  >
+                </div>
+                <div>
+                  <p
+                    class="text-[11px] font-bold tracking-tight text-slate-400 uppercase"
+                  >
+                    Insight
+                  </p>
+                  <p class="text-xs text-slate-700 dark:text-slate-300">
+                    Your coding sessions are 20% longer on Thursdays.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- Weekly Calendar / Heatmap -->
+            <div
+              class="col-span-12 rounded-xl border border-slate-200/50 bg-white p-6 shadow-sm lg:col-span-7 dark:border-slate-800/50 dark:bg-slate-900"
+            >
+              <div class="mb-6 flex items-center justify-between">
+                <h4 class="text-lg font-bold">Weekly Consistency</h4>
+                <div class="flex gap-2">
+                  <button
+                    class="rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  >
+                    <span class="material-icons-round text-sm"
+                      >chevron_left</span
+                    >
+                  </button>
+                  <span class="self-center text-xs font-semibold"
+                    >October 2023</span
+                  >
+                  <button
+                    class="rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  >
+                    <span class="material-icons-round text-sm"
+                      >chevron_right</span
+                    >
+                  </button>
+                </div>
+              </div>
+              <div class="grid grid-cols-7 gap-4">
+                <!-- Labels -->
+                <div
+                  class="text-center text-[10px] font-bold text-slate-400 uppercase"
+                >
+                  Mon
+                </div>
+                <div
+                  class="text-center text-[10px] font-bold text-slate-400 uppercase"
+                >
+                  Tue
+                </div>
+                <div
+                  class="text-center text-[10px] font-bold text-slate-400 uppercase"
+                >
+                  Wed
+                </div>
+                <div
+                  class="text-center text-[10px] font-bold text-slate-400 uppercase"
+                >
+                  Thu
+                </div>
+                <div
+                  class="text-center text-[10px] font-bold text-slate-400 uppercase"
+                >
+                  Fri
+                </div>
+                <div
+                  class="text-center text-[10px] font-bold text-slate-400 uppercase"
+                >
+                  Sat
+                </div>
+                <div
+                  class="text-center text-[10px] font-bold text-slate-400 uppercase"
+                >
+                  Sun
+                </div>
+                <!-- Calendar Days -->
+                <div
+                  class="flex aspect-square flex-col items-center justify-center rounded-lg border-b-2 border-emerald-400 bg-slate-100 dark:bg-slate-800"
+                >
+                  <span class="text-xs font-bold">16</span>
+                  <div class="mt-1 flex gap-0.5">
+                    <div class="h-1 w-1 rounded-full bg-emerald-400"></div>
+                    <div class="h-1 w-1 rounded-full bg-emerald-400"></div>
+                  </div>
+                </div>
+                <div
+                  class="flex aspect-square flex-col items-center justify-center rounded-lg border-b-2 border-emerald-400 bg-slate-100 dark:bg-slate-800"
+                >
+                  <span class="text-xs font-bold">17</span>
+                  <div class="mt-1 flex gap-0.5">
+                    <div class="h-1 w-1 rounded-full bg-emerald-400"></div>
+                  </div>
+                </div>
+                <div
+                  class="flex aspect-square flex-col items-center justify-center rounded-lg border-b-2 border-amber-400 bg-slate-100 dark:bg-slate-800"
+                >
+                  <span class="text-xs font-bold">18</span>
+                </div>
+                <div
+                  class="bg-primary/10 border-primary shadow-primary/10 relative z-10 flex aspect-square scale-110 flex-col items-center justify-center rounded-lg border-2 shadow-lg"
+                >
+                  <span class="text-primary text-xs font-black">19</span>
+                  <div class="mt-1 flex gap-0.5">
+                    <div class="bg-primary h-1 w-1 rounded-full"></div>
+                    <div class="bg-primary h-1 w-1 rounded-full"></div>
+                    <div class="bg-primary h-1 w-1 rounded-full"></div>
+                  </div>
+                </div>
+                <div
+                  class="flex aspect-square flex-col items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800"
+                >
+                  <span class="text-xs font-bold">20</span>
+                </div>
+                <div
+                  class="flex aspect-square flex-col items-center justify-center rounded-lg bg-slate-50 text-slate-400 dark:bg-slate-800/40"
+                >
+                  <span class="text-xs font-bold">21</span>
+                </div>
+                <div
+                  class="flex aspect-square flex-col items-center justify-center rounded-lg bg-slate-50 text-slate-400 dark:bg-slate-800/40"
+                >
+                  <span class="text-xs font-bold">22</span>
+                </div>
+              </div>
+            </div>
+            <!-- Activity Feed -->
+            <div
+              class="col-span-12 rounded-xl border border-slate-200/50 bg-white p-6 shadow-sm lg:col-span-5 dark:border-slate-800/50 dark:bg-slate-900"
+            >
+              <div class="mb-6 flex items-center justify-between">
+                <h4 class="text-lg font-bold">Recent Flow</h4>
+                <button class="text-primary text-xs font-bold hover:underline">
+                  View All
+                </button>
+              </div>
+              <div class="space-y-6">
+                <div class="group flex gap-4">
+                  <div class="flex flex-col items-center">
+                    <div
+                      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-500 dark:bg-emerald-900/30"
+                    >
+                      <span class="material-icons-round text-lg"
+                        >check_circle</span
+                      >
+                    </div>
+                    <div
+                      class="my-1 w-0.5 flex-1 bg-slate-100 dark:bg-slate-800"
+                    ></div>
+                  </div>
+                  <div class="pb-2">
+                    <p class="text-sm font-semibold">
+                      Completed: Project Alpha Design
+                    </p>
+                    <p class="text-xs text-slate-500">
+                      24 mins ago •
+                      <span class="text-indigo-500">Deep Work</span>
+                    </p>
+                  </div>
+                </div>
+                <div class="group flex gap-4">
+                  <div class="flex flex-col items-center">
+                    <div
+                      class="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+                    >
+                      <span class="material-icons-round text-lg"
+                        >military_tech</span
+                      >
+                    </div>
+                    <div
+                      class="my-1 w-0.5 flex-1 bg-slate-100 dark:bg-slate-800"
+                    ></div>
+                  </div>
+                  <div class="pb-2">
+                    <p class="text-sm font-semibold">
+                      Reached 4h Deep Work streak
+                    </p>
+                    <p class="text-xs text-slate-500">
+                      2 hours ago • Milestone achieved
+                    </p>
+                  </div>
+                </div>
+                <div class="group flex gap-4">
+                  <div class="flex flex-col items-center">
+                    <div
+                      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-500 dark:bg-amber-900/30"
+                    >
+                      <span class="material-icons-round text-lg"
+                        >summarize</span
+                      >
+                    </div>
+                    <div
+                      class="my-1 w-0.5 flex-1 bg-slate-100 dark:bg-slate-800"
+                    ></div>
+                  </div>
+                  <div class="pb-2">
+                    <p class="text-sm font-semibold">Weekly Report is ready</p>
+                    <p class="text-xs text-slate-500">
+                      Today, 09:15 AM • Analytics
+                    </p>
+                  </div>
+                </div>
+                <div class="group flex gap-4">
+                  <div class="flex flex-col items-center">
+                    <div
+                      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800"
+                    >
+                      <span class="material-icons-round text-lg">history</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold">
+                      Session started: Code Review
+                    </p>
+                    <p class="text-xs text-slate-500">
+                      Yesterday • 1h 45m duration
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

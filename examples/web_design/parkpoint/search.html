@@ -1,327 +1,646 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Search Results - ParkPoint</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#3caff6",
-                        "background-light": "#f5f7f8",
-                        "background-dark": "#101b22",
-                    },
-                    fontFamily: {
-                        "display": ["Inter", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Search Results - ParkPoint</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3caff6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101b22",
             },
-        }
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
     </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #cbd5e1;
-        }
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+        vertical-align: middle;
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #cbd5e1;
+      }
     </style>
-</head>
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-hidden h-screen flex flex-col">
-<!-- Sticky Top Navigation -->
-<header class="sticky top-0 z-50 w-full bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 px-6 py-3 shrink-0">
-<div class="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
-<div class="flex items-center gap-2 cursor-pointer">
-<div class="text-primary">
-<svg class="size-8" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-<path d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z" fill="currentColor"></path>
-<path clip-rule="evenodd" d="M39.998 12.236C39.9944 12.2537 39.9875 12.2845 39.9748 12.3294C39.9436 12.4399 39.8949 12.5741 39.8346 12.7175C39.8168 12.7597 39.7989 12.8007 39.7813 12.8398C38.5103 13.7113 35.9788 14.9393 33.7095 15.4811C30.9875 16.131 27.6413 16.5217 24 16.5217C20.3587 16.5217 17.0125 16.131 14.2905 15.4811C12.0012 14.9346 9.44505 13.6897 8.18538 12.8168C8.17384 12.7925 8.16216 12.767 8.15052 12.7408C8.09919 12.6249 8.05721 12.5114 8.02977 12.411C8.00356 12.3152 8.00039 12.2667 8.00004 12.2612C8.00004 12.261 8 12.2607 8.00004 12.2612C8.00004 12.2359 8.0104 11.9233 8.68485 11.3686C9.34546 10.8254 10.4222 10.2469 11.9291 9.72276C14.9242 8.68098 19.1919 8 24 8C28.8081 8 33.0758 8.68098 36.0709 9.72276C37.5778 10.2469 38.6545 10.8254 39.3151 11.3686C39.9006 11.8501 39.9857 12.1489 39.998 12.236ZM4.95178 15.2312L21.4543 41.6973C22.6288 43.5809 25.3712 43.5809 26.5457 41.6973L43.0534 15.223C43.0709 15.1948 43.0878 15.1662 43.104 15.1371L41.3563 14.1648C43.104 15.1371 43.1038 15.1374 43.104 15.1371L43.1051 15.135L43.1065 15.1325L43.1101 15.1261L43.1199 15.1082C43.1276 15.094 43.1377 15.0754 43.1497 15.0527C43.1738 15.0075 43.2062 14.9455 43.244 14.8701C43.319 14.7208 43.4196 14.511 43.5217 14.2683C43.6901 13.8679 44 13.0689 44 12.2609C44 10.5573 43.003 9.22254 41.8558 8.2791C40.6947 7.32427 39.1354 6.55361 37.385 5.94477C33.8654 4.72057 29.133 4 24 4C18.867 4 14.1346 4.72057 10.615 5.94478C8.86463 6.55361 7.30529 7.32428 6.14419 8.27911C4.99695 9.22255 3.99999 10.5573 3.99999 12.2609C3.99999 13.1275 4.29264 13.9078 4.49321 14.3607C4.60375 14.6102 4.71348 14.8196 4.79687 14.9689C4.83898 15.0444 4.87547 15.1065 4.9035 15.1529C4.91754 15.1762 4.92954 15.1957 4.93916 15.2111L4.94662 15.223L4.95178 15.2312ZM35.9868 18.996L24 38.22L12.0131 18.996C12.4661 19.1391 12.9179 19.2658 13.3617 19.3718C16.4281 20.1039 20.0901 20.5217 24 20.5217C27.9099 20.5217 31.5719 20.1039 34.6383 19.3718C35.082 19.2658 35.5339 19.1391 35.9868 18.996Z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-<h2 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">ParkPoint</h2>
-</div>
-<nav class="hidden md:flex items-center gap-8">
-<a class="text-sm font-semibold text-primary" href="#">Find Parking</a>
-<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="#">Monthly</a>
-<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="#">Business</a>
-<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="#">Help</a>
-</nav>
-<div class="flex items-center gap-3">
-<button class="flex items-center justify-center p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-<div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
-<div class="flex items-center gap-3 pl-1">
-<div class="hidden sm:block text-right">
-<p class="text-sm font-semibold leading-none">Alex Johnson</p>
-<p class="text-xs text-slate-500 mt-1">Pro Member</p>
-</div>
-<div class="size-9 rounded-full bg-slate-200 overflow-hidden border-2 border-primary/20">
-<img class="w-full h-full object-cover" data-alt="User profile avatar of Alex Johnson" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIs9R3OqBi8sf2bVUqSQBilRaNgzcXqYG6YzvI3YDUaoJkyMS7nHOX6tm443wjH_yLAc5DJL6KZ1_DrOXNTFaEj-pJS3rAOFjwXy5lIl3cgk5PYnfeBGpEJuh0WF1faRg_xHiOjQCb32UabAomrA5ErHK10X6ZduiQCaKVslqET1ixMPNw35DvzaJRFHYjiLpGLTEqpd_Yv6WhI1s3AwmPBFEa7rw0fumfoZIVCfpXVOWOeRFXZxF668pU-Rm6aB5r1LABZ0t14cBD"/>
-</div>
-</div>
-</div>
-</div>
-</header>
-<!-- Main Content Area -->
-<main class="flex flex-1 overflow-hidden">
-<!-- Left Pane: Search & Results -->
-<section class="w-full md:w-[500px] xl:w-[600px] flex flex-col bg-white dark:bg-background-dark border-r border-slate-200 dark:border-slate-800 h-full relative z-10">
-<!-- Filters Bar -->
-<div class="p-4 border-b border-slate-100 dark:border-slate-800 space-y-4 shadow-sm">
-<!-- Search Input -->
-<div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-<input class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-900 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Search by address, city, or landmark" type="text" value="Downtown San Francisco, CA"/>
-</div>
-<!-- Filters Row -->
-<div class="flex flex-wrap items-center gap-2">
-<button class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                        Price
-                        <span class="material-symbols-outlined text-[16px]">expand_more</span>
-</button>
-<button class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                        Distance
-                        <span class="material-symbols-outlined text-[16px]">expand_more</span>
-</button>
-<div class="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
-<!-- EV Toggle -->
-<label class="inline-flex items-center cursor-pointer gap-2 ml-1">
-<div class="relative">
-<input class="sr-only peer" type="checkbox"/>
-<div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
-</div>
-<span class="text-xs font-semibold text-slate-600 dark:text-slate-400">EV Charging</span>
-</label>
-<button class="ml-auto text-primary text-xs font-bold hover:underline">Clear all</button>
-</div>
-<div class="flex items-center justify-between">
-<h3 class="text-sm font-bold text-slate-900 dark:text-white">128 parking spots found</h3>
-<div class="flex items-center gap-1 text-xs text-slate-500">
-<span>Sort by:</span>
-<span class="font-bold text-slate-900 dark:text-white cursor-pointer flex items-center">Recommended <span class="material-symbols-outlined text-[14px]">expand_more</span></span>
-</div>
-</div>
-</div>
-<!-- Scrollable Results List -->
-<div class="flex-1 overflow-y-auto custom-scrollbar bg-background-light dark:bg-slate-950 p-4 space-y-4">
-<!-- Result Card 1 -->
-<div class="group bg-white dark:bg-background-dark rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm hover:border-primary transition-all cursor-pointer relative overflow-hidden">
-<div class="flex gap-4">
-<div class="size-24 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative">
-<img class="w-full h-full object-cover" data-alt="Exterior view of a modern underground parking garage entrance" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3aHPDGJnJuezl9Yl2ubYlrgFMp6pa4PAGYrZsBdOQXCbtyI0oW9Aa7zTflDC4r1ny8kFygmUQRhjYK39MT2FFRlSI_l4nJydNtO_7Q9PNlii5jEloqwL3HWerTxCRxWpdUxkRI7wXWO8-nu7zT2IMFDJA4tGla4P-yh7Emi4Q2EsIoyU3iJObA-imfb2PX7vmOZMH6l9hrCFRaiOQ8AHfeRcTD11hdRRqDc8tL7AQ6PJGVLBUzvtREbTSWXxYulRU8YKuofE1ZWVS"/>
-<div class="absolute top-1 left-1 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">Fast Entry</div>
-</div>
-<div class="flex-1 flex flex-col justify-between">
-<div>
-<div class="flex justify-between items-start">
-<h4 class="font-bold text-base leading-tight">Central Plaza Garage</h4>
-<span class="material-symbols-outlined text-slate-300 group-hover:text-primary">bookmark</span>
-</div>
-<p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">location_on</span> 123 North Main St • 0.4 miles
-                                </p>
-<div class="flex items-center gap-1 mt-2">
-<span class="flex items-center text-amber-500">
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-<span class="material-symbols-outlined text-[16px]">star_half</span>
-</span>
-<span class="text-[11px] font-bold text-slate-500">(120)</span>
-</div>
-</div>
-<div class="flex items-center justify-between mt-3">
-<div class="flex flex-col">
-<span class="text-lg font-extrabold text-slate-900 dark:text-white">$5.00<span class="text-xs font-normal text-slate-500"> / hr</span></span>
-</div>
-<button class="bg-primary text-white px-5 py-1.5 rounded-lg text-sm font-bold hover:bg-primary/90 transition-all shadow-md shadow-primary/20">Book</button>
-</div>
-</div>
-</div>
-</div>
-<!-- Result Card 2 -->
-<div class="group bg-white dark:bg-background-dark rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm hover:border-primary transition-all cursor-pointer">
-<div class="flex gap-4">
-<div class="size-24 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative">
-<img class="w-full h-full object-cover" data-alt="Well lit indoor parking structure with green lane indicators" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqvvAiTnemeswLUUqXItXpb3LHZ0L1Fa-KuboSZRADcorLdBuY4atq3gTyn7y2gUthHzgw5Ao48jGE5xyjuc5TsRPUIBQdrEHozrVel6UMMPC94d7i6nL1DS7-4VoykSVoYSBJV7RyhFNrYNa0TcAiha_9zWsit87iI7-T9MJqF1FWxbIAuQkc2ErJ4I4hiyRcvDXfHG463FmzMeYkTEwUIpQzwO83HVUMKWzujTFigdHKIzH9Vwt6sito4n7APiRnKhXSIhMn-4vk"/>
-<div class="absolute top-1 left-1 bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">EV Ready</div>
-</div>
-<div class="flex-1 flex flex-col justify-between">
-<div>
-<div class="flex justify-between items-start">
-<h4 class="font-bold text-base leading-tight">Financial District Deck</h4>
-<span class="material-symbols-outlined text-slate-300 group-hover:text-primary">bookmark</span>
-</div>
-<p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">location_on</span> 450 Sansome St • 0.6 miles
-                                </p>
-<div class="flex items-center gap-1 mt-2">
-<span class="flex items-center text-amber-500">
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-</span>
-<span class="text-[11px] font-bold text-slate-500">(85)</span>
-</div>
-</div>
-<div class="flex items-center justify-between mt-3">
-<div class="flex flex-col">
-<span class="text-lg font-extrabold text-slate-900 dark:text-white">$7.50<span class="text-xs font-normal text-slate-500"> / hr</span></span>
-</div>
-<button class="bg-primary text-white px-5 py-1.5 rounded-lg text-sm font-bold hover:bg-primary/90 transition-all shadow-md shadow-primary/20">Book</button>
-</div>
-</div>
-</div>
-</div>
-<!-- Result Card 3 -->
-<div class="group bg-white dark:bg-background-dark rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm hover:border-primary transition-all cursor-pointer">
-<div class="flex gap-4">
-<div class="size-24 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden relative">
-<img class="w-full h-full object-cover" data-alt="Rooftop parking lot with city skyline in background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlTbPD_6evKXuDtOqCTWOIKqBIrivKtRK8ZNIrAihvdBGNwdRFCpSaojhGrWlC1mZdJDk01T9XCTscn2Urt0JwPlDlYMWNxapLGEqOn7sXnXaSZJ1KSFRF0nF2QnI68LFgFZA8jGrA62gv1uNWjQqPY7naNnPwgdA_iQzEQtNfv3ppiD4qsm3I_KldLGP6IQzAG64rlWRrsIy4RDNx28yVSbfe-RGu2KmjJJIcjV9BerhqYv1awfw5ZKgDH-i1-U0JMTZSSE9s1JqS"/>
-</div>
-<div class="flex-1 flex flex-col justify-between">
-<div>
-<div class="flex justify-between items-start">
-<h4 class="font-bold text-base leading-tight">Union Square Valet</h4>
-<span class="material-symbols-outlined text-slate-300 group-hover:text-primary">bookmark</span>
-</div>
-<p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">location_on</span> 333 Post St • 0.9 miles
-                                </p>
-<div class="flex items-center gap-1 mt-2">
-<span class="flex items-center text-amber-500">
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-<span class="material-symbols-outlined text-[16px] fill-current">star</span>
-<span class="material-symbols-outlined text-[16px]">star</span>
-</span>
-<span class="text-[11px] font-bold text-slate-500">(214)</span>
-</div>
-</div>
-<div class="flex items-center justify-between mt-3">
-<div class="flex flex-col">
-<span class="text-lg font-extrabold text-slate-900 dark:text-white">$12.00<span class="text-xs font-normal text-slate-500"> / hr</span></span>
-</div>
-<button class="bg-primary text-white px-5 py-1.5 rounded-lg text-sm font-bold hover:bg-primary/90 transition-all shadow-md shadow-primary/20">Book</button>
-</div>
-</div>
-</div>
-</div>
-<!-- Pagination -->
-<nav class="flex items-center justify-center gap-2 py-6">
-<button class="size-9 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
-<span class="material-symbols-outlined">chevron_left</span>
-</button>
-<button class="size-9 flex items-center justify-center rounded-lg bg-primary text-white font-bold text-sm">1</button>
-<button class="size-9 flex items-center justify-center rounded-lg border border-transparent hover:border-slate-200 dark:hover:border-slate-800 text-sm font-semibold">2</button>
-<button class="size-9 flex items-center justify-center rounded-lg border border-transparent hover:border-slate-200 dark:hover:border-slate-800 text-sm font-semibold">3</button>
-<span class="px-1 text-slate-400">...</span>
-<button class="size-9 flex items-center justify-center rounded-lg border border-transparent hover:border-slate-200 dark:hover:border-slate-800 text-sm font-semibold">12</button>
-<button class="size-9 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
-<span class="material-symbols-outlined">chevron_right</span>
-</button>
-</nav>
-</div>
-</section>
-<!-- Right Pane: Interactive Map -->
-<section class="hidden md:block flex-1 h-full bg-slate-200 relative overflow-hidden">
-<!-- Map Placeholder / Background -->
-<div class="absolute inset-0 grayscale-[0.2]" data-location="San Francisco" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA49Ubx9XnpW0Dq4iInSiP2lvxKxG5duZd7hp1-0dDOkGKLphMo4NTbDphB6tmnU9wRY_dbqyIX6zWhGkLYnN07-wlVtgqNm08mFlaSEsD_P8pIzPh_9qx2aizBpdkdBCW536MJOeBURuvrXWWbxg8hAIdtIXKtYaHpeS2hD7lNC9d0RCo0fp3CYa0uYJpi34rappvyOvPLaP0gUtpNX0jYXLEkpKLLGiM8aC0gEqp8jBXKB-7ivel6PwwgUYwjf_1WwMky4YK2ms45'); background-size: cover;">
-<!-- Simulated Map UI -->
-<div class="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/light-v10/static/-122.4194,37.7749,12,0/1200x1200?access_token=none')] bg-cover opacity-80" data-alt="Clean minimal street map of downtown San Francisco area"></div>
-<!-- Custom Map Markers -->
-<div class="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 cursor-pointer group">
-<div class="bg-white dark:bg-background-dark border-2 border-primary rounded-full px-2 py-1 shadow-lg group-hover:scale-110 transition-transform flex items-center gap-1">
-<span class="text-xs font-black text-slate-900 dark:text-white">$5</span>
-</div>
-<div class="w-0.5 h-2 bg-primary mx-auto"></div>
-</div>
-<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer group">
-<div class="bg-primary text-white rounded-full px-2 py-1 shadow-lg group-hover:scale-110 transition-transform border-2 border-white flex items-center gap-1">
-<span class="text-xs font-black">$7.5</span>
-</div>
-<div class="w-0.5 h-2 bg-primary mx-auto"></div>
-</div>
-<div class="absolute top-1/4 right-1/4 -translate-x-1/2 -translate-y-1/2 cursor-pointer group">
-<div class="bg-white dark:bg-background-dark border-2 border-primary rounded-full px-2 py-1 shadow-lg group-hover:scale-110 transition-transform flex items-center gap-1">
-<span class="text-xs font-black text-slate-900 dark:text-white">$12</span>
-</div>
-<div class="w-0.5 h-2 bg-primary mx-auto"></div>
-</div>
-<!-- Map Controls -->
-<div class="absolute top-6 right-6 flex flex-col gap-2">
-<div class="flex flex-col rounded-lg bg-white dark:bg-background-dark shadow-xl overflow-hidden border border-slate-200 dark:border-slate-800">
-<button class="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b border-slate-100 dark:border-slate-800">
-<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">add</span>
-</button>
-<button class="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">remove</span>
-</button>
-</div>
-<button class="p-3 rounded-lg bg-white dark:bg-background-dark shadow-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">my_location</span>
-</button>
-<button class="p-3 rounded-lg bg-white dark:bg-background-dark shadow-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">layers</span>
-</button>
-</div>
-<!-- Map Overlay Info -->
-<div class="absolute bottom-6 left-6 right-6 flex justify-center pointer-events-none">
-<div class="bg-white/90 dark:bg-background-dark/90 backdrop-blur-md px-4 py-2 rounded-full border border-slate-200/50 dark:border-slate-800/50 shadow-2xl flex items-center gap-4 pointer-events-auto">
-<p class="text-xs font-medium text-slate-600 dark:text-slate-400">Move map to update results</p>
-<div class="h-4 w-px bg-slate-300 dark:bg-slate-700"></div>
-<button class="text-xs font-bold text-primary hover:text-primary/80 transition-colors uppercase tracking-widest">Search this area</button>
-</div>
-</div>
-</div>
-</section>
-</main>
-<!-- Mobile Navigation Bar -->
-<div class="md:hidden sticky bottom-0 w-full bg-white dark:bg-background-dark border-t border-slate-200 dark:border-slate-800 px-6 py-2 flex items-center justify-between z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
-<button class="flex flex-col items-center gap-0.5 text-primary">
-<span class="material-symbols-outlined">explore</span>
-<span class="text-[10px] font-bold">Explore</span>
-</button>
-<button class="flex flex-col items-center gap-0.5 text-slate-400">
-<span class="material-symbols-outlined">map</span>
-<span class="text-[10px] font-bold">Map</span>
-</button>
-<button class="flex flex-col items-center gap-0.5 text-slate-400">
-<span class="material-symbols-outlined">bookmark</span>
-<span class="text-[10px] font-bold">Saved</span>
-</button>
-<button class="flex flex-col items-center gap-0.5 text-slate-400">
-<span class="material-symbols-outlined">person</span>
-<span class="text-[10px] font-bold">Profile</span>
-</button>
-</div>
-</body></html>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark font-display flex h-screen flex-col overflow-hidden text-slate-900 antialiased dark:text-slate-100"
+  >
+    <!-- Sticky Top Navigation -->
+    <header
+      class="dark:bg-background-dark sticky top-0 z-50 w-full shrink-0 border-b border-slate-200 bg-white px-6 py-3 dark:border-slate-800"
+    >
+      <div
+        class="mx-auto flex max-w-[1600px] items-center justify-between gap-4"
+      >
+        <div class="flex cursor-pointer items-center gap-2">
+          <div class="text-primary">
+            <svg
+              class="size-8"
+              fill="none"
+              viewbox="0 0 48 48"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z"
+                fill="currentColor"
+              ></path>
+              <path
+                clip-rule="evenodd"
+                d="M39.998 12.236C39.9944 12.2537 39.9875 12.2845 39.9748 12.3294C39.9436 12.4399 39.8949 12.5741 39.8346 12.7175C39.8168 12.7597 39.7989 12.8007 39.7813 12.8398C38.5103 13.7113 35.9788 14.9393 33.7095 15.4811C30.9875 16.131 27.6413 16.5217 24 16.5217C20.3587 16.5217 17.0125 16.131 14.2905 15.4811C12.0012 14.9346 9.44505 13.6897 8.18538 12.8168C8.17384 12.7925 8.16216 12.767 8.15052 12.7408C8.09919 12.6249 8.05721 12.5114 8.02977 12.411C8.00356 12.3152 8.00039 12.2667 8.00004 12.2612C8.00004 12.261 8 12.2607 8.00004 12.2612C8.00004 12.2359 8.0104 11.9233 8.68485 11.3686C9.34546 10.8254 10.4222 10.2469 11.9291 9.72276C14.9242 8.68098 19.1919 8 24 8C28.8081 8 33.0758 8.68098 36.0709 9.72276C37.5778 10.2469 38.6545 10.8254 39.3151 11.3686C39.9006 11.8501 39.9857 12.1489 39.998 12.236ZM4.95178 15.2312L21.4543 41.6973C22.6288 43.5809 25.3712 43.5809 26.5457 41.6973L43.0534 15.223C43.0709 15.1948 43.0878 15.1662 43.104 15.1371L41.3563 14.1648C43.104 15.1371 43.1038 15.1374 43.104 15.1371L43.1051 15.135L43.1065 15.1325L43.1101 15.1261L43.1199 15.1082C43.1276 15.094 43.1377 15.0754 43.1497 15.0527C43.1738 15.0075 43.2062 14.9455 43.244 14.8701C43.319 14.7208 43.4196 14.511 43.5217 14.2683C43.6901 13.8679 44 13.0689 44 12.2609C44 10.5573 43.003 9.22254 41.8558 8.2791C40.6947 7.32427 39.1354 6.55361 37.385 5.94477C33.8654 4.72057 29.133 4 24 4C18.867 4 14.1346 4.72057 10.615 5.94478C8.86463 6.55361 7.30529 7.32428 6.14419 8.27911C4.99695 9.22255 3.99999 10.5573 3.99999 12.2609C3.99999 13.1275 4.29264 13.9078 4.49321 14.3607C4.60375 14.6102 4.71348 14.8196 4.79687 14.9689C4.83898 15.0444 4.87547 15.1065 4.9035 15.1529C4.91754 15.1762 4.92954 15.1957 4.93916 15.2111L4.94662 15.223L4.95178 15.2312ZM35.9868 18.996L24 38.22L12.0131 18.996C12.4661 19.1391 12.9179 19.2658 13.3617 19.3718C16.4281 20.1039 20.0901 20.5217 24 20.5217C27.9099 20.5217 31.5719 20.1039 34.6383 19.3718C35.082 19.2658 35.5339 19.1391 35.9868 18.996Z"
+                fill="currentColor"
+                fill-rule="evenodd"
+              ></path>
+            </svg>
+          </div>
+          <h2
+            class="text-xl font-bold tracking-tight text-slate-900 dark:text-white"
+          >
+            ParkPoint
+          </h2>
+        </div>
+        <nav class="hidden items-center gap-8 md:flex">
+          <a class="text-primary text-sm font-semibold" href="#"
+            >Find Parking</a
+          >
+          <a
+            class="hover:text-primary text-sm font-medium text-slate-600 transition-colors dark:text-slate-400"
+            href="#"
+            >Monthly</a
+          >
+          <a
+            class="hover:text-primary text-sm font-medium text-slate-600 transition-colors dark:text-slate-400"
+            href="#"
+            >Business</a
+          >
+          <a
+            class="hover:text-primary text-sm font-medium text-slate-600 transition-colors dark:text-slate-400"
+            href="#"
+            >Help</a
+          >
+        </nav>
+        <div class="flex items-center gap-3">
+          <button
+            class="flex items-center justify-center rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+          >
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <div class="mx-1 h-8 w-px bg-slate-200 dark:bg-slate-700"></div>
+          <div class="flex items-center gap-3 pl-1">
+            <div class="hidden text-right sm:block">
+              <p class="text-sm leading-none font-semibold">Alex Johnson</p>
+              <p class="mt-1 text-xs text-slate-500">Pro Member</p>
+            </div>
+            <div
+              class="border-primary/20 size-9 overflow-hidden rounded-full border-2 bg-slate-200"
+            >
+              <img
+                class="h-full w-full object-cover"
+                data-alt="User profile avatar of Alex Johnson"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIs9R3OqBi8sf2bVUqSQBilRaNgzcXqYG6YzvI3YDUaoJkyMS7nHOX6tm443wjH_yLAc5DJL6KZ1_DrOXNTFaEj-pJS3rAOFjwXy5lIl3cgk5PYnfeBGpEJuh0WF1faRg_xHiOjQCb32UabAomrA5ErHK10X6ZduiQCaKVslqET1ixMPNw35DvzaJRFHYjiLpGLTEqpd_Yv6WhI1s3AwmPBFEa7rw0fumfoZIVCfpXVOWOeRFXZxF668pU-Rm6aB5r1LABZ0t14cBD"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- Main Content Area -->
+    <main class="flex flex-1 overflow-hidden">
+      <!-- Left Pane: Search & Results -->
+      <section
+        class="dark:bg-background-dark relative z-10 flex h-full w-full flex-col border-r border-slate-200 bg-white md:w-[500px] xl:w-[600px] dark:border-slate-800"
+      >
+        <!-- Filters Bar -->
+        <div
+          class="space-y-4 border-b border-slate-100 p-4 shadow-sm dark:border-slate-800"
+        >
+          <!-- Search Input -->
+          <div class="relative">
+            <span
+              class="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+              >search</span
+            >
+            <input
+              class="focus:ring-primary/50 w-full rounded-lg border-none bg-slate-50 py-2.5 pr-4 pl-10 text-sm transition-all focus:ring-2 dark:bg-slate-900"
+              placeholder="Search by address, city, or landmark"
+              type="text"
+              value="Downtown San Francisco, CA"
+            />
+          </div>
+          <!-- Filters Row -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              class="flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
+            >
+              Price
+              <span class="material-symbols-outlined text-[16px]"
+                >expand_more</span
+              >
+            </button>
+            <button
+              class="flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
+            >
+              Distance
+              <span class="material-symbols-outlined text-[16px]"
+                >expand_more</span
+              >
+            </button>
+            <div class="mx-1 h-4 w-px bg-slate-200 dark:bg-slate-700"></div>
+            <!-- EV Toggle -->
+            <label class="ml-1 inline-flex cursor-pointer items-center gap-2">
+              <div class="relative">
+                <input class="peer sr-only" type="checkbox" />
+                <div
+                  class="peer peer-checked:bg-primary h-4 w-8 rounded-full bg-slate-200 peer-focus:outline-none after:absolute after:start-[2px] after:top-[2px] after:h-3 after:w-3 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-slate-700"
+                ></div>
+              </div>
+              <span
+                class="text-xs font-semibold text-slate-600 dark:text-slate-400"
+                >EV Charging</span
+              >
+            </label>
+            <button
+              class="text-primary ml-auto text-xs font-bold hover:underline"
+            >
+              Clear all
+            </button>
+          </div>
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">
+              128 parking spots found
+            </h3>
+            <div class="flex items-center gap-1 text-xs text-slate-500">
+              <span>Sort by:</span>
+              <span
+                class="flex cursor-pointer items-center font-bold text-slate-900 dark:text-white"
+                >Recommended
+                <span class="material-symbols-outlined text-[14px]"
+                  >expand_more</span
+                ></span
+              >
+            </div>
+          </div>
+        </div>
+        <!-- Scrollable Results List -->
+        <div
+          class="custom-scrollbar bg-background-light flex-1 space-y-4 overflow-y-auto p-4 dark:bg-slate-950"
+        >
+          <!-- Result Card 1 -->
+          <div
+            class="group dark:bg-background-dark hover:border-primary relative cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all dark:border-slate-800"
+          >
+            <div class="flex gap-4">
+              <div
+                class="relative size-24 flex-shrink-0 overflow-hidden rounded-lg bg-slate-100"
+              >
+                <img
+                  class="h-full w-full object-cover"
+                  data-alt="Exterior view of a modern underground parking garage entrance"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3aHPDGJnJuezl9Yl2ubYlrgFMp6pa4PAGYrZsBdOQXCbtyI0oW9Aa7zTflDC4r1ny8kFygmUQRhjYK39MT2FFRlSI_l4nJydNtO_7Q9PNlii5jEloqwL3HWerTxCRxWpdUxkRI7wXWO8-nu7zT2IMFDJA4tGla4P-yh7Emi4Q2EsIoyU3iJObA-imfb2PX7vmOZMH6l9hrCFRaiOQ8AHfeRcTD11hdRRqDc8tL7AQ6PJGVLBUzvtREbTSWXxYulRU8YKuofE1ZWVS"
+                />
+                <div
+                  class="bg-primary absolute top-1 left-1 rounded px-1.5 py-0.5 text-[10px] font-bold text-white uppercase"
+                >
+                  Fast Entry
+                </div>
+              </div>
+              <div class="flex flex-1 flex-col justify-between">
+                <div>
+                  <div class="flex items-start justify-between">
+                    <h4 class="text-base leading-tight font-bold">
+                      Central Plaza Garage
+                    </h4>
+                    <span
+                      class="material-symbols-outlined group-hover:text-primary text-slate-300"
+                      >bookmark</span
+                    >
+                  </div>
+                  <p
+                    class="mt-1 flex items-center gap-1 text-xs text-slate-500"
+                  >
+                    <span class="material-symbols-outlined text-[14px]"
+                      >location_on</span
+                    >
+                    123 North Main St • 0.4 miles
+                  </p>
+                  <div class="mt-2 flex items-center gap-1">
+                    <span class="flex items-center text-amber-500">
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                      <span class="material-symbols-outlined text-[16px]"
+                        >star_half</span
+                      >
+                    </span>
+                    <span class="text-[11px] font-bold text-slate-500"
+                      >(120)</span
+                    >
+                  </div>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                  <div class="flex flex-col">
+                    <span
+                      class="text-lg font-extrabold text-slate-900 dark:text-white"
+                      >$5.00<span class="text-xs font-normal text-slate-500">
+                        / hr</span
+                      ></span
+                    >
+                  </div>
+                  <button
+                    class="bg-primary hover:bg-primary/90 shadow-primary/20 rounded-lg px-5 py-1.5 text-sm font-bold text-white shadow-md transition-all"
+                  >
+                    Book
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Result Card 2 -->
+          <div
+            class="group dark:bg-background-dark hover:border-primary cursor-pointer rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all dark:border-slate-800"
+          >
+            <div class="flex gap-4">
+              <div
+                class="relative size-24 flex-shrink-0 overflow-hidden rounded-lg bg-slate-100"
+              >
+                <img
+                  class="h-full w-full object-cover"
+                  data-alt="Well lit indoor parking structure with green lane indicators"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqvvAiTnemeswLUUqXItXpb3LHZ0L1Fa-KuboSZRADcorLdBuY4atq3gTyn7y2gUthHzgw5Ao48jGE5xyjuc5TsRPUIBQdrEHozrVel6UMMPC94d7i6nL1DS7-4VoykSVoYSBJV7RyhFNrYNa0TcAiha_9zWsit87iI7-T9MJqF1FWxbIAuQkc2ErJ4I4hiyRcvDXfHG463FmzMeYkTEwUIpQzwO83HVUMKWzujTFigdHKIzH9Vwt6sito4n7APiRnKhXSIhMn-4vk"
+                />
+                <div
+                  class="absolute top-1 left-1 rounded bg-green-500 px-1.5 py-0.5 text-[10px] font-bold text-white uppercase"
+                >
+                  EV Ready
+                </div>
+              </div>
+              <div class="flex flex-1 flex-col justify-between">
+                <div>
+                  <div class="flex items-start justify-between">
+                    <h4 class="text-base leading-tight font-bold">
+                      Financial District Deck
+                    </h4>
+                    <span
+                      class="material-symbols-outlined group-hover:text-primary text-slate-300"
+                      >bookmark</span
+                    >
+                  </div>
+                  <p
+                    class="mt-1 flex items-center gap-1 text-xs text-slate-500"
+                  >
+                    <span class="material-symbols-outlined text-[14px]"
+                      >location_on</span
+                    >
+                    450 Sansome St • 0.6 miles
+                  </p>
+                  <div class="mt-2 flex items-center gap-1">
+                    <span class="flex items-center text-amber-500">
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                    </span>
+                    <span class="text-[11px] font-bold text-slate-500"
+                      >(85)</span
+                    >
+                  </div>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                  <div class="flex flex-col">
+                    <span
+                      class="text-lg font-extrabold text-slate-900 dark:text-white"
+                      >$7.50<span class="text-xs font-normal text-slate-500">
+                        / hr</span
+                      ></span
+                    >
+                  </div>
+                  <button
+                    class="bg-primary hover:bg-primary/90 shadow-primary/20 rounded-lg px-5 py-1.5 text-sm font-bold text-white shadow-md transition-all"
+                  >
+                    Book
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Result Card 3 -->
+          <div
+            class="group dark:bg-background-dark hover:border-primary cursor-pointer rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all dark:border-slate-800"
+          >
+            <div class="flex gap-4">
+              <div
+                class="relative size-24 flex-shrink-0 overflow-hidden rounded-lg bg-slate-100"
+              >
+                <img
+                  class="h-full w-full object-cover"
+                  data-alt="Rooftop parking lot with city skyline in background"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlTbPD_6evKXuDtOqCTWOIKqBIrivKtRK8ZNIrAihvdBGNwdRFCpSaojhGrWlC1mZdJDk01T9XCTscn2Urt0JwPlDlYMWNxapLGEqOn7sXnXaSZJ1KSFRF0nF2QnI68LFgFZA8jGrA62gv1uNWjQqPY7naNnPwgdA_iQzEQtNfv3ppiD4qsm3I_KldLGP6IQzAG64rlWRrsIy4RDNx28yVSbfe-RGu2KmjJJIcjV9BerhqYv1awfw5ZKgDH-i1-U0JMTZSSE9s1JqS"
+                />
+              </div>
+              <div class="flex flex-1 flex-col justify-between">
+                <div>
+                  <div class="flex items-start justify-between">
+                    <h4 class="text-base leading-tight font-bold">
+                      Union Square Valet
+                    </h4>
+                    <span
+                      class="material-symbols-outlined group-hover:text-primary text-slate-300"
+                      >bookmark</span
+                    >
+                  </div>
+                  <p
+                    class="mt-1 flex items-center gap-1 text-xs text-slate-500"
+                  >
+                    <span class="material-symbols-outlined text-[14px]"
+                      >location_on</span
+                    >
+                    333 Post St • 0.9 miles
+                  </p>
+                  <div class="mt-2 flex items-center gap-1">
+                    <span class="flex items-center text-amber-500">
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                      <span
+                        class="material-symbols-outlined fill-current text-[16px]"
+                        >star</span
+                      >
+                      <span class="material-symbols-outlined text-[16px]"
+                        >star</span
+                      >
+                    </span>
+                    <span class="text-[11px] font-bold text-slate-500"
+                      >(214)</span
+                    >
+                  </div>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                  <div class="flex flex-col">
+                    <span
+                      class="text-lg font-extrabold text-slate-900 dark:text-white"
+                      >$12.00<span class="text-xs font-normal text-slate-500">
+                        / hr</span
+                      ></span
+                    >
+                  </div>
+                  <button
+                    class="bg-primary hover:bg-primary/90 shadow-primary/20 rounded-lg px-5 py-1.5 text-sm font-bold text-white shadow-md transition-all"
+                  >
+                    Book
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Pagination -->
+          <nav class="flex items-center justify-center gap-2 py-6">
+            <button
+              class="flex size-9 items-center justify-center rounded-lg border border-slate-200 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <button
+              class="bg-primary flex size-9 items-center justify-center rounded-lg text-sm font-bold text-white"
+            >
+              1
+            </button>
+            <button
+              class="flex size-9 items-center justify-center rounded-lg border border-transparent text-sm font-semibold hover:border-slate-200 dark:hover:border-slate-800"
+            >
+              2
+            </button>
+            <button
+              class="flex size-9 items-center justify-center rounded-lg border border-transparent text-sm font-semibold hover:border-slate-200 dark:hover:border-slate-800"
+            >
+              3
+            </button>
+            <span class="px-1 text-slate-400">...</span>
+            <button
+              class="flex size-9 items-center justify-center rounded-lg border border-transparent text-sm font-semibold hover:border-slate-200 dark:hover:border-slate-800"
+            >
+              12
+            </button>
+            <button
+              class="flex size-9 items-center justify-center rounded-lg border border-slate-200 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </nav>
+        </div>
+      </section>
+      <!-- Right Pane: Interactive Map -->
+      <section
+        class="relative hidden h-full flex-1 overflow-hidden bg-slate-200 md:block"
+      >
+        <!-- Map Placeholder / Background -->
+        <div
+          class="absolute inset-0 grayscale-[0.2]"
+          data-location="San Francisco"
+          style="
+            background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuA49Ubx9XnpW0Dq4iInSiP2lvxKxG5duZd7hp1-0dDOkGKLphMo4NTbDphB6tmnU9wRY_dbqyIX6zWhGkLYnN07-wlVtgqNm08mFlaSEsD_P8pIzPh_9qx2aizBpdkdBCW536MJOeBURuvrXWWbxg8hAIdtIXKtYaHpeS2hD7lNC9d0RCo0fp3CYa0uYJpi34rappvyOvPLaP0gUtpNX0jYXLEkpKLLGiM8aC0gEqp8jBXKB-7ivel6PwwgUYwjf_1WwMky4YK2ms45&quot;);
+            background-size: cover;
+          "
+        >
+          <!-- Simulated Map UI -->
+          <div
+            class="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/light-v10/static/-122.4194,37.7749,12,0/1200x1200?access_token=none')] bg-cover opacity-80"
+            data-alt="Clean minimal street map of downtown San Francisco area"
+          ></div>
+          <!-- Custom Map Markers -->
+          <div
+            class="group absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+          >
+            <div
+              class="dark:bg-background-dark border-primary flex items-center gap-1 rounded-full border-2 bg-white px-2 py-1 shadow-lg transition-transform group-hover:scale-110"
+            >
+              <span class="text-xs font-black text-slate-900 dark:text-white"
+                >$5</span
+              >
+            </div>
+            <div class="bg-primary mx-auto h-2 w-0.5"></div>
+          </div>
+          <div
+            class="group absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+          >
+            <div
+              class="bg-primary flex items-center gap-1 rounded-full border-2 border-white px-2 py-1 text-white shadow-lg transition-transform group-hover:scale-110"
+            >
+              <span class="text-xs font-black">$7.5</span>
+            </div>
+            <div class="bg-primary mx-auto h-2 w-0.5"></div>
+          </div>
+          <div
+            class="group absolute top-1/4 right-1/4 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+          >
+            <div
+              class="dark:bg-background-dark border-primary flex items-center gap-1 rounded-full border-2 bg-white px-2 py-1 shadow-lg transition-transform group-hover:scale-110"
+            >
+              <span class="text-xs font-black text-slate-900 dark:text-white"
+                >$12</span
+              >
+            </div>
+            <div class="bg-primary mx-auto h-2 w-0.5"></div>
+          </div>
+          <!-- Map Controls -->
+          <div class="absolute top-6 right-6 flex flex-col gap-2">
+            <div
+              class="dark:bg-background-dark flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl dark:border-slate-800"
+            >
+              <button
+                class="border-b border-slate-100 p-3 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
+              >
+                <span
+                  class="material-symbols-outlined text-slate-600 dark:text-slate-400"
+                  >add</span
+                >
+              </button>
+              <button
+                class="p-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+              >
+                <span
+                  class="material-symbols-outlined text-slate-600 dark:text-slate-400"
+                  >remove</span
+                >
+              </button>
+            </div>
+            <button
+              class="dark:bg-background-dark rounded-lg border border-slate-200 bg-white p-3 shadow-xl transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
+            >
+              <span
+                class="material-symbols-outlined text-slate-600 dark:text-slate-400"
+                >my_location</span
+              >
+            </button>
+            <button
+              class="dark:bg-background-dark rounded-lg border border-slate-200 bg-white p-3 shadow-xl transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
+            >
+              <span
+                class="material-symbols-outlined text-slate-600 dark:text-slate-400"
+                >layers</span
+              >
+            </button>
+          </div>
+          <!-- Map Overlay Info -->
+          <div
+            class="pointer-events-none absolute right-6 bottom-6 left-6 flex justify-center"
+          >
+            <div
+              class="dark:bg-background-dark/90 pointer-events-auto flex items-center gap-4 rounded-full border border-slate-200/50 bg-white/90 px-4 py-2 shadow-2xl backdrop-blur-md dark:border-slate-800/50"
+            >
+              <p class="text-xs font-medium text-slate-600 dark:text-slate-400">
+                Move map to update results
+              </p>
+              <div class="h-4 w-px bg-slate-300 dark:bg-slate-700"></div>
+              <button
+                class="text-primary hover:text-primary/80 text-xs font-bold tracking-widest uppercase transition-colors"
+              >
+                Search this area
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- Mobile Navigation Bar -->
+    <div
+      class="dark:bg-background-dark sticky bottom-0 z-50 flex w-full items-center justify-between border-t border-slate-200 bg-white px-6 py-2 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] md:hidden dark:border-slate-800"
+    >
+      <button class="text-primary flex flex-col items-center gap-0.5">
+        <span class="material-symbols-outlined">explore</span>
+        <span class="text-[10px] font-bold">Explore</span>
+      </button>
+      <button class="flex flex-col items-center gap-0.5 text-slate-400">
+        <span class="material-symbols-outlined">map</span>
+        <span class="text-[10px] font-bold">Map</span>
+      </button>
+      <button class="flex flex-col items-center gap-0.5 text-slate-400">
+        <span class="material-symbols-outlined">bookmark</span>
+        <span class="text-[10px] font-bold">Saved</span>
+      </button>
+      <button class="flex flex-col items-center gap-0.5 text-slate-400">
+        <span class="material-symbols-outlined">person</span>
+        <span class="text-[10px] font-bold">Profile</span>
+      </button>
+    </div>
+  </body>
+</html>

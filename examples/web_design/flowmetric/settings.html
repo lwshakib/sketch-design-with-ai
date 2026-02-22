@@ -1,217 +1,342 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Account Settings - FlowMetric</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#3c83f6",
-                        "background-light": "#f5f7f8",
-                        "background-dark": "#101722",
-                    },
-                    fontFamily: {
-                        "display": ["Inter"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "lg": "1rem",
-                        "xl": "1.5rem",
-                        "full": "9999px"
-                    },
-                },
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Account Settings - FlowMetric</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3c83f6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101722",
             },
-        }
+            fontFamily: {
+              display: ["Inter"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "1rem",
+              xl: "1.5rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
     </script>
-<style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .sidebar-item-active {
-            background-color: rgba(60, 131, 246, 0.1);
-            color: #3c83f6;
-            border-right: 3px solid #3c83f6;
-        }
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .sidebar-item-active {
+        background-color: rgba(60, 131, 246, 0.1);
+        color: #3c83f6;
+        border-right: 3px solid #3c83f6;
+      }
     </style>
-</head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
-<!-- Top Navigation Bar -->
-<nav class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="flex justify-between h-16 items-center">
-<div class="flex items-center gap-2">
-<div class="bg-primary p-1.5 rounded-lg text-white">
-<span class="material-icons text-xl">insights</span>
-</div>
-<span class="text-xl font-bold tracking-tight">FlowMetric</span>
-</div>
-<div class="flex items-center gap-4">
-<button class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
-<span class="material-icons">notifications</span>
-</button>
-<div class="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold overflow-hidden">
-<img alt="User Profile" class="w-full h-full object-cover" data-alt="Portrait of a smiling professional man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-n3M3Tg0WBYtZLN0hn2QZMLjo1_sWpAHz30Bgx7R8FDUjFb_HdiQt-nZSf8zftShiZA-K7Cjuj9VFQNwLuWSs7HxUvZjvgEVLvzHay4AC-ErasKjBcyC6BbDLHf613wEab8GbJwC3Jma2TmvBAtOKA0NlyUNcB5zV1ndxIe0QdLGnxexOmlXmt5jfEW6kem4f9kTLB46iuu-l0FE_gMuKCtOn6WQqX-_HWSotsCZEz5Prnp28hQKP1W_zJk4r45nOln18h7ncjb4"/>
-</div>
-</div>
-</div>
-</div>
-</nav>
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-<!-- Breadcrumbs -->
-<nav class="flex mb-8 text-sm font-medium text-slate-500 dark:text-slate-400">
-<a class="hover:text-primary" href="#">Home</a>
-<span class="mx-2 text-slate-300 dark:text-slate-700">/</span>
-<span class="text-slate-900 dark:text-slate-100">Account Settings</span>
-</nav>
-<div class="flex flex-col lg:flex-row gap-8">
-<!-- Sidebar Navigation -->
-<aside class="w-full lg:w-64 flex-shrink-0">
-<nav class="flex flex-col gap-1 bg-white dark:bg-slate-900 p-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-<a class="sidebar-item-active flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors" href="#">
-<span class="material-icons text-lg">person</span>
-                        Profile
-                    </a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
-<span class="material-icons text-lg">settings</span>
-                        Preferences
-                    </a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
-<span class="material-icons text-lg">notifications</span>
-                        Notifications
-                    </a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
-<span class="material-icons text-lg">security</span>
-                        Security
-                    </a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
-<span class="material-icons text-lg">payments</span>
-                        Billing
-                    </a>
-</nav>
-</aside>
-<!-- Main Content Area -->
-<main class="flex-grow">
-<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-<div class="p-6 md:p-8">
-<header class="mb-8">
-<h1 class="text-2xl font-bold text-slate-900 dark:text-white">Profile Information</h1>
-<p class="text-slate-500 dark:text-slate-400 mt-1">Manage your public profile and account-wide preferences.</p>
-</header>
-<!-- Profile Section -->
-<section class="space-y-6">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div class="space-y-2">
-<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Full Name</label>
-<input class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary focus:border-primary transition-all" type="text" value="Alex Thompson"/>
-</div>
-<div class="space-y-2">
-<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Email Address</label>
-<input class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary focus:border-primary transition-all" type="email" value="alex.t@flowmetric.io"/>
-</div>
-<div class="space-y-2 md:col-span-2">
-<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Job Title</label>
-<input class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary focus:border-primary transition-all" type="text" value="Senior Product Designer"/>
-</div>
-</div>
-<!-- Theme Toggle -->
-<div class="pt-6 border-t border-slate-100 dark:border-slate-800">
-<h3 class="text-lg font-semibold mb-4">Appearance</h3>
-<div class="flex items-center gap-4">
-<div class="flex-1 max-w-sm flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
-<button class="flex-1 flex items-center justify-center gap-2 py-2 px-4 bg-white dark:bg-slate-700 rounded-lg shadow-sm text-sm font-medium">
-<span class="material-icons text-lg">light_mode</span>
-                                            Light
-                                        </button>
-<button class="flex-1 flex items-center justify-center gap-2 py-2 px-4 text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-slate-700">
-<span class="material-icons text-lg">dark_mode</span>
-                                            Dark
-                                        </button>
-</div>
-<p class="text-xs text-slate-500 dark:text-slate-400">Personalize how FlowMetric looks for you.</p>
-</div>
-</div>
-<!-- Integrations -->
-<div class="pt-6 border-t border-slate-100 dark:border-slate-800">
-<h3 class="text-lg font-semibold mb-4">Integrations</h3>
-<div class="grid grid-cols-1 gap-4">
-<!-- Slack Integration -->
-<div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-<div class="flex items-center gap-4">
-<div class="h-10 w-10 flex items-center justify-center bg-purple-100 text-purple-600 rounded-lg">
-<span class="material-icons">chat_bubble</span>
-</div>
-<div>
-<h4 class="font-semibold">Slack</h4>
-<p class="text-xs text-slate-500">Sync activity notifications directly to your channels.</p>
-</div>
-</div>
-<button class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary">
-<span class="inline-block h-4 w-4 translate-x-6 transform rounded-full bg-white transition"></span>
-</button>
-</div>
-<!-- Calendar Integration -->
-<div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-<div class="flex items-center gap-4">
-<div class="h-10 w-10 flex items-center justify-center bg-blue-100 text-blue-600 rounded-lg">
-<span class="material-icons">calendar_today</span>
-</div>
-<div>
-<h4 class="font-semibold">Google Calendar</h4>
-<p class="text-xs text-slate-500">Automatically sync deadlines and meetings.</p>
-</div>
-</div>
-<button class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary">
-<span class="inline-block h-4 w-4 translate-x-6 transform rounded-full bg-white transition"></span>
-</button>
-</div>
-<!-- Notion Integration -->
-<div class="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-<div class="flex items-center gap-4">
-<div class="h-10 w-10 flex items-center justify-center bg-slate-100 text-slate-800 rounded-lg">
-<span class="material-icons">description</span>
-</div>
-<div>
-<h4 class="font-semibold">Notion</h4>
-<p class="text-xs text-slate-500">Export reports and metrics to your Notion workspace.</p>
-</div>
-</div>
-<button class="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200 dark:bg-slate-700">
-<span class="inline-block h-4 w-4 translate-x-1 transform rounded-full bg-white transition"></span>
-</button>
-</div>
-</div>
-</div>
-</section>
-</div>
-<!-- Sticky Footer Actions -->
-<div class="bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 p-6 flex justify-between items-center">
-<button class="text-sm font-medium text-red-500 hover:text-red-600">
-                            Deactivate Account
-                        </button>
-<div class="flex gap-3">
-<button class="px-6 py-2 rounded-lg border border-slate-300 dark:border-slate-600 font-medium text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 transition-colors">
-                                Cancel
-                            </button>
-<button class="px-6 py-2 rounded-lg bg-primary hover:bg-primary/90 text-white font-medium shadow-sm transition-all">
-                                Save Changes
-                            </button>
-</div>
-</div>
-</div>
-<!-- Toast Notification Simulator -->
-<div class="mt-6 flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-<span class="material-icons text-emerald-500">check_circle</span>
-<p class="text-sm text-emerald-800 dark:text-emerald-400">All changes have been successfully saved.</p>
-</div>
-</main>
-</div>
-</div>
-</body></html>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark font-display min-h-screen text-slate-900 dark:text-slate-100"
+  >
+    <!-- Top Navigation Bar -->
+    <nav
+      class="sticky top-0 z-50 border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+    >
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="bg-primary rounded-lg p-1.5 text-white">
+              <span class="material-icons text-xl">insights</span>
+            </div>
+            <span class="text-xl font-bold tracking-tight">FlowMetric</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <button
+              class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+            >
+              <span class="material-icons">notifications</span>
+            </button>
+            <div
+              class="bg-primary/20 text-primary flex h-8 w-8 items-center justify-center overflow-hidden rounded-full font-bold"
+            >
+              <img
+                alt="User Profile"
+                class="h-full w-full object-cover"
+                data-alt="Portrait of a smiling professional man"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-n3M3Tg0WBYtZLN0hn2QZMLjo1_sWpAHz30Bgx7R8FDUjFb_HdiQt-nZSf8zftShiZA-K7Cjuj9VFQNwLuWSs7HxUvZjvgEVLvzHay4AC-ErasKjBcyC6BbDLHf613wEab8GbJwC3Jma2TmvBAtOKA0NlyUNcB5zV1ndxIe0QdLGnxexOmlXmt5jfEW6kem4f9kTLB46iuu-l0FE_gMuKCtOn6WQqX-_HWSotsCZEz5Prnp28hQKP1W_zJk4r45nOln18h7ncjb4"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <!-- Breadcrumbs -->
+      <nav
+        class="mb-8 flex text-sm font-medium text-slate-500 dark:text-slate-400"
+      >
+        <a class="hover:text-primary" href="#">Home</a>
+        <span class="mx-2 text-slate-300 dark:text-slate-700">/</span>
+        <span class="text-slate-900 dark:text-slate-100">Account Settings</span>
+      </nav>
+      <div class="flex flex-col gap-8 lg:flex-row">
+        <!-- Sidebar Navigation -->
+        <aside class="w-full flex-shrink-0 lg:w-64">
+          <nav
+            class="flex flex-col gap-1 rounded-xl border border-slate-200 bg-white p-2 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          >
+            <a
+              class="sidebar-item-active flex items-center gap-3 rounded-lg px-4 py-3 font-medium transition-colors"
+              href="#"
+            >
+              <span class="material-icons text-lg">person</span>
+              Profile
+            </a>
+            <a
+              class="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
+              href="#"
+            >
+              <span class="material-icons text-lg">settings</span>
+              Preferences
+            </a>
+            <a
+              class="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
+              href="#"
+            >
+              <span class="material-icons text-lg">notifications</span>
+              Notifications
+            </a>
+            <a
+              class="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
+              href="#"
+            >
+              <span class="material-icons text-lg">security</span>
+              Security
+            </a>
+            <a
+              class="flex items-center gap-3 rounded-lg px-4 py-3 font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
+              href="#"
+            >
+              <span class="material-icons text-lg">payments</span>
+              Billing
+            </a>
+          </nav>
+        </aside>
+        <!-- Main Content Area -->
+        <main class="flex-grow">
+          <div
+            class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div class="p-6 md:p-8">
+              <header class="mb-8">
+                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">
+                  Profile Information
+                </h1>
+                <p class="mt-1 text-slate-500 dark:text-slate-400">
+                  Manage your public profile and account-wide preferences.
+                </p>
+              </header>
+              <!-- Profile Section -->
+              <section class="space-y-6">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div class="space-y-2">
+                    <label
+                      class="text-sm font-semibold text-slate-700 dark:text-slate-300"
+                      >Full Name</label
+                    >
+                    <input
+                      class="focus:ring-primary focus:border-primary w-full rounded-lg border border-slate-200 bg-white px-4 py-2 transition-all focus:ring-2 dark:border-slate-700 dark:bg-slate-800"
+                      type="text"
+                      value="Alex Thompson"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label
+                      class="text-sm font-semibold text-slate-700 dark:text-slate-300"
+                      >Email Address</label
+                    >
+                    <input
+                      class="focus:ring-primary focus:border-primary w-full rounded-lg border border-slate-200 bg-white px-4 py-2 transition-all focus:ring-2 dark:border-slate-700 dark:bg-slate-800"
+                      type="email"
+                      value="alex.t@flowmetric.io"
+                    />
+                  </div>
+                  <div class="space-y-2 md:col-span-2">
+                    <label
+                      class="text-sm font-semibold text-slate-700 dark:text-slate-300"
+                      >Job Title</label
+                    >
+                    <input
+                      class="focus:ring-primary focus:border-primary w-full rounded-lg border border-slate-200 bg-white px-4 py-2 transition-all focus:ring-2 dark:border-slate-700 dark:bg-slate-800"
+                      type="text"
+                      value="Senior Product Designer"
+                    />
+                  </div>
+                </div>
+                <!-- Theme Toggle -->
+                <div
+                  class="border-t border-slate-100 pt-6 dark:border-slate-800"
+                >
+                  <h3 class="mb-4 text-lg font-semibold">Appearance</h3>
+                  <div class="flex items-center gap-4">
+                    <div
+                      class="flex max-w-sm flex-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-800"
+                    >
+                      <button
+                        class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium shadow-sm dark:bg-slate-700"
+                      >
+                        <span class="material-icons text-lg">light_mode</span>
+                        Light
+                      </button>
+                      <button
+                        class="flex flex-1 items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                      >
+                        <span class="material-icons text-lg">dark_mode</span>
+                        Dark
+                      </button>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                      Personalize how FlowMetric looks for you.
+                    </p>
+                  </div>
+                </div>
+                <!-- Integrations -->
+                <div
+                  class="border-t border-slate-100 pt-6 dark:border-slate-800"
+                >
+                  <h3 class="mb-4 text-lg font-semibold">Integrations</h3>
+                  <div class="grid grid-cols-1 gap-4">
+                    <!-- Slack Integration -->
+                    <div
+                      class="flex items-center justify-between rounded-xl border border-slate-200 p-4 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+                    >
+                      <div class="flex items-center gap-4">
+                        <div
+                          class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 text-purple-600"
+                        >
+                          <span class="material-icons">chat_bubble</span>
+                        </div>
+                        <div>
+                          <h4 class="font-semibold">Slack</h4>
+                          <p class="text-xs text-slate-500">
+                            Sync activity notifications directly to your
+                            channels.
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        class="bg-primary relative inline-flex h-6 w-11 items-center rounded-full"
+                      >
+                        <span
+                          class="inline-block h-4 w-4 translate-x-6 transform rounded-full bg-white transition"
+                        ></span>
+                      </button>
+                    </div>
+                    <!-- Calendar Integration -->
+                    <div
+                      class="flex items-center justify-between rounded-xl border border-slate-200 p-4 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+                    >
+                      <div class="flex items-center gap-4">
+                        <div
+                          class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600"
+                        >
+                          <span class="material-icons">calendar_today</span>
+                        </div>
+                        <div>
+                          <h4 class="font-semibold">Google Calendar</h4>
+                          <p class="text-xs text-slate-500">
+                            Automatically sync deadlines and meetings.
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        class="bg-primary relative inline-flex h-6 w-11 items-center rounded-full"
+                      >
+                        <span
+                          class="inline-block h-4 w-4 translate-x-6 transform rounded-full bg-white transition"
+                        ></span>
+                      </button>
+                    </div>
+                    <!-- Notion Integration -->
+                    <div
+                      class="flex items-center justify-between rounded-xl border border-slate-200 p-4 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+                    >
+                      <div class="flex items-center gap-4">
+                        <div
+                          class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-800"
+                        >
+                          <span class="material-icons">description</span>
+                        </div>
+                        <div>
+                          <h4 class="font-semibold">Notion</h4>
+                          <p class="text-xs text-slate-500">
+                            Export reports and metrics to your Notion workspace.
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        class="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200 dark:bg-slate-700"
+                      >
+                        <span
+                          class="inline-block h-4 w-4 translate-x-1 transform rounded-full bg-white transition"
+                        ></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+            <!-- Sticky Footer Actions -->
+            <div
+              class="flex items-center justify-between border-t border-slate-200 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-800/50"
+            >
+              <button
+                class="text-sm font-medium text-red-500 hover:text-red-600"
+              >
+                Deactivate Account
+              </button>
+              <div class="flex gap-3">
+                <button
+                  class="rounded-lg border border-slate-300 px-6 py-2 font-medium text-slate-700 transition-colors hover:bg-white dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  class="bg-primary hover:bg-primary/90 rounded-lg px-6 py-2 font-medium text-white shadow-sm transition-all"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Toast Notification Simulator -->
+          <div
+            class="mt-6 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20"
+          >
+            <span class="material-icons text-emerald-500">check_circle</span>
+            <p class="text-sm text-emerald-800 dark:text-emerald-400">
+              All changes have been successfully saved.
+            </p>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

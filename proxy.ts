@@ -49,7 +49,9 @@ export default async function proxy(request: NextRequest) {
   const isLoggedIn = !!session;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-  const isPublicRoute = publicRoutes.some(route => nextUrl.pathname.startsWith(route));
+  const isPublicRoute = publicRoutes.some((route) =>
+    nextUrl.pathname.startsWith(route),
+  );
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
   // 1. Allow all API auth routes

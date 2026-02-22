@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 export async function GET(req: Request) {
   try {
     const session = await auth.api.getSession({
-      headers: await headers()
+      headers: await headers(),
     });
 
     if (!session) {
@@ -24,8 +24,12 @@ export async function GET(req: Request) {
 
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { screens: { some: { content: { contains: search, mode: 'insensitive' } } } }
+        { title: { contains: search, mode: "insensitive" } },
+        {
+          screens: {
+            some: { content: { contains: search, mode: "insensitive" } },
+          },
+        },
       ];
     }
 
@@ -40,28 +44,28 @@ export async function GET(req: Request) {
         screens: {
           take: 1,
           orderBy: {
-            createdAt: "asc"
+            createdAt: "asc",
           },
           select: {
             id: true,
             type: true,
             content: true,
-          }
-        }
+          },
+        },
       },
       take: limit,
       skip: skip,
       orderBy: {
         updatedAt: "desc",
-      }
+      },
     });
 
     // Transform to include firstScreenType for easier consumption
-    const transformedProjects = projects.map(p => ({
+    const transformedProjects = projects.map((p) => ({
       ...p,
       firstScreenType: p.screens?.[0]?.type || null,
       firstScreenContent: p.screens?.[0]?.content || null,
-      screens: undefined
+      screens: undefined,
     }));
 
     return NextResponse.json(transformedProjects);
@@ -74,7 +78,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const session = await auth.api.getSession({
-      headers: await headers()
+      headers: await headers(),
     });
 
     if (!session) {
@@ -92,7 +96,7 @@ export async function POST(req: Request) {
       data: {
         title,
         userId: session.user.id,
-      }
+      },
     });
 
     return NextResponse.json(project);

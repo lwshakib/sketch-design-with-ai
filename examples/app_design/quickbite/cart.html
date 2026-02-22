@@ -1,163 +1,255 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>QuickBite - Cart</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#e77e23",
-                        "background-light": "#f8f7f6",
-                        "background-dark": "#211811",
-                    },
-                    fontFamily: {
-                        "display": ["Plus Jakarta Sans"]
-                    },
-                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
-                },
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>QuickBite - Cart</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#e77e23",
+              "background-light": "#f8f7f6",
+              "background-dark": "#211811",
             },
-        }
+            fontFamily: {
+              display: ["Plus Jakarta Sans"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "1rem",
+              xl: "1.5rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
     </script>
-<style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .material-symbols-outlined.fill {
-            font-variation-settings: 'FILL' 1;
-        }
+    <style>
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .material-symbols-outlined.fill {
+        font-variation-settings: "FILL" 1;
+      }
     </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
   </head>
-<body class="bg-background-light dark:bg-background-dark text-[#181411] dark:text-white min-h-screen flex flex-col">
-<!-- Header -->
-<header class="sticky top-0 z-20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-4 border-b border-primary/10">
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-3">
-<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-[#2d221a] shadow-sm cursor-pointer" onclick="history.back()">
-<span class="material-symbols-outlined text-[#181411] dark:text-white">arrow_back</span>
-</button>
-<h1 class="text-xl font-bold tracking-tight">Your Cart</h1>
-</div>
-<button class="text-primary font-semibold text-sm hover:opacity-80 transition-opacity">Clear All</button>
-</div>
-</header>
-<main class="flex-1 px-4 py-6 space-y-6 overflow-y-auto pb-40">
-<!-- Cart Items List -->
-<div class="space-y-4">
-<!-- Item 1 -->
-<div class="flex items-center gap-4 bg-white dark:bg-[#2d221a] p-3 rounded-xl shadow-sm border border-primary/5">
-<div class="w-20 h-20 rounded-lg bg-cover bg-center shrink-0" data-alt="A juicy spicy zinger burger with lettuce" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCnS8ULMArTjwaVZG2iVSmr59k88V1jV_OEaqEh0cLSNxi7-l4SO5r4cfsAHVQDJD3es2nXiB8zSC63X0Bw10iUVEjL1n3dxdfGRjl7whB4JE5rzMBYKjYNoyfK-TTvGuguXI7coKCWpNj03naDkzmumyIzJXA_DKoiaagPQKmZSjVQkwtHaEWFIcMlqdiBg8yq6VUziy6xLhsn8l1HjujK32lFblmO2b2-NoQf8p9WctIDfxFp95REEDQBqKKQQxfZtkQ7I7enlU4')"></div>
-<div class="flex-1 min-w-0">
-<h3 class="font-bold text-base truncate">Spicy Zinger Burger</h3>
-<p class="text-primary font-bold mt-1">$8.50</p>
-<div class="flex items-center gap-2 mt-2">
-<button class="w-7 h-7 flex items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors">
-<span class="material-symbols-outlined text-sm">remove</span>
-</button>
-<span class="text-sm font-bold w-4 text-center">1</span>
-<button class="w-7 h-7 flex items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors">
-<span class="material-symbols-outlined text-sm">add</span>
-</button>
-</div>
-</div>
-<button class="text-[#887463] p-1">
-<span class="material-symbols-outlined">delete</span>
-</button>
-</div>
-<!-- Item 2 -->
-<div class="flex items-center gap-4 bg-white dark:bg-[#2d221a] p-3 rounded-xl shadow-sm border border-primary/5">
-<div class="w-20 h-20 rounded-lg bg-cover bg-center shrink-0" data-alt="Golden peri-peri fries in a bowl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAkAvlHk9GkDwMvuDUO-3f4rOgEXgl_Z5fkiocjlx17W_82hSOWfMn1XCa-8ryBDijsyjTAkqudwY6kqE-Tn0KL8RW3oFhJcLAx1q1TOqEu3ZOqscvByCKkxAzN9QTkacIAD_cM9ke_GPCBfr2umfbtv1QJNSc9G_PyV-poFceJj9z7-qASwOF4KIWx9W0ZrLnYjiDtOPQCGlfxK3VaDK7NqrhXX6CW09DvMysc7epXXfg0t7OgvPEl09Hv8Vvy8RMZJlXZMXZ7juc')"></div>
-<div class="flex-1 min-w-0">
-<h3 class="font-bold text-base truncate">Peri-Peri Fries</h3>
-<p class="text-primary font-bold mt-1">$4.00</p>
-<div class="flex items-center gap-2 mt-2">
-<button class="w-7 h-7 flex items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors">
-<span class="material-symbols-outlined text-sm">remove</span>
-</button>
-<span class="text-sm font-bold w-4 text-center">2</span>
-<button class="w-7 h-7 flex items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors">
-<span class="material-symbols-outlined text-sm">add</span>
-</button>
-</div>
-</div>
-<button class="text-[#887463] p-1">
-<span class="material-symbols-outlined">delete</span>
-</button>
-</div>
-</div>
-<!-- Coupon Section -->
-<div class="space-y-3">
-<h2 class="text-lg font-bold">Promo Code</h2>
-<div class="flex gap-2">
-<div class="relative flex-1">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#887463]">sell</span>
-<input class="w-full pl-10 pr-4 py-3 bg-white dark:bg-[#2d221a] border border-[#e5e0dc] dark:border-[#3d322a] rounded-xl focus:ring-primary focus:border-primary placeholder:text-[#887463] text-sm" placeholder="Enter coupon code" type="text"/>
-</div>
-<button class="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all">Apply</button>
-</div>
-</div>
-<!-- Order Summary -->
-<div class="bg-white dark:bg-[#2d221a] p-4 rounded-xl shadow-sm border border-primary/5 space-y-3">
-<div class="flex justify-between text-sm">
-<span class="text-[#887463]">Subtotal</span>
-<span class="font-semibold">$16.50</span>
-</div>
-<div class="flex justify-between text-sm">
-<span class="text-[#887463]">Delivery Fee</span>
-<span class="font-semibold">$2.00</span>
-</div>
-<div class="flex justify-between text-sm">
-<span class="text-[#887463]">Tax (5%)</span>
-<span class="font-semibold">$0.83</span>
-</div>
-<div class="pt-3 border-t border-dashed border-[#e5e0dc] dark:border-[#3d322a] flex justify-between items-center">
-<span class="text-base font-bold">Total</span>
-<span class="text-xl font-bold text-primary">$19.33</span>
-</div>
-</div>
-</main>
-<!-- Bottom Actions & Navigation -->
-<div class="fixed bottom-0 left-0 right-0 z-30">
-<!-- Sticky Checkout CTA -->
-<div class="px-4 py-4 bg-background-light dark:bg-background-dark border-t border-primary/5">
-<button class="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-primary/20 hover:scale-[0.98] transition-transform flex items-center justify-center gap-2 cursor-pointer" onclick="window.location.href='checkout.html'">
-<span>Checkout</span>
-<span class="material-symbols-outlined">arrow_forward</span>
-</button>
-</div>
-<!-- Bottom Navigation Bar -->
-<nav class="bg-white dark:bg-[#211811] border-t border-[#f4f2f0] dark:border-[#3d322a] px-4 py-3 flex justify-between items-center">
-<a class="flex flex-col items-center gap-1 text-[#887463] dark:text-[#a08e7e]" href="dashboard.html">
-<span class="material-symbols-outlined">home</span>
-<span class="text-[10px] font-medium">Home</span>
-</a>
-<a class="flex flex-col items-center gap-1 text-[#887463] dark:text-[#a08e7e]" href="search.html">
-<span class="material-symbols-outlined">search</span>
-<span class="text-[10px] font-medium">Search</span>
-</a>
-<a class="flex flex-col items-center gap-1 text-primary" href="cart.html">
-<span class="material-symbols-outlined fill">shopping_cart</span>
-<span class="text-[10px] font-bold">Cart</span>
-</a>
-<a class="flex flex-col items-center gap-1 text-[#887463] dark:text-[#a08e7e]" href="profile.html">
-<span class="material-symbols-outlined">person</span>
-<span class="text-[10px] font-medium">Profile</span>
-</a>
-</nav>
-</div>
-</body></html>
+  <body
+    class="bg-background-light dark:bg-background-dark flex min-h-screen flex-col text-[#181411] dark:text-white"
+  >
+    <!-- Header -->
+    <header
+      class="bg-background-light/80 dark:bg-background-dark/80 border-primary/10 sticky top-0 z-20 border-b px-4 py-4 backdrop-blur-md"
+    >
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button
+            class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white shadow-sm dark:bg-[#2d221a]"
+            onclick="history.back()"
+          >
+            <span
+              class="material-symbols-outlined text-[#181411] dark:text-white"
+              >arrow_back</span
+            >
+          </button>
+          <h1 class="text-xl font-bold tracking-tight">Your Cart</h1>
+        </div>
+        <button
+          class="text-primary text-sm font-semibold transition-opacity hover:opacity-80"
+        >
+          Clear All
+        </button>
+      </div>
+    </header>
+    <main class="flex-1 space-y-6 overflow-y-auto px-4 py-6 pb-40">
+      <!-- Cart Items List -->
+      <div class="space-y-4">
+        <!-- Item 1 -->
+        <div
+          class="border-primary/5 flex items-center gap-4 rounded-xl border bg-white p-3 shadow-sm dark:bg-[#2d221a]"
+        >
+          <div
+            class="h-20 w-20 shrink-0 rounded-lg bg-cover bg-center"
+            data-alt="A juicy spicy zinger burger with lettuce"
+            style="
+              background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuCnS8ULMArTjwaVZG2iVSmr59k88V1jV_OEaqEh0cLSNxi7-l4SO5r4cfsAHVQDJD3es2nXiB8zSC63X0Bw10iUVEjL1n3dxdfGRjl7whB4JE5rzMBYKjYNoyfK-TTvGuguXI7coKCWpNj03naDkzmumyIzJXA_DKoiaagPQKmZSjVQkwtHaEWFIcMlqdiBg8yq6VUziy6xLhsn8l1HjujK32lFblmO2b2-NoQf8p9WctIDfxFp95REEDQBqKKQQxfZtkQ7I7enlU4&quot;);
+            "
+          ></div>
+          <div class="min-w-0 flex-1">
+            <h3 class="truncate text-base font-bold">Spicy Zinger Burger</h3>
+            <p class="text-primary mt-1 font-bold">$8.50</p>
+            <div class="mt-2 flex items-center gap-2">
+              <button
+                class="bg-primary/10 text-primary hover:bg-primary flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:text-white"
+              >
+                <span class="material-symbols-outlined text-sm">remove</span>
+              </button>
+              <span class="w-4 text-center text-sm font-bold">1</span>
+              <button
+                class="bg-primary/10 text-primary hover:bg-primary flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:text-white"
+              >
+                <span class="material-symbols-outlined text-sm">add</span>
+              </button>
+            </div>
+          </div>
+          <button class="p-1 text-[#887463]">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
+        <!-- Item 2 -->
+        <div
+          class="border-primary/5 flex items-center gap-4 rounded-xl border bg-white p-3 shadow-sm dark:bg-[#2d221a]"
+        >
+          <div
+            class="h-20 w-20 shrink-0 rounded-lg bg-cover bg-center"
+            data-alt="Golden peri-peri fries in a bowl"
+            style="
+              background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuAkAvlHk9GkDwMvuDUO-3f4rOgEXgl_Z5fkiocjlx17W_82hSOWfMn1XCa-8ryBDijsyjTAkqudwY6kqE-Tn0KL8RW3oFhJcLAx1q1TOqEu3ZOqscvByCKkxAzN9QTkacIAD_cM9ke_GPCBfr2umfbtv1QJNSc9G_PyV-poFceJj9z7-qASwOF4KIWx9W0ZrLnYjiDtOPQCGlfxK3VaDK7NqrhXX6CW09DvMysc7epXXfg0t7OgvPEl09Hv8Vvy8RMZJlXZMXZ7juc&quot;);
+            "
+          ></div>
+          <div class="min-w-0 flex-1">
+            <h3 class="truncate text-base font-bold">Peri-Peri Fries</h3>
+            <p class="text-primary mt-1 font-bold">$4.00</p>
+            <div class="mt-2 flex items-center gap-2">
+              <button
+                class="bg-primary/10 text-primary hover:bg-primary flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:text-white"
+              >
+                <span class="material-symbols-outlined text-sm">remove</span>
+              </button>
+              <span class="w-4 text-center text-sm font-bold">2</span>
+              <button
+                class="bg-primary/10 text-primary hover:bg-primary flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:text-white"
+              >
+                <span class="material-symbols-outlined text-sm">add</span>
+              </button>
+            </div>
+          </div>
+          <button class="p-1 text-[#887463]">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
+      </div>
+      <!-- Coupon Section -->
+      <div class="space-y-3">
+        <h2 class="text-lg font-bold">Promo Code</h2>
+        <div class="flex gap-2">
+          <div class="relative flex-1">
+            <span
+              class="material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-[#887463]"
+              >sell</span
+            >
+            <input
+              class="focus:ring-primary focus:border-primary w-full rounded-xl border border-[#e5e0dc] bg-white py-3 pr-4 pl-10 text-sm placeholder:text-[#887463] dark:border-[#3d322a] dark:bg-[#2d221a]"
+              placeholder="Enter coupon code"
+              type="text"
+            />
+          </div>
+          <button
+            class="bg-primary hover:bg-opacity-90 rounded-xl px-6 py-3 font-bold text-white transition-all"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+      <!-- Order Summary -->
+      <div
+        class="border-primary/5 space-y-3 rounded-xl border bg-white p-4 shadow-sm dark:bg-[#2d221a]"
+      >
+        <div class="flex justify-between text-sm">
+          <span class="text-[#887463]">Subtotal</span>
+          <span class="font-semibold">$16.50</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-[#887463]">Delivery Fee</span>
+          <span class="font-semibold">$2.00</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-[#887463]">Tax (5%)</span>
+          <span class="font-semibold">$0.83</span>
+        </div>
+        <div
+          class="flex items-center justify-between border-t border-dashed border-[#e5e0dc] pt-3 dark:border-[#3d322a]"
+        >
+          <span class="text-base font-bold">Total</span>
+          <span class="text-primary text-xl font-bold">$19.33</span>
+        </div>
+      </div>
+    </main>
+    <!-- Bottom Actions & Navigation -->
+    <div class="fixed right-0 bottom-0 left-0 z-30">
+      <!-- Sticky Checkout CTA -->
+      <div
+        class="bg-background-light dark:bg-background-dark border-primary/5 border-t px-4 py-4"
+      >
+        <button
+          class="bg-primary shadow-primary/20 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl py-4 text-lg font-bold text-white shadow-lg transition-transform hover:scale-[0.98]"
+          onclick="window.location.href = 'checkout.html'"
+        >
+          <span>Checkout</span>
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </div>
+      <!-- Bottom Navigation Bar -->
+      <nav
+        class="flex items-center justify-between border-t border-[#f4f2f0] bg-white px-4 py-3 dark:border-[#3d322a] dark:bg-[#211811]"
+      >
+        <a
+          class="flex flex-col items-center gap-1 text-[#887463] dark:text-[#a08e7e]"
+          href="dashboard.html"
+        >
+          <span class="material-symbols-outlined">home</span>
+          <span class="text-[10px] font-medium">Home</span>
+        </a>
+        <a
+          class="flex flex-col items-center gap-1 text-[#887463] dark:text-[#a08e7e]"
+          href="search.html"
+        >
+          <span class="material-symbols-outlined">search</span>
+          <span class="text-[10px] font-medium">Search</span>
+        </a>
+        <a
+          class="text-primary flex flex-col items-center gap-1"
+          href="cart.html"
+        >
+          <span class="material-symbols-outlined fill">shopping_cart</span>
+          <span class="text-[10px] font-bold">Cart</span>
+        </a>
+        <a
+          class="flex flex-col items-center gap-1 text-[#887463] dark:text-[#a08e7e]"
+          href="profile.html"
+        >
+          <span class="material-symbols-outlined">person</span>
+          <span class="text-[10px] font-medium">Profile</span>
+        </a>
+      </nav>
+    </div>
+  </body>
+</html>

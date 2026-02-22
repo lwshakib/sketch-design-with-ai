@@ -40,7 +40,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set) => ({
   updateWorkspace: (id, updates) =>
     set((state) => ({
       workspaces: state.workspaces.map((w) =>
-        w.id === id ? { ...w, ...updates } : w
+        w.id === id ? { ...w, ...updates } : w,
       ),
     })),
   deleteWorkspace: (id) =>

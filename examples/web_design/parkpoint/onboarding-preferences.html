@@ -1,198 +1,321 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Onboarding Step 3: Preferences - ParkPoint</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#3caff6",
-                        "background-light": "#f5f7f8",
-                        "background-dark": "#101b22",
-                    },
-                    fontFamily: {
-                        "display": ["Inter"]
-                    },
-                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
-                },
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Onboarding Step 3: Preferences - ParkPoint</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3caff6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101b22",
             },
-        }
+            fontFamily: {
+              display: ["Inter"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
     </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        input[type="range"] {
-            -webkit-appearance: none;
-            appearance: none;
-            background: transparent;
-            cursor: pointer;
-        }
-        input[type="range"]::-webkit-slider-runnable-track {
-            background: #e2e8f0;
-            height: 0.5rem;
-            border-radius: 0.5rem;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            margin-top: -4px;
-            background-color: #3caff6;
-            height: 1rem;
-            width: 1rem;
-            border-radius: 50%;
-        }
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+        cursor: pointer;
+      }
+      input[type="range"]::-webkit-slider-runnable-track {
+        background: #e2e8f0;
+        height: 0.5rem;
+        border-radius: 0.5rem;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        margin-top: -4px;
+        background-color: #3caff6;
+        height: 1rem;
+        width: 1rem;
+        border-radius: 50%;
+      }
     </style>
-</head>
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
-<!-- Top Navigation Bar -->
-<header class="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
-<div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-<div class="flex items-center gap-2">
-<div class="bg-primary p-1.5 rounded-lg text-white flex items-center justify-center">
-<span class="material-symbols-outlined text-xl">local_parking</span>
-</div>
-<h2 class="text-lg font-bold tracking-tight">ParkPoint</h2>
-</div>
-<div class="flex items-center gap-4">
-<button class="text-sm font-medium text-slate-500 hover:text-primary transition-colors">Exit Setup</button>
-<div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border border-slate-200 dark:border-slate-800">
-<img alt="Avatar" class="w-full h-full object-cover" data-alt="User profile avatar placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKom1E6KugOJgEzCmpKnBDk0FXyv8Bp5gjvizY-tfhg3EHdMRra7smUxb32T1AwX2nTx2FCSmDLqd-VVyF6LAlw_RM1XJd1krD0HogF5XSuklKBdcb2nfJBWSTvOg8jc5jMGcB5rtZOz8Nt6h_0xtoqotTNTkKcjbWJFIlCl0bW8xGbYQXVH-i3dnEkmqEshIOXlBoTYGiCxccCJmBGqPUY1nOQi49PBPmXqCJeLGCxVKKKh7OdT-18Hl8jIM-oWBh3VyK4QWt8s3D"/>
-</div>
-</div>
-</div>
-</header>
-<main class="max-w-[1440px] mx-auto flex flex-col items-center justify-center py-12 px-4">
-<!-- Centered Card Layout -->
-<div class="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-<!-- Progress Section -->
-<div class="p-8 pb-4">
-<div class="flex justify-between items-end mb-2">
-<div>
-<span class="text-primary text-xs font-bold uppercase tracking-wider">Step 3 of 4</span>
-<h1 class="text-2xl font-bold mt-1">Tell us what you're looking for</h1>
-</div>
-<span class="text-sm font-semibold text-slate-500">75% Complete</span>
-</div>
-<div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-<div class="bg-primary h-full rounded-full" style="width: 75%;"></div>
-</div>
-<p class="text-slate-500 dark:text-slate-400 text-sm mt-4">Personalize your search results by selecting your specific parking needs and preferences.</p>
-</div>
-<hr class="border-slate-100 dark:border-slate-800"/>
-<!-- Preferences Form Area -->
-<div class="p-8 space-y-8">
-<!-- Parking Type Section -->
-<section>
-<label class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 block">Parking Type</label>
-<div class="flex flex-wrap gap-3">
-<button class="flex items-center gap-2 px-6 py-2.5 rounded-lg border-2 border-primary bg-primary/10 text-primary font-semibold transition-all">
-<span class="material-symbols-outlined text-lg">garage</span>
-                            Covered
-                        </button>
-<button class="flex items-center gap-2 px-6 py-2.5 rounded-lg border-2 border-slate-200 dark:border-slate-700 hover:border-primary/50 text-slate-600 dark:text-slate-400 font-medium transition-all">
-<span class="material-symbols-outlined text-lg">wb_sunny</span>
-                            Open
-                        </button>
-</div>
-</section>
-<!-- Infrastructure & EV Section -->
-<section class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-primary/20 text-primary flex items-center justify-center">
-<span class="material-symbols-outlined">ev_station</span>
-</div>
-<div>
-<p class="font-semibold text-slate-800 dark:text-slate-200">EV Charging Available</p>
-<p class="text-xs text-slate-500">Show only spots with charging stations</p>
-</div>
-</div>
-<label class="relative inline-flex items-center cursor-pointer">
-<input checked="" class="sr-only peer" type="checkbox" value=""/>
-<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
-</label>
-</section>
-<!-- Sliders Section -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-<!-- Price Range -->
-<section>
-<div class="flex justify-between items-center mb-3">
-<label class="text-sm font-bold text-slate-700 dark:text-slate-300">Daily Price Range</label>
-<span class="text-sm font-bold text-primary">$0 - $45</span>
-</div>
-<input class="w-full h-2 rounded-lg cursor-pointer accent-primary" max="100" min="0" type="range" value="45"/>
-<div class="flex justify-between mt-2">
-<span class="text-[10px] text-slate-400 font-medium">$0</span>
-<span class="text-[10px] text-slate-400 font-medium">$100+</span>
-</div>
-</section>
-<!-- Distance Radius -->
-<section>
-<div class="flex justify-between items-center mb-3">
-<label class="text-sm font-bold text-slate-700 dark:text-slate-300">Distance Radius</label>
-<span class="text-sm font-bold text-primary">Within 3 miles</span>
-</div>
-<input class="w-full h-2 rounded-lg cursor-pointer accent-primary" max="20" min="1" type="range" value="3"/>
-<div class="flex justify-between mt-2">
-<span class="text-[10px] text-slate-400 font-medium">1 mi</span>
-<span class="text-[10px] text-slate-400 font-medium">20 mi</span>
-</div>
-</section>
-</div>
-<!-- Amenities Multi-select -->
-<section>
-<label class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4 block">Included Amenities</label>
-<div class="flex flex-wrap gap-2">
-<button class="px-4 py-2 rounded-full border border-primary bg-primary text-white text-sm font-medium flex items-center gap-2">
-<span class="material-symbols-outlined text-base">check</span>
-                            24/7 Access
-                        </button>
-<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 text-sm font-medium hover:border-primary/50 transition-colors">
-                            Security Guard
-                        </button>
-<button class="px-4 py-2 rounded-full border border-primary bg-primary text-white text-sm font-medium flex items-center gap-2">
-<span class="material-symbols-outlined text-base">check</span>
-                            CCTV Camera
-                        </button>
-<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 text-sm font-medium hover:border-primary/50 transition-colors">
-                            Valet Parking
-                        </button>
-<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 text-sm font-medium hover:border-primary/50 transition-colors">
-                            Handicap Accessible
-                        </button>
-<button class="px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 text-sm font-medium hover:border-primary/50 transition-colors">
-                            Car Wash
-                        </button>
-<button class="px-4 py-2 rounded-full border border-primary bg-primary text-white text-sm font-medium flex items-center gap-2">
-<span class="material-symbols-outlined text-base">check</span>
-                            In/Out Privileges
-                        </button>
-</div>
-</section>
-</div>
-<!-- Footer Actions -->
-<div class="p-8 pt-0 bg-slate-50/50 dark:bg-slate-800/30 flex justify-between items-center gap-4 mt-4">
-<button class="flex items-center gap-2 px-6 py-3 text-slate-500 font-bold hover:text-slate-800 transition-colors">
-<span class="material-symbols-outlined">arrow_back</span>
-                    Back
-                </button>
-<button class="flex-1 md:flex-none md:min-w-[200px] bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
-                    Save Preferences
-                    <span class="material-symbols-outlined">arrow_forward</span>
-</button>
-</div>
-</div>
-<!-- Help/Context Text -->
-<p class="mt-8 text-slate-400 text-xs text-center max-w-sm">
-            You can always update these preferences later in your account settings. We use this data to filter the most relevant parking options for you.
-        </p>
-</main>
-</body></html>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark font-display min-h-screen text-slate-900 dark:text-slate-100"
+  >
+    <!-- Top Navigation Bar -->
+    <header
+      class="sticky top-0 z-50 w-full border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+    >
+      <div
+        class="mx-auto flex h-16 max-w-5xl items-center justify-between px-4"
+      >
+        <div class="flex items-center gap-2">
+          <div
+            class="bg-primary flex items-center justify-center rounded-lg p-1.5 text-white"
+          >
+            <span class="material-symbols-outlined text-xl">local_parking</span>
+          </div>
+          <h2 class="text-lg font-bold tracking-tight">ParkPoint</h2>
+        </div>
+        <div class="flex items-center gap-4">
+          <button
+            class="hover:text-primary text-sm font-medium text-slate-500 transition-colors"
+          >
+            Exit Setup
+          </button>
+          <div
+            class="h-8 w-8 overflow-hidden rounded-full border border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-700"
+          >
+            <img
+              alt="Avatar"
+              class="h-full w-full object-cover"
+              data-alt="User profile avatar placeholder"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKom1E6KugOJgEzCmpKnBDk0FXyv8Bp5gjvizY-tfhg3EHdMRra7smUxb32T1AwX2nTx2FCSmDLqd-VVyF6LAlw_RM1XJd1krD0HogF5XSuklKBdcb2nfJBWSTvOg8jc5jMGcB5rtZOz8Nt6h_0xtoqotTNTkKcjbWJFIlCl0bW8xGbYQXVH-i3dnEkmqEshIOXlBoTYGiCxccCJmBGqPUY1nOQi49PBPmXqCJeLGCxVKKKh7OdT-18Hl8jIM-oWBh3VyK4QWt8s3D"
+            />
+          </div>
+        </div>
+      </div>
+    </header>
+    <main
+      class="mx-auto flex max-w-[1440px] flex-col items-center justify-center px-4 py-12"
+    >
+      <!-- Centered Card Layout -->
+      <div
+        class="w-full max-w-2xl overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
+      >
+        <!-- Progress Section -->
+        <div class="p-8 pb-4">
+          <div class="mb-2 flex items-end justify-between">
+            <div>
+              <span
+                class="text-primary text-xs font-bold tracking-wider uppercase"
+                >Step 3 of 4</span
+              >
+              <h1 class="mt-1 text-2xl font-bold">
+                Tell us what you're looking for
+              </h1>
+            </div>
+            <span class="text-sm font-semibold text-slate-500"
+              >75% Complete</span
+            >
+          </div>
+          <div
+            class="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+          >
+            <div
+              class="bg-primary h-full rounded-full"
+              style="width: 75%"
+            ></div>
+          </div>
+          <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">
+            Personalize your search results by selecting your specific parking
+            needs and preferences.
+          </p>
+        </div>
+        <hr class="border-slate-100 dark:border-slate-800" />
+        <!-- Preferences Form Area -->
+        <div class="space-y-8 p-8">
+          <!-- Parking Type Section -->
+          <section>
+            <label
+              class="mb-3 block text-sm font-bold text-slate-700 dark:text-slate-300"
+              >Parking Type</label
+            >
+            <div class="flex flex-wrap gap-3">
+              <button
+                class="border-primary bg-primary/10 text-primary flex items-center gap-2 rounded-lg border-2 px-6 py-2.5 font-semibold transition-all"
+              >
+                <span class="material-symbols-outlined text-lg">garage</span>
+                Covered
+              </button>
+              <button
+                class="hover:border-primary/50 flex items-center gap-2 rounded-lg border-2 border-slate-200 px-6 py-2.5 font-medium text-slate-600 transition-all dark:border-slate-700 dark:text-slate-400"
+              >
+                <span class="material-symbols-outlined text-lg">wb_sunny</span>
+                Open
+              </button>
+            </div>
+          </section>
+          <!-- Infrastructure & EV Section -->
+          <section
+            class="flex items-center justify-between rounded-lg bg-slate-50 p-4 dark:bg-slate-800/50"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="bg-primary/20 text-primary flex h-10 w-10 items-center justify-center rounded-full"
+              >
+                <span class="material-symbols-outlined">ev_station</span>
+              </div>
+              <div>
+                <p class="font-semibold text-slate-800 dark:text-slate-200">
+                  EV Charging Available
+                </p>
+                <p class="text-xs text-slate-500">
+                  Show only spots with charging stations
+                </p>
+              </div>
+            </div>
+            <label class="relative inline-flex cursor-pointer items-center">
+              <input checked="" class="peer sr-only" type="checkbox" value="" />
+              <div
+                class="peer peer-checked:bg-primary h-6 w-11 rounded-full bg-slate-200 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:border-gray-600 dark:bg-slate-700"
+              ></div>
+            </label>
+          </section>
+          <!-- Sliders Section -->
+          <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+            <!-- Price Range -->
+            <section>
+              <div class="mb-3 flex items-center justify-between">
+                <label
+                  class="text-sm font-bold text-slate-700 dark:text-slate-300"
+                  >Daily Price Range</label
+                >
+                <span class="text-primary text-sm font-bold">$0 - $45</span>
+              </div>
+              <input
+                class="accent-primary h-2 w-full cursor-pointer rounded-lg"
+                max="100"
+                min="0"
+                type="range"
+                value="45"
+              />
+              <div class="mt-2 flex justify-between">
+                <span class="text-[10px] font-medium text-slate-400">$0</span>
+                <span class="text-[10px] font-medium text-slate-400"
+                  >$100+</span
+                >
+              </div>
+            </section>
+            <!-- Distance Radius -->
+            <section>
+              <div class="mb-3 flex items-center justify-between">
+                <label
+                  class="text-sm font-bold text-slate-700 dark:text-slate-300"
+                  >Distance Radius</label
+                >
+                <span class="text-primary text-sm font-bold"
+                  >Within 3 miles</span
+                >
+              </div>
+              <input
+                class="accent-primary h-2 w-full cursor-pointer rounded-lg"
+                max="20"
+                min="1"
+                type="range"
+                value="3"
+              />
+              <div class="mt-2 flex justify-between">
+                <span class="text-[10px] font-medium text-slate-400">1 mi</span>
+                <span class="text-[10px] font-medium text-slate-400"
+                  >20 mi</span
+                >
+              </div>
+            </section>
+          </div>
+          <!-- Amenities Multi-select -->
+          <section>
+            <label
+              class="mb-4 block text-sm font-bold text-slate-700 dark:text-slate-300"
+              >Included Amenities</label
+            >
+            <div class="flex flex-wrap gap-2">
+              <button
+                class="border-primary bg-primary flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium text-white"
+              >
+                <span class="material-symbols-outlined text-base">check</span>
+                24/7 Access
+              </button>
+              <button
+                class="hover:border-primary/50 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition-colors dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400"
+              >
+                Security Guard
+              </button>
+              <button
+                class="border-primary bg-primary flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium text-white"
+              >
+                <span class="material-symbols-outlined text-base">check</span>
+                CCTV Camera
+              </button>
+              <button
+                class="hover:border-primary/50 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition-colors dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400"
+              >
+                Valet Parking
+              </button>
+              <button
+                class="hover:border-primary/50 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition-colors dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400"
+              >
+                Handicap Accessible
+              </button>
+              <button
+                class="hover:border-primary/50 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition-colors dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400"
+              >
+                Car Wash
+              </button>
+              <button
+                class="border-primary bg-primary flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium text-white"
+              >
+                <span class="material-symbols-outlined text-base">check</span>
+                In/Out Privileges
+              </button>
+            </div>
+          </section>
+        </div>
+        <!-- Footer Actions -->
+        <div
+          class="mt-4 flex items-center justify-between gap-4 bg-slate-50/50 p-8 pt-0 dark:bg-slate-800/30"
+        >
+          <button
+            class="flex items-center gap-2 px-6 py-3 font-bold text-slate-500 transition-colors hover:text-slate-800"
+          >
+            <span class="material-symbols-outlined">arrow_back</span>
+            Back
+          </button>
+          <button
+            class="bg-primary hover:bg-primary/90 shadow-primary/20 flex flex-1 items-center justify-center gap-2 rounded-lg px-8 py-3 font-bold text-white shadow-lg transition-all md:min-w-[200px] md:flex-none"
+          >
+            Save Preferences
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+      <!-- Help/Context Text -->
+      <p class="mt-8 max-w-sm text-center text-xs text-slate-400">
+        You can always update these preferences later in your account settings.
+        We use this data to filter the most relevant parking options for you.
+      </p>
+    </main>
+  </body>
+</html>

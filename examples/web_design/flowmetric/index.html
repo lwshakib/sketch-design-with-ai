@@ -1,346 +1,645 @@
-<!DOCTYPE html>
-<html class="scroll-smooth" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>FlowMetric | Master Your Focus, Measure Your Flow</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              colors: {
-                "primary": "#3c83f6",
-                "background-light": "#f5f7f8",
-                "background-dark": "#101722",
-              },
-              fontFamily: {
-                "display": ["Inter"]
-              },
-              borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+<!doctype html>
+<html class="scroll-smooth" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>FlowMetric | Master Your Focus, Measure Your Flow</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3c83f6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101722",
+            },
+            fontFamily: {
+              display: ["Inter"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "1rem",
+              xl: "1.5rem",
+              full: "9999px",
             },
           },
-        }
+        },
+      };
     </script>
-</head>
-<body class="font-display bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 antialiased">
-<!-- Sticky Navbar -->
-<nav class="sticky top-0 z-50 w-full bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="flex justify-between items-center h-16">
-<div class="flex items-center gap-2">
-<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-<span class="material-icons text-white text-lg">insights</span>
-</div>
-<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">FlowMetric</span>
-</div>
-<div class="hidden md:flex items-center space-x-8">
-<a class="text-sm font-medium hover:text-primary transition-colors" href="#features">Features</a>
-<a class="text-sm font-medium hover:text-primary transition-colors" href="#workflow">Workflow</a>
-<a class="text-sm font-medium hover:text-primary transition-colors" href="#pricing">Pricing</a>
-<a class="text-sm font-medium hover:text-primary transition-colors" href="#faq">FAQ</a>
-</div>
-<div>
-<button class="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm">
-                        Get Started
-                    </button>
-</div>
-</div>
-</div>
-</nav>
-<!-- Hero Section -->
-<section class="relative pt-20 pb-16 lg:pt-32 lg:pb-24 overflow-hidden">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mb-6">
-<span class="relative flex h-2 w-2">
-<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-</span>
-                New: Team Energy Sync
+  </head>
+  <body
+    class="font-display bg-background-light dark:bg-background-dark text-slate-800 antialiased dark:text-slate-200"
+  >
+    <!-- Sticky Navbar -->
+    <nav
+      class="bg-background-light/80 dark:bg-background-dark/80 border-primary/10 sticky top-0 z-50 w-full border-b backdrop-blur-md"
+    >
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div
+              class="bg-primary flex h-8 w-8 items-center justify-center rounded-lg"
+            >
+              <span class="material-icons text-lg text-white">insights</span>
             </div>
-<h1 class="text-5xl lg:text-7xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">
-                Master Your Focus, <br/>
-<span class="text-primary">Measure Your Flow</span>
-</h1>
-<p class="max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-400 mb-10 leading-relaxed">
-                The data-driven platform designed to optimize your deep work sessions and synchronize your team's energy patterns for peak performance.
+            <span
+              class="text-xl font-bold tracking-tight text-slate-900 dark:text-white"
+              >FlowMetric</span
+            >
+          </div>
+          <div class="hidden items-center space-x-8 md:flex">
+            <a
+              class="hover:text-primary text-sm font-medium transition-colors"
+              href="#features"
+              >Features</a
+            >
+            <a
+              class="hover:text-primary text-sm font-medium transition-colors"
+              href="#workflow"
+              >Workflow</a
+            >
+            <a
+              class="hover:text-primary text-sm font-medium transition-colors"
+              href="#pricing"
+              >Pricing</a
+            >
+            <a
+              class="hover:text-primary text-sm font-medium transition-colors"
+              href="#faq"
+              >FAQ</a
+            >
+          </div>
+          <div>
+            <button
+              class="bg-primary hover:bg-primary/90 rounded-lg px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all"
+            >
+              Get Started
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden pt-20 pb-16 lg:pt-32 lg:pb-24">
+      <div class="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+        <div
+          class="bg-primary/10 text-primary mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold tracking-wider uppercase"
+        >
+          <span class="relative flex h-2 w-2">
+            <span
+              class="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+            ></span>
+            <span
+              class="bg-primary relative inline-flex h-2 w-2 rounded-full"
+            ></span>
+          </span>
+          New: Team Energy Sync
+        </div>
+        <h1
+          class="mb-6 text-5xl font-bold tracking-tight text-slate-900 lg:text-7xl dark:text-white"
+        >
+          Master Your Focus, <br />
+          <span class="text-primary">Measure Your Flow</span>
+        </h1>
+        <p
+          class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-slate-600 dark:text-slate-400"
+        >
+          The data-driven platform designed to optimize your deep work sessions
+          and synchronize your team's energy patterns for peak performance.
+        </p>
+        <div
+          class="mb-16 flex flex-col items-center justify-center gap-4 sm:flex-row"
+        >
+          <button
+            class="bg-primary hover:shadow-primary/30 w-full rounded-xl px-8 py-4 text-lg font-bold text-white transition-all hover:shadow-lg sm:w-auto"
+          >
+            Start Free Trial
+          </button>
+          <button
+            class="w-full rounded-xl border border-slate-200 bg-white px-8 py-4 text-lg font-bold transition-all hover:bg-slate-50 sm:w-auto dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+          >
+            Watch Demo
+          </button>
+        </div>
+        <!-- Dashboard Mockup -->
+        <div class="relative mx-auto max-w-5xl">
+          <div
+            class="from-primary/20 absolute -inset-4 rounded-full bg-gradient-to-r to-purple-500/20 opacity-30 blur-3xl"
+          ></div>
+          <div
+            class="relative rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl lg:p-4 dark:border-slate-800 dark:bg-slate-900"
+          >
+            <img
+              alt="FlowMetric Dashboard Visualization"
+              class="aspect-[16/9] w-full rounded-xl object-cover"
+              data-alt="Modern clean dashboard with productivity charts"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaqpFH4f8K2oyi3A_6m73mY5pmZs_WTKxJ4rk3AbQUxFSdf7y754uLShekEuMkXF7jfuqU3HWIHnWZMXqe3pWSosTX7VI3uRaU0OpfXb6Belc1svR2844yF-HOz15sD0YhM65Zwhxzq-Gn4bDDr0kPcvGnNJCZTI4fIv44lFgEgx4sU5BAV8QitLHCyAM2KA9Q7Nl8hn1QnZOEYc-isGE_dU8LxFazKZbxI_lix1mzGNdgzoyTmMNF36AEXnPBi1VE7ZPzdd1yRS4"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Metrics Ribbon -->
+    <div class="bg-primary/5 border-primary/10 border-y py-12">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
+          <div>
+            <div class="mb-1 text-3xl font-bold text-slate-900 dark:text-white">
+              1.2M+
+            </div>
+            <div
+              class="text-sm font-medium tracking-widest text-slate-500 uppercase"
+            >
+              Focus Hours
+            </div>
+          </div>
+          <div>
+            <div class="mb-1 text-3xl font-bold text-slate-900 dark:text-white">
+              45k
+            </div>
+            <div
+              class="text-sm font-medium tracking-widest text-slate-500 uppercase"
+            >
+              Active Users
+            </div>
+          </div>
+          <div>
+            <div class="mb-1 text-3xl font-bold text-slate-900 dark:text-white">
+              98%
+            </div>
+            <div
+              class="text-sm font-medium tracking-widest text-slate-500 uppercase"
+            >
+              Satisfaction
+            </div>
+          </div>
+          <div>
+            <div class="mb-1 text-3xl font-bold text-slate-900 dark:text-white">
+              24%
+            </div>
+            <div
+              class="text-sm font-medium tracking-widest text-slate-500 uppercase"
+            >
+              Output Boost
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Features Section -->
+    <section class="py-24" id="features">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-16 text-center">
+          <h2 class="mb-4 text-3xl font-bold text-slate-900 dark:text-white">
+            Everything you need to stay in flow
+          </h2>
+          <p class="text-slate-600 dark:text-slate-400">
+            Simple yet powerful tools to reclaim your attention.
+          </p>
+        </div>
+        <div class="grid gap-8 md:grid-cols-3">
+          <!-- Deep Work -->
+          <div
+            class="hover:border-primary/50 group rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div
+              class="bg-primary/10 text-primary group-hover:bg-primary mb-6 flex h-12 w-12 items-center justify-center rounded-lg transition-all group-hover:text-white"
+            >
+              <span class="material-icons">timer</span>
+            </div>
+            <h3 class="mb-3 text-xl font-bold text-slate-900 dark:text-white">
+              Deep Work
+            </h3>
+            <p class="leading-relaxed text-slate-600 dark:text-slate-400">
+              Track uninterrupted sessions with automated distraction blocking
+              and smart notifications.
             </p>
-<div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-<button class="w-full sm:w-auto bg-primary text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-primary/30 transition-all">
-                    Start Free Trial
-                </button>
-<button class="w-full sm:w-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
-                    Watch Demo
-                </button>
-</div>
-<!-- Dashboard Mockup -->
-<div class="relative max-w-5xl mx-auto">
-<div class="absolute -inset-4 bg-gradient-to-r from-primary/20 to-purple-500/20 blur-3xl opacity-30 rounded-full"></div>
-<div class="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-2 lg:p-4">
-<img alt="FlowMetric Dashboard Visualization" class="rounded-xl w-full object-cover aspect-[16/9]" data-alt="Modern clean dashboard with productivity charts" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaqpFH4f8K2oyi3A_6m73mY5pmZs_WTKxJ4rk3AbQUxFSdf7y754uLShekEuMkXF7jfuqU3HWIHnWZMXqe3pWSosTX7VI3uRaU0OpfXb6Belc1svR2844yF-HOz15sD0YhM65Zwhxzq-Gn4bDDr0kPcvGnNJCZTI4fIv44lFgEgx4sU5BAV8QitLHCyAM2KA9Q7Nl8hn1QnZOEYc-isGE_dU8LxFazKZbxI_lix1mzGNdgzoyTmMNF36AEXnPBi1VE7ZPzdd1yRS4"/>
-</div>
-</div>
-</div>
-</section>
-<!-- Metrics Ribbon -->
-<div class="bg-primary/5 border-y border-primary/10 py-12">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-<div>
-<div class="text-3xl font-bold text-slate-900 dark:text-white mb-1">1.2M+</div>
-<div class="text-sm text-slate-500 font-medium uppercase tracking-widest">Focus Hours</div>
-</div>
-<div>
-<div class="text-3xl font-bold text-slate-900 dark:text-white mb-1">45k</div>
-<div class="text-sm text-slate-500 font-medium uppercase tracking-widest">Active Users</div>
-</div>
-<div>
-<div class="text-3xl font-bold text-slate-900 dark:text-white mb-1">98%</div>
-<div class="text-sm text-slate-500 font-medium uppercase tracking-widest">Satisfaction</div>
-</div>
-<div>
-<div class="text-3xl font-bold text-slate-900 dark:text-white mb-1">24%</div>
-<div class="text-sm text-slate-500 font-medium uppercase tracking-widest">Output Boost</div>
-</div>
-</div>
-</div>
-</div>
-<!-- Features Section -->
-<section class="py-24" id="features">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="text-center mb-16">
-<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Everything you need to stay in flow</h2>
-<p class="text-slate-600 dark:text-slate-400">Simple yet powerful tools to reclaim your attention.</p>
-</div>
-<div class="grid md:grid-cols-3 gap-8">
-<!-- Deep Work -->
-<div class="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-colors shadow-sm group">
-<div class="w-12 h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-<span class="material-icons">timer</span>
-</div>
-<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Deep Work</h3>
-<p class="text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Track uninterrupted sessions with automated distraction blocking and smart notifications.
-                    </p>
-</div>
-<!-- Energy Patterns -->
-<div class="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-colors shadow-sm group">
-<div class="w-12 h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-<span class="material-icons">bolt</span>
-</div>
-<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Energy Patterns</h3>
-<p class="text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Visualize when you are most productive throughout the day using bio-rhythm analysis.
-                    </p>
-</div>
-<!-- Team Sync -->
-<div class="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-colors shadow-sm group">
-<div class="w-12 h-12 bg-primary/10 text-primary rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
-<span class="material-icons">groups</span>
-</div>
-<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Team Sync</h3>
-<p class="text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Align focus blocks across your organization to eliminate meeting fatigue and fragmented days.
-                    </p>
-</div>
-</div>
-</div>
-</section>
-<!-- Workflow Section -->
-<section class="py-24 bg-slate-50 dark:bg-slate-900/50" id="workflow">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="flex flex-col lg:flex-row gap-16 items-center">
-<div class="lg:w-1/2">
-<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-8">How FlowMetric works</h2>
-<div class="space-y-8">
-<div class="flex gap-4">
-<div class="flex-none w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">1</div>
-<div>
-<h4 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Connect Tools</h4>
-<p class="text-slate-600 dark:text-slate-400">Seamlessly integrate with Slack, Google Calendar, and your favorite IDEs.</p>
-</div>
-</div>
-<div class="flex gap-4">
-<div class="flex-none w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">2</div>
-<div>
-<h4 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Track Flow</h4>
-<p class="text-slate-600 dark:text-slate-400">Let FlowMetric run in the background while you focus on what matters most.</p>
-</div>
-</div>
-<div class="flex gap-4">
-<div class="flex-none w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">3</div>
-<div>
-<h4 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Get Insights</h4>
-<p class="text-slate-600 dark:text-slate-400">Receive weekly reports and AI-driven tips to optimize your schedule.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="lg:w-1/2">
-<img alt="Developer focusing" class="rounded-2xl shadow-xl w-full object-cover h-[400px]" data-alt="Person working focused on a laptop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTBMh1gc07kfdqM5AyE8jIp57JOFxRxjZ9T14yfy8zjU9-WLIhtdkv8iZdQVyeWP2t4q_nNMPBkcn7i1x2UqB9NtGuJvVLZFE3-V1-8rn7BKbVp8PkKMmjHz7JvFbe_-4XCP02erxkBWbwOIOTImZnuwDNs-FTrWsrRhV5uS-0Uz6qVe0IgV6lY-iH0wcBgixiUgoXGgFpFdk7142KGY4h9h5RSQQylRmooGD9fZaIV9Nw2Y-kjrzT6s3EExEljh2prn9DAuyXpxs"/>
-</div>
-</div>
-</div>
-</section>
-<!-- Pricing Section -->
-<section class="py-24" id="pricing">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="text-center mb-12">
-<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Simple, transparent pricing</h2>
-<div class="flex items-center justify-center gap-4 mt-8">
-<span class="text-sm font-medium text-slate-600 dark:text-slate-400">Monthly</span>
-<button class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary">
-<span class="inline-block h-4 w-4 transform rounded-full bg-white transition translate-x-6"></span>
-</button>
-<span class="text-sm font-medium text-slate-600 dark:text-slate-400">Yearly <span class="text-primary font-bold">(Save 20%)</span></span>
-</div>
-</div>
-<div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-<!-- Personal Plan -->
-<div class="bg-white dark:bg-slate-900 p-10 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative">
-<h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Personal</h3>
-<p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Perfect for solo deep workers</p>
-<div class="flex items-baseline gap-1 mb-8">
-<span class="text-4xl font-bold text-slate-900 dark:text-white">$12</span>
-<span class="text-slate-500">/mo</span>
-</div>
-<ul class="space-y-4 mb-8">
-<li class="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-<span class="material-icons text-primary text-sm">check_circle</span>
-                            Individual Focus Tracking
-                        </li>
-<li class="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-<span class="material-icons text-primary text-sm">check_circle</span>
-                            Personal Energy Insights
-                        </li>
-<li class="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-<span class="material-icons text-primary text-sm">check_circle</span>
-                            Weekly Progress Reports
-                        </li>
-</ul>
-<button class="w-full py-3 border border-primary text-primary hover:bg-primary/5 rounded-xl font-bold transition-colors">
-                        Choose Personal
-                    </button>
-</div>
-<!-- Pro Plan -->
-<div class="bg-white dark:bg-slate-900 p-10 rounded-2xl border-2 border-primary shadow-xl relative overflow-hidden">
-<div class="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-widest">Most Popular</div>
-<h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Team Pro</h3>
-<p class="text-slate-500 dark:text-slate-400 text-sm mb-6">For high-performing teams</p>
-<div class="flex items-baseline gap-1 mb-8">
-<span class="text-4xl font-bold text-slate-900 dark:text-white">$39</span>
-<span class="text-slate-500">/mo</span>
-</div>
-<ul class="space-y-4 mb-8">
-<li class="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-<span class="material-icons text-primary text-sm">check_circle</span>
-                            Everything in Personal
-                        </li>
-<li class="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-<span class="material-icons text-primary text-sm">check_circle</span>
-                            Team Energy Dashboard
-                        </li>
-<li class="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-<span class="material-icons text-primary text-sm">check_circle</span>
-                            Sync-time Optimization
-                        </li>
-<li class="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-<span class="material-icons text-primary text-sm">check_circle</span>
-                            Priority Support
-                        </li>
-</ul>
-<button class="w-full py-3 bg-primary text-white hover:bg-primary/90 rounded-xl font-bold transition-all">
-                        Choose Pro
-                    </button>
-</div>
-</div>
-</div>
-</section>
-<!-- FAQ Section -->
-<section class="py-24 bg-slate-50 dark:bg-slate-900/50" id="faq">
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="text-center mb-16">
-<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Frequently Asked Questions</h2>
-</div>
-<div class="space-y-4">
-<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-<button class="w-full flex items-center justify-between p-5 text-left font-semibold text-slate-900 dark:text-white">
-<span>How does FlowMetric track my focus?</span>
-<span class="material-icons text-slate-400">expand_more</span>
-</button>
-<div class="px-5 pb-5 text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                        We use a lightweight desktop agent that analyzes active applications and browser tabs (without recording sensitive content) to determine when you are in a state of high productivity.
-                    </div>
-</div>
-<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-<button class="w-full flex items-center justify-between p-5 text-left font-semibold text-slate-900 dark:text-white">
-<span>Is my data private and secure?</span>
-<span class="material-icons text-slate-400">expand_more</span>
-</button>
-<div class="px-5 pb-5 text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                        Absolutely. Data is encrypted end-to-end. We never share your individual application usage details with your employer; we only report aggregate focus trends.
-                    </div>
-</div>
-<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-<button class="w-full flex items-center justify-between p-5 text-left font-semibold text-slate-900 dark:text-white">
-<span>Can I cancel my subscription anytime?</span>
-<span class="material-icons text-slate-400">expand_more</span>
-</button>
-<div class="px-5 pb-5 text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-                        Yes, you can cancel at any time from your account settings. You'll keep access to your pro features until the end of your billing cycle.
-                    </div>
-</div>
-</div>
-</div>
-</section>
-<!-- Footer -->
-<footer class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-900 pt-16 pb-8">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-<div class="grid md:grid-cols-4 gap-12 mb-16">
-<div class="col-span-2">
-<div class="flex items-center gap-2 mb-6">
-<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-<span class="material-icons text-white text-lg">insights</span>
-</div>
-<span class="text-xl font-bold text-slate-900 dark:text-white">FlowMetric</span>
-</div>
-<p class="text-slate-500 dark:text-slate-400 max-w-sm mb-6">
-                        Empowering teams and individuals to reclaim their focus through data-driven insights and smarter scheduling.
-                    </p>
-<div class="flex gap-4">
-<a class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-600 hover:text-primary transition-colors" href="#">
-<span class="material-icons text-sm">public</span>
-</a>
-<a class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-600 hover:text-primary transition-colors" href="#">
-<span class="material-icons text-sm">forum</span>
-</a>
-</div>
-</div>
-<div>
-<h4 class="font-bold text-slate-900 dark:text-white mb-6">Product</h4>
-<ul class="space-y-4 text-sm text-slate-600 dark:text-slate-400">
-<li><a class="hover:text-primary transition-colors" href="#">Features</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Integrations</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Pricing</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Changelog</a></li>
-</ul>
-</div>
-<div>
-<h4 class="font-bold text-slate-900 dark:text-white mb-6">Company</h4>
-<ul class="space-y-4 text-sm text-slate-600 dark:text-slate-400">
-<li><a class="hover:text-primary transition-colors" href="#">About</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
-<li><a class="hover:text-primary transition-colors" href="#">Security</a></li>
-</ul>
-</div>
-</div>
-<div class="pt-8 border-t border-slate-100 dark:border-slate-900 text-center text-xs text-slate-500 dark:text-slate-600">
-                © 2024 FlowMetric Inc. All rights reserved.
+          </div>
+          <!-- Energy Patterns -->
+          <div
+            class="hover:border-primary/50 group rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div
+              class="bg-primary/10 text-primary group-hover:bg-primary mb-6 flex h-12 w-12 items-center justify-center rounded-lg transition-all group-hover:text-white"
+            >
+              <span class="material-icons">bolt</span>
             </div>
-</div>
-</footer>
-</body></html>
+            <h3 class="mb-3 text-xl font-bold text-slate-900 dark:text-white">
+              Energy Patterns
+            </h3>
+            <p class="leading-relaxed text-slate-600 dark:text-slate-400">
+              Visualize when you are most productive throughout the day using
+              bio-rhythm analysis.
+            </p>
+          </div>
+          <!-- Team Sync -->
+          <div
+            class="hover:border-primary/50 group rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div
+              class="bg-primary/10 text-primary group-hover:bg-primary mb-6 flex h-12 w-12 items-center justify-center rounded-lg transition-all group-hover:text-white"
+            >
+              <span class="material-icons">groups</span>
+            </div>
+            <h3 class="mb-3 text-xl font-bold text-slate-900 dark:text-white">
+              Team Sync
+            </h3>
+            <p class="leading-relaxed text-slate-600 dark:text-slate-400">
+              Align focus blocks across your organization to eliminate meeting
+              fatigue and fragmented days.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Workflow Section -->
+    <section class="bg-slate-50 py-24 dark:bg-slate-900/50" id="workflow">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col items-center gap-16 lg:flex-row">
+          <div class="lg:w-1/2">
+            <h2 class="mb-8 text-3xl font-bold text-slate-900 dark:text-white">
+              How FlowMetric works
+            </h2>
+            <div class="space-y-8">
+              <div class="flex gap-4">
+                <div
+                  class="bg-primary flex h-10 w-10 flex-none items-center justify-center rounded-full font-bold text-white"
+                >
+                  1
+                </div>
+                <div>
+                  <h4
+                    class="mb-1 text-lg font-bold text-slate-900 dark:text-white"
+                  >
+                    Connect Tools
+                  </h4>
+                  <p class="text-slate-600 dark:text-slate-400">
+                    Seamlessly integrate with Slack, Google Calendar, and your
+                    favorite IDEs.
+                  </p>
+                </div>
+              </div>
+              <div class="flex gap-4">
+                <div
+                  class="bg-primary flex h-10 w-10 flex-none items-center justify-center rounded-full font-bold text-white"
+                >
+                  2
+                </div>
+                <div>
+                  <h4
+                    class="mb-1 text-lg font-bold text-slate-900 dark:text-white"
+                  >
+                    Track Flow
+                  </h4>
+                  <p class="text-slate-600 dark:text-slate-400">
+                    Let FlowMetric run in the background while you focus on what
+                    matters most.
+                  </p>
+                </div>
+              </div>
+              <div class="flex gap-4">
+                <div
+                  class="bg-primary flex h-10 w-10 flex-none items-center justify-center rounded-full font-bold text-white"
+                >
+                  3
+                </div>
+                <div>
+                  <h4
+                    class="mb-1 text-lg font-bold text-slate-900 dark:text-white"
+                  >
+                    Get Insights
+                  </h4>
+                  <p class="text-slate-600 dark:text-slate-400">
+                    Receive weekly reports and AI-driven tips to optimize your
+                    schedule.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="lg:w-1/2">
+            <img
+              alt="Developer focusing"
+              class="h-[400px] w-full rounded-2xl object-cover shadow-xl"
+              data-alt="Person working focused on a laptop"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTBMh1gc07kfdqM5AyE8jIp57JOFxRxjZ9T14yfy8zjU9-WLIhtdkv8iZdQVyeWP2t4q_nNMPBkcn7i1x2UqB9NtGuJvVLZFE3-V1-8rn7BKbVp8PkKMmjHz7JvFbe_-4XCP02erxkBWbwOIOTImZnuwDNs-FTrWsrRhV5uS-0Uz6qVe0IgV6lY-iH0wcBgixiUgoXGgFpFdk7142KGY4h9h5RSQQylRmooGD9fZaIV9Nw2Y-kjrzT6s3EExEljh2prn9DAuyXpxs"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Pricing Section -->
+    <section class="py-24" id="pricing">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-12 text-center">
+          <h2 class="mb-4 text-3xl font-bold text-slate-900 dark:text-white">
+            Simple, transparent pricing
+          </h2>
+          <div class="mt-8 flex items-center justify-center gap-4">
+            <span class="text-sm font-medium text-slate-600 dark:text-slate-400"
+              >Monthly</span
+            >
+            <button
+              class="bg-primary relative inline-flex h-6 w-11 items-center rounded-full"
+            >
+              <span
+                class="inline-block h-4 w-4 translate-x-6 transform rounded-full bg-white transition"
+              ></span>
+            </button>
+            <span class="text-sm font-medium text-slate-600 dark:text-slate-400"
+              >Yearly
+              <span class="text-primary font-bold">(Save 20%)</span></span
+            >
+          </div>
+        </div>
+        <div class="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
+          <!-- Personal Plan -->
+          <div
+            class="relative rounded-2xl border border-slate-200 bg-white p-10 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+          >
+            <h3 class="mb-2 text-lg font-bold text-slate-900 dark:text-white">
+              Personal
+            </h3>
+            <p class="mb-6 text-sm text-slate-500 dark:text-slate-400">
+              Perfect for solo deep workers
+            </p>
+            <div class="mb-8 flex items-baseline gap-1">
+              <span class="text-4xl font-bold text-slate-900 dark:text-white"
+                >$12</span
+              >
+              <span class="text-slate-500">/mo</span>
+            </div>
+            <ul class="mb-8 space-y-4">
+              <li
+                class="flex items-center gap-3 text-slate-600 dark:text-slate-400"
+              >
+                <span class="material-icons text-primary text-sm"
+                  >check_circle</span
+                >
+                Individual Focus Tracking
+              </li>
+              <li
+                class="flex items-center gap-3 text-slate-600 dark:text-slate-400"
+              >
+                <span class="material-icons text-primary text-sm"
+                  >check_circle</span
+                >
+                Personal Energy Insights
+              </li>
+              <li
+                class="flex items-center gap-3 text-slate-600 dark:text-slate-400"
+              >
+                <span class="material-icons text-primary text-sm"
+                  >check_circle</span
+                >
+                Weekly Progress Reports
+              </li>
+            </ul>
+            <button
+              class="border-primary text-primary hover:bg-primary/5 w-full rounded-xl border py-3 font-bold transition-colors"
+            >
+              Choose Personal
+            </button>
+          </div>
+          <!-- Pro Plan -->
+          <div
+            class="border-primary relative overflow-hidden rounded-2xl border-2 bg-white p-10 shadow-xl dark:bg-slate-900"
+          >
+            <div
+              class="bg-primary absolute top-0 right-0 rounded-bl-lg px-3 py-1 text-[10px] font-bold tracking-widest text-white uppercase"
+            >
+              Most Popular
+            </div>
+            <h3 class="mb-2 text-lg font-bold text-slate-900 dark:text-white">
+              Team Pro
+            </h3>
+            <p class="mb-6 text-sm text-slate-500 dark:text-slate-400">
+              For high-performing teams
+            </p>
+            <div class="mb-8 flex items-baseline gap-1">
+              <span class="text-4xl font-bold text-slate-900 dark:text-white"
+                >$39</span
+              >
+              <span class="text-slate-500">/mo</span>
+            </div>
+            <ul class="mb-8 space-y-4">
+              <li
+                class="flex items-center gap-3 text-slate-600 dark:text-slate-400"
+              >
+                <span class="material-icons text-primary text-sm"
+                  >check_circle</span
+                >
+                Everything in Personal
+              </li>
+              <li
+                class="flex items-center gap-3 text-slate-600 dark:text-slate-400"
+              >
+                <span class="material-icons text-primary text-sm"
+                  >check_circle</span
+                >
+                Team Energy Dashboard
+              </li>
+              <li
+                class="flex items-center gap-3 text-slate-600 dark:text-slate-400"
+              >
+                <span class="material-icons text-primary text-sm"
+                  >check_circle</span
+                >
+                Sync-time Optimization
+              </li>
+              <li
+                class="flex items-center gap-3 text-slate-600 dark:text-slate-400"
+              >
+                <span class="material-icons text-primary text-sm"
+                  >check_circle</span
+                >
+                Priority Support
+              </li>
+            </ul>
+            <button
+              class="bg-primary hover:bg-primary/90 w-full rounded-xl py-3 font-bold text-white transition-all"
+            >
+              Choose Pro
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- FAQ Section -->
+    <section class="bg-slate-50 py-24 dark:bg-slate-900/50" id="faq">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-16 text-center">
+          <h2 class="mb-4 text-3xl font-bold text-slate-900 dark:text-white">
+            Frequently Asked Questions
+          </h2>
+        </div>
+        <div class="space-y-4">
+          <div
+            class="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+          >
+            <button
+              class="flex w-full items-center justify-between p-5 text-left font-semibold text-slate-900 dark:text-white"
+            >
+              <span>How does FlowMetric track my focus?</span>
+              <span class="material-icons text-slate-400">expand_more</span>
+            </button>
+            <div
+              class="px-5 pb-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400"
+            >
+              We use a lightweight desktop agent that analyzes active
+              applications and browser tabs (without recording sensitive
+              content) to determine when you are in a state of high
+              productivity.
+            </div>
+          </div>
+          <div
+            class="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+          >
+            <button
+              class="flex w-full items-center justify-between p-5 text-left font-semibold text-slate-900 dark:text-white"
+            >
+              <span>Is my data private and secure?</span>
+              <span class="material-icons text-slate-400">expand_more</span>
+            </button>
+            <div
+              class="px-5 pb-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400"
+            >
+              Absolutely. Data is encrypted end-to-end. We never share your
+              individual application usage details with your employer; we only
+              report aggregate focus trends.
+            </div>
+          </div>
+          <div
+            class="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+          >
+            <button
+              class="flex w-full items-center justify-between p-5 text-left font-semibold text-slate-900 dark:text-white"
+            >
+              <span>Can I cancel my subscription anytime?</span>
+              <span class="material-icons text-slate-400">expand_more</span>
+            </button>
+            <div
+              class="px-5 pb-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400"
+            >
+              Yes, you can cancel at any time from your account settings. You'll
+              keep access to your pro features until the end of your billing
+              cycle.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Footer -->
+    <footer
+      class="border-t border-slate-200 bg-white pt-16 pb-8 dark:border-slate-900 dark:bg-slate-950"
+    >
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-16 grid gap-12 md:grid-cols-4">
+          <div class="col-span-2">
+            <div class="mb-6 flex items-center gap-2">
+              <div
+                class="bg-primary flex h-8 w-8 items-center justify-center rounded-lg"
+              >
+                <span class="material-icons text-lg text-white">insights</span>
+              </div>
+              <span class="text-xl font-bold text-slate-900 dark:text-white"
+                >FlowMetric</span
+              >
+            </div>
+            <p class="mb-6 max-w-sm text-slate-500 dark:text-slate-400">
+              Empowering teams and individuals to reclaim their focus through
+              data-driven insights and smarter scheduling.
+            </p>
+            <div class="flex gap-4">
+              <a
+                class="hover:text-primary flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors dark:bg-slate-900"
+                href="#"
+              >
+                <span class="material-icons text-sm">public</span>
+              </a>
+              <a
+                class="hover:text-primary flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors dark:bg-slate-900"
+                href="#"
+              >
+                <span class="material-icons text-sm">forum</span>
+              </a>
+            </div>
+          </div>
+          <div>
+            <h4 class="mb-6 font-bold text-slate-900 dark:text-white">
+              Product
+            </h4>
+            <ul class="space-y-4 text-sm text-slate-600 dark:text-slate-400">
+              <li>
+                <a class="hover:text-primary transition-colors" href="#"
+                  >Features</a
+                >
+              </li>
+              <li>
+                <a class="hover:text-primary transition-colors" href="#"
+                  >Integrations</a
+                >
+              </li>
+              <li>
+                <a class="hover:text-primary transition-colors" href="#"
+                  >Pricing</a
+                >
+              </li>
+              <li>
+                <a class="hover:text-primary transition-colors" href="#"
+                  >Changelog</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="mb-6 font-bold text-slate-900 dark:text-white">
+              Company
+            </h4>
+            <ul class="space-y-4 text-sm text-slate-600 dark:text-slate-400">
+              <li>
+                <a class="hover:text-primary transition-colors" href="#"
+                  >About</a
+                >
+              </li>
+              <li>
+                <a class="hover:text-primary transition-colors" href="#"
+                  >Blog</a
+                >
+              </li>
+              <li>
+                <a class="hover:text-primary transition-colors" href="#"
+                  >Careers</a
+                >
+              </li>
+              <li>
+                <a class="hover:text-primary transition-colors" href="#"
+                  >Security</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div
+          class="border-t border-slate-100 pt-8 text-center text-xs text-slate-500 dark:border-slate-900 dark:text-slate-600"
+        >
+          © 2024 FlowMetric Inc. All rights reserved.
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

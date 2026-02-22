@@ -27,7 +27,7 @@ const DUMMY_STATUSES = [
   "Finalizing design manifest",
   "Calibrating visual rhythm",
   "Optimizing for all screens",
-  "Synthesizing design tokens"
+  "Synthesizing design tokens",
 ];
 
 interface GenerationStatusProps {
@@ -43,9 +43,9 @@ interface GenerationStatusProps {
   isCreditError?: boolean;
 }
 
-export function GenerationStatus({ 
-  status, 
-  isComplete, 
+export function GenerationStatus({
+  status,
+  isComplete,
   conclusionText,
   planScreens = [],
   projectArtifacts = [],
@@ -53,20 +53,18 @@ export function GenerationStatus({
   statusMessage,
   className,
   error,
-  isCreditError
+  isCreditError,
 }: GenerationStatusProps) {
   const [dummyStatus, setDummyStatus] = useState(DUMMY_STATUSES[0]);
   const [dots, setDots] = useState("...");
-  
-  const { 
-    focusArtifact
-  } = useProjectStore();
+
+  const { focusArtifact } = useProjectStore();
 
   useEffect(() => {
     if (isComplete) return;
 
     const statusInterval = setInterval(() => {
-      setDummyStatus(prev => {
+      setDummyStatus((prev) => {
         const currentIndex = DUMMY_STATUSES.indexOf(prev);
         const nextIndex = (currentIndex + 1) % DUMMY_STATUSES.length;
         return DUMMY_STATUSES[nextIndex];
@@ -74,7 +72,7 @@ export function GenerationStatus({
     }, 4500);
 
     const dotsInterval = setInterval(() => {
-      setDots(prev => {
+      setDots((prev) => {
         if (prev.length >= 6) return "...";
         return prev + ".";
       });
@@ -90,9 +88,15 @@ export function GenerationStatus({
     focusArtifact(artifactTitle);
   };
 
-  const finalConclusionText = conclusionText || (status === 'complete' ? statusMessage : null);
+  const finalConclusionText =
+    conclusionText || (status === "complete" ? statusMessage : null);
 
-  const displayedPlanScreens = planScreens.length > 0 ? planScreens : (!isComplete ? [{ id: 'placeholder-pulse', title: 'Loading' }] : []);
+  const displayedPlanScreens =
+    planScreens.length > 0
+      ? planScreens
+      : !isComplete
+        ? [{ id: "placeholder-pulse", title: "Loading" }]
+        : [];
 
   return (
     <div className={cn("flex flex-col gap-6", className)}>
@@ -102,19 +106,21 @@ export function GenerationStatus({
           // Find the artifact that matches this plan item
           let artifact = null;
           if (planItem.id) {
-            artifact = projectArtifacts.find(a => a.id === planItem.id);
+            artifact = projectArtifacts.find((a) => a.id === planItem.id);
           }
           // Fallback to title if no ID match or planItem has no ID, but only if the artifact itself doesn't have an ID yet
           if (!artifact && planItem.title) {
-            artifact = projectArtifacts.find(a => a.title === planItem.title && !a.id);
+            artifact = projectArtifacts.find(
+              (a) => a.title === planItem.title && !a.id,
+            );
           }
           // If still no artifact, try matching by title regardless of artifact ID (for existing artifacts)
           if (!artifact && planItem.title) {
-            artifact = projectArtifacts.find(a => a.title === planItem.title);
+            artifact = projectArtifacts.find((a) => a.title === planItem.title);
           }
 
           const hasContent = !!artifact?.content;
-          const isPlaceholder = planItem.id === 'placeholder-pulse';
+          const isPlaceholder = planItem.id === "placeholder-pulse";
           // A screen is considered not available if we are complete but the matching artifact is missing from the global state
           const isNotAvailable = isComplete && !isPlaceholder && !artifact;
 
@@ -127,19 +133,21 @@ export function GenerationStatus({
                       if (hasContent) handleFocusScreen(artifact!.title);
                     }}
                     className={cn(
-                      "h-16 w-16 rounded-xl bg-muted/50 border border-border overflow-hidden relative shrink-0 shadow-sm group transition-all",
-                      hasContent ? "cursor-pointer hover:border-primary/50 hover:shadow-md hover:bg-muted" : "cursor-default",
+                      "bg-muted/50 border-border group relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border shadow-sm transition-all",
+                      hasContent
+                        ? "hover:border-primary/50 hover:bg-muted cursor-pointer hover:shadow-md"
+                        : "cursor-default",
                       isPlaceholder && "animate-pulse",
-                      isNotAvailable && "opacity-40 grayscale"
+                      isNotAvailable && "opacity-40 grayscale",
                     )}
                   >
                     {/* Preview Content (scaled iframe) */}
                     {hasContent ? (
                       <>
-                        <div className="absolute inset-0 scale-[calc(64/1024)] origin-top-left w-[1024px] h-[2000px] pointer-events-none opacity-90 group-hover:opacity-40 transition-all translate-z-0">
+                        <div className="pointer-events-none absolute inset-0 h-[2000px] w-[1024px] origin-top-left translate-z-0 scale-[calc(64/1024)] opacity-90 transition-all group-hover:opacity-40">
                           <iframe
                             title={`mini-preview-${idx}`}
-                            className="w-full h-full border-none"
+                            className="h-full w-full border-none"
                             srcDoc={`
                                  <!DOCTYPE html>
                                  <html>
@@ -156,40 +164,42 @@ export function GenerationStatus({
                           />
                         </div>
                         {/* Hover Overlay Icon */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-primary/10">
-                          <Maximize2 className="h-4 w-4 text-primary" />
+                        <div className="bg-primary/10 absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+                          <Maximize2 className="text-primary h-4 w-4" />
                         </div>
                       </>
                     ) : isNotAvailable ? (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-muted/30">
-                        <EyeOff className="size-4 text-muted-foreground/30" />
-                        <span className="text-[7px] font-bold text-muted-foreground/30 uppercase tracking-tighter text-center px-1">Not Available</span>
+                      <div className="bg-muted/30 absolute inset-0 flex flex-col items-center justify-center gap-1.5">
+                        <EyeOff className="text-muted-foreground/30 size-4" />
+                        <span className="text-muted-foreground/30 px-1 text-center text-[7px] font-bold tracking-tighter uppercase">
+                          Not Available
+                        </span>
                       </div>
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite_linear]" />
+                      <div className="via-primary/5 absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite_linear] bg-gradient-to-r from-transparent to-transparent" />
                     )}
                   </div>
                 </TooltipTrigger>
-                { (hasContent || isNotAvailable) && (
-                  <TooltipContent 
-                    side="top" 
+                {(hasContent || isNotAvailable) && (
+                  <TooltipContent
+                    side="top"
                     className={cn(
-                      "text-[11px] py-1.5 px-3 border border-border bg-popover text-popover-foreground font-bold rounded-lg shadow-xl animate-in zoom-in-95 duration-200", 
-                      isNotAvailable && "opacity-80"
+                      "border-border bg-popover text-popover-foreground animate-in zoom-in-95 rounded-lg border px-3 py-1.5 text-[11px] font-bold shadow-xl duration-200",
+                      isNotAvailable && "opacity-80",
                     )}
                   >
                     <div className="flex items-center gap-2">
-                       {isNotAvailable ? (
-                         <>
-                           <EyeOff className="size-3 text-muted-foreground" />
-                           <span>Screen not available</span>
-                         </>
-                       ) : (
-                         <>
-                           <Maximize2 className="size-3 text-primary" />
-                           <span>View full screen</span>
-                         </>
-                       )}
+                      {isNotAvailable ? (
+                        <>
+                          <EyeOff className="text-muted-foreground size-3" />
+                          <span>Screen not available</span>
+                        </>
+                      ) : (
+                        <>
+                          <Maximize2 className="text-primary size-3" />
+                          <span>View full screen</span>
+                        </>
+                      )}
                     </div>
                   </TooltipContent>
                 )}
@@ -199,30 +209,32 @@ export function GenerationStatus({
         })}
       </div>
 
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         {error ? (
-          <div className="flex flex-col gap-3 p-4 rounded-xl border border-destructive/20 bg-destructive/5 animate-in fade-in slide-in-from-top-2">
+          <div className="border-destructive/20 bg-destructive/5 animate-in fade-in slide-in-from-top-2 flex flex-col gap-3 rounded-xl border p-4">
             <div className="flex items-start gap-3">
-              <AlertCircle className="size-5 text-destructive shrink-0 mt-0.5" />
+              <AlertCircle className="text-destructive mt-0.5 size-5 shrink-0" />
               <div className="flex flex-col gap-1">
-                <p className="text-sm font-semibold text-destructive">
+                <p className="text-destructive text-sm font-semibold">
                   {isCreditError ? "Credits Exhausted" : "Generation Error"}
                 </p>
-                <p className="text-[13px] text-destructive/80 leading-relaxed">
+                <p className="text-destructive/80 text-[13px] leading-relaxed">
                   {error}
                 </p>
               </div>
             </div>
-            
+
             {isCreditError && (
-              <div className="flex flex-col gap-2 mt-1">
-                <button 
-                  onClick={() => window.open('https://sketch.com/pricing', '_blank')}
-                  className="w-full py-2 px-4 rounded-lg bg-destructive text-white text-xs font-bold hover:bg-destructive/90 transition-all shadow-lg shadow-destructive/20 uppercase tracking-widest"
+              <div className="mt-1 flex flex-col gap-2">
+                <button
+                  onClick={() =>
+                    window.open("https://sketch.com/pricing", "_blank")
+                  }
+                  className="bg-destructive hover:bg-destructive/90 shadow-destructive/20 w-full rounded-lg px-4 py-2 text-xs font-bold tracking-widest text-white uppercase shadow-lg transition-all"
                 >
                   Upgrade to Pro
                 </button>
-                <p className="text-[10px] text-destructive/60 text-center italic">
+                <p className="text-destructive/60 text-center text-[10px] italic">
                   Generate unlimited screens with a Pro subscription
                 </p>
               </div>
@@ -235,7 +247,7 @@ export function GenerationStatus({
             </MessageResponse>
           </div>
         ) : !isComplete ? (
-          <p className="text-sm font-medium text-muted-foreground animate-pulse transition-all duration-500">
+          <p className="text-muted-foreground animate-pulse text-sm font-medium transition-all duration-500">
             {`${dummyStatus}${dots}`}
           </p>
         ) : null}
@@ -243,8 +255,12 @@ export function GenerationStatus({
 
       <style jsx global>{`
         @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
         }
       `}</style>
     </div>

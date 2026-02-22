@@ -1,105 +1,169 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              colors: {
-                "primary": "#e77e23",
-                "background-light": "#f8f7f6",
-                "background-dark": "#211811",
-              },
-              fontFamily: {
-                "display": ["Plus Jakarta Sans"]
-              },
-              borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#e77e23",
+              "background-light": "#f8f7f6",
+              "background-dark": "#211811",
+            },
+            fontFamily: {
+              display: ["Plus Jakarta Sans"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "1rem",
+              xl: "1.5rem",
+              full: "9999px",
             },
           },
-        }
-      </script>
-<title>QuickBite Onboarding - Live Tracking</title>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
+        },
+      };
+    </script>
+    <title>QuickBite Onboarding - Live Tracking</title>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
   </head>
-<body class="bg-background-light dark:bg-background-dark font-display antialiased">
-<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-<!-- Header -->
-<div class="flex items-center justify-end p-6">
-<button class="text-primary/80 hover:text-primary text-base font-bold leading-normal tracking-[0.015em] transition-colors">
-                Skip
-            </button>
-</div>
-<!-- Hero Content / Layered Map Mockup -->
-<div class="flex flex-1 flex-col items-center justify-center px-6">
-<!-- Layered UI Container -->
-<div class="relative w-full max-w-sm aspect-square mb-12">
-<!-- Background Map Element (Layer 1) -->
-<div class="absolute inset-0 bg-white dark:bg-zinc-800 rounded-xl shadow-xl overflow-hidden border border-primary/10">
-<div class="w-full h-full bg-cover bg-center opacity-60 grayscale-[20%]" data-alt="Modern minimalist city map interface" data-location="San Francisco" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCGb6SiD3CrinFVi0X8vQb6qBe32RIEoRnYpyreu9ulLFfyRYDCMZ62Rrvoi1aym4masLrFAxi0cPZTBlVSw11rc147KQuIsHoVqxoQZXOZ9FoSLYO6OprzO6swSMz-ppMjNgkUjQNZhO8rUVfhWy6ggU5HzDMk4HnEb6IAKU0IW_j1WqBzMVKxL2VRkXgz7e6FrS2coZXFGZuI1DkInRvoK0OVe6LpthT4mx4hgBvmm5KIQRaujdQHFsRKzZcVYX_OB_1t3mBlBEg');">
-</div>
-<!-- SVG Path Overlay (Mocking route) -->
-<svg class="absolute inset-0 w-full h-full pointer-events-none" fill="none" viewbox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-<path class="opacity-80" d="M50 300C120 280 180 320 250 200S350 100 350 100" stroke="#e77e23" stroke-dasharray="8 8" stroke-width="4"></path>
-</svg>
-</div>
-<!-- Destination Marker (Layer 2) -->
-<div class="absolute top-[80px] right-[40px] bg-white dark:bg-zinc-900 p-2 rounded-lg shadow-lg flex items-center gap-2 border border-primary/5">
-<div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-<span class="text-[10px] font-bold text-zinc-600 dark:text-zinc-300">Your Home</span>
-</div>
-<!-- Floating Delivery Rider Card (Layer 3 - The Focal Point) -->
-<div class="absolute bottom-[20%] left-[20%] transform -translate-x-1/2 -translate-y-1/2">
-<div class="relative group">
-<!-- Glow effect -->
-<div class="absolute -inset-1 bg-primary/30 rounded-full blur-md"></div>
-<!-- Rider Icon Circle -->
-<div class="relative flex h-16 w-16 items-center justify-center rounded-full bg-primary shadow-2xl border-4 border-white dark:border-zinc-900">
-<span class="material-symbols-outlined text-white text-3xl" data-icon="delivery_dining">delivery_dining</span>
-</div>
-<!-- Info Tag -->
-<div class="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-white dark:bg-zinc-800 px-3 py-1.5 rounded-full shadow-md border border-primary/20 whitespace-nowrap">
-<p class="text-[11px] font-bold text-primary">5 mins away</p>
-</div>
-</div>
-</div>
-</div>
-<!-- Text Content -->
-<div class="text-center space-y-4 max-w-xs mx-auto">
-<h1 class="text-zinc-900 dark:text-white text-3xl font-extrabold tracking-tight leading-tight">
-                    Live Order Tracking
-                </h1>
-<p class="text-zinc-600 dark:text-zinc-400 text-base font-normal leading-relaxed">
-                    Track your food in real-time from the kitchen to your door.
-                </p>
-</div>
-</div>
-<!-- Footer Actions -->
-<div class="p-8 space-y-8">
-<!-- Progress Indicator (3 of 4) -->
-<div class="flex w-full flex-row items-center justify-center gap-2.5">
-<div class="h-1.5 w-1.5 rounded-full bg-primary/20"></div>
-<div class="h-1.5 w-1.5 rounded-full bg-primary/20"></div>
-<div class="h-1.5 w-8 rounded-full bg-primary"></div>
-<div class="h-1.5 w-1.5 rounded-full bg-primary/20"></div>
-</div>
-<!-- Primary Button -->
-<div class="flex justify-center">
-<button class="w-full max-w-md bg-primary hover:bg-primary/90 text-white font-bold py-4 px-8 rounded-xl shadow-lg shadow-primary/25 transition-all active:scale-95 flex items-center justify-center gap-2" onclick="window.location.href='onboarding.html'">
-<span>Next</span>
-<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
-</button>
-</div>
-</div>
-</div>
-</body></html>
+  <body
+    class="bg-background-light dark:bg-background-dark font-display antialiased"
+  >
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+      <!-- Header -->
+      <div class="flex items-center justify-end p-6">
+        <button
+          class="text-primary/80 hover:text-primary text-base leading-normal font-bold tracking-[0.015em] transition-colors"
+        >
+          Skip
+        </button>
+      </div>
+      <!-- Hero Content / Layered Map Mockup -->
+      <div class="flex flex-1 flex-col items-center justify-center px-6">
+        <!-- Layered UI Container -->
+        <div class="relative mb-12 aspect-square w-full max-w-sm">
+          <!-- Background Map Element (Layer 1) -->
+          <div
+            class="border-primary/10 absolute inset-0 overflow-hidden rounded-xl border bg-white shadow-xl dark:bg-zinc-800"
+          >
+            <div
+              class="h-full w-full bg-cover bg-center opacity-60 grayscale-[20%]"
+              data-alt="Modern minimalist city map interface"
+              data-location="San Francisco"
+              style="
+                background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuCGb6SiD3CrinFVi0X8vQb6qBe32RIEoRnYpyreu9ulLFfyRYDCMZ62Rrvoi1aym4masLrFAxi0cPZTBlVSw11rc147KQuIsHoVqxoQZXOZ9FoSLYO6OprzO6swSMz-ppMjNgkUjQNZhO8rUVfhWy6ggU5HzDMk4HnEb6IAKU0IW_j1WqBzMVKxL2VRkXgz7e6FrS2coZXFGZuI1DkInRvoK0OVe6LpthT4mx4hgBvmm5KIQRaujdQHFsRKzZcVYX_OB_1t3mBlBEg&quot;);
+              "
+            ></div>
+            <!-- SVG Path Overlay (Mocking route) -->
+            <svg
+              class="pointer-events-none absolute inset-0 h-full w-full"
+              fill="none"
+              viewbox="0 0 400 400"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                class="opacity-80"
+                d="M50 300C120 280 180 320 250 200S350 100 350 100"
+                stroke="#e77e23"
+                stroke-dasharray="8 8"
+                stroke-width="4"
+              ></path>
+            </svg>
+          </div>
+          <!-- Destination Marker (Layer 2) -->
+          <div
+            class="border-primary/5 absolute top-[80px] right-[40px] flex items-center gap-2 rounded-lg border bg-white p-2 shadow-lg dark:bg-zinc-900"
+          >
+            <div class="h-2 w-2 animate-pulse rounded-full bg-red-500"></div>
+            <span class="text-[10px] font-bold text-zinc-600 dark:text-zinc-300"
+              >Your Home</span
+            >
+          </div>
+          <!-- Floating Delivery Rider Card (Layer 3 - The Focal Point) -->
+          <div
+            class="absolute bottom-[20%] left-[20%] -translate-x-1/2 -translate-y-1/2 transform"
+          >
+            <div class="group relative">
+              <!-- Glow effect -->
+              <div
+                class="bg-primary/30 absolute -inset-1 rounded-full blur-md"
+              ></div>
+              <!-- Rider Icon Circle -->
+              <div
+                class="bg-primary relative flex h-16 w-16 items-center justify-center rounded-full border-4 border-white shadow-2xl dark:border-zinc-900"
+              >
+                <span
+                  class="material-symbols-outlined text-3xl text-white"
+                  data-icon="delivery_dining"
+                  >delivery_dining</span
+                >
+              </div>
+              <!-- Info Tag -->
+              <div
+                class="border-primary/20 absolute -bottom-10 left-1/2 -translate-x-1/2 rounded-full border bg-white px-3 py-1.5 whitespace-nowrap shadow-md dark:bg-zinc-800"
+              >
+                <p class="text-primary text-[11px] font-bold">5 mins away</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Text Content -->
+        <div class="mx-auto max-w-xs space-y-4 text-center">
+          <h1
+            class="text-3xl leading-tight font-extrabold tracking-tight text-zinc-900 dark:text-white"
+          >
+            Live Order Tracking
+          </h1>
+          <p
+            class="text-base leading-relaxed font-normal text-zinc-600 dark:text-zinc-400"
+          >
+            Track your food in real-time from the kitchen to your door.
+          </p>
+        </div>
+      </div>
+      <!-- Footer Actions -->
+      <div class="space-y-8 p-8">
+        <!-- Progress Indicator (3 of 4) -->
+        <div class="flex w-full flex-row items-center justify-center gap-2.5">
+          <div class="bg-primary/20 h-1.5 w-1.5 rounded-full"></div>
+          <div class="bg-primary/20 h-1.5 w-1.5 rounded-full"></div>
+          <div class="bg-primary h-1.5 w-8 rounded-full"></div>
+          <div class="bg-primary/20 h-1.5 w-1.5 rounded-full"></div>
+        </div>
+        <!-- Primary Button -->
+        <div class="flex justify-center">
+          <button
+            class="bg-primary hover:bg-primary/90 shadow-primary/25 flex w-full max-w-md items-center justify-center gap-2 rounded-xl px-8 py-4 font-bold text-white shadow-lg transition-all active:scale-95"
+            onclick="window.location.href = 'onboarding.html'"
+          >
+            <span>Next</span>
+            <span class="material-symbols-outlined" data-icon="arrow_forward"
+              >arrow_forward</span
+            >
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

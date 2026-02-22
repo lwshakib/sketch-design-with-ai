@@ -60,13 +60,13 @@ Bugs are tracked as [GitHub issues](https://github.com/lwshakib/sketch-design-wi
 
 Create an issue and provide the following information:
 
-* **Use a clear and descriptive title** for the issue
-* **Describe the exact steps to reproduce the problem** in as much detail as possible
-* **Provide specific examples** to demonstrate the steps
-* **Describe the behavior you observed** after following the steps
-* **Explain which behavior you expected to see instead** and why
-* **Include screenshots or animated GIFs** if possible
-* **Include your environment details**:
+- **Use a clear and descriptive title** for the issue
+- **Describe the exact steps to reproduce the problem** in as much detail as possible
+- **Provide specific examples** to demonstrate the steps
+- **Describe the behavior you observed** after following the steps
+- **Explain which behavior you expected to see instead** and why
+- **Include screenshots or animated GIFs** if possible
+- **Include your environment details**:
   - OS and version
   - Node.js version
   - Browser and version
@@ -80,6 +80,7 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '...'
 3. Scroll down to '...'
@@ -92,10 +93,11 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Environment:**
- - OS: [e.g. Windows 11]
- - Browser: [e.g. Chrome 120]
- - Node.js: [e.g. 20.10.0]
- - Version: [e.g. 0.1.0]
+
+- OS: [e.g. Windows 11]
+- Browser: [e.g. Chrome 120]
+- Node.js: [e.g. 20.10.0]
+- Version: [e.g. 0.1.0]
 
 **Additional context**
 Add any other context about the problem here.
@@ -107,11 +109,11 @@ Enhancement suggestions are also tracked as [GitHub issues](https://github.com/l
 
 #### How to Submit a Good Enhancement Suggestion
 
-* **Use a clear and descriptive title** for the issue
-* **Provide a detailed description** of the suggested enhancement
-* **Explain why this enhancement would be useful** to most users
-* **List some examples** of how it would be used
-* **Include mockups or examples** if applicable
+- **Use a clear and descriptive title** for the issue
+- **Provide a detailed description** of the suggested enhancement
+- **Explain why this enhancement would be useful** to most users
+- **List some examples** of how it would be used
+- **Include mockups or examples** if applicable
 
 #### Feature Request Template
 
@@ -133,8 +135,8 @@ Add any other context or screenshots about the feature request here.
 
 Unsure where to begin? You can start by looking through these issues:
 
-* **Good First Issue** - issues labeled `good first issue` are great for newcomers
-* **Help Wanted** - issues labeled `help wanted` need attention
+- **Good First Issue** - issues labeled `good first issue` are great for newcomers
+- **Help Wanted** - issues labeled `help wanted` need attention
 
 ### Pull Requests
 
@@ -149,6 +151,7 @@ Unsure where to begin? You can start by looking through these issues:
 #### Pull Request Process
 
 1. **Create a feature branch** from `main`:
+
    ```bash
    git checkout -b feature/amazing-feature
    ```
@@ -156,17 +159,20 @@ Unsure where to begin? You can start by looking through these issues:
 2. **Make your changes** following our coding standards
 
 3. **Commit your changes** using conventional commits:
+
    ```bash
    git commit -m "feat: add amazing feature"
    ```
 
 4. **Keep your branch up to date** with upstream:
+
    ```bash
    git fetch upstream
    git rebase upstream/main
    ```
 
 5. **Push to your fork**:
+
    ```bash
    git push origin feature/amazing-feature
    ```
@@ -181,24 +187,30 @@ Unsure where to begin? You can start by looking through these issues:
 
 ```markdown
 ## Description
+
 Brief description of the changes made.
 
 ## Type of Change
+
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Documentation update
 
 ## Related Issues
+
 Fixes #(issue number)
 
 ## How Has This Been Tested?
+
 Describe the tests you ran to verify your changes.
 
 ## Screenshots (if applicable)
+
 Add screenshots to help explain your changes.
 
 ## Checklist
+
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
@@ -212,32 +224,39 @@ Add screenshots to help explain your changes.
 ### Initial Setup
 
 1. **Install dependencies**:
+
    ```bash
    bun install
    ```
 
 2. **Set up environment variables**:
+
    ```bash
    cp .env.example .env
    ```
+
    Then fill in your API keys and database URL in `.env`
 
 3. **Set up the database**:
+
    ```bash
    bun run db:migrate
    ```
 
 4. **Start the Inngest Dev Server**:
+
    ```bash
    npx --ignore-scripts=false inngest-cli@latest dev
    ```
 
 5. **Start the development server**:
+
    ```bash
    bun dev
    ```
 
 6. **Build for production**:
+
    ```bash
    bun run build
    ```
@@ -303,8 +322,8 @@ bun run db:reset     # Reset database (⚠️ destructive)
 
 ```tsx
 // 1. Imports
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 // 2. Types/Interfaces
 interface MyComponentProps {
@@ -353,10 +372,11 @@ export function MyComponent({ title, onAction }: MyComponentProps) {
 - **Validate input** using Zod or similar
 - **Handle errors** gracefully
 - **Return consistent response format**:
+
   ```typescript
   // Success
   { success: true, data: {...} }
-  
+
   // Error
   { success: false, error: "Error message" }
   ```
@@ -411,16 +431,16 @@ chore(deps): update dependencies
 ### Test Structure
 
 ```typescript
-describe('ComponentName', () => {
-  it('should render correctly', () => {
+describe("ComponentName", () => {
+  it("should render correctly", () => {
     // Test implementation
   });
 
-  it('should handle user interaction', () => {
+  it("should handle user interaction", () => {
     // Test implementation
   });
 
-  it('should handle errors gracefully', () => {
+  it("should handle errors gracefully", () => {
     // Test implementation
   });
 });
@@ -452,6 +472,7 @@ describe('ComponentName', () => {
 ### Recognition
 
 Contributors are recognized in:
+
 - GitHub contributors page
 - Release notes for significant contributions
 - README acknowledgments section
@@ -469,6 +490,7 @@ Contributors are recognized in:
 ### Code Review
 
 When reviewing others' code:
+
 - **Be constructive** and respectful
 - **Explain your suggestions** with reasoning
 - **Approve** when satisfied or request changes clearly

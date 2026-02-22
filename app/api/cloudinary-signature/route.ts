@@ -1,4 +1,3 @@
-
 import { cloudinaryClient } from "@/lib/cloudinary";
 import { NextResponse } from "next/server";
 
@@ -8,7 +7,7 @@ export async function GET() {
     const folder = "sketch-design-with-ai";
     const signature = cloudinaryClient.utils.api_sign_request(
       { timestamp, folder },
-      process.env.CLOUDINARY_API_SECRET!
+      process.env.CLOUDINARY_API_SECRET!,
     );
     return NextResponse.json({
       signature,
@@ -28,7 +27,7 @@ export async function GET() {
         ...(process.env.NODE_ENV === "development" &&
           error instanceof Error && { stack: error.stack }),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

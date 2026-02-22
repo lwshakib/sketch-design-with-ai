@@ -5,11 +5,11 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   req: Request,
-  { params }: { params: Promise<{ projectId: string }> }
+  { params }: { params: Promise<{ projectId: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
-      headers: await headers()
+      headers: await headers(),
     });
 
     if (!session) {
@@ -26,7 +26,7 @@ export async function POST(
       include: {
         messages: true,
         screens: true,
-      }
+      },
     });
 
     if (!originalProject) {
@@ -40,12 +40,12 @@ export async function POST(
           title: `${originalProject.title} (Copy)`,
           userId: session.user.id,
           canvasData: originalProject.canvasData || {},
-        }
+        },
       });
 
       // 2. Create new messages and build an ID map
       const oldToNewMessageId = new Map<string, string>();
-      
+
       for (const msg of originalProject.messages) {
         const newMsg = await tx.message.create({
           data: {
@@ -54,7 +54,7 @@ export async function POST(
             parts: msg.parts || [],
             status: msg.status,
             plan: msg.plan || {},
-          }
+          },
         });
         oldToNewMessageId.set(msg.id, newMsg.id);
       }
@@ -62,7 +62,7 @@ export async function POST(
       // 3. Create screens with remapped generationMessageId
       // We also need to remap ids in the canvasData if strictly necessary, but sticking to the request about 'preview screen message'
       await tx.screen.createMany({
-        data: originalProject.screens.map(s => ({
+        data: originalProject.screens.map((s) => ({
           projectId: project.id,
           title: s.title,
           content: s.content,
@@ -74,8 +74,10 @@ export async function POST(
           status: s.status,
           isLiked: s.isLiked,
           isDisliked: s.isDisliked,
-          generationMessageId: s.generationMessageId ? oldToNewMessageId.get(s.generationMessageId) || null : null
-        }))
+          generationMessageId: s.generationMessageId
+            ? oldToNewMessageId.get(s.generationMessageId) || null
+            : null,
+        })),
       });
 
       return project;

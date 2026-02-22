@@ -52,13 +52,14 @@ export function ForgotPasswordForm({
     return (
       <div className={cn("flex flex-col gap-6 text-center", className)}>
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <CheckCircle2 className="h-6 w-6 text-primary" />
+          <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-full">
+            <CheckCircle2 className="text-primary h-6 w-6" />
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-bold">Check your email</h1>
             <p className="text-muted-foreground text-sm text-balance">
-              We&apos;ve sent a password reset link to <span className="font-medium text-foreground">{email}</span>.
+              We&apos;ve sent a password reset link to{" "}
+              <span className="text-foreground font-medium">{email}</span>.
             </p>
           </div>
           <Button asChild variant="outline" className="w-full">
@@ -79,12 +80,13 @@ export function ForgotPasswordForm({
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Forgot password?</h1>
           <p className="text-muted-foreground text-sm text-balance">
-            Enter your email address and we&apos;ll send you a link to reset your password.
+            Enter your email address and we&apos;ll send you a link to reset
+            your password.
           </p>
         </div>
 
         {error && (
-          <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md text-center">
+          <div className="bg-destructive/10 text-destructive rounded-md p-3 text-center text-sm">
             {error}
           </div>
         )}
@@ -106,7 +108,7 @@ export function ForgotPasswordForm({
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="size-4 animate-spin mr-2" />
+                <Loader2 className="mr-2 size-4 animate-spin" />
                 Sending link...
               </>
             ) : (
