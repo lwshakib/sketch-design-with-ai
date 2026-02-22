@@ -1,4 +1,4 @@
-# Contributor Covenant Code of Conduct
+# <img src="public/logo.svg" width="32" alt="Sketch Logo" /> Contributor Covenant Code of Conduct
 
 ## Our Pledge
 

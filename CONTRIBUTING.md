@@ -1,4 +1,4 @@
-# Contributing to Sketch - Design with AI 🎨
+# <img src="public/logo.svg" width="32" alt="Sketch Logo" /> Contributing to Sketch - Design with AI
 
 First off, **thank you** for considering contributing to Sketch! It's people like you that make this AI-powered design tool amazing. We welcome contributions from everyone, whether you're fixing a typo, reporting a bug, or implementing a major feature.
 
