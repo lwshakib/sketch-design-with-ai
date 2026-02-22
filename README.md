@@ -1,4 +1,4 @@
-# Sketch - Design with AI 🎨✨
+# <img src="public/logo.svg" width="32" alt="Sketch Logo" /> Sketch - Design with AI
 
 > Transform your sketches into stunning, production-ready designs using the power of AI.
 
