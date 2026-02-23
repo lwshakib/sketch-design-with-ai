@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * @file generation-status.tsx
+ * @description This component visualizes the AI's generation process.
+ * It displays a grid of screen previews (placeholders that turn into actual previews as content arrives),
+ * a rotating set of encouraging "dummy" status messages to keep the user engaged,
+ * and handles error states like credit exhaustion.
+ */
+
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { MessageResponse } from "@/components/ai-elements/message";
@@ -30,16 +38,29 @@ const DUMMY_STATUSES = [
   "Synthesizing design tokens",
 ];
 
+/**
+ * Props for the GenerationStatus component.
+ */
 interface GenerationStatusProps {
+  /** The current high-level status string */
   status?: string;
+  /** Whether the generation task is finished */
   isComplete?: boolean;
+  /** The final text response from the AI after generation */
   conclusionText?: string;
+  /** List of screens the AI planned to create */
   planScreens?: any[];
+  /** List of actual generated screen artifacts available in the project */
   projectArtifacts?: any[];
+  /** The title of the screen currently being worked on */
   currentScreenTitle?: string;
+  /** An optional specific status message to display */
   statusMessage?: string;
+  /** Additional CSS classes for the container */
   className?: string;
+  /** Error message if generation failed */
   error?: string;
+  /** Whether the generation failed specifically due to credit limits */
   isCreditError?: boolean;
 }
 
@@ -63,6 +84,10 @@ export function GenerationStatus({
   useEffect(() => {
     if (isComplete) return;
 
+    /**
+     * Cycle through friendly status messages every 4.5 seconds
+     * while the AI is thinking/generating.
+     */
     const statusInterval = setInterval(() => {
       setDummyStatus((prev) => {
         const currentIndex = DUMMY_STATUSES.indexOf(prev);
@@ -71,6 +96,9 @@ export function GenerationStatus({
       });
     }, 4500);
 
+    /**
+     * Simple dot animation ("..." -> "....") for the status text.
+     */
     const dotsInterval = setInterval(() => {
       setDots((prev) => {
         if (prev.length >= 6) return "...";

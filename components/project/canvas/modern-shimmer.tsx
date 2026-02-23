@@ -1,5 +1,13 @@
 import React from "react";
 
+/**
+ * @file modern-shimmer.tsx
+ * @description Provides a professional loading skeleton for artifacts.
+ * While the AI is streaming HTML or regenerating a screen, this component
+ * overlays a clean background with a moving gradient 'shimmer' to indicate
+ * active progress without showing a broken or empty UI.
+ */
+
 export const ModernShimmer = ({
   type = "app",
   appliedTheme,

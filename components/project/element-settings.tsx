@@ -1,6 +1,14 @@
 /** @jsxImportSource react */
 "use client";
 
+/**
+ * @file element-settings.tsx
+ * @description Provides a property inspector for a selected HTML element in the canvas.
+ * Allows users to adjust CSS properties (typography, colors, layout, borders) directly.
+ * It uses a combination of local state to track input values and direct DOM manipulation
+ * (with debounced updates) to apply styles to the preview element.
+ */
+
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import {
   RotateCcw,
@@ -17,9 +25,15 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Props for the ElementSettings component.
+ */
 type Props = {
+  /** The currently selected HTML element from the iframe preview */
   selectedEl: HTMLElement | null;
+  /** Callback to update the selection in the parent store/component */
   setSelectedEl: (el: HTMLElement | null) => void;
+  /** Callback triggered after a style change is applied and debounced */
   onUpdate: () => void;
 };
 
@@ -91,6 +105,10 @@ export function ElementSettings({
   }, [selectedEl]);
 
   const timeoutRef = React.useRef<NodeJS.Timeout>(null);
+  /**
+   * Debounces the onUpdate call to prevent excessive re-renders/processing
+   * during rapid property changes (e.g., color picking or slider dragging).
+   */
   const debouncedUpdate = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
@@ -98,6 +116,10 @@ export function ElementSettings({
     }, 300);
   }, [onUpdate]);
 
+  /**
+   * Applies a specific CSS style property and value to the selected element.
+   * If value is empty, the property is removed from the inline style.
+   */
   const applyStyle = (property: string, value: string) => {
     const el = selectedEl;
     if (!el) return;
@@ -111,6 +133,10 @@ export function ElementSettings({
     debouncedUpdate();
   };
 
+  /**
+   * Synchronizes the component's local state with the actual styles
+   * of the passed HTML element. Reads both inline styles and computed styles.
+   */
   const syncFromElement = useCallback((el: HTMLElement) => {
     const computed = getComputedStyle(el);
     setAlign(

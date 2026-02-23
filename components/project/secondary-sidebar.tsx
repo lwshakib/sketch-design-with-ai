@@ -1,5 +1,14 @@
 "use client";
 
+/**
+ * @file secondary-sidebar.tsx
+ * @description This component acts as the secondary inspector panel.
+ * It is dynamically toggled by the user or by context-specific actions (like selecting an element).
+ * It switches between two primary modes:
+ * 1. 'properties' - Shows the ElementSettings for the currently selected DOM element.
+ * 2. 'theme' - Shows the ThemeSettings for overall project styling.
+ */
+
 import React from "react";
 import { useProjectStore } from "@/hooks/use-project-store";
 import { ElementSettings } from "./element-settings";
@@ -7,8 +16,13 @@ import { ThemeSettings } from "./theme-settings";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Props for the SecondarySidebar component.
+ */
 interface SecondarySidebarProps {
+  /** Callback to persist changes made in the element inspector back to the project state */
   commitEdits: () => void;
+  /** Callback to apply a global theme to the current project */
   applyTheme: (theme: any) => void;
 }
 

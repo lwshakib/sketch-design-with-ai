@@ -1,4 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+
+/**
+ * @file artifact-frame.tsx
+ * @description Highly optimized Iframe wrapper for rendering design artifacts.
+ * It uses a "Virtual DOM" like approach for the iframe content: instead of updating
+ * 'srcDoc' (which causes a full reload/white flash), it communicates with a script
+ * inside the iframe via 'postMessage' to surgically update the body and styles.
+ * This preserves the user's selection and provides a fluid editing experience.
+ */
+
 import { cn } from "@/lib/utils";
 import { type Artifact } from "@/lib/artifact-renderer";
 import {
@@ -17,6 +27,10 @@ export interface ArtifactFrameProps {
   onRef: (index: number, el: HTMLIFrameElement | null) => void;
 }
 
+/**
+ * ArtifactFrame is memoized to prevent unnecessary re-renders of the expensive iframe
+ * unless its core properties or content actually change.
+ */
 export const ArtifactFrame = React.memo(
   ({
     artifact,
@@ -28,6 +42,10 @@ export const ArtifactFrame = React.memo(
     onRef,
   }: ArtifactFrameProps) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
+    /**
+     * Initial content set only once to avoid reloads.
+     * Subsequent updates happen via window.postMessage.
+     */
     const [initialSrcDoc] = useState(() => getInjectedHTML(artifact.content));
     const lastContentRef = useRef(artifact.content);
 
@@ -65,6 +83,10 @@ export const ArtifactFrame = React.memo(
     `;
     }, []);
 
+    /**
+     * Injects or updates a <style> tag in the iframe's <head> to apply the project theme.
+     * This uses CSS variables to override default Tailwind values in real-time.
+     */
     const applyThemeToIframe = useCallback(() => {
       if (
         !appliedTheme ||

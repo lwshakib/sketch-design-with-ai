@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * @file canvas-area.tsx
+ * @description The core workspace area where generated screens (artifacts) are displayed.
+ * This component manages the infinite-feeling canvas, handling scaling (zoom),
+ * multi-element selection, drag-and-drop positioning, and screen resizing.
+ * It also provides the Floating Toolbar for each screen and the main Canvas Toolbar.
+ */
+
 import React from "react";
 import {
   ChevronDown,
@@ -55,30 +63,48 @@ import { useProjectStore } from "@/hooks/use-project-store";
 
 const SELECTION_BLUE = "#3b82f6";
 
+/**
+ * Props for the CanvasArea component.
+ * Includes interaction handlers from the useCanvas hook and project actions from page.tsx.
+ */
 interface CanvasAreaProps {
+  /** Ref to the main preview container for scroll/wheel events */
   previewRef: React.RefObject<HTMLDivElement | null>;
+  /** Dictionary of refs to the individual iframes of each artifact */
   iframeRefs: React.MutableRefObject<Record<string, HTMLIFrameElement | null>>;
 
-  // Interaction Handlers (from useCanvas)
+  // Interaction Handlers (bridged from useCanvas)
   handleMouseDown: (e: React.MouseEvent) => void;
   handleMouseMove: (e: React.MouseEvent) => void;
   handleMouseUp: () => void;
+  /** Starts the resize operation for a screen frame */
   startResizing: (e: React.MouseEvent, index: number, handle: string) => void;
+  /** Starts the dragging operation for one or more screen frames */
   startDraggingFrame: (e: React.MouseEvent, index: number) => void;
 
   // Page-level Action Handlers
+  /** Triggers AI actions for a specific artifact */
   handleArtifactAction: (
     action: "more" | "regenerate" | "variations",
     artifact: Artifact,
   ) => void;
+  /** Updates the user feedback (like/dislike) for a generated screen */
   handleFeedback: (index: number, action: "like" | "dislike" | "none") => void;
+  /** Opens the full code view for a specific artifact */
   openCodeViewer: (index: number) => void;
+  /** Exports an artifact's code as a ZIP file */
   handleExportZip: (index: number) => void;
+  /** Deletes an artifact from the project */
   deleteArtifact: (index: number) => void;
+  /** Controls the visibility of the export sheet */
   setIsExportSheetOpen: (open: boolean) => void;
+  /** Sets which artifact is currently being targeted for export */
   setExportArtifactIndex: (index: number | null) => void;
+  /** Global action to download the entire project */
   handleDownloadFullProject: () => void;
+  /** Global action to duplicate the current project */
   handleDuplicateProject: () => void;
+  /** Global action to delete the entire project */
   handleDeleteProject: () => void;
 }
 
@@ -236,7 +262,7 @@ export function CanvasArea({
         </div>
       </header>
 
-      {/* Content Layer */}
+      {/* Content Layer: Contains the translated and scaled artifacts */}
       <div
         className={cn(
           "absolute inset-0 flex select-none",
@@ -249,6 +275,7 @@ export function CanvasArea({
           <div
             className="relative"
             style={{
+              /** Apply the global canvas zoom and offset translation */
               transform: `translate(${canvasOffset.x}px, ${canvasOffset.y}px) scale(${zoom * 0.5})`,
               transformOrigin: "0 0",
               transition:

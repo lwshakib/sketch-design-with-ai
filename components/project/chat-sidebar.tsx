@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * @file chat-sidebar.tsx
+ * @description This component provides the main chat interface for the project.
+ * It handles user messages, AI responses, project navigation, sharing, and artifact interaction.
+ * It integrates with the useProjectStore for global state and includes a complex
+ * message rendering system that supports various message types (text, images, screen plans).
+ */
+
 import React, { RefObject } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -65,17 +73,29 @@ import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
+/**
+ * Interface for the ChatSidebar component props.
+ * These handlers and data are typically passed down from the parent project page.
+ */
 interface ChatSidebarProps {
-  // Logic Handlers (passed from page.tsx)
+  /** Handler for submitting a new prompt or edited message */
   handleCustomSubmit: (e: React.FormEvent) => void;
+  /** Handler to retry the last failed message */
   handleRetry: () => void;
+  /** Handler for file/image uploads in the chat */
   handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** Reference to the hidden file input for attachments */
   fileInputRef: RefObject<HTMLInputElement | null>;
+  /** Function to apply a specific visual theme to the project */
   applyTheme: (theme: any) => void;
+  /** Current user session data */
   session: any;
-  status: string; // from useChat
-  messages: any[]; // from useChat
-  error: any; // from useChat
+  /** Current status of the chat (e.g., "loading", "streaming") */
+  status: string;
+  /** Array of chat messages from the useChat hook */
+  messages: any[];
+  /** Error object if the chat encounter any issues */
+  error: any;
 }
 
 export function ChatSidebar({
@@ -90,6 +110,8 @@ export function ChatSidebar({
   error,
 }: ChatSidebarProps) {
   const router = useRouter();
+
+  // Extract global state and actions from the project store
   const {
     secondarySidebarMode,
     setSecondarySidebarMode,
@@ -110,8 +132,13 @@ export function ChatSidebar({
     setSelectedArtifactIds,
   } = useProjectStore();
 
+  // Store for managing workspace-wide data like credits
   const { fetchCredits } = useWorkspaceStore();
 
+  /**
+   * Effect to refresh workspace credits when the component mounts
+   * or when the fetchCredits action changes.
+   */
   React.useEffect(() => {
     fetchCredits();
   }, [fetchCredits]);
@@ -119,6 +146,10 @@ export function ChatSidebar({
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
+  /**
+   * Scrolls the message list to the bottom smoothly.
+   * Useful when new messages arrive or when AI is generating content.
+   */
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
@@ -126,6 +157,10 @@ export function ChatSidebar({
     });
   };
 
+  /**
+   * Effect to trigger auto-scrolling whenever messages, generation state,
+   * or realtime generation status updates.
+   */
   React.useEffect(() => {
     // Small delay to ensure the DOM has updated (especially for iframes/shimmers)
     const timer = setTimeout(scrollToBottom, 50);

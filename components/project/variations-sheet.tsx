@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * @file variations-sheet.tsx
+ * @description A configuration sheet for generating design variations of an existing screen.
+ * Users can specify the number of options, the 'creative range' (Refine, Explore, Reimagine),
+ * provide custom AI instructions, and select which specific aspects of the design
+ * should be varied (e.g., just the colors, or the entire layout).
+ */
+
 import React from "react";
 import {
   Sheet,
@@ -17,7 +25,11 @@ import { Minus, Plus } from "lucide-react";
 import { useProjectStore } from "@/hooks/use-project-store";
 import { cn } from "@/lib/utils";
 
+/**
+ * Props for the VariationsSheet component.
+ */
 interface VariationsSheetProps {
+  /** Callback to trigger the AI generation process with the configured options */
   handleGenerateVariations: () => void;
 }
 

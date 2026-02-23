@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * @file project-dialogs.tsx
+ * @description This component serves as a central hub for all modal dialogs,
+ * alerts, sheets, and the command menu within a project.
+ * It handles interactions like project deletion, title editing, regeneration prompts,
+ * design export (ZIP or Copy Code), and system settings.
+ */
+
 import React, { useEffect } from "react";
 import {
   Dialog,
@@ -62,12 +70,22 @@ import { getInjectedHTML } from "@/components/project/utils";
 import { useProjectStore } from "@/hooks/use-project-store";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 
+/**
+ * Props for the ProjectDialogs component.
+ * Handlers for project-level actions are passed from the main page logic.
+ */
 interface ProjectDialogsProps {
+  /** Handler to submit a request for AI regeneration of a screen */
   handleRegenerateSubmit: () => void;
+  /** Handler to update the project title in the backend/store */
   updateProjectTitle: (title: string) => void;
+  /** Handler to permanently delete the current project */
   handleDeleteProject: () => void;
+  /** Handler to export a specific screen artifact as a ZIP file */
   handleExportZip: (index: number) => void;
+  /** Handler to download the entire project structure as a package */
   handleDownloadFullProject: () => void;
+  /** Handler to duplicate the current project */
   handleDuplicateProject: () => void;
 }
 
@@ -79,6 +97,7 @@ export function ProjectDialogs({
   handleDownloadFullProject,
   handleDuplicateProject,
 }: ProjectDialogsProps) {
+  // Extract necessary state and setters from the project store
   const {
     isRegenerateDialogOpen,
     setIsRegenerateDialogOpen,
@@ -112,6 +131,10 @@ export function ProjectDialogs({
   } = useProjectStore();
   const { credits: _credits } = useWorkspaceStore();
 
+  /**
+   * Effect to listen for global keyboard shortcuts.
+   * Currently supports 'Ctrl/Cmd + K' to toggle the Command Menu.
+   */
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {

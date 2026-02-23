@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * @file project-share-view.tsx
+ * @description This component provides a read-only, shared view of the project.
+ * It allows external users to view the generated screens in an interactive canvas
+ * with zoom/pan capabilities, access a mobile preview via QR code, and copy the sharing link.
+ */
+
 import React, { useState, useEffect } from "react";
 import { type Artifact } from "@/lib/artifact-renderer";
 import { cn } from "@/lib/utils";
@@ -19,13 +26,22 @@ import { Logo } from "@/components/logo";
 import { QRCodeSVG } from "qrcode.react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
+/**
+ * Props for the ProjectShareView component.
+ * Contains the shared project metadata and the list of screen artifacts.
+ */
 interface ProjectShareViewProps {
   project: {
+    /** Title of the shared project */
     title: string;
+    /** Unique token used for sharing security/identification */
     shareToken: string;
+    /** Available visual themes for the project */
     themes?: any[];
+    /** The specific theme currently applied to this project */
     appliedTheme?: any;
   };
+  /** Array of artifact objects (screens) to render on the shared canvas */
   artifacts: Artifact[];
 }
 
@@ -72,6 +88,10 @@ export function ProjectShareView({
     canvasOffsetRef.current = canvasOffset;
   }, [zoom, canvasOffset]);
 
+  /**
+   * Effect to listen for postMessage events from the preview iframes.
+   * Updates the height of the artifacts dynamically based on their actual content.
+   */
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (
@@ -86,6 +106,7 @@ export function ProjectShareView({
             if (artifactTitle) {
               setDynamicHeights((prev) => {
                 const currentHeight = prev[artifactTitle] || 0;
+                // Avoid tiny updates for stability
                 if (Math.abs(currentHeight - event.data.height) < 10)
                   return prev;
                 return {

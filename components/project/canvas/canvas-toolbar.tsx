@@ -1,4 +1,11 @@
+/**
+ * @file canvas-toolbar.tsx
+ * @description The main floating toolbar for the workspace canvas.
+ * Allows users to toggle between the 'Select' tool (for interacting/moving frames)
+ * and the 'Hand' tool (for panning across the infinite canvas).
+ */
 import { Hand, MousePointer2 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/hooks/use-project-store";
 

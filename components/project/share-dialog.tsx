@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * @file share-dialog.tsx
+ * @description Manages the public sharing of a project.
+ * Allows users to generate a unique, token-based URL that can be shared
+ * with anyone to preview the live design screens without requiring an account.
+ * Also includes a reset feature to regenerate the token and invalidate current links.
+ */
+
 import React, { useState } from "react";
 import {
   Dialog,
@@ -23,6 +31,10 @@ export function ShareDialog() {
 
   if (!project) return null;
 
+  /**
+   * Constructs the full sharing URL.
+   * Uses both project.id and project.shareToken for secure, public access.
+   */
   const shareUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/preview/project/${project.id}/${project.shareToken || "generating..."}`

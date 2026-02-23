@@ -1,5 +1,12 @@
-/** @jsxImportSource react */
 "use client";
+
+/**
+ * @file theme-settings.tsx
+ * @description Manages the project's visual identity.
+ * Supports switching between hand-crafted brand presets and AI-designed theme systems.
+ * Provides granular control over global design tokens like color palettes,
+ * typography families, and border-radius (pixel-rounding) across all screens.
+ */
 
 import React from "react";
 import { Sparkles, Type, Box, Zap } from "lucide-react";
@@ -40,9 +47,15 @@ const defaultThemes: Theme[] = (THEME_NAME_LIST as unknown as string[]).map(
   },
 );
 
+/**
+ * Props for the ThemeSettings component.
+ */
 type Props = {
+  /** The unique identifier of the currently active theme */
   activeThemeId: string | null;
+  /** Callback triggered when a user selects a new hand-crafted or AI theme */
   onApplyTheme: (theme: Theme) => void;
+  /** The theme object that is currently applied to the project workspace */
   appliedTheme?: Theme | null;
 };
 
@@ -75,6 +88,10 @@ export function ThemeSettings({
 
   const _combinedThemes = [...defaultThemes, ...projectThemes];
 
+  /**
+   * Calls the AI Designer API to generate a completely new design system (color tokens)
+   * based on a natural language brand description.
+   */
   const handleGenerateTheme = async () => {
     if (!themePrompt.trim()) return;
 

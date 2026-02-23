@@ -1,12 +1,25 @@
 "use client";
 
+/**
+ * @file use-canvas.ts
+ * @description custom hook that encapsulates the complex interaction logic for the project canvas.
+ * It manages panning, zooming (with coordinate-space correction), box-selection of multiple artifacts,
+ * and dragging/resizing calculation for artifact frames.
+ */
+
 import { useRef, useEffect, useCallback } from "react";
 import { type Artifact } from "@/lib/artifact-renderer";
 import { useProjectStore } from "@/hooks/use-project-store";
 
+/**
+ * Props for the useCanvas hook.
+ */
 interface UseCanvasProps {
+  /** Callback triggered when a frame's position or size is finalized (persistence) */
   onPersistFrame: (indices: number[]) => void;
+  /** Callback triggered to save the current workspace state */
   onSave: () => void;
+  /** Ref to the scrollable container of the canvas */
   previewRef: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -57,6 +70,7 @@ export function useCanvas({
   const zoomRef = useRef(zoom);
   const canvasOffsetRef = useRef(canvasOffset);
 
+  // Synchronize refs with state for use in event listeners and callbacks
   useEffect(() => {
     zoomRef.current = zoom;
     canvasOffsetRef.current = canvasOffset;
@@ -409,6 +423,14 @@ export function useCanvas({
     ],
   );
 
+  /**
+   * Complex zoom logic that keeps the point under the mouse (mx, my) stationary
+   * by adjusting the canvas offset proportional to the zoom delta.
+   *
+   * @param newScale The target zoom level (1.0 = 100%)
+   * @param mx Mouse X coordinate relative to the preview container
+   * @param my Mouse Y coordinate relative to the preview container
+   */
   const handleZoom = useCallback(
     (newScale: number, mx: number, my: number) => {
       const rect = previewRef.current?.getBoundingClientRect();
@@ -419,7 +441,7 @@ export function useCanvas({
       const originX = rect.width / 2;
       const originY = artifacts.length === 0 ? rect.height / 2 : 144;
 
-      // Convert screen-relative mx/my to origin-relative coordinates
+      // Convert screen-relative mx/my to origin-relative coordinates (our "world space")
       const localMx = mx - originX;
       const localMy = my - originY;
 
@@ -429,15 +451,15 @@ export function useCanvas({
       const nextZoom = Math.min(Math.max(newScale, 0.1), 5);
       if (nextZoom === prevZoom) return;
 
-      // The actual scale applied in CSS is zoom * 0.5
+      // The actual scale applied in CSS is zoom * 0.5 (scaled down for better workspace feel)
       const prevActualScale = prevZoom * 0.5;
       const nextActualScale = nextZoom * 0.5;
 
-      // dx/dy are content-space coordinates relative to the untranslated origin
+      // dx/dy are the content-space coordinates (unscaled) of the point under the cursor
       const dx = (localMx - canvasOffsetRef.current.x) / prevActualScale;
       const dy = (localMy - canvasOffsetRef.current.y) / prevActualScale;
 
-      // Calculate new offset to keep the same point under the mouse
+      // New offsets are calculated such that: localM = dx * newScale + newOffset
       const newOffsetX = localMx - dx * nextActualScale;
       const newOffsetY = localMy - dy * nextActualScale;
 

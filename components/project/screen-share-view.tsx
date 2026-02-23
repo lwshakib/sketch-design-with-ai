@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * @file screen-share-view.tsx
+ * @description Provides a focused, single-screen sharing experience.
+ * Unlike the ProjectShareView which shows multiple screens on a canvas,
+ * this component targets a specific screen but still offers full
+ * zoom/pan capabilities and responsive viewport switching.
+ */
+
 import React, { useState, useRef, useEffect } from "react";
 import { type Artifact } from "@/lib/artifact-renderer";
 import { cn } from "@/lib/utils";
@@ -23,13 +31,21 @@ import { Logo } from "@/components/logo";
 import { QRCodeSVG } from "qrcode.react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
+/**
+ * Props for the ScreenShareView component.
+ */
 interface ScreenShareViewProps {
   project: {
+    /** Title of the project the screen belongs to */
     title: string;
+    /** Token for shared access */
     shareToken: string;
+    /** Available themes for the project */
     themes?: any[];
+    /** The theme currently active for this shared view */
     appliedTheme?: any;
   };
+  /** The specific screen artifact to be showcased */
   artifact: Artifact;
 }
 
@@ -80,6 +96,11 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
     return () => clearTimeout(timer);
   }, [project.themes, artifact.type, appliedTheme]);
 
+  /**
+   * Effect to listen for height updates from the child iframe.
+   * This ensures the container wrapper correctly matches the content's
+   * natural height for a pixel-perfect preview.
+   */
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (
