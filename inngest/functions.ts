@@ -1,7 +1,8 @@
 import { inngest } from "./client";
 import { NonRetriableError } from "inngest";
 import { stepCountIs as _stepCountIs } from "ai";
-import { generateText, generateObject } from "../llm/generate";
+import { generateText } from "../llm/generate-text";
+import { generateObject } from "../llm/generate-object";
 import { z } from "zod";
 import {
   PlanningPrompt,
@@ -839,47 +840,64 @@ CRITICAL:
 
             const { object } = await generateObject({
               system:
-                PlanningPrompt +
-                "\n\nCRITICAL: You are generating exactly 10 high-fidelity color palettes for this project.",
+                "You are an elite color theorist. Generate exactly 10 high-fidelity color palettes. " +
+                "CRITICAL: You MUST provide all 18 color variables for EACH theme. " +
+                "Example structure for one theme:\n" +
+                '{"name": "Sunset", "background": "#1a0505", "foreground": "#fee2e2", "primary": "#ff4d4d", "primaryForeground": "#ffffff", "secondary": "#3d1414", "secondaryForeground": "#ff4d4d", "muted": "#301010", "mutedForeground": "#a87d7d", "accent": "#ff9e9e", "accentForeground": "#1a0505", "border": "#4a1c1c", "input": "#4a1c1c", "ring": "#ff4d4d", "radius": "0.75rem", "card": "#260a0a", "cardForeground": "#fee2e2", "popover": "#260a0a", "popoverForeground": "#fee2e2"}',
               messages: stepMessages as any,
               schema: z.object({
                 themes: z
                   .array(
                     z.object({
                       name: z.string(),
-                      colors: z.object({
-                        background: z.string(),
-                        foreground: z.string(),
-                        primary: z.string(),
-                        primaryForeground: z.string(),
-                        secondary: z.string(),
-                        secondaryForeground: z.string(),
-                        muted: z.string(),
-                        mutedForeground: z.string(),
-                        accent: z.string(),
-                        accentForeground: z.string(),
-                        border: z.string(),
-                        input: z.string(),
-                        ring: z.string(),
-                        radius: z.string(),
-                        card: z.string(),
-                        cardForeground: z.string(),
-                        popover: z.string(),
-                        popoverForeground: z.string(),
-                      }),
+                      background: z.string(),
+                      foreground: z.string(),
+                      primary: z.string(),
+                      primaryForeground: z.string(),
+                      secondary: z.string(),
+                      secondaryForeground: z.string(),
+                      muted: z.string(),
+                      mutedForeground: z.string(),
+                      accent: z.string(),
+                      accentForeground: z.string(),
+                      border: z.string(),
+                      input: z.string(),
+                      ring: z.string(),
+                      radius: z.string(),
+                      card: z.string(),
+                      cardForeground: z.string(),
+                      popover: z.string(),
+                      popoverForeground: z.string(),
                     }),
                   )
                   .min(10)
-                  .max(10)
-                  .describe(
-                    "Exactly 10 distinct, high-fidelity color palettes.",
-                  ),
+                  .max(10),
               }),
             });
 
             finalThemes = object.themes.map((t: any, i: number) => ({
-              ...t,
               id: `project-theme-${i}`,
+              name: t.name,
+              colors: {
+                background: t.background,
+                foreground: t.foreground,
+                primary: t.primary,
+                primaryForeground: t.primaryForeground,
+                secondary: t.secondary,
+                secondaryForeground: t.secondaryForeground,
+                muted: t.muted,
+                mutedForeground: t.mutedForeground,
+                accent: t.accent,
+                accentForeground: t.accentForeground,
+                border: t.border,
+                input: t.input,
+                ring: t.ring,
+                radius: t.radius,
+                card: t.card,
+                cardForeground: t.cardForeground,
+                popover: t.popover,
+                popoverForeground: t.popoverForeground,
+              },
             }));
 
             // ONLY overwrite selectedTheme if it doesn't already exist

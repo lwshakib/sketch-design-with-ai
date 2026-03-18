@@ -1,6 +1,5 @@
-import { generateObject } from "ai";
+import { generateObject } from "@/llm/generate-object";
 import { z } from "zod";
-import { GeminiModel } from "@/llm/model";
 
 export async function POST(req: Request) {
   try {
@@ -11,7 +10,6 @@ export async function POST(req: Request) {
     }
 
     const { object } = await generateObject({
-      model: GeminiModel(),
       schema: z.object({
         name: z.string().describe("A short creative name for the theme"),
         description: z
