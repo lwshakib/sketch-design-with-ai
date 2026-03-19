@@ -282,8 +282,6 @@ export const generateDesign = inngest.createFunction(
               "\n\nCRITICAL: You are REGENERATING/REFACTORING an existing screen. Rethink the layout and visual rhythm entirely while maintaining core functionality and branding.";
 
             const project = originalScreen.project;
-            const selectedTheme =
-              project.selectedTheme || (project.themes as any[])?.[0] || null;
 
             const hydratedMessages = await hydrateImages(safeMessages);
 
@@ -306,11 +304,9 @@ export const generateDesign = inngest.createFunction(
                     content: `Regenerate the "${originalScreen.title}" (${originalScreen.type}) screen using the code provided above as a reference.
     Instructions: ${instructions || "Rethink the UI structure entirely while keeping the same theme and core functionality."}
 
-    ${selectedTheme ? `IMPORTANT: Use this theme for the color palette:\n${JSON.stringify(selectedTheme, null, 2)}` : ""}
-
     CRITICAL INSTRUCTIONS:
     1. CONSISTENCY: You MUST use the exact same color palette and typography as the project.
-    2. BACKGROUND: You MUST set the body or main container background to the theme's background color (\`var(--background)\`).
+    2. BACKGROUND: Ensure the background color and gradients are consistent with the project vision.
     3. NEW LAYOUT: Do NOT repeat the previous layout. Rethink the component placement and visual rhythm. Rebuild it from the ground up if necessary.
     4. FORMAT: You MUST wrap the code in a single artifact block with title="${originalScreen.title} (Refactored)".`,
                   },
@@ -585,8 +581,6 @@ Provide a unique title and technical description for each of the ${optionsCount}
                 "\n\nCRITICAL: You are generating a VARIATION of an existing screen. Focus on the specific variation focus and description provided.";
               // ...
               const project = originalScreen.project;
-              const selectedTheme =
-                project.selectedTheme || (project.themes as any[])?.[0] || null;
               const hydratedMessages = await hydrateImages(safeMessages);
 
               let attempts = 0;
@@ -608,10 +602,8 @@ Provide a unique title and technical description for each of the ${optionsCount}
 Variation Focus: ${v.description}
 Technical Prompt: ${v.prompt}
 
-${selectedTheme ? `Use this theme:\n${JSON.stringify(selectedTheme, null, 2)}` : ""}
-
 CRITICAL:
-1. BACKGROUND: You MUST set the body or main container background to the theme's background color (\`var(--background)\`).
+1. BACKGROUND: Ensure the background color and theme consistency.
 2. WRAP: Wrap code in <artifact title="${v.title}"> block.`,
                     },
                   ] as any,
@@ -853,8 +845,6 @@ CRITICAL:
         return {
           plan: {
             screens: finalScreens,
-            themes: themes,
-            selectedTheme: selectedTheme,
             conclusionText: finalConclusion,
             suggestion: finalSuggestion,
           },
