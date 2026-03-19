@@ -365,7 +365,6 @@ export const generateDesign = inngest.createFunction(
             where: { id: assistantMessageId },
             data: {
               parts: [{ type: "text", text: conclusionText }],
-              plan: regenPlan,
               status: "completed",
             },
           });
@@ -665,7 +664,6 @@ CRITICAL:
             where: { id: messageId },
             data: {
               parts: [{ type: "text", text: conclusionText }],
-              plan: JSON.parse(JSON.stringify(varPlan)),
               status: "completed",
             },
           });
@@ -1156,7 +1154,6 @@ SPECIFIC PROMPT: ${(screen as any).prompt || ""}
             where: { id: fullDesignMessageId },
             data: {
               parts: [{ type: "text", text: plan.conclusionText || "" }],
-              plan: JSON.parse(JSON.stringify(planWithIds)),
               status: "completed",
             },
           });

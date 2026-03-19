@@ -44,6 +44,8 @@ import {
   ArrowUp,
   ChevronUp,
   Rocket,
+  User,
+  History,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -213,6 +215,7 @@ export function CanvasArea({
 
   const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
   const [qrCodeUrl, setQrCodeUrl] = React.useState("");
+  const [selectedTurnId, setSelectedTurnId] = React.useState<string | null>(null);
 
   return (
     <main
@@ -244,6 +247,43 @@ export function CanvasArea({
           transform: `translate(${canvasOffset.x % (20 * zoom * 0.5)}px, ${canvasOffset.y % (20 * zoom * 0.5)}px)`,
         }}
       />
+      
+      {/* Turn Details Detail (Top Left) */}
+      {selectedTurnId && (
+        <div className="pointer-events-none absolute top-[68px] left-6 z-[60] flex flex-col items-start gap-4">
+          {(() => {
+            const userIdx = messages?.findIndex((m) => m.id === selectedTurnId);
+            if (userIdx === -1 || userIdx === undefined) return null;
+            const userMsg = messages![userIdx];
+            const assistantMsg = messages?.slice(userIdx + 1).find((m) => m.role === "assistant");
+            
+            const getUserText = () => userMsg.parts?.find((p: any) => p.type === "text")?.text || "Instruction";
+            const getAssistantText = () => {
+                 if (!assistantMsg) return "Generating response...";
+                 const text = assistantMsg.parts?.find((p: any) => p.type === "text")?.text || "The design was updated.";
+                 return text.replace(/<(artifact|artifact\s+.*?)>[\s\S]*?<\/artifact>/g, "").trim();
+            }
+
+            return (
+              <div className="bg-background/80 border-border pointer-events-auto flex max-h-[480px] w-[340px] flex-col gap-4 overflow-y-auto rounded-xl border p-4 shadow-xl backdrop-blur-3xl animate-in fade-in slide-in-from-top-2 duration-300 scrollbar-none ring-1 ring-black/5 lg:w-[400px]">
+                <div className="flex flex-col gap-3">
+                   {/* User Message */}
+                   <p className="text-[14px] font-medium leading-relaxed text-foreground/90">
+                     {getUserText().replace(/\[Context:.*?\]\s*/g, "").trim()}
+                   </p>
+
+                   <hr className="border-border/10" />
+
+                   {/* Assistant Message */}
+                   <div className="text-[13.5px] leading-relaxed text-muted-foreground">
+                     {getAssistantText()}
+                   </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
 
       {/* Preview Header */}
       <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex h-16 items-center justify-between px-6">
@@ -366,6 +406,16 @@ export function CanvasArea({
                 title="Edit Mode"
               >
                 <Pencil className="h-4 w-4" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => openCodeViewer(selectedIndex)}
+                className="h-9 w-9 rounded-full transition-all hover:bg-secondary/40"
+                title="View Code"
+              >
+                <Code className="h-4 w-4" />
               </Button>
 
               <DropdownMenu>
@@ -787,15 +837,72 @@ export function CanvasArea({
         )}
       </div>
 
-      {/* Agent Log Button at Bottom Left */}
-      <div className="pointer-events-none absolute bottom-4 left-8 z-[100]">
+      {/* Agent Log / History (Bottom Left) */}
+      <div className="pointer-events-none absolute bottom-6 left-6 z-[60] flex flex-col items-start gap-2.5">
+        {/* Minimal History Window */}
+        {isAgentLogOpen && (
+          <div className="bg-background/80 border-border pointer-events-auto flex max-h-[300px] w-[260px] flex-col gap-1 overflow-y-auto rounded-xl border p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 scrollbar-none ring-1 ring-black/5">
+            <div className="flex flex-col gap-0.5">
+              {messages
+                ?.filter((m) => m.role === "user" && !m.isSilent)
+                .slice()
+                .reverse()
+                .map((msg, i) => {
+                  const textPart = msg.parts?.find((p: any) => p.type === "text");
+                  const text = textPart?.text || "Instruction";
+                  const cleanText = text.replace(/\[Context:.*?\]\s*/g, "").trim(); 
+                  
+                  if (!cleanText) return null;
+
+                  return (
+                    <div
+                      key={msg.id || i}
+                      onClick={() => setSelectedTurnId(prev => prev === msg.id ? null : msg.id)}
+                      className={cn(
+                        "group relative flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 transition-all",
+                        selectedTurnId === msg.id
+                          ? "bg-secondary/60 ring-1 ring-primary/10 shadow-sm" 
+                          : "hover:bg-secondary/40"
+                      )}
+                    >
+                      <Check className={cn(
+                        "h-3 w-3 shrink-0 transition-colors",
+                        selectedTurnId === msg.id ? "text-primary" : "text-muted-foreground/30 group-hover:text-muted-foreground"
+                      )} />
+                      <span className={cn(
+                        "text-[12px] font-medium truncate leading-tight transition-colors",
+                        selectedTurnId === msg.id ? "text-foreground" : "text-muted-foreground"
+                      )}>
+                        {cleanText}
+                      </span>
+                    </div>
+                  );
+                })}
+              {messages?.filter((m) => m.role === "user" && !m.isSilent).length === 0 && (
+                <div className="text-muted-foreground/50 py-6 text-center text-[11px] font-medium italic">
+                  No activity logs found
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Minimal Toggle Button */}
         <Button
           variant="ghost"
-          className="pointer-events-auto bg-background/50 border-border group flex items-center gap-2.5 rounded-full border px-4 h-9 text-[13px] font-medium text-muted-foreground backdrop-blur-md transition-all hover:bg-background/80 hover:text-foreground hover:shadow-lg"
+          onClick={() => setIsAgentLogOpen(!isAgentLogOpen)}
+          className={cn(
+            "pointer-events-auto bg-background/50 border-border group flex items-center gap-2.5 rounded-full border px-4 h-10 text-[13px] font-medium text-muted-foreground backdrop-blur-md transition-all hover:bg-background/80 hover:text-foreground hover:shadow-lg",
+            isAgentLogOpen && "bg-background/80 text-foreground border-primary/20 shadow-lg"
+          )}
         >
-          <Rocket className="h-4 w-4 stroke-[1.5px]" />
+          <Rocket className={cn("h-4 w-4 stroke-[1.5px] transition-colors", isAgentLogOpen ? "text-primary" : "text-muted-foreground")} />
           <span>Agent Log</span>
-          <ChevronDown className="h-4 w-4 opacity-50" />
+          {isAgentLogOpen ? (
+            <ChevronDown className="h-4 w-4 opacity-50" />
+          ) : (
+            <ChevronUp className="h-4 w-4 opacity-50" />
+          )}
         </Button>
       </div>
 
@@ -992,69 +1099,6 @@ export function CanvasArea({
         </Button>
       </div>
 
-      {/* Agent Log / History (Bottom Left) */}
-      <div className="pointer-events-none absolute bottom-6 left-6 z-[60] flex flex-col items-start gap-4 text-white">
-        {/* History Window */}
-        {isAgentLogOpen && (
-          <div className="bg-zinc-950/95 border-zinc-800/50 pointer-events-auto flex max-h-[340px] w-[280px] flex-col gap-2 overflow-y-auto rounded-[2rem] border p-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-3xl animate-in fade-in slide-in-from-bottom-4 duration-300 scrollbar-none">
-            <div className="flex flex-col gap-2">
-              {messages
-                ?.filter((m) => m.role === "user" && !m.isSilent)
-                .slice()
-                .reverse()
-                .map((msg, i) => {
-                  const textPart = msg.parts?.find((p: any) => p.type === "text");
-                  const text = textPart?.text || "Instruction";
-                  const cleanText = text.replace(/\[Context:.*?\]\s*/g, "").trim(); 
-                  
-                  if (!cleanText) return null;
-
-                  return (
-                    <div
-                      key={msg.id || i}
-                      className={cn(
-                        "group relative flex items-center gap-3 rounded-[1.25rem] px-4 py-2.5 transition-all text-white",
-                        i === 0 
-                          ? "bg-zinc-800/80 ring-1 ring-white/10" 
-                          : "bg-zinc-900/40 hover:bg-zinc-800/60"
-                      )}
-                    >
-                      <Check className={cn(
-                        "h-3.5 w-3.5 shrink-0 transition-colors",
-                        i === 0 ? "text-zinc-400" : "text-zinc-600 group-hover:text-zinc-400"
-                      )} />
-                      <span className="text-[13px] font-medium text-zinc-300 truncate leading-snug">
-                        {cleanText}
-                      </span>
-                    </div>
-                  );
-                })}
-              {messages?.filter((m) => m.role === "user" && !m.isSilent).length === 0 && (
-                <div className="text-zinc-500 py-6 text-center text-xs font-medium italic">
-                  No activity logs found
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Toggle Button */}
-        <Button
-          onClick={() => setIsAgentLogOpen(!isAgentLogOpen)}
-          className={cn(
-            "pointer-events-auto flex h-14 items-center gap-3 rounded-full bg-zinc-950 px-6 text-sm font-semibold text-white shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all hover:bg-zinc-900 hover:scale-[1.02] active:scale-[0.98] border-none ring-offset-0 focus-visible:ring-0",
-            isAgentLogOpen && "bg-zinc-900 ring-2 ring-zinc-700"
-          )}
-        >
-          <Rocket className={cn("h-5 w-5", isAgentLogOpen ? "text-primary" : "text-zinc-400")} />
-          <span className="tracking-tight">Agent log</span>
-          {isAgentLogOpen ? (
-            <ChevronDown className="h-4 w-4 text-zinc-500 transition-transform duration-300" />
-          ) : (
-            <ChevronUp className="h-4 w-4 text-zinc-500 transition-transform duration-300" />
-          )}
-        </Button>
-      </div>
 
       {/* QR Code Dialog */}
       <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>

@@ -658,14 +658,8 @@ export default function ProjectPage() {
           const lastAssistant = [...data.messages]
             .reverse()
             .find((m: any) => m.role === "assistant");
-          if (lastAssistant?.plan?.screens) {
-            setDesignPlan({
-              screens: lastAssistant.plan.screens,
-              _markdown: lastAssistant.plan._markdown,
-            });
-            if (lastAssistant.status === "generating") {
-              setIsGenerating(true);
-            }
+          if (lastAssistant?.status === "generating") {
+            setIsGenerating(true);
           }
         }
 

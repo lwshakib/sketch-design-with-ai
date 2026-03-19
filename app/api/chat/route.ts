@@ -65,7 +65,6 @@ export async function POST(req: Request) {
                     ?.text || "",
           },
         ],
-        plan: selectedScreens ? { selectedScreens } : undefined,
       },
     });
 
