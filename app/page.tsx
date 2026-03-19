@@ -347,7 +347,7 @@ export default function Home() {
         {/* Top Header */}
         <header className="z-40 flex items-center justify-between bg-transparent px-6 py-4">
           <div className="flex items-center gap-4">
-            <Logo textSize="1.6rem" />
+            <Logo />
           </div>
 
           <div className="flex items-center gap-3">
