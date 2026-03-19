@@ -356,23 +356,6 @@ export default function AccountPage() {
                                 <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-500">
                                   Active
                                 </span>
-                                {accounts?.some(
-                                  (a: any) => a.providerId === provider,
-                                ) && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      const acc = accounts?.find(
-                                        (a: any) => a.providerId === provider,
-                                      );
-                                      if (acc) handleUnlinkAccount(acc.id);
-                                    }}
-                                    className="text-destructive hover:bg-destructive/10 h-8 rounded-lg px-3 text-[10px] font-bold"
-                                  >
-                                    Unlink
-                                  </Button>
-                                )}
                               </div>
                             ) : (
                               <Button
