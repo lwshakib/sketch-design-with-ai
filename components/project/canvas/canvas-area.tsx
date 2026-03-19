@@ -73,6 +73,7 @@ import {
 import { LogoIcon } from "@/components/logo";
 import { toast } from "sonner";
 import { useProjectStore } from "@/hooks/use-project-store";
+import { ModeToggle } from "@/components/mode-toggle";
 
 const SELECTION_BLUE = "#3b82f6";
 
@@ -237,18 +238,56 @@ export function CanvasArea({
 
       {/* Preview Header */}
       <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex h-16 items-center justify-between px-6">
-        <div className="pointer-events-auto flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => window.location.href = "/"}
-            className="text-muted-foreground hover:text-foreground h-10 w-10 transition-all hover:bg-transparent"
-            title="Go to Dashboard"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
+        <div className="pointer-events-auto flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-foreground h-10 w-10 transition-all hover:bg-transparent"
+                title="Menu"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              className="border-border bg-background/95 w-56 backdrop-blur-xl"
+            >
+              <DropdownMenuItem
+                onClick={() => (window.location.href = "/")}
+                className="cursor-pointer"
+              >
+                <LayoutGrid className="mr-2.5 h-4 w-4 opacity-70" />
+                <span>Go to projects</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="opacity-50" />
+              <DropdownMenuItem
+                onClick={_handleDownloadFullProject}
+                className="cursor-pointer"
+              >
+                <Download className="mr-2.5 h-4 w-4 opacity-70" />
+                <span>Download project</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={_handleDuplicateProject}
+                className="cursor-pointer"
+              >
+                <Copy className="mr-2.5 h-4 w-4 opacity-70" />
+                <span>Duplicate project</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="opacity-50" />
+              <DropdownMenuItem
+                onClick={_handleDeleteProject}
+                className="cursor-pointer"
+              >
+                <Trash2 className="mr-2.5 h-4 w-4 opacity-70" />
+                <span>Delete project</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <div className="flex items-center">
-            <span className="text-foreground whitespace-nowrap text-[15px] font-semibold tracking-tight">
+            <span className="text-foreground whitespace-nowrap text-[15.5px] font-semibold tracking-tight">
               {project?.title || "Untitled Project"}
             </span>
           </div>
@@ -269,6 +308,7 @@ export function CanvasArea({
               </div>
             )}
           </div>
+          <ModeToggle />
           <UserMenu />
         </div>
       </header>

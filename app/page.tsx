@@ -32,6 +32,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Image from "next/image";
 import { uploadFileToCloudinary } from "@/lib/cloudinary-client";
 import { toast } from "sonner";
+import { ModeToggle } from "@/components/mode-toggle";
 
 const PROMPTS = {
   app: [
@@ -340,6 +341,7 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-4">
+          <ModeToggle />
           <UserMenu />
           <div className="lg:hidden">
             <MobileMenu

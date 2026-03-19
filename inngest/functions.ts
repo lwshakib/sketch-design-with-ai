@@ -19,10 +19,8 @@ import {
   normalizeMessages,
   publishStatus,
   publishPlan,
-  deductCredits,
   getVariation,
 } from "./helpers";
-import { recordCreditUsage } from "../lib/credits";
 
 // Types
 
@@ -62,6 +60,7 @@ export const generateDesign = inngest.createFunction(
         variationCustomInstructions,
         variationAspects,
         assistantMessageId: providedMessageId,
+        intent: initialIntent,
       } = event.data;
 
       // Normalize messages
@@ -69,8 +68,8 @@ export const generateDesign = inngest.createFunction(
 
       // --- STEP 1: ANALYZE INTENT ---
       // We only do this for standard messages, not for silent or specific mode triggers if they are already clear.
-      let intent: { action: string; response: string } | null = null;
-      if (!screenId && !isVariations && !isSilent) {
+      let intent = initialIntent;
+      if (!intent && !screenId && !isVariations && !isSilent) {
         intent = await step.run("analyze-intent", async () => {
           await publishStatus({
             publish,
@@ -92,46 +91,46 @@ export const generateDesign = inngest.createFunction(
           });
           return object;
         });
+      }
 
-        if (intent && intent.action === "chat") {
-          const validIntent = intent;
-          // ... (existing chat logic)
-          await step.run("respond-to-chat", async () => {
-            await prisma.message.update({
-              where: { id: providedMessageId },
-              data: {
-                parts: [{ type: "text", text: intent!.response }],
-                status: "completed",
-              },
-            });
+      if (intent && intent.action === "chat") {
+        const validIntent = intent;
+        // ... (existing chat logic)
+        await step.run("respond-to-chat", async () => {
+          await prisma.message.update({
+            where: { id: providedMessageId },
+            data: {
+              parts: [{ type: "text", text: intent!.response }],
+              status: "completed",
+            },
           });
+        });
 
-          await publishStatus({
-            publish,
-            projectId,
-            message: "Chat response sent.",
-            status: "complete",
-            messageId: providedMessageId,
-          });
+        await publishStatus({
+          publish,
+          projectId,
+          message: "Chat response sent.",
+          status: "complete",
+          messageId: providedMessageId,
+        });
 
-          await publishPlan({
-            publish,
-            projectId,
-            markdown: validIntent.response,
-            messageId: providedMessageId,
-          });
+        await publishPlan({
+          publish,
+          projectId,
+          markdown: validIntent.response,
+          messageId: providedMessageId,
+        });
 
-          return { success: true, chat: true };
-        } else if (intent) {
-          // If action is "generate", notify UI but with empty markdown
-          // to avoid showing the vision text.
-          await publishPlan({
-            publish,
-            projectId,
-            markdown: "",
-            messageId: providedMessageId,
-          });
-        }
+        return { success: true, chat: true };
+      } else if (intent) {
+        // If action is "generate", notify UI but with empty markdown
+        // to avoid showing the vision text.
+        await publishPlan({
+          publish,
+          projectId,
+          markdown: "",
+          messageId: providedMessageId,
+        });
       }
 
       if (screenId) {
@@ -1188,9 +1187,7 @@ SPECIFIC PROMPT: ${(screen as any).prompt || ""}
       const isCreditError = error.message
         ?.toLowerCase()
         .includes("insufficient credits");
-      const msg = isCreditError
-        ? "Insufficient credits. Please check your credit balance to continue generating designs."
-        : error.message || "An unexpected error occurred during generation.";
+      const msg = error.message || "An unexpected error occurred during generation.";
 
       await publishStatus({
         publish,
@@ -1199,11 +1196,9 @@ SPECIFIC PROMPT: ${(screen as any).prompt || ""}
         status: "error",
         messageId:
           event.data.assistantMessageId || event.data.providedMessageId,
-        isCreditError,
       });
 
-      // Stop retries if it's a credit error or already a NonRetriableError
-      if (isCreditError || error instanceof NonRetriableError) {
+      if (error instanceof NonRetriableError) {
         return { error: msg };
       }
 

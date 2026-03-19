@@ -3,6 +3,9 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { inngest } from "@/inngest/client";
+import { generateObject } from "@/llm/generate-object";
+import { IntentAnalysisPrompt } from "@/llm/prompts";
+import { z } from "zod";
 
 export async function POST(req: Request) {
   try {
@@ -66,15 +69,45 @@ export async function POST(req: Request) {
       },
     });
 
-    // 2. Create Assistant Message Placeholder (if not silent)
+    // 2. Perform Intent Analysis (LLM based) to decide if we need Inngest
+    const normalizedMessagesForAnalysis = (messages || []).map((msg: any) => ({
+      role: msg.role,
+      content:
+        typeof msg.content === "string"
+          ? msg.content
+          : msg.parts?.find((p: any) => p.type === "text")?.text || "",
+    }));
+
+    const { object: intent } = await generateObject({
+      system: IntentAnalysisPrompt,
+      messages: normalizedMessagesForAnalysis,
+      schema: z.object({
+        action: z.enum(["generate", "chat"]),
+        response: z.string(),
+      }),
+    });
+
+    // 3. Handle based on intent
+    if (intent.action === "chat") {
+      const assistantMsg = await prisma.message.create({
+        data: {
+          projectId: projectId,
+          role: "assistant",
+          parts: [{ type: "text", text: intent.response }],
+          status: "completed",
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        assistantMessageId: assistantMsg.id,
+        isChat: true,
+      });
+    }
+
+    // 4. Create Assistant Message Placeholder for "generate"
     let assistantMessageId = null;
     if (!isSilent) {
-      const _introText = screenId
-        ? "*Architecting refactored layout...*"
-        : isVariations
-          ? `*Architecting variations...*`
-          : "*Analyzing your request and architecting project manifest...*";
-
       const assistantMsg = await prisma.message.create({
         data: {
           projectId: projectId,
@@ -134,6 +167,7 @@ export async function POST(req: Request) {
         variationCreativeRange,
         variationCustomInstructions,
         variationAspects,
+        intent, // Pass the pre-analyzed intent
       },
     });
 
