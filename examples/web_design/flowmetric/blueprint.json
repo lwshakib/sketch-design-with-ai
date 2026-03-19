@@ -1,0 +1,40 @@
+{
+  "vision": "FlowMetric is a next-generation productivity and analytics platform designed to help individuals and teams master their workflow. The vision is to provide a unified, visually immersive experience that balances complex data visualization with intuitive collaboration tools. The design language prioritizes clarity and focus, utilizing a sophisticated blue primary palette (#3c83f6), the Inter typeface, and a robust dark mode implementation to reduce eye strain during deep work sessions. The architecture supports a seamless transition from public marketing (Landing Page) to private application (Dashboard, Analytics, Team) while maintaining a consistent design system across authentication, onboarding, and settings flows.",
+  "screens": [
+    {
+      "title": "Landing Page",
+      "description": "The public-facing entry point for FlowMetric. It should feature a sticky navigation bar with a logo, a compelling hero section with a gradient background and primary CTA, a feature grid highlighting productivity tools, a pricing table, and a comprehensive FAQ section.",
+      "prompt": "Design a modern, high-converting SaaS landing page for FlowMetric. Include a sticky navigation bar with a logo, a hero section with a gradient background and a primary CTA button, a feature grid with icons, a pricing table with three tiers, and a FAQ section. Use the Inter font and the primary blue color (#3c83f6). Ensure the design is responsive and uses the existing color palette (light and dark backgrounds)."
+    },
+    {
+      "title": "Authentication (Sign In)",
+      "description": "A clean, focused login interface. It should feature a centered card layout with the FlowMetric logo, welcome text, email and password inputs with floating labels, a 'Remember me' checkbox, a 'Forgot Password' link, and a primary 'Sign In' button.",
+      "prompt": "Create a centered authentication card for FlowMetric. Include the logo, welcome text, email and password inputs with floating labels, a 'Remember me' checkbox, a 'Forgot Password' link, and a primary 'Sign In' button. Add a 'Sign up' link at the bottom. Use the existing design tokens (Inter font, blue primary, white/dark backgrounds)."
+    },
+    {
+      "title": "Main Dashboard",
+      "description": "The core application interface. It should feature a collapsible sidebar with navigation icons (Dashboard, Analytics, Team, Settings) and a hover-expand effect, a top header with a search bar and user profile, and a main content area displaying key performance indicators (KPIs), a line chart for 'Flow Rate', and a list of recent activities.",
+      "prompt": "Design the main FlowMetric dashboard. Include a collapsible sidebar with navigation icons (Dashboard, Analytics, Team, Settings) and a hover-expand effect. The top header should have a search bar and user profile. The main area should display key performance indicators (KPI cards), a line chart for 'Flow Rate', and a list of recent activities. Use dark mode support and the primary blue color."
+    },
+    {
+      "title": "Analytics View",
+      "description": "A deep-dive data visualization page. It should include a date range picker, summary cards (Total Flow, Active Users, Retention), a large area chart showing trends, a bar chart for user distribution, and a data table with sorting capabilities.",
+      "prompt": "Design a detailed analytics page for FlowMetric. Include a date range picker, summary cards (Total Flow, Active Users, Retention), a large area chart showing trends, a bar chart for user distribution, and a data table with sorting capabilities. Use a clean layout with ample whitespace and the existing color palette."
+    },
+    {
+      "title": "Team Hub",
+      "description": "A collaboration-focused interface. It should include a header with search, a sidebar for team members, a main area showing active projects with progress bars, and a chat or activity feed section. Use a card-based layout for team members with avatars.",
+      "prompt": "Design the Team Collaboration Hub. Include a header with search, a sidebar for team members, a main area showing active projects with progress bars, and a chat or activity feed section. Use a card-based layout for team members with avatars. Ensure the design supports both light and dark modes."
+    },
+    {
+      "title": "Onboarding Wizard",
+      "description": "An interactive step-by-step guide for new users. It should feature a progress stepper at the top, a large card with selectable work style options (e.g., Deep Work, Agile, Creative) with icons, and a 'Next' button.",
+      "prompt": "Design an interactive onboarding wizard for FlowMetric. Include a progress stepper at the top, a large card with selectable work style options (e.g., Deep Work, Agile, Creative) with icons, and a 'Next' button. Use the primary blue color for active states and the existing typography."
+    },
+    {
+      "title": "Account Settings",
+      "description": "A user preference and account management page. It should include a sidebar for navigation (Profile, Security, Notifications, Billing) and a main content area with form fields for editing profile details, toggles for notifications, and a section for changing password.",
+      "prompt": "Design the Account Settings page. Include a sidebar for navigation (Profile, Security, Notifications, Billing) and a main content area with form fields for editing profile details, toggles for notifications, and a section for changing password. Use a clean, organized layout with the existing design tokens."
+    }
+  ]
+}

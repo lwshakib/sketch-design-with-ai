@@ -129,7 +129,6 @@ export function ProjectDialogs({
     isGenerating,
     project,
   } = useProjectStore();
-  const { credits: _credits } = useWorkspaceStore();
 
   /**
    * Effect to listen for global keyboard shortcuts.
@@ -265,26 +264,25 @@ export function ProjectDialogs({
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
       >
-        <AlertDialogContent className="bg-background border-border text-foreground max-w-[380px] rounded-3xl border p-6 shadow-2xl">
-          <AlertDialogHeader className="space-y-2">
-            <AlertDialogTitle className="text-xl font-bold tracking-tight">
+        <AlertDialogContent className="bg-background border-border text-foreground max-w-[400px] rounded-2xl border p-6 shadow-xl">
+          <AlertDialogHeader className="space-y-1.5">
+            <AlertDialogTitle className="text-lg font-semibold tracking-tight">
               Delete Project
             </AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground text-sm leading-relaxed">
-              Are you sure? This will permanently remove{" "}
-              <span className="text-foreground font-bold">
+              Are you sure you want to delete{" "}
+              <span className="text-foreground font-medium">
                 "{project?.title}"
-              </span>{" "}
-              and all its associated screens. This action cannot be undone.
+              </span>? This will permanently remove all associated screens and cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mt-6 flex flex-row items-center gap-3">
-            <AlertDialogCancel className="bg-secondary border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground mt-0 h-10 flex-1 rounded-xl text-sm font-medium transition-all">
+          <AlertDialogFooter className="mt-5 flex flex-row items-center gap-2">
+            <AlertDialogCancel className="bg-secondary hover:bg-muted text-muted-foreground mt-0 h-9 flex-1 rounded-lg border-none text-xs font-medium transition-colors">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteProject}
-              className="h-10 flex-1 rounded-xl border-none bg-red-500 text-sm font-bold text-white shadow-[0_4px_12px_rgba(239,68,68,0.25)] transition-all hover:bg-red-600 hover:shadow-[0_6px_15px_rgba(239,68,68,0.35)] active:scale-[0.98]"
+              className="bg-red-600 text-white hover:bg-red-700 h-9 flex-1 rounded-lg border-none text-xs font-medium transition-colors shadow-none"
             >
               Delete Project
             </AlertDialogAction>

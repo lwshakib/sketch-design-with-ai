@@ -42,6 +42,7 @@ import {
   ArrowRight,
   LayoutGrid,
   ArrowUp,
+  ChevronUp,
   Rocket,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
@@ -73,7 +74,6 @@ import {
 import { LogoIcon } from "@/components/logo";
 import { toast } from "sonner";
 import { useProjectStore } from "@/hooks/use-project-store";
-import { ModeToggle } from "@/components/mode-toggle";
 
 const SELECTION_BLUE = "#3b82f6";
 
@@ -188,7 +188,16 @@ export function CanvasArea({
     setSelectedArtifactIds,
     isGenerating,
     realtimeStatus,
+    isAgentLogOpen,
+    setIsAgentLogOpen,
+    messages,
   } = useProjectStore();
+
+  const selectedIndex = throttledArtifacts.findIndex(
+    (a) => a.id && selectedArtifactIds.has(a.id),
+  );
+  const selectedArtifact =
+    selectedIndex !== -1 ? throttledArtifacts[selectedIndex] : null;
 
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -290,7 +299,227 @@ export function CanvasArea({
             <span className="text-foreground whitespace-nowrap text-[15.5px] font-semibold tracking-tight">
               {project?.title || "Untitled Project"}
             </span>
-          </div>
+           </div>
+        </div>
+        
+        {/* Dynamic Center Toolbar for Selected Artifact */}
+        <div className="pointer-events-none absolute inset-x-0 h-full flex items-center justify-center">
+          {selectedArtifact && selectedArtifactIds.size === 1 && (
+            <div className="bg-card/95 border-border/50 pointer-events-auto flex items-center gap-1.5 rounded-full border px-2 py-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-300 ring-1 ring-white/5">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-foreground/80 hover:text-foreground flex h-9 items-center gap-2 rounded-full px-4 text-[13px] font-medium transition-colors hover:bg-secondary/40"
+                  >
+                    <Sparkles className="text-primary h-4 w-4" />
+                    Generate
+                    <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="center"
+                  className="bg-card border-border text-foreground z-[100] w-56 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
+                >
+                  <DropdownMenuItem
+                    onClick={() => handleArtifactAction("more", selectedArtifact)}
+                    className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
+                  >
+                    <Plus className="text-primary h-4 w-4" />
+                    Create more pages
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleArtifactAction("regenerate", selectedArtifact)}
+                    className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
+                  >
+                    <RotateCcw className="text-primary h-4 w-4" />
+                    Regenerate
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleArtifactAction("variations", selectedArtifact)}
+                    className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
+                  >
+                    <Columns className="text-primary h-4 w-4" />
+                    Variations
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <div className="bg-border/50 mx-1 h-4 w-[1px]" />
+
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                   if (secondarySidebarMode === "properties") {
+                      setSecondarySidebarMode("none");
+                   } else {
+                      setSecondarySidebarMode("properties");
+                      setActiveTool("select");
+                   }
+                }}
+                className={cn(
+                  "h-9 w-9 rounded-full transition-all hover:bg-secondary/40",
+                  secondarySidebarMode === "properties" && "bg-primary/10 text-primary"
+                )}
+                title="Edit Mode"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-foreground/80 hover:text-foreground flex h-9 items-center gap-2 rounded-full px-3 text-[13px] font-medium transition-colors hover:bg-secondary/40"
+                  >
+                    {(() => {
+                      const mode = artifactPreviewModes[selectedArtifact.title] || selectedArtifact.type;
+                      if (mode === "app") return <Smartphone className="h-4 w-4 opacity-70" />;
+                      if (mode === "tablet") return <Tablet className="h-4 w-4 opacity-70" />;
+                      return <Monitor className="h-4 w-4 opacity-70" />;
+                    })()}
+                    <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="center"
+                  className="bg-card border-border text-foreground z-[100] w-48 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
+                >
+                  <DropdownMenuItem
+                    onClick={() => {
+                        const newModes = { ...artifactPreviewModes, [selectedArtifact.title]: "app" as const };
+                        setArtifactPreviewModes(newModes);
+                    }}
+                    className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[13px]"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Smartphone className="h-4 w-4" /> App
+                    </div>
+                    <span className="text-muted-foreground text-[10px]">380px</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                        const newModes = { ...artifactPreviewModes, [selectedArtifact.title]: "web" as const };
+                        setArtifactPreviewModes(newModes);
+                    }}
+                    className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[13px]"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Monitor className="h-4 w-4" /> Web
+                    </div>
+                    <span className="text-muted-foreground text-[10px]">1280px</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                        const newModes = { ...artifactPreviewModes, [selectedArtifact.title]: "tablet" as const };
+                        setArtifactPreviewModes(newModes);
+                    }}
+                    className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[13px]"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Tablet className="h-4 w-4" /> Tablet
+                    </div>
+                    <span className="text-muted-foreground text-[10px]">768px</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <div className="bg-border/50 mx-1 h-4 w-[1px]" />
+
+              <div className="flex items-center gap-1 px-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleFeedback(selectedIndex, selectedArtifact.isLiked ? "none" : "like")}
+                  className={cn(
+                    "h-8 w-8 rounded-full transition-all hover:bg-secondary/40",
+                    selectedArtifact.isLiked ? "text-primary bg-primary/10" : "text-foreground/40"
+                  )}
+                >
+                  <ThumbsUp className={cn("h-3.5 w-3.5", selectedArtifact.isLiked && "fill-current")} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleFeedback(selectedIndex, selectedArtifact.isDisliked ? "none" : "dislike")}
+                  className={cn(
+                    "h-8 w-8 rounded-full transition-all hover:bg-secondary/40",
+                    selectedArtifact.isDisliked ? "text-red-500 bg-red-500/10" : "text-foreground/40"
+                  )}
+                >
+                  <ThumbsDown className={cn("h-3.5 w-3.5", selectedArtifact.isDisliked && "fill-current")} />
+                </Button>
+              </div>
+
+              <div className="bg-border/50 mx-1 h-4 w-[1px]" />
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-foreground/80 hover:text-foreground h-9 w-9 rounded-full transition-all hover:bg-secondary/40"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="bg-card border-border text-foreground z-[100] w-52 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
+                >
+                  <DropdownMenuItem
+                    onClick={() => openCodeViewer(selectedIndex)}
+                    className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px]"
+                  >
+                    <Code className="text-muted-foreground h-4 w-4" />
+                    View Code
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setExportArtifactIndex(selectedIndex);
+                      setIsExportSheetOpen(true);
+                    }}
+                    className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px]"
+                  >
+                    <Share2 className="text-muted-foreground h-4 w-4" />
+                    Export
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                     onClick={() => {
+                        if (project?.shareToken && selectedArtifact.id) {
+                           setQrCodeUrl(`${window.location.origin}/preview/screen/${selectedArtifact.id}/${project.shareToken}`);
+                           setIsQrDialogOpen(true);
+                        } else {
+                           toast.error("Project must be shared first");
+                        }
+                     }}
+                     className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px]"
+                  >
+                    <QrCode className="text-muted-foreground h-4 w-4" />
+                    Show QR Code
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleExportZip(selectedIndex)}
+                    className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px]"
+                  >
+                    <Download className="text-muted-foreground h-4 w-4" />
+                    Download
+                  </DropdownMenuItem>
+                  <div className="bg-border my-1 h-px opacity-50" />
+                  <DropdownMenuItem
+                    onClick={() => deleteArtifact(selectedIndex)}
+                    className="hover:bg-destructive/10 text-destructive flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </div>
 
         <div className="pointer-events-auto flex items-center gap-4">
@@ -308,7 +537,6 @@ export function CanvasArea({
               </div>
             )}
           </div>
-          <ModeToggle />
           <UserMenu />
         </div>
       </header>
@@ -376,379 +604,6 @@ export function CanvasArea({
                           : "transform 0.2s ease-out",
                   }}
                 >
-                  {/* Modern Floating Toolbar */}
-                  {activeTool === "select" &&
-                    artifact.id &&
-                    selectedArtifactIds.has(artifact.id) &&
-                    selectedArtifactIds.size === 1 && (
-                      <div
-                        className={cn(
-                          "animate-in fade-in slide-in-from-bottom-2 pointer-events-auto absolute left-1/2 z-[70] flex items-center gap-3 duration-300",
-                          (!artifact.id ||
-                            !selectedArtifactIds.has(artifact.id)) &&
-                            "opacity-0 group-hover:opacity-100",
-                        )}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        style={{
-                          bottom: `calc(100% + ${28 + 20 / zoom}px)`,
-                          transform: `translateX(-50%) scale(${1.8 / zoom})`,
-                          transformOrigin: "bottom center",
-                        }}
-                      >
-                        <div className="bg-card/95 border-border/50 flex items-center gap-1 rounded-lg border px-2 py-1.5 shadow-2xl backdrop-blur-md">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-foreground/80 hover:text-foreground flex h-9 items-center gap-2 rounded-md px-3 text-[13px] font-medium transition-colors hover:bg-transparent"
-                              >
-                                <Sparkles className="text-primary h-4 w-4" />
-                                Generate
-                                <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="center"
-                              className="bg-card border-border text-foreground z-[100] w-56 rounded-xl p-1.5 shadow-2xl"
-                            >
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleArtifactAction("more", artifact)
-                                }
-                                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-[13px] font-medium"
-                              >
-                                <Plus className="text-primary h-4 w-4" />
-                                Create more pages
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleArtifactAction("regenerate", artifact)
-                                }
-                                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-[13px] font-medium"
-                              >
-                                <RotateCcw className="text-primary h-4 w-4" />
-                                Regenerate
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleArtifactAction("variations", artifact)
-                                }
-                                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-[13px] font-medium"
-                              >
-                                <Columns className="text-primary h-4 w-4" />
-                                Variations
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              if (secondarySidebarMode === "properties") {
-                                setSecondarySidebarMode("none");
-                              } else {
-                                setSecondarySidebarMode("properties");
-                                setActiveTool("select");
-                              }
-                            }}
-                            className={cn(
-                              "text-foreground/80 hover:text-foreground flex h-9 w-9 items-center justify-center rounded-md transition-all hover:bg-transparent disabled:opacity-30",
-                              secondarySidebarMode === "properties" &&
-                                "bg-primary/20 text-primary shadow-primary/5 border-primary/30 border shadow-lg",
-                            )}
-                            title="Edit Mode"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-
-
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-foreground/80 hover:text-foreground flex h-9 items-center gap-2 rounded-md px-3 text-[13px] font-medium transition-colors hover:bg-transparent"
-                              >
-                                {(() => {
-                                  const mode =
-                                    artifactPreviewModes[artifact.title] ||
-                                    artifact.type;
-                                  if (mode === "app")
-                                    return (
-                                      <Smartphone className="h-4 w-4 opacity-70" />
-                                    );
-                                  if (mode === "tablet")
-                                    return (
-                                      <Tablet className="h-4 w-4 opacity-70" />
-                                    );
-                                  return (
-                                    <Monitor className="h-4 w-4 opacity-70" />
-                                  );
-                                })()}
-                                Preview
-                                <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="center"
-                              className="bg-card border-border text-foreground z-[100] w-48 rounded-xl p-1.5 shadow-2xl"
-                            >
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  const newModes = {
-                                    ...artifactPreviewModes,
-                                    [artifact.title]: "app" as const,
-                                  };
-                                  setArtifactPreviewModes(newModes);
-                                  setThrottledArtifacts((prev) =>
-                                    prev.map((a, i) =>
-                                      i === index
-                                        ? {
-                                            ...a,
-                                            width: undefined,
-                                            height: undefined,
-                                          }
-                                        : a,
-                                    ),
-                                  );
-                                  setArtifacts((prev) =>
-                                    prev.map((a, i) =>
-                                      i === index
-                                        ? {
-                                            ...a,
-                                            width: undefined,
-                                            height: undefined,
-                                          }
-                                        : a,
-                                    ),
-                                  );
-                                }}
-                                className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-lg px-3 py-2.5 text-[13px]"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <Smartphone className="h-4 w-4" /> App
-                                </div>
-                                <span className="text-muted-foreground text-[10px]">
-                                  380px
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  const newModes = {
-                                    ...artifactPreviewModes,
-                                    [artifact.title]: "web" as const,
-                                  };
-                                  setArtifactPreviewModes(newModes);
-                                  setThrottledArtifacts((prev) =>
-                                    prev.map((a, i) =>
-                                      i === index
-                                        ? {
-                                            ...a,
-                                            width: undefined,
-                                            height: undefined,
-                                          }
-                                        : a,
-                                    ),
-                                  );
-                                  setArtifacts((prev) =>
-                                    prev.map((a, i) =>
-                                      i === index
-                                        ? {
-                                            ...a,
-                                            width: undefined,
-                                            height: undefined,
-                                          }
-                                        : a,
-                                    ),
-                                  );
-                                }}
-                                className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-lg px-3 py-2.5 text-[13px]"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <Monitor className="h-4 w-4" /> Web
-                                </div>
-                                <span className="text-muted-foreground text-[10px]">
-                                  1280px
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  const newModes = {
-                                    ...artifactPreviewModes,
-                                    [artifact.title]: "tablet" as const,
-                                  };
-                                  setArtifactPreviewModes(newModes);
-                                  setThrottledArtifacts((prev) =>
-                                    prev.map((a, i) =>
-                                      i === index
-                                        ? {
-                                            ...a,
-                                            width: undefined,
-                                            height: undefined,
-                                          }
-                                        : a,
-                                    ),
-                                  );
-                                  setArtifacts((prev) =>
-                                    prev.map((a, i) =>
-                                      i === index
-                                        ? {
-                                            ...a,
-                                            width: undefined,
-                                            height: undefined,
-                                          }
-                                        : a,
-                                    ),
-                                  );
-                                }}
-                                className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-lg px-3 py-2.5 text-[13px]"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <Tablet className="h-4 w-4" /> Tablet
-                                </div>
-                                <span className="text-muted-foreground text-[10px]">
-                                  768px
-                                </span>
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  if (project?.shareToken && artifact.id) {
-                                    window.open(
-                                      `/preview/screen/${artifact.id}/${project.shareToken}`,
-                                      "_blank",
-                                    );
-                                  } else {
-                                    toast.error("Project must be shared first");
-                                  }
-                                }}
-                                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-[13px]"
-                              >
-                                <ExternalLink className="h-4 w-4" /> New Tab
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  if (project?.shareToken && artifact.id) {
-                                    setQrCodeUrl(
-                                      `${window.location.origin}/preview/screen/${artifact.id}/${project.shareToken}`,
-                                    );
-                                    setIsQrDialogOpen(true);
-                                  } else {
-                                    toast.error("Project must be shared first");
-                                  }
-                                }}
-                                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-[13px]"
-                              >
-                                <QrCode className="h-4 w-4" /> Show QR Code
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-
-                          <div className="mx-1 h-4 w-[1px] bg-white/10" />
-
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-foreground/80 hover:text-foreground flex h-9 items-center gap-2 rounded-md px-3 text-[13px] font-medium transition-colors hover:bg-transparent"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              className="bg-card border-border text-foreground z-[100] w-52 rounded-xl p-1.5 shadow-2xl"
-                            >
-                              <DropdownMenuItem
-                                onClick={() => openCodeViewer(index)}
-                                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-[13px]"
-                              >
-                                <Code className="text-muted-foreground h-4 w-4" />
-                                View Code
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setExportArtifactIndex(index);
-                                  setIsExportSheetOpen(true);
-                                }}
-                                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-[13px]"
-                              >
-                                <Share2 className="text-muted-foreground h-4 w-4" />
-                                Export
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleExportZip(index)}
-                                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-[13px]"
-                              >
-                                <Download className="text-muted-foreground h-4 w-4" />
-                                Download
-                              </DropdownMenuItem>
-                              <div className="bg-border my-1 h-px" />
-                              <DropdownMenuItem
-                                onClick={() => deleteArtifact(index)}
-                                className="hover:bg-destructive/20 text-destructive flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-[13px]"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-
-                        {/* Feedback Container */}
-                        <div className="bg-card/95 border-border/50 flex items-center gap-0.5 rounded-lg border px-1.5 py-1.5 shadow-2xl backdrop-blur-md">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              handleFeedback(
-                                index,
-                                artifact.isLiked ? "none" : "like",
-                              )
-                            }
-                            className={cn(
-                              "h-9 w-9 rounded-md p-0 transition-all",
-                              artifact.isLiked
-                                ? "text-primary bg-primary/10"
-                                : "text-foreground/80 hover:text-foreground hover:bg-transparent",
-                            )}
-                          >
-                            <ThumbsUp
-                              className={cn(
-                                "h-4 w-4",
-                                artifact.isLiked && "fill-current",
-                              )}
-                            />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              handleFeedback(
-                                index,
-                                artifact.isDisliked ? "none" : "dislike",
-                              )
-                            }
-                            className={cn(
-                              "h-9 w-9 rounded-md p-0 transition-all",
-                              artifact.isDisliked
-                                ? "bg-red-500/10 text-red-500"
-                                : "text-foreground/80 hover:text-foreground hover:bg-transparent",
-                            )}
-                          >
-                            <ThumbsDown
-                              className={cn(
-                                "h-4 w-4",
-                                artifact.isDisliked && "fill-current",
-                              )}
-                            />
-                          </Button>
-                        </div>
-                      </div>
-                    )}
 
                   {/* Frame Info Overlay */}
                   {artifact.id &&
@@ -1134,6 +989,70 @@ export function CanvasArea({
           title="Reset View"
         >
           <RotateCcw className="h-5 w-5" />
+        </Button>
+      </div>
+
+      {/* Agent Log / History (Bottom Left) */}
+      <div className="pointer-events-none absolute bottom-6 left-6 z-[60] flex flex-col items-start gap-4 text-white">
+        {/* History Window */}
+        {isAgentLogOpen && (
+          <div className="bg-zinc-950/95 border-zinc-800/50 pointer-events-auto flex max-h-[340px] w-[280px] flex-col gap-2 overflow-y-auto rounded-[2rem] border p-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-3xl animate-in fade-in slide-in-from-bottom-4 duration-300 scrollbar-none">
+            <div className="flex flex-col gap-2">
+              {messages
+                ?.filter((m) => m.role === "user" && !m.isSilent)
+                .slice()
+                .reverse()
+                .map((msg, i) => {
+                  const textPart = msg.parts?.find((p: any) => p.type === "text");
+                  const text = textPart?.text || "Instruction";
+                  const cleanText = text.replace(/\[Context:.*?\]\s*/g, "").trim(); 
+                  
+                  if (!cleanText) return null;
+
+                  return (
+                    <div
+                      key={msg.id || i}
+                      className={cn(
+                        "group relative flex items-center gap-3 rounded-[1.25rem] px-4 py-2.5 transition-all text-white",
+                        i === 0 
+                          ? "bg-zinc-800/80 ring-1 ring-white/10" 
+                          : "bg-zinc-900/40 hover:bg-zinc-800/60"
+                      )}
+                    >
+                      <Check className={cn(
+                        "h-3.5 w-3.5 shrink-0 transition-colors",
+                        i === 0 ? "text-zinc-400" : "text-zinc-600 group-hover:text-zinc-400"
+                      )} />
+                      <span className="text-[13px] font-medium text-zinc-300 truncate leading-snug">
+                        {cleanText}
+                      </span>
+                    </div>
+                  );
+                })}
+              {messages?.filter((m) => m.role === "user" && !m.isSilent).length === 0 && (
+                <div className="text-zinc-500 py-6 text-center text-xs font-medium italic">
+                  No activity logs found
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Toggle Button */}
+        <Button
+          onClick={() => setIsAgentLogOpen(!isAgentLogOpen)}
+          className={cn(
+            "pointer-events-auto flex h-14 items-center gap-3 rounded-full bg-zinc-950 px-6 text-sm font-semibold text-white shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all hover:bg-zinc-900 hover:scale-[1.02] active:scale-[0.98] border-none ring-offset-0 focus-visible:ring-0",
+            isAgentLogOpen && "bg-zinc-900 ring-2 ring-zinc-700"
+          )}
+        >
+          <Rocket className={cn("h-5 w-5", isAgentLogOpen ? "text-primary" : "text-zinc-400")} />
+          <span className="tracking-tight">Agent log</span>
+          {isAgentLogOpen ? (
+            <ChevronDown className="h-4 w-4 text-zinc-500 transition-transform duration-300" />
+          ) : (
+            <ChevronUp className="h-4 w-4 text-zinc-500 transition-transform duration-300" />
+          )}
         </Button>
       </div>
 

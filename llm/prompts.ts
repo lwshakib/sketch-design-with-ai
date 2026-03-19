@@ -40,9 +40,8 @@ export const CORE_DESIGN_PRINCIPLES = `### 💎 Elite Design Principles (VIBRANT
    - **Contextual Integrity**: Even if the user asks for a "card", you must design the ENTIRE PAGE that contains that card. 
 
 10. **Icons & Global Assets**:
-   - **Primary Icons**: Use **Material Icons** via CDN (https://fonts.googleapis.com/icon?family=Material+Icons). Apply the 'material-icons' class to span or i elements.
-   - **Alternative Icons**: Use **Lucide Icons** as a fallback (https://unpkg.com/lucide@latest).
-   - **Lucide Implementation**: Use <i data-lucide="[name]"></i> tags and MANDATORY call lucide.createIcons(); in a script tag at the very end of the body.
+    - **Primary Icons**: Use **Lucide Icons** primarily (https://unpkg.com/lucide@latest). Use <i data-lucide="[name]"></i> tags and **MANDATORY** call lucide.createIcons(); in a script tag at the very end of the body.
+    - **Alternative Icons**: Use **Material Icons** as a fallback (https://fonts.googleapis.com/icon?family=Material+Icons). Apply the 'material-icons' class to span or i elements.
 11. **Interactive Maps**:
    - **Google Maps**: Use **Google Maps via <iframe>** for any location-based features. 
    - **Styling**: Ensure maps are contained within cards, have a consistent radius, and fit the bento-grid layout.
@@ -115,8 +114,8 @@ ${CORE_DESIGN_PRINCIPLES}
 - Ensure your artifact 'title' is unique and does not collide with existing screen titles. Use descriptive suffixes like '(v2)' or '(Revised)' if you are improving an existing concept.
 
 ### 🎨 Assets & Icons (MANDATORY):
-- **Icons**: Use Material Icons primarily (Material Icons class).
-- **Lucide fallback**: If a specific icon is not in Material Icons, use Lucide.
+ - **Icons**: Use Lucide Icons primarily. Always remember the mandatory lucide.createIcons() script.
+ - **Material fallback**: Use Material Icons if a specific icon is missing from Lucide.
 - **Maps**: If the design requires a map, use a Google Maps iframe.
 
 ### 📊 Dynamic Data Visualization: 

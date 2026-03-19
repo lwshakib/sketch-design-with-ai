@@ -1,0 +1,27 @@
+```json
+{
+  "vision": "ParkPoint is a next-generation urban mobility platform designed to alleviate city congestion through intelligent parking discovery and management. The product vision centers on a seamless, frictionless user experience that transitions from a high-conversion landing page to a data-rich dashboard and finally to a utility-focused booking interface. The design language is 'Cyber-Urban Minimalism,' utilizing a deep slate and charcoal palette for dark mode (optimized for night driving) with vibrant cyan (#3caff6) accents to guide user attention. The architecture prioritizes responsive design, ensuring the dashboard and search tools feel native on both desktop and mobile devices.",
+  "screens": [
+    {
+      "title": "Landing Page - Hero Section",
+      "description": "A high-impact landing page showcasing the 'Smart Urban Parking' value proposition with a futuristic city aesthetic.",
+      "prompt": "UI design of the ParkPoint landing page hero section. Dark mode aesthetic with a deep slate background (#101b22) and neon cyan (#3caff6) primary color. Features a stylized, isometric 3D illustration of a city block with floating parking icons. Glassmorphism navigation bar at the top. Clean typography using Inter font. Professional, futuristic, and high-tech vibe."
+    },
+    {
+      "title": "User Dashboard",
+      "description": "The central command center for users to view parking history, active bookings, and city-wide availability.",
+      "prompt": "Desktop dashboard interface for ParkPoint. Sidebar navigation on the left with a logo and menu items. Main content area features a grid of widgets: 'Available Spots' (circular progress), 'Recent Bookings' (list view), and 'City Map' (miniature). Color palette: Slate-900 background, White text, Cyan buttons. Flat design, clean lines, high contrast."
+    },
+    {
+      "title": "Search & Map Interface",
+      "description": "The core utility screen allowing users to locate, filter, and select parking spots with real-time availability.",
+      "prompt": "Mobile-first search interface for ParkPoint. Split screen layout: Top 60% is a dark map view with glowing blue markers indicating available spots. Bottom 40% is a scrollable list of parking garages showing price per hour and distance. Floating search bar at the top with a magnifying glass icon. Material Symbols Outlined icons. High contrast, easy to read, modern UI."
+    },
+    {
+      "title": "Onboarding - Location Step",
+      "description": "A step-by-step mobile onboarding flow to enable location services and personalize the user experience.",
+      "prompt": "Mobile onboarding screen for ParkPoint. Step 2 of 4. Centered card design with a progress bar at the top showing 50%. Illustration of a smartphone with a map pin icon. Background is a soft gray. Clean white card with rounded corners. Primary color is Cyan. Minimalist, friendly, and instructional."
+    }
+  ]
+}
+```

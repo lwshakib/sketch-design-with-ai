@@ -1,0 +1,40 @@
+{
+  "vision": "A seamless, mobile-first food delivery experience characterized by a modern, high-contrast design system (primary orange #e77e23) that supports both light and dark modes. The platform prioritizes intuitive navigation, rapid onboarding, and real-time order tracking to ensure a frictionless user journey from discovery to delivery.",
+  "screens": [
+    {
+      "title": "Onboarding",
+      "description": "The initial user entry point designed to introduce the brand and guide new users through the setup process.",
+      "prompt": "Design a mobile onboarding screen for a food delivery app. The layout should feature a large, appetizing hero image of a gourmet burger, a clear 'Get Started' call-to-action button, and a step indicator showing the user's progress through the setup flow."
+    },
+    {
+      "title": "Dashboard / Discover",
+      "description": "The main hub for users to browse restaurants, search for food, and manage their delivery location.",
+      "prompt": "Design a mobile dashboard for a food delivery app. The interface should include a sticky header with location selection, a search bar, horizontal scrolling category chips (e.g., Burgers, Sushi, Pizza), and a vertical list of restaurant cards displaying ratings, delivery times, and cuisine types."
+    },
+    {
+      "title": "Restaurant Details",
+      "description": "A detailed view of a specific restaurant including menu items, ratings, and the ability to add items to the cart.",
+      "prompt": "Design a mobile restaurant detail page. The design should feature a full-width hero image of the food, restaurant metadata (rating, delivery fee, time), a sticky 'Add to Cart' button at the bottom, and a scrollable list of menu items with images, descriptions, and prices."
+    },
+    {
+      "title": "Cart",
+      "description": "A screen allowing users to review selected items, adjust quantities, and proceed to checkout.",
+      "prompt": "Design a mobile shopping cart screen. The layout should display a list of added items with quantity controls (+/-), item descriptions, and individual prices, followed by a summary section showing the subtotal, delivery fee, and a large 'Checkout' button."
+    },
+    {
+      "title": "Checkout",
+      "description": "The final step before payment, requiring address confirmation and payment method selection.",
+      "prompt": "Design a mobile checkout screen. The interface should include a delivery address section with a map preview, a payment method selector (card, cash, etc.), and a final order summary with the total amount due."
+    },
+    {
+      "title": "Live Tracking",
+      "description": "A real-time view of the delivery driver's location and the order status.",
+      "prompt": "Design a mobile live order tracking screen. The visual should feature a map interface with a moving delivery icon, a progress timeline indicating the current status (e.g., 'Preparing', 'On the way'), and a driver contact card."
+    },
+    {
+      "title": "Profile",
+      "description": "A user management screen allowing access to order history, payment methods, and app settings.",
+      "prompt": "Design a mobile user profile screen. The design should include a large profile avatar, user details, quick links to order history and payment methods, and a settings menu with toggles for notifications and dark mode."
+    }
+  ]
+}

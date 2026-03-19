@@ -81,6 +81,7 @@ interface ProjectState {
   regeneratingArtifactIds: Set<string>;
   isCommandMenuOpen: boolean;
   isSettingsDialogOpen: boolean;
+  isAgentLogOpen: boolean;
   isShareDialogOpen: boolean;
   isVariationsSheetOpen: boolean;
   variationsArtifactIndex: number | null;
@@ -190,6 +191,7 @@ interface ProjectState {
   setMessages: (val: any[] | ((prev: any[]) => any[])) => void;
   setIsCommandMenuOpen: (open: boolean) => void;
   setIsSettingsDialogOpen: (open: boolean) => void;
+  setIsAgentLogOpen: (open: boolean) => void;
   setIsShareDialogOpen: (open: boolean) => void;
   setIsVariationsSheetOpen: (open: boolean) => void;
   setVariationsArtifactIndex: (index: number | null) => void;
@@ -262,6 +264,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   regeneratingArtifactIds: new Set(),
   isCommandMenuOpen: false,
   isSettingsDialogOpen: false,
+  isAgentLogOpen: false,
   isShareDialogOpen: false,
   isVariationsSheetOpen: false,
   variationsArtifactIndex: null,
@@ -374,6 +377,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setIsCommandMenuOpen: (isCommandMenuOpen) => set({ isCommandMenuOpen }),
   setIsSettingsDialogOpen: (isSettingsDialogOpen) =>
     set({ isSettingsDialogOpen }),
+  setIsAgentLogOpen: (isAgentLogOpen) => set({ isAgentLogOpen }),
   setIsShareDialogOpen: (isShareDialogOpen) => set({ isShareDialogOpen }),
   setIsVariationsSheetOpen: (isVariationsSheetOpen) =>
     set({ isVariationsSheetOpen }),
@@ -483,5 +487,6 @@ export const useProjectStore = create<ProjectState>((set) => ({
       is3xMode: false,
       selectedEl: null,
       regeneratingArtifactIds: new Set(),
+      isAgentLogOpen: false,
     }),
 }));

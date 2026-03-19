@@ -79,20 +79,48 @@ export function getAllExamples(): string {
         .filter((f: string) => f.endsWith(".html"));
 
       if (files.length > 0) {
+        const blueprintJsonPath = path.join(appFolderPath, "blueprint.json");
+        let logicalBlueprint: any = null;
+        if (fs.existsSync(blueprintJsonPath)) {
+          try {
+            logicalBlueprint = JSON.parse(
+              fs.readFileSync(blueprintJsonPath, "utf-8"),
+            );
+          } catch (e) {
+            console.warn(`Failed to parse blueprint.json in ${appFolderName}`);
+          }
+        }
+
         blueprintsContent += `  <inspiration app="${appFolderName}" type="${type}">\n`;
+        if (logicalBlueprint?.vision) {
+          blueprintsContent += `    <vision>${logicalBlueprint.vision}</vision>\n`;
+        }
 
         for (const file of files) {
           const filePath = path.join(appFolderPath, file);
           const rawHtml = fs.readFileSync(filePath, "utf-8");
-          const blueprint = getDesignBlueprint(rawHtml);
+          const structuralHtml = getDesignBlueprint(rawHtml);
 
-          const screenName = file
+          const screenTitle = file
             .replace(".html", "")
             .split("-")
             .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
             .join(" ");
 
-          blueprintsContent += `    <blueprint screen="${screenName}">\n${blueprint}\n    </blueprint>\n`;
+          const screenMetadata = logicalBlueprint?.screens?.find(
+            (s: any) =>
+              s.title.toLowerCase() === screenTitle.toLowerCase() ||
+              s.title.toLowerCase().includes(screenTitle.toLowerCase()),
+          );
+
+          blueprintsContent += `    <blueprint screen="${screenTitle}">\n`;
+          if (screenMetadata?.prompt) {
+            blueprintsContent += `      <prompt>${screenMetadata.prompt}</prompt>\n`;
+          }
+          if (screenMetadata?.description) {
+            blueprintsContent += `      <description>${screenMetadata.description}</description>\n`;
+          }
+          blueprintsContent += `      <html>${structuralHtml}</html>\n    </blueprint>\n`;
         }
 
         blueprintsContent += `  </inspiration>\n`;
