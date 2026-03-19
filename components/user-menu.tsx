@@ -16,7 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import { Coins, LogOut, Monitor, Moon, Palette, Sun, User } from "lucide-react";
+import { LayoutGrid, LogOut, Monitor, Moon, Palette, Sun, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function UserMenu() {
@@ -61,28 +61,10 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <Palette className="mr-2 h-4 w-4" />
-            <span>Appearance</span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuSubContent>
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                <Sun className="mr-2 h-4 w-4" />
-                <span>Light</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                <Moon className="mr-2 h-4 w-4" />
-                <span>Dark</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                <Monitor className="mr-2 h-4 w-4" />
-                <span>System</span>
-              </DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuPortal>
-        </DropdownMenuSub>
+        <DropdownMenuItem onClick={() => router.push("/")}>
+          <LayoutGrid className="mr-2 h-4 w-4" />
+          <span>Projects</span>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push("/account")}>
           <User className="mr-2 h-4 w-4" />
           <span>Account Settings</span>

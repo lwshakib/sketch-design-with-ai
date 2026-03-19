@@ -21,6 +21,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { UserMenu } from "@/components/user-menu";
+import { cn } from "@/lib/utils";
 
 export default function AccountPage() {
   const {
@@ -43,6 +44,8 @@ export default function AccountPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [showNameCheck, setShowNameCheck] = useState(false);
+  const [showPasswordCheck, setShowPasswordCheck] = useState(false);
 
   const router = useRouter();
 
@@ -118,6 +121,8 @@ export default function AccountPage() {
       toast.error("Failed to update profile");
     } finally {
       setIsUpdatingName(false);
+      setShowNameCheck(true);
+      setTimeout(() => setShowNameCheck(false), 2000);
     }
   };
 
@@ -142,6 +147,8 @@ export default function AccountPage() {
       toast.error(error.message || "Failed to update password");
     } finally {
       setIsUpdatingPassword(false);
+      setShowPasswordCheck(true);
+      setTimeout(() => setShowPasswordCheck(false), 2000);
     }
   };
 
@@ -285,12 +292,19 @@ export default function AccountPage() {
                     />
                     <Button
                       onClick={handleUpdateName}
-                      disabled={isUpdatingName || name === user.name}
-                      variant="outline"
-                      className="h-11 rounded-xl border-zinc-200 dark:border-zinc-800 px-6 font-bold transition-all"
+                      disabled={isUpdatingName || name === user.name || showNameCheck}
+                      variant={showNameCheck ? "ghost" : "outline"}
+                      size={showNameCheck ? "icon" : "default"}
+                      className={cn(
+                        "h-11 rounded-xl font-bold transition-all",
+                        !showNameCheck && "border-zinc-200 dark:border-zinc-800 px-6",
+                        showNameCheck && "text-emerald-500"
+                      )}
                     >
                       {isUpdatingName ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : showNameCheck ? (
+                        <CheckCircle2 className="h-5 w-5" />
                       ) : (
                         "Update"
                       )}
@@ -348,14 +362,21 @@ export default function AccountPage() {
                 <Button
                   onClick={handleUpdatePassword}
                   disabled={
-                    isUpdatingPassword || !currentPassword || !newPassword
+                    isUpdatingPassword || !currentPassword || !newPassword || showPasswordCheck
                   }
-                  className="hover:shadow-primary/20 mt-2 h-11 w-full rounded-xl font-bold shadow-lg transition-all"
-                >
-                  {isUpdatingPassword && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  variant={showPasswordCheck ? "ghost" : "default"}
+                  className={cn(
+                    "hover:shadow-primary/20 mt-2 h-11 w-full rounded-xl font-bold shadow-lg transition-all",
+                    showPasswordCheck && "text-emerald-500 shadow-none hover:bg-transparent"
                   )}
-                  Update Password
+                >
+                  {isUpdatingPassword ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : showPasswordCheck ? (
+                    <CheckCircle2 className="h-5 w-5" />
+                  ) : (
+                    "Update Password"
+                  )}
                 </Button>
               </div>
             </section>

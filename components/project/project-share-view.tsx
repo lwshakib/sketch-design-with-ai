@@ -36,10 +36,6 @@ interface ProjectShareViewProps {
     title: string;
     /** Unique token used for sharing security/identification */
     shareToken: string;
-    /** Available visual themes for the project */
-    themes?: any[];
-    /** The specific theme currently applied to this project */
-    appliedTheme?: any;
   };
   /** Array of artifact objects (screens) to render on the shared canvas */
   artifacts: Artifact[];
@@ -51,9 +47,6 @@ export function ProjectShareView({
 }: ProjectShareViewProps) {
   const [showQrDialog, setShowQrDialog] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
-  const [appliedTheme] = useState<any>(
-    project.appliedTheme || project.themes?.[0] || null,
-  );
   const [dynamicHeights, setDynamicHeights] = useState<Record<string, number>>(
     {},
   );
@@ -355,10 +348,7 @@ export function ProjectShareView({
                   style={{
                     width: getWidth(artifact.type),
                     height: dynamicHeights[artifact.title] || 800,
-                    borderColor: appliedTheme?.cssVars?.border || "#27272a",
-                    borderRadius: 12,
-                    backgroundColor:
-                      appliedTheme?.cssVars?.background || "#09090b",
+                    backgroundColor: "#09090b",
                   }}
                 >
                   <ArtifactFrame
@@ -371,7 +361,7 @@ export function ProjectShareView({
                     isEditMode={false}
                     activeTool={activeTool}
                     isDraggingFrame={false}
-                    appliedTheme={appliedTheme}
+                    appliedTheme={null}
                     onRef={(idx, el) => {
                       if (el)
                         (el as any).dataset.artifactTitle = artifact.title;

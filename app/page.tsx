@@ -582,8 +582,8 @@ function MobileMenu({
       </DrawerTrigger>
       <DrawerContent className="bg-background border-border text-foreground max-h-[90vh]">
         <DrawerHeader className="flex flex-row items-center justify-between border-none px-6 py-5">
-          <DrawerTitle className="text-left text-xl font-black tracking-tighter uppercase">
-            Design History
+          <DrawerTitle className="text-left text-xl font-black tracking-tighter">
+            Design history
           </DrawerTitle>
           <Button
             variant="ghost"

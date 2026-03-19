@@ -6,7 +6,6 @@ export interface Project {
   title: string;
   messages: any[];
   canvasData?: any;
-  themes?: any[];
   shareToken?: string | null;
 }
 
@@ -58,7 +57,7 @@ interface ProjectState {
 
   // UI State
   leftSidebarMode: "chat";
-  secondarySidebarMode: "none" | "properties" | "theme";
+  secondarySidebarMode: "none" | "properties";
   isCodeViewerOpen: boolean;
   isGenerating: boolean;
   viewingCode: string;
@@ -91,8 +90,6 @@ interface ProjectState {
   variationAspects: string[];
 
   // Theme & Selection
-  activeThemeId: string | null;
-  appliedTheme: any | null;
   selectedEl: HTMLElement | null;
 
   // Actions
@@ -167,7 +164,7 @@ interface ProjectState {
   setResizingHandle: (handle: string | null) => void;
 
   setLeftSidebarMode: (mode: "chat") => void;
-  setSecondarySidebarMode: (mode: "none" | "properties" | "theme") => void;
+  setSecondarySidebarMode: (mode: "none" | "properties") => void;
   setIsCodeViewerOpen: (open: boolean) => void;
   setIsGenerating: (generating: boolean) => void;
   setViewingCode: (code: string) => void;
@@ -203,8 +200,6 @@ interface ProjectState {
   setVariationCustomInstructions: (instructions: string) => void;
   setVariationAspects: (val: string[] | ((prev: string[]) => string[])) => void;
 
-  setActiveThemeId: (id: string | null) => void;
-  setAppliedTheme: (theme: any | null) => void;
   setSelectedEl: (
     el: HTMLElement | null | ((prev: HTMLElement | null) => HTMLElement | null),
   ) => void;
@@ -275,8 +270,6 @@ export const useProjectStore = create<ProjectState>((set) => ({
   variationCustomInstructions: "",
   variationAspects: [],
 
-  activeThemeId: null,
-  appliedTheme: null,
   selectedEl: null,
 
   // Actions
@@ -401,8 +394,6 @@ export const useProjectStore = create<ProjectState>((set) => ({
         typeof val === "function" ? val(state.variationAspects) : val,
     })),
 
-  setActiveThemeId: (activeThemeId) => set({ activeThemeId }),
-  setAppliedTheme: (appliedTheme) => set({ appliedTheme }),
   setSelectedEl: (val) =>
     set((state) => ({
       selectedEl: typeof val === "function" ? val(state.selectedEl) : val,
@@ -490,8 +481,6 @@ export const useProjectStore = create<ProjectState>((set) => ({
       viewingPrompt: "",
       isSidebarVisible: true,
       is3xMode: false,
-      activeThemeId: null,
-      appliedTheme: null,
       selectedEl: null,
       regeneratingArtifactIds: new Set(),
     }),

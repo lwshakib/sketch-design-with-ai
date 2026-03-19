@@ -748,109 +748,8 @@ CRITICAL:
         messageId: fullDesignMessageId || "",
       });
 
-      const { themes, selectedTheme } = await step.run(
-        "generate-design-themes",
-        async () => {
-          // Fetch existing
-          const proj = await prisma.project.findUnique({
-            where: { id: projectId },
-            select: { themes: true, selectedTheme: true },
-          });
-
-          let finalThemes = (proj?.themes as any[]) || [];
-          let finalSelectedTheme = (proj?.selectedTheme as any) || null;
-
-          if (finalThemes.length === 0) {
-            // Normalize messages
-            let stepMessages = normalizeMessages(messages);
-            if (stepMessages.length === 0) {
-              stepMessages = [
-                { role: "user", content: "Create a modern design" },
-              ];
-            } else {
-              stepMessages = await hydrateImages(stepMessages);
-            }
-
-            const { object } = await generateObject({
-              system:
-                "You are an elite color theorist. Generate exactly 10 high-fidelity color palettes. " +
-                "CRITICAL: You MUST provide all 18 color variables for EACH theme. " +
-                "Example structure for one theme:\n" +
-                '{"name": "Sunset", "background": "#1a0505", "foreground": "#fee2e2", "primary": "#ff4d4d", "primaryForeground": "#ffffff", "secondary": "#3d1414", "secondaryForeground": "#ff4d4d", "muted": "#301010", "mutedForeground": "#a87d7d", "accent": "#ff9e9e", "accentForeground": "#1a0505", "border": "#4a1c1c", "input": "#4a1c1c", "ring": "#ff4d4d", "radius": "0.75rem", "card": "#260a0a", "cardForeground": "#fee2e2", "popover": "#260a0a", "popoverForeground": "#fee2e2"}',
-              messages: stepMessages as any,
-              schema: z.object({
-                themes: z
-                  .array(
-                    z.object({
-                      name: z.string(),
-                      background: z.string(),
-                      foreground: z.string(),
-                      primary: z.string(),
-                      primaryForeground: z.string(),
-                      secondary: z.string(),
-                      secondaryForeground: z.string(),
-                      muted: z.string(),
-                      mutedForeground: z.string(),
-                      accent: z.string(),
-                      accentForeground: z.string(),
-                      border: z.string(),
-                      input: z.string(),
-                      ring: z.string(),
-                      radius: z.string(),
-                      card: z.string(),
-                      cardForeground: z.string(),
-                      popover: z.string(),
-                      popoverForeground: z.string(),
-                    }),
-                  )
-                  .min(10)
-                  .max(10),
-              }),
-            });
-
-            finalThemes = object.themes.map((t: any, i: number) => ({
-              id: `project-theme-${i}`,
-              name: t.name,
-              colors: {
-                background: t.background,
-                foreground: t.foreground,
-                primary: t.primary,
-                primaryForeground: t.primaryForeground,
-                secondary: t.secondary,
-                secondaryForeground: t.secondaryForeground,
-                muted: t.muted,
-                mutedForeground: t.mutedForeground,
-                accent: t.accent,
-                accentForeground: t.accentForeground,
-                border: t.border,
-                input: t.input,
-                ring: t.ring,
-                radius: t.radius,
-                card: t.card,
-                cardForeground: t.cardForeground,
-                popover: t.popover,
-                popoverForeground: t.popoverForeground,
-              },
-            }));
-
-            // ONLY overwrite selectedTheme if it doesn't already exist
-            if (!finalSelectedTheme) {
-              finalSelectedTheme = finalThemes[0];
-            }
-
-            // Update Project
-            await prisma.project.update({
-              where: { id: projectId },
-              data: {
-                themes: finalThemes,
-                selectedTheme: finalSelectedTheme,
-              },
-            });
-          }
-
-          return { themes: finalThemes, selectedTheme: finalSelectedTheme };
-        },
-      );
+      const themes: any[] = [];
+      const selectedTheme: any = null;
 
       // --- STEP 3: SCREEN PLANNING ---
       await publishStatus({
@@ -873,7 +772,7 @@ CRITICAL:
         const inspiration = getAllExamples();
         let systemPrompt =
           PlanningPrompt +
-          `\n\nYou are generating the detailed plan for each screen. \n\nSELECTED THEME: ${JSON.stringify(selectedTheme || {})}`;
+          "\n\nYou are generating the detailed plan for each screen.";
 
         if (existingScreens.length > 0) {
           systemPrompt += `\n\nEXISTING SCREENS IN PROJECT (ordered from oldest to newest):\n${JSON.stringify(
@@ -1110,12 +1009,6 @@ CRITICAL:
                 "\n\nCRITICAL: You are generating a highly detailed, production-ready screen. Do not use placeholders. Ensure all content is realistic and high-fidelity.";
 
               // Contextual messages: Vision + Plan + Previous Screens
-              // Contextual messages: Vision + Plan + Previous Screens
-              const proj = await prisma.project.findUnique({
-                where: { id: projectId },
-                select: { selectedTheme: true },
-              });
-              const selectedTheme = proj?.selectedTheme;
 
               await publishStatus({
                 publish,
@@ -1172,13 +1065,10 @@ CRITICAL:
 Description: ${screen.description}.
 SPECIFIC PROMPT: ${(screen as any).prompt || ""}
 
-${selectedTheme ? `IMPORTANT: Use this theme for the color palette:\n${JSON.stringify(selectedTheme, null, 2)}` : ""}
-
-CRITICAL INSTRUCTIONS:
 1. CONSISTENCY: You MUST use the exact same color palette, typography, and corner variations as the previous screens.
-2. BACKGROUND: You MUST set the body or main container background to the theme's background color (\`var(--background)\`). NEVER leave it default white unless the theme explicitly defines it as white.
+2. BACKGROUND: Ensure the background color and gradients are consistent with the project vision.
 3. DETAIL: The code must be extremely detailed. Use strict Tailwind classes for everything.
-4. THEME: Ensure the theme is consistent. If previous screens used a specific background gradient, YOU MUST USE IT TOO.
+4. CONTENT: Use realistic data. No 'Lorem Ipsum'.
 5. CONTENT: Use realistic data. No 'Lorem Ipsum'.
 5. FORMAT: You MUST wrap the code in a single artifact block exactly like this:
 <artifact type="${screen.type === "app" ? "app" : "web"}" title="${screen.title}">

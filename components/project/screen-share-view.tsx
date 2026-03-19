@@ -53,9 +53,6 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
   const [viewportMode, setViewportMode] = useState<
     "mobile" | "tablet" | "desktop"
   >("desktop");
-  const [appliedTheme, setAppliedTheme] = useState<any>(
-    project.appliedTheme || project.themes?.[0] || null,
-  );
   const [showQrDialog, setShowQrDialog] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
   const [dynamicHeight, setDynamicHeight] = useState<number | null>(null);
@@ -84,17 +81,12 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
   // Initialize
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (project.themes && project.themes.length > 0 && !appliedTheme) {
-        setAppliedTheme(project.themes[0]);
-      }
-
       // Set initial viewport based on artifact type
       if (artifact.type === "app") setViewportMode("mobile");
       else setViewportMode("desktop");
     }, 0);
-
     return () => clearTimeout(timer);
-  }, [project.themes, artifact.type, appliedTheme]);
+  }, [artifact.type]);
 
   /**
    * Effect to listen for height updates from the child iframe.
@@ -379,10 +371,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
                   : viewportMode === "tablet"
                     ? 900
                     : 800),
-              border: `1px solid ${appliedTheme?.cssVars?.border || "#27272a"}`,
-              borderRadius: 12,
-              overflow: "hidden",
-              backgroundColor: appliedTheme?.cssVars?.background || "#09090b",
+              backgroundColor: "#09090b",
             }}
             onMouseDown={(e) => {
               if (activeTool === "select") {
@@ -397,7 +386,7 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
               isEditMode={false}
               activeTool={activeTool}
               isDraggingFrame={false}
-              appliedTheme={appliedTheme}
+              appliedTheme={null}
               onRef={(i, el) => (iframeRef.current = el)}
             />
           </div>
