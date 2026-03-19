@@ -13,7 +13,6 @@ import {
   RotateCcw,
   Layout,
 } from "lucide-react";
-import NumberFlow from "@number-flow/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -155,7 +154,7 @@ interface Attachment {
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 
 export default function Home() {
-  const { credits, fetchCredits } = useWorkspaceStore();
+  const {} = useWorkspaceStore();
   const [inputValue, setInputValue] = useState("");
   const [isMounted, setIsMounted] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -221,8 +220,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchProjects();
-    fetchCredits();
-  }, [fetchCredits, fetchProjects]);
+  }, [fetchProjects]);
 
   useEffect(() => {
     if (isMounted) {
@@ -243,10 +241,6 @@ export default function Home() {
   const onSubmit = async () => {
     if (!inputValue.trim() && attachments.length === 0) return;
 
-    if (credits !== null && credits < 10000) {
-      toast.error("Insufficient credits (10k required)");
-      return;
-    }
 
     if (attachments.some((a) => a.isUploading)) {
       toast.error("Please wait for images to finish uploading");
@@ -356,24 +350,6 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link
-              href="/settings"
-              className="group flex items-center rounded-2xl border border-zinc-200 bg-zinc-100/50 px-4 py-2 shadow-sm transition-all hover:bg-zinc-200/50 dark:border-white/10 dark:bg-zinc-900/40 dark:hover:bg-zinc-800/80"
-            >
-              <span className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
-                <NumberFlow
-                  value={(credits || 0) / 1000}
-                  className="font-bold text-zinc-900 dark:text-zinc-100"
-                  format={{
-                    minimumFractionDigits: 1,
-                    maximumFractionDigits: 1,
-                  }}
-                />
-                <span className="text-zinc-500 dark:text-zinc-500">
-                  k credits remaining
-                </span>
-              </span>
-            </Link>
             <UserMenu />
           </div>
         </header>
@@ -480,15 +456,15 @@ export default function Home() {
 
                         <button
                           type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 text-zinc-500 transition-colors outline-none hover:text-zinc-900 dark:border-white/5 dark:bg-zinc-900/50 dark:hover:text-white"
+                          disabled
+                          className="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 text-zinc-300 opacity-50 outline-none dark:border-white/5 dark:bg-zinc-900/50 dark:text-zinc-700"
                         >
                           <Plus className="h-5 w-5" />
                         </button>
 
                         <div className="mx-1 h-4 w-[1px] bg-zinc-200 dark:bg-white/10" />
 
-                        <p className="hidden text-[10px] font-bold tracking-widest text-zinc-400 uppercase sm:block dark:text-zinc-600">
+                        <p className="hidden text-[10px] font-bold text-zinc-400 sm:block dark:text-zinc-600">
                           Press Enter to Generate
                         </p>
                       </div>
@@ -500,17 +476,12 @@ export default function Home() {
                           attachments.some((a) => a.isUploading) ||
                           isSubmitting
                         }
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground h-10 rounded-full border border-black/5 px-5 shadow-xl transition-all disabled:opacity-30 dark:border-white/10"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground flex h-10 w-10 items-center justify-center rounded-full border border-black/5 p-0 shadow-xl transition-all disabled:opacity-30 dark:border-white/10"
                       >
                         {isSubmitting ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold tracking-tight">
-                              Generate
-                            </span>
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </div>
+                          <ArrowRight className="h-5 w-5" />
                         )}
                       </Button>
                     </div>
@@ -660,7 +631,7 @@ function MobileMenu({
             <>
               {sections.map((section) => (
                 <div key={section.title} className="space-y-4">
-                  <h4 className="text-muted-foreground px-2 text-[10px] font-black tracking-widest uppercase">
+                  <h4 className="text-muted-foreground px-2 text-[11px] font-bold">
                     {section.title}
                   </h4>
                   <div className="space-y-2">

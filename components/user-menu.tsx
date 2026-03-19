@@ -65,10 +65,6 @@ export function UserMenu() {
           <User className="mr-2 h-4 w-4" />
           <span>Account</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push("/settings")}>
-          <Coins className="mr-2 h-4 w-4" />
-          <span>Usage & Credits</span>
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>

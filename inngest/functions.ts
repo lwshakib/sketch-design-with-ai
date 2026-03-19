@@ -14,7 +14,6 @@ import prisma from "../lib/prisma";
 import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
 import { extractArtifacts } from "../lib/artifact-renderer";
 import { extractHtml as _extractHtml } from "../llm/tools";
-import { google as _google } from "@ai-sdk/google";
 import {
   hydrateImages,
   normalizeMessages,
@@ -150,22 +149,7 @@ export const generateDesign = inngest.createFunction(
         if (!originalScreen) return { error: "Screen not found" };
 
         // --- STEP 1.5: CHECK CREDITS ---
-        await step.run("check-regeneration-credits", async () => {
-          try {
-            const user = await prisma.user.findUnique({
-              where: { id: (originalScreen as any).project.userId },
-              select: { credits: true },
-            });
-            if (!user || user.credits < 10000) {
-              throw new NonRetriableError(
-                "Insufficient credits: 10,000 credits required for design refactoring.",
-              );
-            }
-          } catch (e: any) {
-            if (e instanceof NonRetriableError) throw e;
-            throw new NonRetriableError(e.message || "Credit check failed.");
-          }
-        });
+        // Credit check disabled
 
         // --- STEP 2: INITIAL PERSISTENCE (Message & New Screen) ---
         const { assistantMessageId, newScreenId } = await step.run(
@@ -332,7 +316,6 @@ export const generateDesign = inngest.createFunction(
                   },
                 ] as any,
                 tools: {
-                  googleSearch: _google.tools.googleSearch({}),
                   extractHtml: _extractHtml,
                 },
                 stopWhen: _stepCountIs(5),
@@ -363,16 +346,7 @@ export const generateDesign = inngest.createFunction(
         );
 
         // Deduct regeneration credits
-        await step.run("deduct-regeneration-credits", async () => {
-          try {
-            await deductCredits(projectId, 2000);
-          } catch (e: any) {
-            if (e.message?.toLowerCase().includes("insufficient credits")) {
-              throw new NonRetriableError(e.message);
-            }
-            throw e;
-          }
-        });
+        // Credit deduction disabled
 
         // --- STEP 4: PERSIST & NOTIFY ---
         const finalScreen = await step.run("update-screen-db", async () => {
@@ -446,23 +420,7 @@ export const generateDesign = inngest.createFunction(
         if (!originalScreen) return { error: "Screen not found" };
 
         // 2. Check credits
-        await step.run("check-variation-credits", async () => {
-          try {
-            const user = await prisma.user.findUnique({
-              where: { id: (originalScreen as any).project.userId },
-              select: { credits: true },
-            });
-            const required = (optionsCount || 3) * 2000;
-            if (!user || user.credits < required) {
-              throw new NonRetriableError(
-                `Insufficient credits: ${required} credits required to generate variations.`,
-              );
-            }
-          } catch (e: any) {
-            if (e instanceof NonRetriableError) throw e;
-            throw new NonRetriableError(e.message || "Credit check failed.");
-          }
-        });
+        // Credit check disabled
 
         // 3. Initial Message
         const messageId = await step.run(
@@ -658,7 +616,6 @@ CRITICAL:
                     },
                   ] as any,
                   tools: {
-                    googleSearch: _google.tools.googleSearch({}),
                     extractHtml: _extractHtml,
                   },
                   stopWhen: _stepCountIs(5),
@@ -699,19 +656,7 @@ CRITICAL:
             });
           });
 
-          await step.run(`deduct-variation-${i}-credits`, async () => {
-            try {
-              await recordCreditUsage(
-                (originalScreen as any).project.userId,
-                2000,
-              );
-            } catch (e: any) {
-              if (e.message?.toLowerCase().includes("insufficient credits")) {
-                throw new NonRetriableError(e.message);
-              }
-              throw e;
-            }
-          });
+          // Credit deduction disabled
 
           await publishStatus({
             publish,
@@ -776,19 +721,7 @@ CRITICAL:
       );
 
       // --- STEP 1: CREDIT CHECK ---
-      await step.run("check-planning-credits", async () => {
-        try {
-          await deductCredits(projectId, 1000);
-        } catch (e: any) {
-          if (e.message?.toLowerCase().includes("insufficient credits")) {
-            throw new NonRetriableError(e.message);
-          }
-          throw new NonRetriableError(
-            e.message ||
-              "Insufficient credits: 1,000 credits required for planning.",
-          );
-        }
-      });
+      // Credit check disabled
 
       // --- STEP 1.5: FETCH EXISTING SCREENS ---
       const existingScreens = await step.run(
@@ -1030,19 +963,7 @@ CRITICAL:
       })) as { plan: Plan };
 
       // Deduct planning credits
-      await step.run("deduct-planning-credits", async () => {
-        try {
-          await deductCredits(projectId, 1000);
-        } catch (e: any) {
-          if (e.message?.toLowerCase().includes("insufficient credits")) {
-            throw new NonRetriableError(e.message);
-          }
-          throw new NonRetriableError(
-            e.message ||
-              "Insufficient credits: 1,000 credits required for planning.",
-          );
-        }
-      });
+      // Credit deduction disabled
 
       // Update status to planning
       await publishStatus({
@@ -1166,18 +1087,7 @@ CRITICAL:
           });
 
           // Deduct screen credits before generation
-          await step.run(`deduct-screen-credits-${i}`, async () => {
-            try {
-              await deductCredits(projectId, 2000);
-            } catch (e: any) {
-              if (e.message?.toLowerCase().includes("insufficient credits")) {
-                throw new NonRetriableError(e.message);
-              }
-              throw new NonRetriableError(
-                e.message || "Insufficient credits to complete this screen.",
-              );
-            }
-          });
+          // Credit deduction disabled
 
           const generatedScreen = await step.run(
             `generate-screen-${i}`,
@@ -1277,7 +1187,6 @@ CRITICAL INSTRUCTIONS:
                     },
                   ] as any,
                   tools: {
-                    googleSearch: _google.tools.googleSearch({}),
                     extractHtml: _extractHtml,
                   },
                   stopWhen: _stepCountIs(5),
@@ -1425,6 +1334,7 @@ CRITICAL INSTRUCTIONS:
 );
 
 // --- Daily Credit Reset ---
+/*
 export const dailyCreditReset = inngest.createFunction(
   { id: "daily-credit-reset" },
   { cron: "0 0 * * *" }, // Midnight every day
@@ -1439,3 +1349,4 @@ export const dailyCreditReset = inngest.createFunction(
     });
   },
 );
+*/

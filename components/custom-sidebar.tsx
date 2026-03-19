@@ -103,7 +103,7 @@ export function Sidebar({
           <>
             {sections.map((section) => (
               <div key={section.title} className="space-y-4">
-                <h3 className="text-muted-foreground px-2 text-[10px] font-black tracking-widest uppercase">
+                <h3 className="text-muted-foreground px-2 text-[11px] font-bold">
                   {section.title}
                 </h3>
                 <div className="space-y-1">

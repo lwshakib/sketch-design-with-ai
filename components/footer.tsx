@@ -19,7 +19,6 @@ const data = () => ({
   navigation: {
     product: [
       { name: "Features", href: "#features" },
-      { name: "Pricing", href: "#pricing" },
       { name: "Integrations", href: "#integrations" },
       { name: "Roadmap", href: "#roadmap" },
     ],

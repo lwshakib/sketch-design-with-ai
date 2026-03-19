@@ -244,29 +244,13 @@ export function GenerationStatus({
               <AlertCircle className="text-destructive mt-0.5 size-5 shrink-0" />
               <div className="flex flex-col gap-1">
                 <p className="text-destructive text-sm font-semibold">
-                  {isCreditError ? "Credits Exhausted" : "Generation Error"}
+                  Generation Error
                 </p>
                 <p className="text-destructive/80 text-[13px] leading-relaxed">
                   {error}
                 </p>
               </div>
             </div>
-
-            {isCreditError && (
-              <div className="mt-1 flex flex-col gap-2">
-                <button
-                  onClick={() =>
-                    window.open("https://sketch.com/pricing", "_blank")
-                  }
-                  className="bg-destructive hover:bg-destructive/90 shadow-destructive/20 w-full rounded-lg px-4 py-2 text-xs font-bold tracking-widest text-white uppercase shadow-lg transition-all"
-                >
-                  Upgrade to Pro
-                </button>
-                <p className="text-destructive/60 text-center text-[10px] italic">
-                  Generate unlimited screens with a Pro subscription
-                </p>
-              </div>
-            )}
           </div>
         ) : isComplete && finalConclusionText ? (
           <div className="animate-in fade-in slide-in-from-top-2 duration-1000">

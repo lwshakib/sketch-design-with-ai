@@ -1,10 +1,65 @@
 import fs from "fs";
 import path from "path";
+import { parse } from "node-html-parser";
+
+/**
+ * Compresses raw HTML into a "Design Blueprint" by stripping text, scripts,
+ * and non-essential attributes, leaving only the structural layout and Tailwind classes.
+ */
+function getDesignBlueprint(html: string): string {
+  try {
+    const root = parse(html);
+    
+    // 1. Strip all non-visual/non-structural tags
+    root.querySelectorAll("script, style, link, meta, title, svg, path, iframe, noscript").forEach(node => node.remove());
+
+    /**
+     * Recursively cleans the DOM tree
+     */
+    function clean(node: any) {
+      if (!node.childNodes) return;
+
+      const toRemove: any[] = [];
+      node.childNodes.forEach((child: any) => {
+        if (child.nodeType === 3) {
+          // It's a text node - remove it to save space
+          toRemove.push(child);
+        } else if (child.nodeType === 1) {
+          // It's an element node - clean its attributes and recurse
+          const attrs = { ...child.attributes };
+          for (const key in attrs) {
+            // Keep ONLY class for Tailwind inspiration
+            if (key !== "class") {
+              child.removeAttribute(key);
+            }
+          }
+          clean(child);
+        } else {
+          toRemove.push(child);
+        }
+      });
+
+      toRemove.forEach(n => n.remove());
+    }
+
+    const body = root.querySelector("body") || root;
+    clean(body);
+
+    // 2. Return the minified structural HTML
+    return body.innerHTML
+      .replace(/>\s+</g, "><") // Remove whitespace between tags
+      .replace(/\s{2,}/g, " ") // Collapse multiple spaces
+      .trim();
+  } catch (error) {
+    console.warn("[LLM Blueprint] Failed to compress HTML, returning original snippet length:", html.length);
+    return html.substring(0, 1000); // Fallback to truncated version
+  }
+}
 
 export function getAllExamples(): string {
   const baseExamplesDir = path.join(process.cwd(), "examples");
   const categories = ["app_design", "web_design"];
-  let examplesContent = "<examples>\n";
+  let blueprintsContent = "<design_blueprints>\n";
 
   for (const category of categories) {
     const categoryPath = path.join(baseExamplesDir, category);
@@ -24,27 +79,27 @@ export function getAllExamples(): string {
         .filter((f: string) => f.endsWith(".html"));
 
       if (files.length > 0) {
-        examplesContent += `  <example>\n`;
+        blueprintsContent += `  <inspiration app="${appFolderName}" type="${type}">\n`;
 
         for (const file of files) {
           const filePath = path.join(appFolderPath, file);
-          const fileContent = fs.readFileSync(filePath, "utf-8");
+          const rawHtml = fs.readFileSync(filePath, "utf-8");
+          const blueprint = getDesignBlueprint(rawHtml);
 
-          // Convert filename to screen name: dashboard.html -> Dashboard
           const screenName = file
             .replace(".html", "")
             .split("-")
             .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
             .join(" ");
 
-          examplesContent += `    <artifact appName="${appFolderName}" screenName="${screenName}" type="${type}">\n${fileContent}\n    </artifact>\n`;
+          blueprintsContent += `    <blueprint screen="${screenName}">\n${blueprint}\n    </blueprint>\n`;
         }
 
-        examplesContent += `  </example>\n`;
+        blueprintsContent += `  </inspiration>\n`;
       }
     }
   }
 
-  examplesContent += "</examples>";
-  return examplesContent;
+  blueprintsContent += "</design_blueprints>";
+  return blueprintsContent;
 }

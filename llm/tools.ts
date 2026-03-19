@@ -1,17 +1,15 @@
-import { tool } from "ai";
 import { z } from "zod";
 
 /**
  * Tool for extracting HTML content from a given URL.
- * Used by the AI to understand the structure and content of reference websites.
+ * Plain object implementation (no AI SDK dependency).
  */
-export const extractHtml = tool({
+export const extractHtml = {
   description:
     "Extract HTML content and text from a URL to understand its structure and design.",
   parameters: z.object({
     url: z.string().describe("The URL of the website to extract content from."),
   }),
-  // @ts-expect-error - AI SDK tool execute type mismatch in some versions
   execute: async ({ url }: { url: string }) => {
     try {
       console.log(`[Tool] Extracting HTML from: ${url}`);
@@ -48,4 +46,4 @@ export const extractHtml = tool({
       return { error: error.message };
     }
   },
-});
+};
