@@ -132,16 +132,6 @@ export function ChatSidebar({
     setSelectedArtifactIds,
   } = useProjectStore();
 
-  // Store for managing workspace-wide data like credits
-  const { fetchCredits } = useWorkspaceStore();
-
-  /**
-   * Effect to refresh workspace credits when the component mounts
-   * or when the fetchCredits action changes.
-   */
-  React.useEffect(() => {
-    fetchCredits();
-  }, [fetchCredits]);
 
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);

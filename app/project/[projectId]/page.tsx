@@ -120,7 +120,6 @@ export default function ProjectPage() {
     setVariationsArtifactIndex,
   } = useProjectStore();
 
-  const { fetchCredits } = useWorkspaceStore();
 
   const handlePersistArtifacts = async (indices: number[]) => {
     for (const index of indices) {
@@ -444,7 +443,6 @@ export default function ProjectPage() {
           } else {
             toast.success("Design generation complete!");
           }
-          fetchCredits();
         }
         if (event.data.status === "partial_complete" && event.data.screen) {
           setIsGenerating(true);
@@ -508,7 +506,6 @@ export default function ProjectPage() {
           };
           setArtifacts(updateFn);
           setThrottledArtifacts(updateFn);
-          fetchCredits();
         }
       }
     });
@@ -617,7 +614,6 @@ export default function ProjectPage() {
     setArtifacts,
     setThrottledArtifacts,
     projectId,
-    fetchCredits,
     setRegeneratingArtifactIds,
     setProject,
     setActiveThemeId,
@@ -727,7 +723,6 @@ export default function ProjectPage() {
       }
     };
     if (projectId) fetchProjectAndInitialize();
-    fetchCredits();
   }, [
     projectId,
     sendMessage,
@@ -744,7 +739,6 @@ export default function ProjectPage() {
     setActiveThemeId,
     setDesignPlan,
     setIsGenerating,
-    fetchCredits,
     resetProjectState, // Added missing dependency
   ]);
 
@@ -1217,12 +1211,6 @@ export default function ProjectPage() {
     e.preventDefault();
     if (!input.trim() && attachments?.length === 0) return;
 
-    // Check credits before sending
-    const { credits } = useWorkspaceStore.getState();
-    if (credits !== null && credits < 10000) {
-      toast.error("Insufficient credits (10k required)");
-      return;
-    }
 
     const text = input.trim();
     setIsGenerating(true);
@@ -1243,12 +1231,6 @@ export default function ProjectPage() {
     action: "more" | "regenerate" | "variations",
     artifact: Artifact,
   ) => {
-    // Check credits before starting any generation action
-    const { credits } = useWorkspaceStore.getState();
-    if (credits !== null && credits < 10000) {
-      toast.error("Insufficient credits (10k required)");
-      return;
-    }
 
     let prompt = "";
     if (action === "more")
@@ -1270,12 +1252,6 @@ export default function ProjectPage() {
   };
 
   const handleRegenerateSubmit = async () => {
-    // Check credits
-    const { credits } = useWorkspaceStore.getState();
-    if (credits !== null && credits < 10000) {
-      toast.error("Insufficient credits (10k required)");
-      return;
-    }
 
     const selectedId = Array.from(selectedArtifactIds)[0];
     const artifact = artifacts.find((a) => a.id === selectedId);

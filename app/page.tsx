@@ -12,6 +12,7 @@ import {
   Loader2,
   RotateCcw,
   Layout,
+  Menu,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -349,23 +350,22 @@ export default function Home() {
             <Logo textSize="1.6rem" />
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="lg:hidden">
+              <MobileMenu
+                sections={sections}
+                loading={loadingProjects}
+                isLoadingMore={isLoadingMore}
+                hasMore={hasMore}
+                loadMore={() => fetchProjects(true)}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+              />
+            </div>
             <UserMenu />
           </div>
         </header>
 
-        {/* Mobile Page Header */}
-        <div className="absolute top-20 right-6 z-50 lg:hidden">
-          <MobileMenu
-            sections={sections}
-            loading={loadingProjects}
-            isLoadingMore={isLoadingMore}
-            hasMore={hasMore}
-            loadMore={() => fetchProjects(true)}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
-        </div>
 
         {/* Main Content Area */}
         <div className="flex flex-1 overflow-hidden">
@@ -576,9 +576,9 @@ function MobileMenu({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <div className="bg-secondary border-border hover:bg-secondary/80 cursor-pointer rounded-lg border p-2 shadow-lg transition-all lg:hidden">
-          <List className="text-foreground h-6 w-6" />
-        </div>
+        <button className="text-muted-foreground hover:text-foreground p-1 transition-colors outline-none lg:hidden">
+          <Menu className="h-6 w-6" />
+        </button>
       </DrawerTrigger>
       <DrawerContent className="bg-background border-border text-foreground max-h-[90vh]">
         <DrawerHeader className="flex flex-row items-center justify-between border-none px-6 py-5">

@@ -61,11 +61,6 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push("/account")}>
-          <User className="mr-2 h-4 w-4" />
-          <span>Account Settings</span>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <Palette className="mr-2 h-4 w-4" />
@@ -88,6 +83,11 @@ export function UserMenu() {
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
         </DropdownMenuSub>
+        <DropdownMenuItem onClick={() => router.push("/account")}>
+          <User className="mr-2 h-4 w-4" />
+          <span>Account Settings</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() =>
             authClient.signOut({
