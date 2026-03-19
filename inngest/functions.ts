@@ -740,8 +740,7 @@ CRITICAL:
         messageId: fullDesignMessageId || "",
       });
 
-      const themes: any[] = [];
-      const selectedTheme: any = null;
+
 
       // --- STEP 3: SCREEN PLANNING ---
       await publishStatus({

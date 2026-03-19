@@ -8,20 +8,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "next-themes";
-import { LayoutGrid, LogOut, Monitor, Moon, Palette, Sun, User } from "lucide-react";
+import { LayoutGrid, LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function UserMenu() {
   const { data: session } = authClient.useSession();
-  const { setTheme } = useTheme();
   const router = useRouter();
 
   if (!session) {

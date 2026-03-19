@@ -19,7 +19,6 @@ import {
   RotateCcw,
   ArrowRight,
   Menu,
-  Palette,
   CopyPlus,
   LayoutGrid,
   Download,
@@ -86,8 +85,6 @@ interface ChatSidebarProps {
   handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   /** Reference to the hidden file input for attachments */
   fileInputRef: RefObject<HTMLInputElement | null>;
-  /** Function to apply a specific visual theme to the project */
-  applyTheme: (theme: any) => void;
   /** Current user session data */
   session: any;
   /** Current status of the chat (e.g., "loading", "streaming") */
@@ -103,7 +100,6 @@ export function ChatSidebar({
   handleRetry,
   handleFileUpload: propHandleFileUpload, // Renamed to avoid conflict
   fileInputRef,
-  applyTheme: _applyTheme,
   session,
   status,
   messages,
@@ -863,28 +859,6 @@ export function ChatSidebar({
                   <TooltipContent>Generate 3 variations</TooltipContent>
                 </Tooltip>
 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={() =>
-                        setSecondarySidebarMode(
-                          secondarySidebarMode === "theme" ? "none" : "theme",
-                        )
-                      }
-                      variant="ghost"
-                      size="icon"
-                      className={cn(
-                        "h-9 w-9 rounded-full border shadow-sm transition-all duration-200",
-                        secondarySidebarMode === "theme"
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted border-border/50",
-                      )}
-                    >
-                      <Palette className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Theme Settings</TooltipContent>
-                </Tooltip>
               </div>
 
               <div className="flex flex-col items-end gap-2.5">

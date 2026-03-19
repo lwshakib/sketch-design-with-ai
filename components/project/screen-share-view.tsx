@@ -40,10 +40,6 @@ interface ScreenShareViewProps {
     title: string;
     /** Token for shared access */
     shareToken: string;
-    /** Available themes for the project */
-    themes?: any[];
-    /** The theme currently active for this shared view */
-    appliedTheme?: any;
   };
   /** The specific screen artifact to be showcased */
   artifact: Artifact;

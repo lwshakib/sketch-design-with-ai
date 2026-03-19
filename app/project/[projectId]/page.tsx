@@ -61,10 +61,7 @@ export default function ProjectPage() {
     setLeftSidebarMode: _setLeftSidebarMode,
     secondarySidebarMode,
     setSecondarySidebarMode: _setSecondarySidebarMode,
-    activeThemeId: _activeThemeId,
-    setActiveThemeId,
-    appliedTheme,
-    setAppliedTheme,
+
     selectedEl,
     setSelectedEl,
     isCodeViewerOpen,
@@ -547,16 +544,7 @@ export default function ProjectPage() {
           const updatedPlan = plan
             ? { ...plan, _markdown: markdown || plan._markdown }
             : null;
-          if (plan?.themes) {
-            setProject((prev) =>
-              prev ? { ...prev, themes: plan.themes } : null,
-            );
-          }
 
-          if (plan?.selectedTheme) {
-            setAppliedTheme(plan.selectedTheme);
-            setActiveThemeId(plan.selectedTheme.id);
-          }
 
           if (targetIndex !== -1) {
             const existing = updated[targetIndex] as any;
@@ -616,8 +604,6 @@ export default function ProjectPage() {
     projectId,
     setRegeneratingArtifactIds,
     setProject,
-    setActiveThemeId,
-    setAppliedTheme,
   ]);
 
   useEffect(() => {
@@ -663,10 +649,7 @@ export default function ProjectPage() {
             setArtifacts(fetchedArtifacts);
             setThrottledArtifacts(fetchedArtifacts);
           }
-          if (data.canvasData.appliedTheme) {
-            setAppliedTheme(data.canvasData.appliedTheme);
-            setActiveThemeId(data.canvasData.appliedTheme.id);
-          }
+
         } else {
           // New project or no canvas data: Reset to defaults
           setZoom(1);
@@ -688,15 +671,7 @@ export default function ProjectPage() {
           }
         }
 
-        // Apply selected theme from project root if available (newer source of truth)
-        if (data.selectedTheme) {
-          setAppliedTheme(data.selectedTheme);
-          setActiveThemeId(data.selectedTheme.id);
-        } else if (data.canvasData?.appliedTheme) {
-          // Fallback to canvasData for older projects
-          setAppliedTheme(data.canvasData.appliedTheme);
-          setActiveThemeId(data.canvasData.appliedTheme.id);
-        }
+
         const pendingPromptRaw = sessionStorage.getItem(
           `pending_prompt_${projectId}`,
         );
@@ -735,8 +710,6 @@ export default function ProjectPage() {
     setFramePos,
     setArtifacts,
     setThrottledArtifacts,
-    setAppliedTheme,
-    setActiveThemeId,
     setDesignPlan,
     setIsGenerating,
     resetProjectState, // Added missing dependency
@@ -975,24 +948,7 @@ export default function ProjectPage() {
     commitEditsRef.current = commitEdits;
   }, [commitEdits]);
 
-  const applyTheme = useCallback(
-    async (theme: any) => {
-      setActiveThemeId(theme.id);
-      setAppliedTheme(theme);
 
-      // Automatically persist the selected theme to the database so AI can use it immediately
-      try {
-        await axios.patch(`/api/projects/${projectId}`, {
-          selectedTheme: theme,
-        });
-        toast.success(`Theme "${theme.name}" applied & saved.`);
-      } catch (error) {
-        console.error("Failed to persist theme selection:", error);
-        toast.success(`Theme "${theme.name}" selected locally.`);
-      }
-    },
-    [projectId, setActiveThemeId, setAppliedTheme],
-  );
 
   const hoveredElRef = useRef<HTMLElement | null>(null);
   const selectedElRef = useRef<HTMLElement | null>(null);
@@ -1103,9 +1059,7 @@ export default function ProjectPage() {
               canvasOffset,
               dynamicFrameHeights,
               artifactPreviewModes,
-              appliedTheme,
             },
-            selectedTheme: appliedTheme,
           }),
         });
         setHasUnsavedChanges(false);
@@ -1126,7 +1080,7 @@ export default function ProjectPage() {
       canvasOffset,
       dynamicFrameHeights,
       artifactPreviewModes,
-      appliedTheme,
+
       setIsSaving,
       setHasUnsavedChanges,
     ],
@@ -1158,7 +1112,7 @@ export default function ProjectPage() {
     artifacts,
     dynamicFrameHeights,
     artifactPreviewModes,
-    appliedTheme,
+
     loading,
     debouncedSave,
   ]);
@@ -1516,13 +1470,12 @@ Reference the existing screen code provided in the context.`;
             handleRetry={handleRetry}
             handleFileUpload={handleFileUpload}
             fileInputRef={fileInputRef}
-            applyTheme={applyTheme}
             session={session}
             status={chatStatus}
             messages={messages}
             error={chatError}
           />
-          <SecondarySidebar commitEdits={commitEdits} applyTheme={applyTheme} />
+          <SecondarySidebar commitEdits={commitEdits} />
         </div>
       )}
 

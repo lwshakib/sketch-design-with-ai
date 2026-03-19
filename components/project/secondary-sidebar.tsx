@@ -4,15 +4,12 @@
  * @file secondary-sidebar.tsx
  * @description This component acts as the secondary inspector panel.
  * It is dynamically toggled by the user or by context-specific actions (like selecting an element).
- * It switches between two primary modes:
- * 1. 'properties' - Shows the ElementSettings for the currently selected DOM element.
- * 2. 'theme' - Shows the ThemeSettings for overall project styling.
+ * It shows the ElementSettings for the currently selected DOM element.
  */
 
 import React from "react";
 import { useProjectStore } from "@/hooks/use-project-store";
 import { ElementSettings } from "./element-settings";
-import { ThemeSettings } from "./theme-settings";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -22,19 +19,12 @@ import { Button } from "@/components/ui/button";
 interface SecondarySidebarProps {
   /** Callback to persist changes made in the element inspector back to the project state */
   commitEdits: () => void;
-  /** Callback to apply a global theme to the current project */
-  applyTheme: (theme: any) => void;
 }
 
-export function SecondarySidebar({
-  commitEdits,
-  applyTheme,
-}: SecondarySidebarProps) {
+export function SecondarySidebar({ commitEdits }: SecondarySidebarProps) {
   const {
     secondarySidebarMode,
     setSecondarySidebarMode,
-    activeThemeId,
-    appliedTheme,
     selectedEl,
     setSelectedEl,
   } = useProjectStore();
@@ -55,19 +45,11 @@ export function SecondarySidebar({
       </div>
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        {secondarySidebarMode === "properties" ? (
-          <ElementSettings
-            selectedEl={selectedEl}
-            setSelectedEl={setSelectedEl}
-            onUpdate={commitEdits}
-          />
-        ) : (
-          <ThemeSettings
-            activeThemeId={activeThemeId}
-            onApplyTheme={applyTheme}
-            appliedTheme={appliedTheme}
-          />
-        )}
+        <ElementSettings
+          selectedEl={selectedEl}
+          setSelectedEl={setSelectedEl}
+          onUpdate={commitEdits}
+        />
       </div>
     </aside>
   );
