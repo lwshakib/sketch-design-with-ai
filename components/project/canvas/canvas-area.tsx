@@ -257,7 +257,7 @@ export function CanvasArea({
             const userMsg = messages![userIdx];
             const assistantMsg = messages?.slice(userIdx + 1).find((m) => m.role === "assistant");
             
-            const getUserText = () => userMsg.parts?.find((p: any) => p.type === "text")?.text || "Instruction";
+            const getUserText = () => userMsg.parts?.find((p: any) => p.type === "text")?.text || "";
             const getAssistantText = () => {
                  if (!assistantMsg) return "Generating response...";
                  const text = assistantMsg.parts?.find((p: any) => p.type === "text")?.text || "The design was updated.";
@@ -850,46 +850,32 @@ export function CanvasArea({
                onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col gap-0.5">
               {messages
-                ?.filter((m) => !m.isSilent)
+                ?.filter((m) => !m.isSilent && m.role === "user")
                 .slice()
                 .reverse()
                 .map((msg, i) => {
                   const textPart = msg.parts?.find((p: any) => p.type === "text");
-                  const text = textPart?.text || "Instruction";
+                  const text = textPart?.text || "";
                   const cleanText = text.replace(/\[Context:.*?\]\s*/g, "").trim(); 
                   
-                  if (!cleanText && msg.role === 'user') return null;
-
-                  const isAssistant = msg.role === "assistant";
-                  const isStreaming = msg.status === "streaming";
+                  if (!cleanText) return null;
 
                   return (
                     <div
                       key={msg.id || i}
-                      onClick={() => !isAssistant && setSelectedTurnId(prev => prev === msg.id ? null : msg.id)}
+                      onClick={() => setSelectedTurnId(prev => prev === msg.id ? null : msg.id)}
                       className={cn(
-                        "group relative flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-all",
-                        !isAssistant && "cursor-pointer",
+                        "group relative flex items-center gap-2 rounded-lg px-2.5 py-1.5 transition-all cursor-pointer",
                         selectedTurnId === msg.id
                           ? "bg-secondary/60 ring-1 ring-primary/10 shadow-sm" 
                           : "hover:bg-secondary/40"
                       )}
                     >
-                      {isAssistant ? (
-                        <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-primary opacity-60" />
-                      ) : (
-                        <Check className={cn(
-                          "mt-0.5 h-3 w-3 shrink-0 transition-colors",
-                          selectedTurnId === msg.id ? "text-primary" : "text-muted-foreground/30 group-hover:text-muted-foreground"
-                        )} />
-                      )}
                       <span className={cn(
-                        "text-[12px] font-medium leading-tight transition-colors flex-1",
+                        "text-[12px] font-medium leading-tight transition-colors flex-1 truncate",
                         selectedTurnId === msg.id ? "text-foreground" : "text-muted-foreground",
-                        isAssistant && "opacity-80"
                       )}>
-                        {cleanText || (isStreaming ? "Thinking..." : "...")}
-                        {isStreaming && <span className="animate-pulse ml-1 inline-block">●</span>}
+                        {cleanText}
                       </span>
                     </div>
                   );
