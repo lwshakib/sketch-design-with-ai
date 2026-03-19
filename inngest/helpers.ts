@@ -1,5 +1,4 @@
 import prisma from "../lib/prisma";
-import { recordCreditUsage } from "../lib/credits";
 
 /**
  * Hydrates messages by converting image URLs to base64 data URIs.
@@ -93,7 +92,6 @@ export async function publishStatus({
   currentScreen,
   screenId,
   screen,
-  isCreditError,
 }: {
   publish: any;
   projectId: string;
@@ -103,7 +101,6 @@ export async function publishStatus({
   currentScreen?: string;
   screenId?: string;
   screen?: any;
-  isCreditError?: boolean;
 }) {
   await publish({
     channel: `project:${projectId}`,
@@ -115,7 +112,6 @@ export async function publishStatus({
       ...(currentScreen && { currentScreen }),
       ...(screenId && { screenId }),
       ...(screen && { screen }),
-      ...(isCreditError && { isCreditError }),
     },
   });
 }
@@ -145,19 +141,6 @@ export async function publishPlan({
       ...(plan && { plan }),
     },
   });
-}
-
-/**
- * Deducts credits for a project step.
- */
-export async function deductCredits(projectId: string, amount: number) {
-  const proj = await prisma.project.findUnique({
-    where: { id: projectId },
-    select: { userId: true },
-  });
-  if (proj) {
-    await recordCreditUsage(proj.userId, amount);
-  }
 }
 
 /**

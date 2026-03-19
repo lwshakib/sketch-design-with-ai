@@ -3,7 +3,7 @@
 import React from "react";
 import {
   ArrowLeft,
-  Coins,
+  Settings,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -33,12 +33,12 @@ export default function SettingsPage() {
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
         <div className="bg-secondary/30 border-border/60 max-w-md space-y-6 rounded-3xl border p-12 shadow-sm backdrop-blur-sm">
           <div className="bg-background border-border mx-auto flex h-20 w-20 items-center justify-center rounded-3xl border shadow-lg">
-            <Coins className="text-primary h-10 w-10" />
+            <Settings className="text-primary h-10 w-10" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">Usage & credits</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Workspace Settings</h1>
             <p className="text-muted-foreground text-sm">
-              This feature is not available now. Our credit system is currently undergoing maintenance as we transition to a more flexible model.
+              Manage your project workspace and preferences. General settings are coming soon.
             </p>
           </div>
           <Button asChild className="rounded-xl px-8 font-bold">

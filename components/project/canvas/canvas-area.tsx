@@ -158,18 +158,11 @@ export function CanvasArea({
     setSecondarySidebarMode,
     activeTool,
     setActiveTool,
-    appliedTheme,
     isSidebarVisible,
     setIsSidebarVisible,
     regeneratingArtifactIds,
-    setIsCommandMenuOpen: _setIsCommandMenuOpen,
-    isSettingsDialogOpen: _isSettingsDialogOpen,
-    setIsSettingsDialogOpen: _setIsSettingsDialogOpen,
-    setIsShareDialogOpen: _setIsShareDialogOpen,
     project,
   } = useProjectStore();
-
-  const { credits } = useWorkspaceStore();
 
   const isEditMode = secondarySidebarMode === "properties";
   const _status = _isGenerating ? "streaming" : "ready"; // Simplification for UI checks
@@ -227,22 +220,6 @@ export function CanvasArea({
         </div>
 
         <div className="pointer-events-auto flex items-center gap-6">
-          <div className="pointer-events-none flex items-center">
-            <span className="text-muted-foreground/60 hover:text-muted-foreground flex items-center text-[11px] font-medium transition-colors">
-              <NumberFlow
-                value={
-                  (credits || 0) >= 1000 ? (credits || 0) / 1000 : credits || 0
-                }
-                format={
-                  (credits || 0) >= 1000
-                    ? { minimumFractionDigits: 1, maximumFractionDigits: 1 }
-                    : {}
-                }
-              />
-              <span className="ml-px">{(credits || 0) >= 1000 ? "k" : ""}</span>
-              <span className="ml-1">credits remaining</span>
-            </span>
-          </div>
 
           <div className="flex h-8 w-8 items-center justify-center">
             {isSaving ? (
@@ -412,25 +389,6 @@ export function CanvasArea({
                             <Pencil className="h-4 w-4" />
                           </Button>
 
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              if (secondarySidebarMode === "theme") {
-                                setSecondarySidebarMode("none");
-                              } else {
-                                setSecondarySidebarMode("theme");
-                              }
-                            }}
-                            className={cn(
-                              "text-foreground/80 hover:text-foreground flex h-9 w-9 items-center justify-center rounded-md transition-all hover:bg-transparent disabled:opacity-30",
-                              secondarySidebarMode === "theme" &&
-                                "bg-primary/20 text-primary shadow-primary/5 border-primary/30 border shadow-lg",
-                            )}
-                            title="Theme Settings"
-                          >
-                            <Palette className="h-4 w-4" />
-                          </Button>
 
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -727,9 +685,7 @@ export function CanvasArea({
                         <span
                           className="text-[12px] font-bold"
                           style={{
-                            color:
-                              appliedTheme?.cssVars?.primary ||
-                              "var(--primary)",
+                            color: "var(--primary)",
                           }}
                         >
                           {artifact.title || "Untitled Screen"}
@@ -738,9 +694,7 @@ export function CanvasArea({
                           <Code
                             className="h-3.5 w-3.5"
                             style={{
-                              color:
-                                appliedTheme?.cssVars?.mutedForeground ||
-                                "var(--muted-foreground)",
+                              color: "var(--muted-foreground)",
                             }}
                           />
                         </div>
@@ -788,13 +742,11 @@ export function CanvasArea({
                       transition: isResizing
                         ? "none"
                         : "width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                      backgroundColor:
-                        appliedTheme?.cssVars?.background ||
-                        "var(--background)",
+                      backgroundColor: "var(--background)",
                       borderColor:
                         artifact.id && selectedArtifactIds.has(artifact.id)
                           ? SELECTION_BLUE
-                          : appliedTheme?.cssVars?.border || "var(--border)",
+                          : "var(--border)",
                       boxShadow:
                         artifact.id && selectedArtifactIds.has(artifact.id)
                           ? `0 0 0 2px ${SELECTION_BLUE}40, 0 40px 100px rgba(0,0,0,0.4)`
@@ -806,7 +758,6 @@ export function CanvasArea({
                         regeneratingArtifactIds.has(artifact.id))) && (
                       <ModernShimmer
                         type={artifact.type}
-                        appliedTheme={appliedTheme}
                       />
                     )}
 
@@ -824,7 +775,6 @@ export function CanvasArea({
                         isEditMode={isEditMode}
                         activeTool={activeTool}
                         isDraggingFrame={isDraggingFrame}
-                        appliedTheme={appliedTheme}
                         onRef={(idx, el) => {
                           if (el)
                             (el as any).dataset.artifactTitle = artifact.title;

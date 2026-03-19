@@ -23,7 +23,6 @@ export interface ArtifactFrameProps {
   isEditMode: boolean;
   activeTool: string;
   isDraggingFrame: boolean;
-  appliedTheme: any;
   onRef: (index: number, el: HTMLIFrameElement | null) => void;
 }
 
@@ -38,7 +37,6 @@ export const ArtifactFrame = React.memo(
     isEditMode,
     activeTool,
     isDraggingFrame,
-    appliedTheme,
     onRef,
   }: ArtifactFrameProps) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -48,77 +46,6 @@ export const ArtifactFrame = React.memo(
      */
     const [initialSrcDoc] = useState(() => getInjectedHTML(artifact.content));
     const lastContentRef = useRef(artifact.content);
-
-    const getThemeCSS = useCallback((theme: any) => {
-      if (!theme || !theme.cssVars) return "";
-
-      return `
-      :root {
-        --background: ${theme.cssVars.background} !important;
-        --foreground: ${theme.cssVars.foreground} !important;
-        --card: ${theme.cssVars.card} !important;
-        --card-foreground: ${theme.cssVars.cardForeground} !important;
-        --popover: ${theme.cssVars.popover} !important;
-        --popover-foreground: ${theme.cssVars.popoverForeground} !important;
-        --primary: ${theme.cssVars.primary} !important;
-        --primary-foreground: ${theme.cssVars.primaryForeground} !important;
-        --secondary: ${theme.cssVars.secondary} !important;
-        --secondary-foreground: ${theme.cssVars.secondaryForeground} !important;
-        --muted: ${theme.cssVars.muted} !important;
-        --muted-foreground: ${theme.cssVars.mutedForeground} !important;
-        --accent: ${theme.cssVars.accent} !important;
-        --accent-foreground: ${theme.cssVars.accentForeground} !important;
-        --destructive: ${theme.cssVars.destructive} !important;
-        --border: ${theme.cssVars.border} !important;
-        --input: ${theme.cssVars.input} !important;
-        --ring: ${theme.cssVars.ring} !important;
-        --radius: ${theme.cssVars.radius} !important;
-        ${theme.cssVars.fontSans ? `--font-sans: ${theme.cssVars.fontSans} !important;` : ""}
-      }
-      body {
-        background-color: var(--background) !important;
-        color: var(--foreground) !important;
-        ${theme.cssVars.fontSans ? `font-family: var(--font-sans) !important;` : ""}
-      }
-    `;
-    }, []);
-
-    /**
-     * Injects or updates a <style> tag in the iframe's <head> to apply the project theme.
-     * This uses CSS variables to override default Tailwind values in real-time.
-     */
-    const applyThemeToIframe = useCallback(() => {
-      if (
-        !appliedTheme ||
-        !appliedTheme.cssVars ||
-        !iframeRef.current?.contentDocument
-      )
-        return;
-
-      const doc = iframeRef.current.contentDocument;
-      if (!doc || !doc.head) return;
-
-      let styleEl = doc.getElementById("theme-overrides");
-
-      if (!styleEl) {
-        styleEl = doc.createElement("style");
-        styleEl.id = "theme-overrides";
-        doc.head.appendChild(styleEl);
-      }
-
-      const css = getThemeCSS(appliedTheme);
-      if (css && styleEl.textContent !== css) {
-        styleEl.textContent = css;
-      }
-    }, [appliedTheme, getThemeCSS]);
-
-    // Apply theme when iframe loads or theme changes
-    useEffect(() => {
-      applyThemeToIframe();
-      // Also re-apply after a short delay to ensure injected content is covered
-      const timer = setTimeout(applyThemeToIframe, 500);
-      return () => clearTimeout(timer);
-    }, [applyThemeToIframe, artifact.content]);
 
     // Use useEffect to handle content updates via postMessage instead of srcDoc
     useEffect(() => {
@@ -149,13 +76,11 @@ export const ArtifactFrame = React.memo(
               },
               "*",
             );
-            // Re-apply theme after content update
-            setTimeout(applyThemeToIframe, 10);
           }
           lastContentRef.current = artifact.content;
         }
       }
-    }, [artifact.content, artifact.isComplete, applyThemeToIframe]);
+    }, [artifact.content, artifact.isComplete]);
 
     return (
       <iframe
