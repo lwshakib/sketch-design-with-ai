@@ -333,47 +333,51 @@ export default function Home() {
   if (!isMounted) return null;
 
   return (
-    <div className="bg-background text-foreground flex h-screen w-full overflow-hidden font-sans transition-colors duration-500">
-      <Sidebar
-        sections={sections}
-        loading={loadingProjects}
-        isLoadingMore={isLoadingMore}
-        hasMore={hasMore}
-        loadMore={() => fetchProjects(true)}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-      />
+    <div className="bg-background text-foreground flex h-screen w-full flex-col overflow-hidden font-sans transition-colors duration-500">
+      {/* Full-Width Top Header */}
+      <header className="z-40 flex w-full items-center justify-between bg-background/50 px-6 py-4 backdrop-blur-md">
+        <div className="flex items-center gap-4">
+          <Logo />
+        </div>
 
-      <main className="bg-background relative flex flex-1 flex-col overflow-hidden">
-        {/* Top Header */}
-        <header className="z-40 flex items-center justify-between bg-transparent px-6 py-4">
-          <div className="flex items-center gap-4">
-            <Logo />
+        <div className="flex items-center gap-4">
+          <ModeToggle />
+          <UserMenu />
+          <div className="lg:hidden">
+            <MobileMenu
+              sections={sections}
+              loading={loadingProjects}
+              isLoadingMore={isLoadingMore}
+              hasMore={hasMore}
+              loadMore={() => fetchProjects(true)}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
           </div>
+        </div>
+      </header>
 
-
-          <div className="flex items-center gap-3">
-            <ModeToggle />
-            <UserMenu />
-            <div className="lg:hidden">
-              <MobileMenu
-                sections={sections}
-                loading={loadingProjects}
-                isLoadingMore={isLoadingMore}
-                hasMore={hasMore}
-                loadMore={() => fetchProjects(true)}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-              />
-            </div>
-          </div>
-        </header>
-
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Sidebar in a custom Card-like container */}
+        <div className="hidden h-full w-[380px] shrink-0 p-4 lg:block">
+          <Sidebar
+            sections={sections}
+            loading={loadingProjects}
+            isLoadingMore={isLoadingMore}
+            hasMore={hasMore}
+            loadMore={() => fetchProjects(true)}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            className="h-full w-full rounded-2xl border border-border/40 bg-secondary/15 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:bg-zinc-900/20 dark:shadow-none"
+          />
+        </div>
 
         {/* Main Content Area */}
-        <div className="flex flex-1 overflow-hidden">
-          {/* Center Workspace */}
-          <div className="relative flex flex-1 flex-col items-center justify-center overflow-y-auto px-6 pb-20">
+        <main className="relative flex flex-1 flex-col overflow-hidden">
+          {/* Main Content Area */}
+          <div className="flex flex-1 overflow-hidden">
+            {/* Center Workspace */}
+            <div className="relative flex flex-1 flex-col items-center justify-center overflow-y-auto px-6 pb-20">
             <div className="mb-12 w-full max-w-2xl space-y-12 pt-10">
               {/* Main Title Row */}
               <div className="flex flex-col items-center space-y-4 text-center">
@@ -528,7 +532,8 @@ export default function Home() {
         </div>
       </main>
     </div>
-  );
+  </div>
+);
 }
 
 interface MobileMenuProps {

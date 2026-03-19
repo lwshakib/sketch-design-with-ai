@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 
 import { useEffect, useRef } from "react";
 import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const ProjectSkeleton = () => (
   <div className="space-y-4">
@@ -33,6 +34,7 @@ interface SidebarProps {
   loadMore: () => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
+  className?: string; // Added className prop
 }
 
 export function Sidebar({
@@ -43,6 +45,7 @@ export function Sidebar({
   loadMore,
   searchQuery,
   setSearchQuery,
+  className, // De-structured className
 }: SidebarProps) {
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -65,7 +68,12 @@ export function Sidebar({
   }, [hasMore, isLoadingMore, loadMore, searchQuery]);
 
   return (
-    <aside className="bg-sidebar border-sidebar-border hidden h-screen w-[340px] flex-col border-r transition-colors duration-300 lg:flex">
+    <aside
+      className={cn(
+        "bg-sidebar border-sidebar-border hidden h-screen w-[340px] flex-col border-r transition-colors duration-300 lg:flex",
+        className, // Combined internal classes with provided className
+      )}
+    >
       {/* Search Header */}
       <div className="p-4 pt-6">
         <div className="group relative">
