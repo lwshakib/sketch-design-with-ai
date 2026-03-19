@@ -20,6 +20,7 @@ import {
   Monitor,
   Tablet,
   MoreHorizontal,
+  Menu,
   Code,
   Share2,
   Download,
@@ -37,6 +38,11 @@ import {
   Copy,
   ExternalLink,
   QrCode,
+  X,
+  ArrowRight,
+  LayoutGrid,
+  ArrowUp,
+  Rocket,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -57,6 +63,14 @@ import { type Artifact } from "@/lib/artifact-renderer";
 import { ArtifactFrame } from "./artifact-frame";
 import { ModernShimmer } from "./modern-shimmer";
 import { CanvasToolbar } from "./canvas-toolbar";
+import { ModeToggle } from "@/components/mode-toggle";
+import Image from "next/image";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { LogoIcon } from "@/components/logo";
 import { toast } from "sonner";
 import { useProjectStore } from "@/hooks/use-project-store";
@@ -106,6 +120,11 @@ interface CanvasAreaProps {
   handleDuplicateProject: () => void;
   /** Global action to delete the entire project */
   handleDeleteProject: () => void;
+
+  // Chat/Generation Handlers
+  handleCustomSubmit: (e: React.FormEvent) => void;
+  handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 export function CanvasArea({
@@ -126,6 +145,9 @@ export function CanvasArea({
   handleDownloadFullProject: _handleDownloadFullProject,
   handleDuplicateProject: _handleDuplicateProject,
   handleDeleteProject: _handleDeleteProject,
+  handleCustomSubmit,
+  handleFileUpload,
+  fileInputRef,
 }: CanvasAreaProps) {
   const {
     zoom,
@@ -138,13 +160,9 @@ export function CanvasArea({
     setThrottledArtifacts,
     artifacts: _artifacts,
     setArtifacts,
-    selectedArtifactIds,
-    setSelectedArtifactIds,
     selectionBox,
     isDraggingFrame,
     isResizing,
-    isGenerating: _isGenerating,
-    realtimeStatus: _realtimeStatus,
     designPlan: _designPlan,
     artifactPreviewModes,
     setArtifactPreviewModes,
@@ -158,14 +176,31 @@ export function CanvasArea({
     setSecondarySidebarMode,
     activeTool,
     setActiveTool,
-    isSidebarVisible,
-    setIsSidebarVisible,
     regeneratingArtifactIds,
     project,
+    input,
+    setInput,
+    attachments,
+    setAttachments,
+    is3xMode,
+    setIs3xMode,
+    selectedArtifactIds,
+    setSelectedArtifactIds,
+    isGenerating,
+    realtimeStatus,
   } = useProjectStore();
 
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  React.useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 160)}px`;
+    }
+  }, [input]);
+
   const isEditMode = secondarySidebarMode === "properties";
-  const _status = _isGenerating ? "streaming" : "ready"; // Simplification for UI checks
+  const _status = isGenerating ? "streaming" : "ready"; // Simplification for UI checks
 
   const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
   const [qrCodeUrl, setQrCodeUrl] = React.useState("");
@@ -203,24 +238,24 @@ export function CanvasArea({
 
       {/* Preview Header */}
       <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex h-16 items-center justify-between px-6">
-        <div className="pointer-events-auto flex items-center gap-2">
+        <div className="pointer-events-auto flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setIsSidebarVisible(!isSidebarVisible)}
-            className="bg-background/80 text-muted-foreground hover:text-foreground h-10 w-10 rounded-xl border shadow-sm backdrop-blur-md transition-all"
-            title={isSidebarVisible ? "Collapse Sidebar" : "Expand Sidebar"}
+            onClick={() => window.location.href = "/"}
+            className="text-muted-foreground hover:text-foreground h-10 w-10 transition-all hover:bg-transparent"
+            title="Go to Dashboard"
           >
-            {isSidebarVisible ? (
-              <ChevronLeft className="h-6 w-6" />
-            ) : (
-              <ChevronRight className="h-6 w-6" />
-            )}
+            <Menu className="h-5 w-5" />
           </Button>
+          <div className="flex items-center">
+            <span className="text-foreground whitespace-nowrap text-[15px] font-semibold tracking-tight">
+              {project?.title || "Untitled Project"}
+            </span>
+          </div>
         </div>
 
-        <div className="pointer-events-auto flex items-center gap-6">
-
+        <div className="pointer-events-auto flex items-center gap-4">
           <div className="flex h-8 w-8 items-center justify-center">
             {isSaving ? (
               <Loader2 className="text-foreground/40 h-4 w-4 animate-spin" />
@@ -235,6 +270,7 @@ export function CanvasArea({
               </div>
             )}
           </div>
+          <ModeToggle />
           <UserMenu />
         </div>
       </header>
@@ -856,6 +892,156 @@ export function CanvasArea({
             </p>
           </div>
         )}
+      </div>
+
+      {/* Agent Log Button at Bottom Left */}
+      <div className="pointer-events-none absolute bottom-4 left-8 z-[100]">
+        <Button
+          variant="ghost"
+          className="pointer-events-auto bg-background/50 border-border group flex items-center gap-2.5 rounded-full border px-4 h-9 text-[13px] font-medium text-muted-foreground backdrop-blur-md transition-all hover:bg-background/80 hover:text-foreground hover:shadow-lg"
+        >
+          <Rocket className="h-4 w-4 stroke-[1.5px]" />
+          <span>Agent Log</span>
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </Button>
+      </div>
+
+      {/* Floating Chat Input */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-4 z-[100] flex justify-center px-6">
+        <div className="pointer-events-auto w-full max-w-[600px]">
+          <div className="bg-background/70 border-border group/input flex flex-col gap-3 rounded-[24px] border p-3 shadow-2xl backdrop-blur-2xl transition-all focus-within:ring-1 focus-within:ring-primary/20">
+            <TooltipProvider>
+              {/* Selected Artifacts Preview (Reference context) */}
+              {selectedArtifactIds.size > 0 && (
+                <div className="animate-in fade-in slide-in-from-bottom-2 flex flex-wrap gap-3 px-2 duration-300">
+                  {Array.from(selectedArtifactIds).map((id) => {
+                    const art = throttledArtifacts.find((a) => a.id === id);
+                    if (!art) return null;
+                    return (
+                      <Tooltip key={id}>
+                        <TooltipTrigger asChild>
+                          <div className="group border-border bg-card/50 hover:border-primary/50 relative h-12 w-12 cursor-help overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md">
+                            <div className="pointer-events-none absolute inset-0 h-[2000px] w-[1024px] origin-top-left scale-[calc(48/1024)] opacity-100">
+                              <iframe
+                                title={`mini-preview-${id}`}
+                                className="h-full w-full border-none"
+                                srcDoc={`
+                                  <!DOCTYPE html>
+                                  <html>
+                                    <head>
+                                      <script src="https://cdn.tailwindcss.com"></script>
+                                      <style>
+                                        body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
+                                      </style>
+                                    </head>
+                                    <body>${art.content}</body>
+                                  </html>
+                                `}
+                              />
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedArtifactIds((prev) => {
+                                  const next = new Set(prev);
+                                  next.delete(id);
+                                  return next;
+                                });
+                              }}
+                              className="bg-card border-border hover:bg-destructive hover:text-destructive-foreground absolute top-1 right-1 z-10 flex h-5 w-5 items-center justify-center rounded-full border opacity-0 shadow-sm transition-all group-hover:opacity-100"
+                            >
+                              <X className="size-3" />
+                            </button>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="top"
+                          className="border-border bg-card text-xs font-bold text-foreground shadow-xl"
+                        >
+                          Reference: {art.title || "Untitled Screen"}
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="flex flex-col gap-3">
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleCustomSubmit(e);
+                    }
+                  }}
+                  placeholder="What would you like to change or create?"
+                  className="placeholder:text-muted-foreground/50 min-h-[1.5rem] w-full resize-none bg-transparent px-2 text-[14px] leading-relaxed text-foreground outline-none overflow-y-auto max-h-[160px]"
+                  rows={1}
+                />
+
+                <div className="flex items-center justify-between gap-3 px-1">
+                  <div className="flex items-center gap-2" />
+
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={(e) => handleCustomSubmit(e as any)}
+                      disabled={
+                        (!input.trim() && attachments.length === 0) ||
+                        isGenerating
+                      }
+                      size="icon"
+                      className={cn(
+                        "h-9 w-9 shrink-0 rounded-full transition-all duration-300",
+                        input.trim() || attachments.length > 0
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90 scale-100"
+                          : "bg-muted text-muted-foreground scale-90 opacity-40 cursor-not-allowed",
+                      )}
+                    >
+                      {isGenerating ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <ArrowUp className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Attachments preview */}
+              {attachments.length > 0 && (
+                <div className="flex flex-wrap gap-2 px-2 pb-1">
+                  {attachments.map((att, idx) => (
+                    <div
+                      key={idx}
+                      className="group border-border bg-muted relative size-12 overflow-hidden rounded-xl border shadow-sm"
+                    >
+                      <Image
+                        src={att.url}
+                        alt="attachment"
+                        fill
+                        className="object-cover opacity-80 transition-opacity group-hover:opacity-100"
+                        unoptimized
+                      />
+                      <button
+                        onClick={() =>
+                          setAttachments((prev) =>
+                            prev.filter((_, i) => i !== idx),
+                          )
+                        }
+                        className="bg-background/80 hover:bg-destructive absolute top-1 right-1 flex size-5 items-center justify-center rounded-full text-foreground hover:text-destructive-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                      >
+                        <X className="size-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TooltipProvider>
+          </div>
+        </div>
       </div>
 
       {/* Selection Box Overlay */}

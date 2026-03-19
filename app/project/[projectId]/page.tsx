@@ -8,8 +8,6 @@ import { toast } from "sonner";
 import { useInngestSubscription } from "@inngest/realtime/hooks";
 import { fetchInngestToken } from "@/app/actions/inngest";
 import { extractArtifacts, type Artifact } from "@/lib/artifact-renderer";
-import { ChatSidebar } from "@/components/project/chat-sidebar";
-import { SecondarySidebar } from "@/components/project/secondary-sidebar";
 import { CanvasArea } from "@/components/project/canvas/canvas-area";
 import { useCanvas } from "@/components/project/canvas/use-canvas";
 import { sanitizeDocumentHtml } from "@/components/project/utils";
@@ -1463,22 +1461,6 @@ Reference the existing screen code provided in the context.`;
 
   return (
     <div className="bg-background text-foreground flex h-screen w-full overflow-hidden font-sans">
-      {isSidebarVisible && (
-        <div className="relative w-[380px] flex-shrink-0 border-r">
-          <ChatSidebar
-            handleCustomSubmit={handleCustomSubmit}
-            handleRetry={handleRetry}
-            handleFileUpload={handleFileUpload}
-            fileInputRef={fileInputRef}
-            session={session}
-            status={chatStatus}
-            messages={messages}
-            error={chatError}
-          />
-          <SecondarySidebar commitEdits={commitEdits} />
-        </div>
-      )}
-
       <CanvasArea
         previewRef={previewRef}
         iframeRefs={iframeRefs}
@@ -1497,6 +1479,9 @@ Reference the existing screen code provided in the context.`;
         handleDownloadFullProject={handleDownloadFullProject}
         handleDuplicateProject={handleDuplicateProject}
         handleDeleteProject={() => setIsDeleteDialogOpen(true)}
+        handleCustomSubmit={handleCustomSubmit}
+        handleFileUpload={handleFileUpload}
+        fileInputRef={fileInputRef}
       />
 
       <CodeViewerModal
