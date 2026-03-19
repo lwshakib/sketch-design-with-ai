@@ -97,11 +97,11 @@ export const getInjectedHTML = (html: string) => {
         }
       }
     </script>
-    /**
-     * Common CSS styles for the preview environment.
-     * Includes basic reset, typography defaults, and selection highlight styles.
-     */
     <style id="sketch-injected-style">
+      /**
+       * Common CSS styles for the preview environment.
+       * Includes basic reset, typography defaults, and selection highlight styles.
+       */
       html, body {
         margin: 0;
         padding: 0;

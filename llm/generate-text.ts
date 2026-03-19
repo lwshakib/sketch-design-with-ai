@@ -179,3 +179,70 @@ export async function generateTextFromGLM(messages: GLMMessage[]): Promise<strin
   const { text } = await generateText({ messages });
   return text;
 }
+/**
+ * Low-level text generation stream to GLM-4.7-Flash.
+ */
+export async function streamText({
+  system,
+  prompt,
+  messages = [],
+  tools = {},
+  temperature = 0.7,
+  maxOutputTokens,
+}: {
+  system?: string;
+  prompt?: string;
+  messages?: GLMMessage[];
+  tools?: Record<string, any>;
+  temperature?: number;
+  maxOutputTokens?: number;
+}) {
+  const allMessages: GLMMessage[] = [...messages];
+  if (system) {
+    const hasSystem =
+      allMessages.length > 0 && allMessages[0].role === "system";
+    if (hasSystem) {
+      allMessages[0] = {
+        ...allMessages[0],
+        content: `${allMessages[0].content}\n\n${system}`,
+      };
+    } else {
+      allMessages.unshift({ role: "system", content: system });
+    }
+  }
+  if (prompt) {
+    allMessages.push({ role: "user", content: prompt });
+  }
+
+  // Convert tools to GLM format
+  const glmTools = Object.entries(tools).map(([name, tool]) => ({
+    type: "function",
+    function: {
+      name,
+      description: (tool as any).description,
+      parameters: zodToJsonSchema((tool as any).parameters as any),
+    },
+  }));
+
+  const response = await fetch(GLM_WORKER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${CLOUDFLARE_API_KEY}`,
+    },
+    body: JSON.stringify({
+      messages: allMessages,
+      tools: glmTools.length > 0 ? glmTools : undefined,
+      temperature,
+      max_tokens: maxOutputTokens,
+      stream: true,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`GLM Worker Error: ${response.status} - ${errorText}`);
+  }
+
+  return response.body;
+}

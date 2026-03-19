@@ -846,11 +846,11 @@ export function CanvasArea({
       <div className="pointer-events-none absolute bottom-6 left-6 z-[60] flex flex-col items-start gap-2.5">
         {/* Minimal History Window */}
         {isAgentLogOpen && (
-          <div className="bg-background/80 border-border pointer-events-auto flex max-h-[300px] w-[260px] flex-col gap-1 overflow-y-auto rounded-xl border p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 scrollbar-none ring-1 ring-black/5"
+          <div className="bg-background/80 border-border pointer-events-auto flex max-h-[300px] w-[280px] flex-col gap-1 overflow-y-auto rounded-xl border p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 scrollbar-none ring-1 ring-black/5"
                onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col gap-0.5">
               {messages
-                ?.filter((m) => m.role === "user" && !m.isSilent)
+                ?.filter((m) => !m.isSilent)
                 .slice()
                 .reverse()
                 .map((msg, i) => {
@@ -858,33 +858,43 @@ export function CanvasArea({
                   const text = textPart?.text || "Instruction";
                   const cleanText = text.replace(/\[Context:.*?\]\s*/g, "").trim(); 
                   
-                  if (!cleanText) return null;
+                  if (!cleanText && msg.role === 'user') return null;
+
+                  const isAssistant = msg.role === "assistant";
+                  const isStreaming = msg.status === "streaming";
 
                   return (
                     <div
                       key={msg.id || i}
-                      onClick={() => setSelectedTurnId(prev => prev === msg.id ? null : msg.id)}
+                      onClick={() => !isAssistant && setSelectedTurnId(prev => prev === msg.id ? null : msg.id)}
                       className={cn(
-                        "group relative flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 transition-all",
+                        "group relative flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-all",
+                        !isAssistant && "cursor-pointer",
                         selectedTurnId === msg.id
                           ? "bg-secondary/60 ring-1 ring-primary/10 shadow-sm" 
                           : "hover:bg-secondary/40"
                       )}
                     >
-                      <Check className={cn(
-                        "h-3 w-3 shrink-0 transition-colors",
-                        selectedTurnId === msg.id ? "text-primary" : "text-muted-foreground/30 group-hover:text-muted-foreground"
-                      )} />
+                      {isAssistant ? (
+                        <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-primary opacity-60" />
+                      ) : (
+                        <Check className={cn(
+                          "mt-0.5 h-3 w-3 shrink-0 transition-colors",
+                          selectedTurnId === msg.id ? "text-primary" : "text-muted-foreground/30 group-hover:text-muted-foreground"
+                        )} />
+                      )}
                       <span className={cn(
-                        "text-[12px] font-medium truncate leading-tight transition-colors",
-                        selectedTurnId === msg.id ? "text-foreground" : "text-muted-foreground"
+                        "text-[12px] font-medium leading-tight transition-colors flex-1",
+                        selectedTurnId === msg.id ? "text-foreground" : "text-muted-foreground",
+                        isAssistant && "opacity-80"
                       )}>
-                        {cleanText}
+                        {cleanText || (isStreaming ? "Thinking..." : "...")}
+                        {isStreaming && <span className="animate-pulse ml-1 inline-block">●</span>}
                       </span>
                     </div>
                   );
                 })}
-              {messages?.filter((m) => m.role === "user" && !m.isSilent).length === 0 && (
+              {messages?.filter((m) => !m.isSilent).length === 0 && (
                 <div className="text-muted-foreground/50 py-6 text-center text-[11px] font-medium italic">
                   No activity logs found
                 </div>

@@ -20,6 +20,7 @@ import { CodeViewerModal } from "@/components/project/code-viewer-modal";
 import { VariationsSheet } from "@/components/project/variations-sheet";
 import { useProjectStore } from "@/hooks/use-project-store";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
+import { useChat } from "@/hooks/use-chat";
 
 export default function ProjectPage() {
   const params = useParams();
@@ -110,10 +111,13 @@ export default function ProjectPage() {
     setMessages,
     updateState: _updateState,
     setActiveTool: _setActiveTool,
+    setIsAgentLogOpen,
     resetProjectState,
     setIsVariationsSheetOpen,
     setVariationsArtifactIndex,
   } = useProjectStore();
+
+  const { sendMessage, chatStatus, chatError } = useChat(projectId);
 
 
   const handlePersistArtifacts = async (indices: number[]) => {
@@ -149,115 +153,6 @@ export default function ProjectPage() {
     previewRef,
   });
 
-  const chatStatus = isGenerating ? "streaming" : "ready";
-  const chatError = null;
-
-  const sendMessage = useCallback(
-    async (params: { text: string; files?: any[] }, options?: any) => {
-      const { is3xMode, messages, selectedArtifactIds, throttledArtifacts } =
-        useProjectStore.getState();
-      const isSilent = options?.body?.isSilent;
-
-      // Inject context about selected screens if any
-      let contextualText = params.text;
-      const selectedScreens = Array.from(selectedArtifactIds)
-        .map((id) => throttledArtifacts.find((a) => a.id === id))
-        .filter((a): a is Artifact => !!a);
-
-      if (selectedScreens.length > 0) {
-        const screenTitles = selectedScreens
-          .map((s) => `"${s.title}"`)
-          .join(", ");
-        contextualText = `[Context: User has selected the following screens: ${screenTitles}. Please refer to or modify these if applicable.]\n\n${params.text}`;
-      }
-
-      const imageUrls =
-        params.files?.map((f: any) => f.url).filter(Boolean) || [];
-      const newUserMessage = {
-        id: `u-${Date.now()}`,
-        role: "user" as const,
-        parts: params.files?.length
-          ? [
-              { type: "text" as const, text: contextualText },
-              ...params.files.map((f) => ({
-                type: "image" as const,
-                url: f.url,
-                mediaType: f.mediaType || "image/png",
-              })),
-            ]
-          : [{ type: "text" as const, text: contextualText }],
-        selectedScreens: selectedScreens.map((s) => ({
-          id: s.id,
-          title: s.title,
-          content: s.content,
-        })),
-        isSilent,
-      };
-
-      // Add a placeholder assistant message for streaming if NOT silent
-      if (!isSilent) {
-        setMessages((prev) => {
-          const assistantPlaceholder = {
-            id: `pending-${newUserMessage.id}`,
-            role: "assistant" as const,
-            visionText: "",
-            parts: [],
-            status: "pending" as any,
-            isSilent: false,
-          };
-          return [...prev, newUserMessage, assistantPlaceholder];
-        });
-      } else {
-        setMessages((prev) => [...prev, newUserMessage]);
-      }
-
-      setIsGenerating(true);
-
-      try {
-        const messagesForApi = [...messages, newUserMessage];
-        const body = {
-          projectId,
-          messages: messagesForApi.map((m: any) => ({
-            role: m.role,
-            parts: m.parts,
-          })),
-          imageUrls, // Send this to API
-          selectedScreens: selectedScreens.map((s) => ({
-            id: s.id,
-            title: s.title,
-            content: s.content,
-          })),
-          is3xMode,
-          ...options?.body,
-        };
-
-        console.log("DEBUG: Custom sendMessage sending body:", body);
-        const res = await axios.post("/api/chat", body);
-
-        // Update the pending assistant message with the real ID from the DB
-        if (res.data.assistantMessageId) {
-          setMessages((prev) => {
-            const updated = [...prev];
-            const pendingIdx = updated.findIndex(
-              (m) => m.id === `pending-${newUserMessage.id}`,
-            );
-            if (pendingIdx !== -1) {
-              updated[pendingIdx] = {
-                ...updated[pendingIdx],
-                id: res.data.assistantMessageId,
-              };
-            }
-            return updated;
-          });
-        }
-      } catch (err) {
-        console.error("Chat error:", err);
-        toast.error("Engine encountered an error.");
-        setIsGenerating(false);
-      }
-    },
-    [projectId, setMessages, setIsGenerating],
-  );
 
   const handleRetry = useCallback(() => {
     const { messages } = useProjectStore.getState();

@@ -3,9 +3,9 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { inngest } from "@/inngest/client";
-import { generateObject } from "@/llm/generate-object";
-import { IntentAnalysisPrompt } from "@/llm/prompts";
-import { z } from "zod";
+import { streamText as streamGLMText } from "@/llm/generate-text";
+import { UX_AGENT_SYSTEM_PROMPT } from "@/llm/prompts";
+import { generateScreen } from "@/llm/tools";
 
 export async function POST(req: Request) {
   try {
@@ -17,22 +17,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const {
-      messages,
-      projectId,
-      is3xMode,
-      imageUrls,
-      isSilent,
-      selectedScreens,
-      screenId,
-      instructions,
-      isVariations,
-      originalScreenId,
-      optionsCount,
-      variationCreativeRange,
-      variationCustomInstructions,
-      variationAspects,
-    } = await req.json();
+    const { messages, projectId, is3xMode, imageUrls } = await req.json();
 
     if (!projectId) {
       return NextResponse.json(
@@ -41,140 +26,177 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get the last message (user's current message)
-    const lastMessage = messages[messages.length - 1];
-    if (!lastMessage || lastMessage.role !== "user") {
-      return NextResponse.json(
-        { error: "Last message must be from user" },
-        { status: 400 },
-      );
-    }
-
-    // 1. Create User Message
-    const _userMsg = await prisma.message.create({
-      data: {
-        projectId: projectId,
-        role: "user",
-        parts: lastMessage.parts || [
-          {
-            type: "text",
-            text:
-              typeof lastMessage.content === "string"
-                ? lastMessage.content
-                : lastMessage.parts?.find((p: any) => p.type === "text")
-                    ?.text || "",
-          },
-        ],
-      },
-    });
-
-    // 2. Perform Intent Analysis (LLM based) to decide if we need Inngest
-    const normalizedMessagesForAnalysis = (messages || []).map((msg: any) => ({
+    // 1. Normalize messages for GLM
+    const normalizedMessages = (messages || []).map((msg: any) => ({
       role: msg.role,
       content:
         typeof msg.content === "string"
           ? msg.content
-          : msg.parts?.find((p: any) => p.type === "text")?.text || "",
+          : msg.content?.[0]?.text || "",
     }));
 
-    const { object: intent } = await generateObject({
-      system: IntentAnalysisPrompt,
-      messages: normalizedMessagesForAnalysis,
-      schema: z.object({
-        action: z.enum(["generate", "chat"]),
-        response: z.string(),
-      }),
+    // 2. Start streaming from GLM
+    const workerStream = await streamGLMText({
+      system: UX_AGENT_SYSTEM_PROMPT,
+      messages: normalizedMessages,
+      tools: { generateScreen },
+      temperature: 0.7,
     });
 
-    // 3. Handle based on intent
-    if (intent.action === "chat") {
-      const assistantMsg = await prisma.message.create({
-        data: {
-          projectId: projectId,
-          role: "assistant",
-          parts: [{ type: "text", text: intent.response }],
-          status: "completed",
-        },
-      });
+    if (!workerStream) throw new Error("Failed to initialize GLM stream");
 
-      return NextResponse.json({
-        success: true,
-        assistantMessageId: assistantMsg.id,
-        isChat: true,
-      });
-    }
+    const encoder = new TextEncoder();
+    const reader = workerStream.getReader();
 
-    // 4. Create Assistant Message Placeholder for "generate"
-    let assistantMessageId = null;
-    if (!isSilent) {
-      const assistantMsg = await prisma.message.create({
-        data: {
-          projectId: projectId,
-          role: "assistant",
-          parts: [],
-          status: "generating",
-        },
-      });
-      assistantMessageId = assistantMsg.id;
-    }
+    const stream = new ReadableStream({
+      async start(controller) {
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let fullContent = "";
+        let toolCallsBuffer: Record<string, any> = {};
 
-    // Normalize messages for Inngest
-    const normalizedMessages = (messages || [])
-      .map((msg: any) => {
-        // Handle simple string content
-        if (typeof msg.content === "string" && !msg.parts) {
-          return { role: msg.role, content: msg.content };
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value, { stream: true });
+            buffer += chunk;
+
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+
+            for (const line of lines) {
+              if (line.startsWith("data: ") && line !== "data: [DONE]") {
+                try {
+                  const data = JSON.parse(line.slice(6));
+                  const delta = data.choices[0].delta;
+
+                  // Handle Text
+                  if (delta.content) {
+                    fullContent += delta.content;
+                    // Format for useChat (text part prefix is 0:)
+                    controller.enqueue(
+                      encoder.encode(`0:${JSON.stringify(delta.content)}\n`),
+                    );
+                  }
+
+                  // Handle Tool Calls (Accumulate for final execution)
+                  if (delta.tool_calls) {
+                    for (const tc of delta.tool_calls) {
+                      const index = tc.index;
+                      if (!toolCallsBuffer[index]) {
+                        toolCallsBuffer[index] = {
+                          id: tc.id,
+                          name: tc.function?.name || "",
+                          args: tc.function?.arguments || "",
+                        };
+                      } else {
+                        if (tc.function?.arguments) {
+                          toolCallsBuffer[index].args += tc.function.arguments;
+                        }
+                      }
+                    }
+                  }
+                } catch (e) {
+                  // Skip invalid JSON lines
+                }
+              }
+            }
+          }
+
+          // 3. Process Accumulated Tool Calls
+          const toolCallArray = Object.values(toolCallsBuffer);
+          for (const tc of toolCallArray) {
+            if (tc.name === "generateScreen") {
+              try {
+                const args = JSON.parse(tc.args);
+                console.log(
+                  "[ChatAPI] Directly generating screen:",
+                  args.screenTitle,
+                );
+
+                // Create Assistant Message Placeholder
+                const assistantMsg = await prisma.message.create({
+                  data: {
+                    projectId,
+                    role: "assistant",
+                    parts: [
+                      {
+                        type: "text",
+                        text: `Generating screen: ${args.screenTitle}...`,
+                      },
+                    ],
+                    status: "generating",
+                  },
+                });
+
+                // Trigger Screen Generation
+                await inngest.send({
+                  name: "app/screen.generate",
+                  data: {
+                    projectId,
+                    is3xMode,
+                    assistantMessageId: assistantMsg.id,
+                    screenTitle: args.screenTitle,
+                    screenContent: args.screenContent,
+                  },
+                });
+
+                // Send data part
+                controller.enqueue(
+                  encoder.encode(
+                    `2:[${JSON.stringify({
+                      type: "tool-result",
+                      tool: "generateScreen",
+                      screenTitle: args.screenTitle,
+                      messageId: assistantMsg.id,
+                    })}]\n`,
+                  ),
+                );
+              } catch (err) {
+                console.error(
+                  "[ChatAPI] Failed to trigger generateScreen tool:",
+                  err,
+                );
+              }
+            }
+          }
+
+          // 4. Persistence (Save the final assistant message if not just tool calls)
+          if (fullContent.trim()) {
+            await prisma.message.create({
+              data: {
+                projectId,
+                role: "assistant",
+                parts: [{ type: "text", text: fullContent }],
+                status: "completed",
+              },
+            });
+          }
+        } catch (error) {
+          console.error("[ChatAPI] Read Loop Error:", error);
+          controller.enqueue(
+            encoder.encode(
+              `3:${JSON.stringify("Connection lost. Please try again.")}\n`,
+            ),
+          );
+        } finally {
+          controller.close();
+          reader.releaseLock();
         }
-
-        // Handle multipart content
-        if (msg.parts && Array.isArray(msg.parts)) {
-          const content = msg.parts
-            .map((p: any) => {
-              if (p.type === "text") return { type: "text", text: p.text };
-              if (p.type === "image" || p.type === "file")
-                return { type: "image", image: p.url };
-              return null;
-            })
-            .filter(Boolean);
-
-          return { role: msg.role, content };
-        }
-
-        // Fallback
-        return { role: msg.role, content: msg.content || "" };
-      })
-      .filter((msg: any) => {
-        if (Array.isArray(msg.content)) return msg.content.length > 0;
-        return !!msg.content;
-      });
-
-    // Trigger Inngest function
-    await inngest.send({
-      name: "app/design.generate",
-      data: {
-        messages: normalizedMessages,
-        projectId,
-        is3xMode,
-        imageUrls: imageUrls || [],
-        isSilent,
-        screenId,
-        instructions,
-        assistantMessageId, // Pass the ID we just created
-        isVariations,
-        originalScreenId,
-        optionsCount,
-        variationCreativeRange,
-        variationCustomInstructions,
-        variationAspects,
-        intent, // Pass the pre-analyzed intent
       },
     });
 
-    return NextResponse.json({ success: true, assistantMessageId });
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+      },
+    });
   } catch (error) {
     console.error("[CHAT]", error);
     return NextResponse.json(
-      { error: "Failed to start design generation" },
+      { error: "Failed to initialize communication" },
       { status: 500 },
     );
   }

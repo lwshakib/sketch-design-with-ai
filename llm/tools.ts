@@ -47,3 +47,26 @@ export const extractHtml = {
     }
   },
 };
+/**
+ * Tool for triggering the design ingestion process for a new screen.
+ */
+export const generateScreen = {
+  description:
+    "Generate a new design screen based on architectural and visual descriptions. Call this once for each new screen you want to create.",
+  parameters: z.object({
+    screenTitle: z
+      .string()
+      .describe("A concise title for the screen (e.g. 'Hero Section', 'Project Dashboard')."),
+    screenContent: z
+      .string()
+      .describe("Detailed instructions for the screen layout, components, and style."),
+  }),
+  execute: async (args: { screenTitle: string; screenContent: string }) => {
+    // This tool is primarily intercepted by the chat route or handled via side-effects.
+    return { 
+      success: true, 
+      message: `Design protocol initiated for "${args.screenTitle}". Generation is now running in the background.`,
+      ...args 
+    };
+  },
+};
