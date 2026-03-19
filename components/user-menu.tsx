@@ -20,7 +20,7 @@ export function UserMenu() {
 
   if (!session) {
     return (
-      <Button variant="outline" size="sm" onClick={() => router.push("/login")}>
+      <Button variant="outline" size="sm" onClick={() => router.push("/sign-in")}>
         Login
       </Button>
     );

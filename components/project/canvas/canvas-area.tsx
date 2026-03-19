@@ -250,7 +250,7 @@ export function CanvasArea({
       
       {/* Turn Details Detail (Top Left) */}
       {selectedTurnId && (
-        <div className="pointer-events-none absolute top-[68px] left-6 z-[60] flex flex-col items-start gap-4">
+        <div className="pointer-events-none absolute top-[68px] left-6 z-[60] flex flex-col items-start gap-4" onMouseDown={(e) => e.stopPropagation()}>
           {(() => {
             const userIdx = messages?.findIndex((m) => m.id === selectedTurnId);
             if (userIdx === -1 || userIdx === undefined) return null;
@@ -286,8 +286,8 @@ export function CanvasArea({
       )}
 
       {/* Preview Header */}
-      <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex h-16 items-center justify-between px-6">
-        <div className="pointer-events-auto flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+      <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex h-16 items-center justify-between px-6" onMouseDown={(e) => e.stopPropagation()}>
+        <div className="pointer-events-auto flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -301,11 +301,11 @@ export function CanvasArea({
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="border-border bg-background/95 w-56 backdrop-blur-xl"
+              className="z-[100] border-border bg-background/95 w-56 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
             >
               <DropdownMenuItem
                 onClick={() => (window.location.href = "/")}
-                className="cursor-pointer"
+                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
               >
                 <LayoutGrid className="mr-2.5 h-4 w-4 opacity-70" />
                 <span>Go to projects</span>
@@ -313,14 +313,14 @@ export function CanvasArea({
               <DropdownMenuSeparator className="opacity-50" />
               <DropdownMenuItem
                 onClick={_handleDownloadFullProject}
-                className="cursor-pointer"
+                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
               >
                 <Download className="mr-2.5 h-4 w-4 opacity-70" />
                 <span>Download project</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={_handleDuplicateProject}
-                className="cursor-pointer"
+                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
               >
                 <Copy className="mr-2.5 h-4 w-4 opacity-70" />
                 <span>Duplicate project</span>
@@ -328,7 +328,7 @@ export function CanvasArea({
               <DropdownMenuSeparator className="opacity-50" />
               <DropdownMenuItem
                 onClick={_handleDeleteProject}
-                className="cursor-pointer"
+                className="hover:bg-destructive/10 text-destructive flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
               >
                 <Trash2 className="mr-2.5 h-4 w-4 opacity-70" />
                 <span>Delete project</span>
@@ -345,8 +345,7 @@ export function CanvasArea({
         {/* Dynamic Center Toolbar for Selected Artifact */}
         <div className="pointer-events-none absolute inset-x-0 h-full flex items-center justify-center">
           {selectedArtifact && selectedArtifactIds.size === 1 && (
-            <div className="bg-card/95 border-border/50 pointer-events-auto flex items-center gap-1.5 rounded-full border px-2 py-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-300 ring-1 ring-white/5" 
-                 onClick={(e) => e.stopPropagation()}>
+            <div className="bg-card/95 border-border/50 pointer-events-auto flex items-center gap-1.5 rounded-full border px-2 py-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-300 ring-1 ring-white/5">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -843,11 +842,10 @@ export function CanvasArea({
       </div>
 
       {/* Agent Log / History (Bottom Left) */}
-      <div className="pointer-events-none absolute bottom-6 left-6 z-[60] flex flex-col items-start gap-2.5">
+      <div className="pointer-events-none absolute bottom-6 left-6 z-[60] flex flex-col items-start gap-2.5" onMouseDown={(e) => e.stopPropagation()}>
         {/* Minimal History Window */}
         {isAgentLogOpen && (
-          <div className="bg-background/80 border-border pointer-events-auto flex max-h-[300px] w-[280px] flex-col gap-1 overflow-y-auto rounded-xl border p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 scrollbar-none ring-1 ring-black/5"
-               onClick={(e) => e.stopPropagation()}>
+          <div className="bg-background/80 border-border pointer-events-auto flex max-h-[300px] w-[280px] flex-col gap-1 overflow-y-auto rounded-xl border p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 scrollbar-none ring-1 ring-black/5">
             <div className="flex flex-col gap-0.5">
               {messages
                 ?.filter((m) => !m.isSilent && m.role === "user")
@@ -912,11 +910,9 @@ export function CanvasArea({
       </div>
 
       {/* Floating Chat Input */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-4 z-[100] flex justify-center px-6"
-           onClick={(e) => e.stopPropagation()}>
+      <div className="pointer-events-none absolute inset-x-0 bottom-4 z-[100] flex justify-center px-6" onMouseDown={(e) => e.stopPropagation()}>
         <div className="pointer-events-auto w-full max-w-[600px]">
-          <div className="bg-background/70 border-border group/input flex flex-col gap-3 rounded-[24px] border p-3 shadow-2xl backdrop-blur-2xl transition-all focus-within:ring-1 focus-within:ring-primary/20"
-               onClick={(e) => e.stopPropagation()}>
+          <div className="bg-background/70 border-border group/input flex flex-col gap-3 rounded-[24px] border p-3 shadow-2xl backdrop-blur-2xl transition-all focus-within:ring-1 focus-within:ring-primary/20">
             <TooltipProvider>
               {/* Selected Artifacts Preview (Reference context) */}
               {selectedArtifactIds.size > 0 && (
@@ -1068,8 +1064,7 @@ export function CanvasArea({
       <CanvasToolbar />
 
       {/* Bottom Right Controls */}
-      <div className="bg-card/80 border-border/50 pointer-events-auto absolute right-6 bottom-6 z-50 flex items-center gap-1 rounded-2xl border p-1 shadow-2xl backdrop-blur-xl"
-           onClick={(e) => e.stopPropagation()}>
+      <div className="bg-card/80 border-border/50 pointer-events-auto absolute right-6 bottom-6 z-50 flex items-center gap-1 rounded-2xl border p-1 shadow-2xl backdrop-blur-xl" onMouseDown={(e) => e.stopPropagation()}>
         <Button
           variant="ghost"
           size="icon"
