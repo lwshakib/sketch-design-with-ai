@@ -287,7 +287,7 @@ export function CanvasArea({
 
       {/* Preview Header */}
       <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex h-16 items-center justify-between px-6">
-        <div className="pointer-events-auto flex items-center gap-2">
+        <div className="pointer-events-auto flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -345,7 +345,8 @@ export function CanvasArea({
         {/* Dynamic Center Toolbar for Selected Artifact */}
         <div className="pointer-events-none absolute inset-x-0 h-full flex items-center justify-center">
           {selectedArtifact && selectedArtifactIds.size === 1 && (
-            <div className="bg-card/95 border-border/50 pointer-events-auto flex items-center gap-1.5 rounded-full border px-2 py-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-300 ring-1 ring-white/5">
+            <div className="bg-card/95 border-border/50 pointer-events-auto flex items-center gap-1.5 rounded-full border px-2 py-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-300 ring-1 ring-white/5" 
+                 onClick={(e) => e.stopPropagation()}>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -521,7 +522,11 @@ export function CanvasArea({
                   className="bg-card border-border text-foreground z-[100] w-52 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
                 >
                   <DropdownMenuItem
-                    onClick={() => openCodeViewer(selectedIndex)}
+                    onClick={() => {
+                      if (selectedIndex !== -1) {
+                         setTimeout(() => openCodeViewer(selectedIndex), 10);
+                      }
+                    }}
                     className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px]"
                   >
                     <Code className="text-muted-foreground h-4 w-4" />
@@ -841,7 +846,8 @@ export function CanvasArea({
       <div className="pointer-events-none absolute bottom-6 left-6 z-[60] flex flex-col items-start gap-2.5">
         {/* Minimal History Window */}
         {isAgentLogOpen && (
-          <div className="bg-background/80 border-border pointer-events-auto flex max-h-[300px] w-[260px] flex-col gap-1 overflow-y-auto rounded-xl border p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 scrollbar-none ring-1 ring-black/5">
+          <div className="bg-background/80 border-border pointer-events-auto flex max-h-[300px] w-[260px] flex-col gap-1 overflow-y-auto rounded-xl border p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 scrollbar-none ring-1 ring-black/5"
+               onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col gap-0.5">
               {messages
                 ?.filter((m) => m.role === "user" && !m.isSilent)
@@ -890,10 +896,13 @@ export function CanvasArea({
         {/* Minimal Toggle Button */}
         <Button
           variant="ghost"
-          onClick={() => setIsAgentLogOpen(!isAgentLogOpen)}
+          onClick={(e) => {
+             e.stopPropagation();
+             setIsAgentLogOpen(!isAgentLogOpen);
+          }}
           className={cn(
-            "pointer-events-auto bg-background/50 border-border group flex items-center gap-2.5 rounded-full border px-4 h-10 text-[13px] font-medium text-muted-foreground backdrop-blur-md transition-all hover:bg-background/80 hover:text-foreground hover:shadow-lg",
-            isAgentLogOpen && "bg-background/80 text-foreground border-primary/20 shadow-lg"
+             "pointer-events-auto bg-background/50 border-border group flex items-center gap-2.5 rounded-full border px-4 h-10 text-[13px] font-medium text-muted-foreground backdrop-blur-md transition-all hover:bg-background/80 hover:text-foreground hover:shadow-lg",
+             isAgentLogOpen && "bg-background/80 text-foreground border-primary/20 shadow-lg"
           )}
         >
           <Rocket className={cn("h-4 w-4 stroke-[1.5px] transition-colors", isAgentLogOpen ? "text-primary" : "text-muted-foreground")} />
@@ -907,9 +916,11 @@ export function CanvasArea({
       </div>
 
       {/* Floating Chat Input */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-4 z-[100] flex justify-center px-6">
+      <div className="pointer-events-none absolute inset-x-0 bottom-4 z-[100] flex justify-center px-6"
+           onClick={(e) => e.stopPropagation()}>
         <div className="pointer-events-auto w-full max-w-[600px]">
-          <div className="bg-background/70 border-border group/input flex flex-col gap-3 rounded-[24px] border p-3 shadow-2xl backdrop-blur-2xl transition-all focus-within:ring-1 focus-within:ring-primary/20">
+          <div className="bg-background/70 border-border group/input flex flex-col gap-3 rounded-[24px] border p-3 shadow-2xl backdrop-blur-2xl transition-all focus-within:ring-1 focus-within:ring-primary/20"
+               onClick={(e) => e.stopPropagation()}>
             <TooltipProvider>
               {/* Selected Artifacts Preview (Reference context) */}
               {selectedArtifactIds.size > 0 && (
@@ -1061,7 +1072,8 @@ export function CanvasArea({
       <CanvasToolbar />
 
       {/* Bottom Right Controls */}
-      <div className="bg-card/80 border-border/50 pointer-events-auto absolute right-6 bottom-6 z-50 flex items-center gap-1 rounded-2xl border p-1 shadow-2xl backdrop-blur-xl">
+      <div className="bg-card/80 border-border/50 pointer-events-auto absolute right-6 bottom-6 z-50 flex items-center gap-1 rounded-2xl border p-1 shadow-2xl backdrop-blur-xl"
+           onClick={(e) => e.stopPropagation()}>
         <Button
           variant="ghost"
           size="icon"
