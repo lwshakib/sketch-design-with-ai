@@ -32,6 +32,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Image from "next/image";
 import { uploadFileToCloudinary } from "@/lib/cloudinary-client";
 import { toast } from "sonner";
+import { ModeToggle } from "@/components/mode-toggle";
 
 const PROMPTS = {
   app: [
@@ -350,7 +351,10 @@ export default function Home() {
             <Logo />
           </div>
 
+
           <div className="flex items-center gap-3">
+            <ModeToggle />
+            <UserMenu />
             <div className="lg:hidden">
               <MobileMenu
                 sections={sections}
@@ -362,7 +366,6 @@ export default function Home() {
                 setSearchQuery={setSearchQuery}
               />
             </div>
-            <UserMenu />
           </div>
         </header>
 
@@ -576,35 +579,22 @@ function MobileMenu({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <button className="text-muted-foreground hover:text-foreground p-1 transition-colors outline-none lg:hidden">
-          <Menu className="h-6 w-6" />
+        <button className="text-muted-foreground hover:text-foreground flex h-9 w-9 items-center justify-center p-0 transition-colors outline-none lg:hidden">
+          <Menu className="h-5 w-5" />
         </button>
       </DrawerTrigger>
-      <DrawerContent className="bg-background border-border text-foreground max-h-[90vh]">
-        <DrawerHeader className="flex flex-row items-center justify-between border-none px-6 py-5">
-          <DrawerTitle className="text-left text-xl font-black tracking-tighter">
-            Design history
-          </DrawerTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setOpen(false)}
-            className="text-muted-foreground hover:text-foreground rounded-full"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </DrawerHeader>
+      <DrawerContent className="bg-background border-border text-foreground max-h-[96vh]">
 
         {/* Search Bar matching Sidebar style */}
-        <div className="p-6 pb-2">
+        <div className="px-6 py-4">
           <div className="group relative">
-            <Search className="text-muted-foreground group-focus-within:text-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
+            <Search className="text-muted-foreground group-focus-within:text-foreground absolute top-1/2 left-3.5 h-3.5 w-3.5 -translate-y-1/2 transition-colors" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search projects"
-              className="bg-secondary/50 border-border text-foreground placeholder:text-muted-foreground focus:border-border w-full rounded-lg border py-2.5 pr-4 pl-10 text-sm font-medium transition-all outline-none"
+              placeholder="Search history"
+              className="bg-secondary/40 border-border text-foreground placeholder:text-muted-foreground focus:border-border w-full rounded-full border py-2.5 pr-4 pl-10 text-xs font-medium transition-all outline-none"
             />
           </div>
         </div>

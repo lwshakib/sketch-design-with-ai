@@ -8,6 +8,7 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/components/user-menu";
+import { ModeToggle } from "@/components/mode-toggle";
 
 
 export default function SettingsPage() {
@@ -24,6 +25,7 @@ export default function SettingsPage() {
           </Link>
         </div>
         <div className="flex items-center gap-4">
+          <ModeToggle />
           <UserMenu />
         </div>
       </header>

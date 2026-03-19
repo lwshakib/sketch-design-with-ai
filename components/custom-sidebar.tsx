@@ -69,13 +69,13 @@ export function Sidebar({
       {/* Search Header */}
       <div className="p-4 pt-6">
         <div className="group relative">
-          <Search className="text-muted-foreground group-focus-within:text-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transition-colors" />
+          <Search className="text-muted-foreground group-focus-within:text-foreground absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 transition-colors" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search projects"
-            className="bg-secondary/50 border-border text-foreground placeholder:text-muted-foreground focus:border-border w-full rounded-lg border py-2 pr-4 pl-10 text-sm font-medium transition-all outline-none"
+            className="bg-secondary/50 border-border text-foreground placeholder:text-muted-foreground focus:border-border w-full rounded-full border py-2.5 pr-4 pl-11 text-sm font-medium transition-all outline-none"
           />
         </div>
       </div>

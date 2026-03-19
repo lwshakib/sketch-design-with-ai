@@ -21,6 +21,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { UserMenu } from "@/components/user-menu";
+import { ModeToggle } from "@/components/mode-toggle";
 import { cn } from "@/lib/utils";
 
 export default function AccountPage() {
@@ -211,6 +212,7 @@ export default function AccountPage() {
           </Link>
         </div>
         <div className="flex items-center gap-4">
+          <ModeToggle />
           <UserMenu />
         </div>
       </header>
