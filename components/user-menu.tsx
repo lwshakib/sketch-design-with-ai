@@ -63,7 +63,7 @@ export function UserMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => router.push("/account")}>
           <User className="mr-2 h-4 w-4" />
-          <span>Account</span>
+          <span>Account Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuSub>

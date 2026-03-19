@@ -232,7 +232,7 @@ export default function AccountPage() {
               </div>
 
               <div className="mt-12 hidden space-y-2 lg:block">
-                {["Profile", "Security", "Sessions"].map((item) => (
+                {["Profile", "Security", "Sessions", "Accounts"].map((item) => (
                   <button
                     key={item}
                     className="text-muted-foreground hover:text-foreground hover:bg-secondary w-full rounded-lg px-4 py-2 text-left text-sm font-medium transition-all"
@@ -263,7 +263,7 @@ export default function AccountPage() {
                   Profile Settings
                 </h2>
                 <p className="text-muted-foreground mt-1 text-xs">
-                  Manage your public information and connected accounts.
+                  Update your personal information.
                 </p>
               </div>
 
@@ -286,8 +286,8 @@ export default function AccountPage() {
                     <Button
                       onClick={handleUpdateName}
                       disabled={isUpdatingName || name === user.name}
-                      variant="default"
-                      className="hover:shadow-primary/20 h-11 rounded-xl px-6 font-bold shadow-lg transition-all"
+                      variant="outline"
+                      className="h-11 rounded-xl border-zinc-200 dark:border-zinc-800 px-6 font-bold transition-all"
                     >
                       {isUpdatingName ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -295,84 +295,6 @@ export default function AccountPage() {
                         "Update"
                       )}
                     </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-muted-foreground text-xs font-bold">
-                      Connected Accounts
-                    </Label>
-                    {isAccountsLoading && (
-                      <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
-                    )}
-                  </div>
-
-                  <div className="grid gap-3">
-                    {isAccountsLoading ? (
-                      <div className="grid gap-3">
-                        {[1, 2].map((i) => (
-                          <div
-                            key={i}
-                            className="bg-secondary/30 border-border/60 h-20 animate-pulse rounded-2xl border"
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      ["google", "github"].map((provider) => {
-                        const isLinked = isProviderLinked(provider);
-                        return (
-                          <div
-                            key={provider}
-                            className="bg-secondary/30 border-border/60 hover:bg-secondary/50 flex items-center justify-between rounded-2xl border p-4 transition-all"
-                          >
-                            <div className="flex items-center gap-4">
-                              <div className="bg-background border-border flex h-10 w-10 items-center justify-center rounded-xl border shadow-sm">
-                                {provider === "google" ? (
-                                  <Image
-                                    src="https://www.svgrepo.com/show/475656/google-color.svg"
-                                    alt="google"
-                                    width={20}
-                                    height={20}
-                                    className="h-5 w-5"
-                                  />
-                                ) : (
-                                  <Github className="text-foreground h-5 w-5" />
-                                )}
-                              </div>
-                              <div>
-                                <p className="text-foreground text-xs font-bold capitalize">
-                                  {provider}
-                                </p>
-                                <p className="text-muted-foreground text-[10px] font-medium">
-                                  {isLinked
-                                    ? "Connected and verified"
-                                    : "Not connected"}
-                                </p>
-                              </div>
-                            </div>
-                            {isLinked ? (
-                              <div className="flex items-center gap-2">
-                                <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-500">
-                                  Active
-                                </span>
-                              </div>
-                            ) : (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() =>
-                                  handleLinkAccount(provider as any)
-                                }
-                                className="border-border bg-background hover:bg-secondary h-8 rounded-lg px-4 text-[10px] font-bold"
-                              >
-                                Connect
-                              </Button>
-                            )}
-                          </div>
-                        );
-                      })
-                    )}
                   </div>
                 </div>
               </div>
@@ -520,6 +442,90 @@ export default function AccountPage() {
                       security logs.
                     </p>
                   </div>
+                )}
+              </div>
+            </section>
+
+            {/* Connected Accounts Section */}
+            <section id="accounts" className="scroll-mt-12 space-y-8">
+              <div className="border-border border-b pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold tracking-tight">
+                      Connected Accounts
+                    </h2>
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      Manage your third-party social account connections.
+                    </p>
+                  </div>
+                  {isAccountsLoading && (
+                    <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+                  )}
+                </div>
+              </div>
+
+              <div className="grid gap-3">
+                {isAccountsLoading ? (
+                  <div className="grid gap-3">
+                    {[1, 2].map((i) => (
+                      <div
+                        key={i}
+                        className="bg-secondary/30 border-border/60 h-20 animate-pulse rounded-2xl border"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  ["google", "github"].map((provider) => {
+                    const isLinked = isProviderLinked(provider);
+                    return (
+                      <div
+                        key={provider}
+                        className="bg-secondary/30 border-border/60 hover:bg-secondary/50 flex items-center justify-between rounded-2xl border p-4 transition-all"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="bg-background border-border flex h-10 w-10 items-center justify-center rounded-xl border shadow-sm">
+                            {provider === "google" ? (
+                              <Image
+                                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                                alt="google"
+                                width={20}
+                                height={20}
+                                className="h-5 w-5"
+                              />
+                            ) : (
+                              <Github className="text-foreground h-5 w-5" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-foreground text-xs font-bold capitalize">
+                              {provider}
+                            </p>
+                            <p className="text-muted-foreground text-[10px] font-medium">
+                              {isLinked
+                                ? "Connected and verified"
+                                : "Not connected"}
+                            </p>
+                          </div>
+                        </div>
+                        {isLinked ? (
+                          <div className="flex items-center gap-2">
+                            <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-500">
+                              Active
+                            </span>
+                          </div>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleLinkAccount(provider as any)}
+                            className="border-border bg-background hover:bg-secondary h-8 rounded-lg px-4 text-[10px] font-bold"
+                          >
+                            Connect
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
             </section>
