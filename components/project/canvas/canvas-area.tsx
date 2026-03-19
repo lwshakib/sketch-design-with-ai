@@ -63,7 +63,6 @@ import { type Artifact } from "@/lib/artifact-renderer";
 import { ArtifactFrame } from "./artifact-frame";
 import { ModernShimmer } from "./modern-shimmer";
 import { CanvasToolbar } from "./canvas-toolbar";
-import { ModeToggle } from "@/components/mode-toggle";
 import Image from "next/image";
 import {
   Tooltip,
@@ -270,7 +269,6 @@ export function CanvasArea({
               </div>
             )}
           </div>
-          <ModeToggle />
           <UserMenu />
         </div>
       </header>
