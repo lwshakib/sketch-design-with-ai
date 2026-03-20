@@ -228,7 +228,7 @@ export function CanvasArea({
         if (e.target === e.currentTarget) setSelectedArtifactIds(new Set());
       }}
       className={cn(
-        "bg-muted relative flex flex-1 flex-col overflow-hidden",
+        "bg-background relative flex flex-1 flex-col overflow-hidden",
         activeTool === "hand"
           ? isPanning
             ? "cursor-grabbing"
