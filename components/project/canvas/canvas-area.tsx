@@ -301,7 +301,7 @@ export function CanvasArea({
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="w-56"
+              className="bg-card border-border text-foreground z-[100] w-56 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
             >
               <DropdownMenuItem
                 onClick={() => (window.location.href = "/")}
