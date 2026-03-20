@@ -62,6 +62,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { UserMenu } from "@/components/user-menu";
+import { ModeToggle } from "@/components/mode-toggle";
 import { type Artifact } from "@/lib/artifact-renderer";
 import { ArtifactFrame } from "./artifact-frame";
 import { ModernShimmer } from "./modern-shimmer";
@@ -591,6 +592,7 @@ export function CanvasArea({
               </div>
             )}
           </div>
+          <ModeToggle />
           <UserMenu />
         </div>
       </header>

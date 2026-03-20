@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sidebar } from "@/components/custom-sidebar";
 import { UserMenu } from "@/components/user-menu";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Logo } from "@/components/logo";
 import {
   Drawer,
@@ -337,6 +338,7 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-4">
+          <ModeToggle />
           <UserMenu />
           <div className="lg:hidden">
             <MobileMenu
@@ -377,12 +379,8 @@ export default function Home() {
               {/* Main Title Row */}
               <div className="flex flex-col items-center space-y-4 text-center">
                 <h1 className="text-foreground text-4xl leading-tight font-black tracking-tight md:text-5xl">
-                  Start a new UI design
+                  Welcome to Sketch...
                 </h1>
-                <p className="text-muted-foreground max-w-md text-sm font-medium">
-                  Transform your ideas into high-fidelity prototypes instantly
-                  using our neural design engine.
-                </p>
               </div>
 
               {/* Premium Chat Input */}
