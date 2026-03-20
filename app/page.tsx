@@ -27,6 +27,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { useDebounce } from "@/hooks/use-debounce";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Image from "next/image";
@@ -167,19 +168,23 @@ export default function Home() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 400);
   const router = useRouter();
 
   const fetchProjects = React.useCallback(
     async (isLoadMore = false) => {
+      // Use internal state rather than constants from closure to keep dependency stable
+      const currentProjects = projects;
+      const skip = isLoadMore ? currentProjects.length : 0;
+
       if (isLoadMore && (isLoadingMore || !hasMore)) return;
 
       if (isLoadMore) setIsLoadingMore(true);
       else setLoadingProjects(true);
 
       try {
-        const skip = isLoadMore ? projects.length : 0;
         const res = await fetch(
-          `/api/projects?limit=20&skip=${skip}${searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""}`,
+          `/api/projects?limit=20&skip=${skip}${debouncedSearchQuery ? `&search=${encodeURIComponent(debouncedSearchQuery)}` : ""}`,
         );
         if (res.ok) {
           const data = await res.json();
@@ -203,7 +208,7 @@ export default function Home() {
         else setLoadingProjects(false);
       }
     },
-    [hasMore, isLoadingMore, projects.length, searchQuery],
+    [debouncedSearchQuery, hasMore, isLoadingMore, projects],
   );
 
   const [shuffledPrompts, setShuffledPrompts] = useState<string[]>([]);
@@ -220,24 +225,16 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetchProjects();
-  }, [fetchProjects]);
-
-  useEffect(() => {
     if (isMounted) {
       refreshPrompts();
     }
   }, [isMounted, refreshPrompts]);
 
   useEffect(() => {
-    if (!isMounted) return;
-
-    const timer = setTimeout(() => {
+    if (isMounted) {
       fetchProjects();
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [fetchProjects, isMounted, searchQuery]);
+    }
+  }, [debouncedSearchQuery, isMounted]);
 
   const onSubmit = async () => {
     if (!inputValue.trim() && attachments.length === 0) return;
