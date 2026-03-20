@@ -301,7 +301,7 @@ export function CanvasArea({
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="z-[100] border-border bg-background/95 w-56 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
+              className="w-56"
             >
               <DropdownMenuItem
                 onClick={() => (window.location.href = "/")}
@@ -328,7 +328,7 @@ export function CanvasArea({
               <DropdownMenuSeparator className="opacity-50" />
               <DropdownMenuItem
                 onClick={_handleDeleteProject}
-                className="hover:bg-destructive/10 text-destructive flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
+                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
               >
                 <Trash2 className="mr-2.5 h-4 w-4 opacity-70" />
                 <span>Delete project</span>
