@@ -20,8 +20,6 @@
     "db:reset": "bun x prisma migrate reset"
   },
   "dependencies": {
-    "@ai-sdk/google": "^3.0.2",
-    "@ai-sdk/react": "^3.0.6",
     "@hookform/resolvers": "^5.2.2",
     "@inngest/realtime": "^0.4.5",
     "@monaco-editor/react": "^4.7.0",
