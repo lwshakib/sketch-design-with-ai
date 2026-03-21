@@ -61,6 +61,8 @@ interface ProjectState {
   isCodeViewerOpen: boolean;
   isGenerating: boolean;
   isTalking: boolean;
+  isTurnDetailVisible: boolean;
+  selectedTurnId: string | null;
   viewingCode: string;
   viewingTitle: string;
   isRegenerateDialogOpen: boolean;
@@ -170,6 +172,8 @@ interface ProjectState {
   setIsCodeViewerOpen: (open: boolean) => void;
   setIsGenerating: (generating: boolean) => void;
   setIsTalking: (talking: boolean) => void;
+  setIsTurnDetailVisible: (visible: boolean) => void;
+  setSelectedTurnId: (id: string | null) => void;
   setViewingCode: (code: string) => void;
   setViewingTitle: (title: string) => void;
   setIsRegenerateDialogOpen: (open: boolean) => void;
@@ -246,6 +250,8 @@ export const useProjectStore = create<ProjectState>((set) => ({
   isCodeViewerOpen: false,
   isGenerating: false,
   isTalking: false,
+  isTurnDetailVisible: false,
+  selectedTurnId: null,
   viewingCode: "",
   viewingTitle: "",
   isRegenerateDialogOpen: false,
@@ -349,6 +355,8 @@ export const useProjectStore = create<ProjectState>((set) => ({
   setIsCodeViewerOpen: (isCodeViewerOpen) => set({ isCodeViewerOpen }),
   setIsGenerating: (isGenerating) => set({ isGenerating }),
   setIsTalking: (isTalking) => set({ isTalking }),
+  setIsTurnDetailVisible: (isTurnDetailVisible) => set({ isTurnDetailVisible }),
+  setSelectedTurnId: (selectedTurnId) => set({ selectedTurnId }),
   setViewingCode: (viewingCode) => set({ viewingCode }),
   setViewingTitle: (viewingTitle) => set({ viewingTitle }),
   setIsRegenerateDialogOpen: (isRegenerateDialogOpen) =>
@@ -472,6 +480,8 @@ export const useProjectStore = create<ProjectState>((set) => ({
       isCodeViewerOpen: false,
       isGenerating: false,
       isTalking: false,
+      isTurnDetailVisible: false,
+      selectedTurnId: null,
       viewingCode: "",
       viewingTitle: "",
       isRegenerateDialogOpen: false,

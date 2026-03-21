@@ -66,6 +66,7 @@ export const generateScreen = inngest.createFunction(
         status: "generating",
         currentScreen: title,
         screenId: dbScreen.id,
+        type: type, // Pass the type here
       });
 
       // --- STEP 2: GENERATE SCREEN CODE ---

@@ -254,7 +254,7 @@ export default function ProjectPage() {
             const planItem = designPlanRef.current.find(
               (p) => p.title === title,
             );
-            const type = planItem?.type || "web";
+            const type = event.data.type || planItem?.type || "web";
             const getNewX = (existing: any[], scrType: string) => {
               const last = existing[existing.length - 1];
               const getWidth = (t: string) =>

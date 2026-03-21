@@ -201,6 +201,10 @@ export function CanvasArea({
     setSelectedArtifactIds,
     isGenerating,
     isTalking,
+    isTurnDetailVisible,
+    selectedTurnId,
+    setIsTurnDetailVisible,
+    setSelectedTurnId,
     realtimeStatus,
     isAgentLogOpen,
     setIsAgentLogOpen,
@@ -234,14 +238,12 @@ export function CanvasArea({
 
   const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
   const [qrCodeUrl, setQrCodeUrl] = React.useState("");
-  const [selectedTurnId, setSelectedTurnId] = React.useState<string | null>(null);
-  const [isTurnDetailVisible, setIsTurnDetailVisible] = React.useState(false);
 
   React.useEffect(() => {
     if (isGenerating) {
         setIsTurnDetailVisible(true);
     }
-  }, [isGenerating]);
+  }, [isGenerating, setIsTurnDetailVisible]);
 
   return (
     <main

@@ -12,6 +12,7 @@ export async function publishStatus({
   currentScreen,
   screenId,
   screen,
+  type,
 }: {
   publish: any;
   projectId: string;
@@ -21,6 +22,7 @@ export async function publishStatus({
   currentScreen?: string;
   screenId?: string;
   screen?: any;
+  type?: string;
 }) {
   await publish({
     channel: `project:${projectId}`,
@@ -32,6 +34,7 @@ export async function publishStatus({
       ...(currentScreen && { currentScreen }),
       ...(screenId && { screenId }),
       ...(screen && { screen }),
+      ...(type && { type }),
     },
   });
 }
