@@ -1,13 +1,15 @@
 "use client";
 
-import React from "react";
-import { Code, Copy, X } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { Code, Copy, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CodeMirror from "@uiw/react-codemirror";
 import { html } from "@codemirror/lang-html";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { CustomModal } from "./custom-modal";
+import { cn } from "@/lib/utils";
 
 interface CodeViewerModalProps {
   isOpen: boolean;
@@ -20,50 +22,54 @@ export function CodeViewerModal({
   isOpen,
   onClose,
   code,
-  title,
+  title: _title,
 }: CodeViewerModalProps) {
+  const { resolvedTheme } = useTheme();
+  const [hasCopied, setHasCopied] = useState(false);
+  
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setHasCopied(true);
+    toast.success("Code copied to clipboard");
+    setTimeout(() => setHasCopied(false), 2000);
+  };
+
   return (
     <CustomModal 
       isOpen={isOpen} 
       onClose={onClose} 
-      className="w-[98vw] h-[95vh] flex flex-col items-stretch"
+      className={cn(
+        "w-[98vw] h-[95vh] flex flex-col items-stretch shadow-2xl relative group transition-all duration-300",
+        resolvedTheme === "light" ? "border-border border" : "border-none"
+      )}
     >
-      <header className="flex h-12 shrink-0 flex-row items-center justify-between border-b bg-muted/40 px-5 select-none z-20">
-        <div className="flex items-center gap-2.5">
-          <Code className="size-4 text-primary" />
-          <h2 className="text-[13px] font-semibold text-foreground/80 tracking-tight">
-            {title} Source
-          </h2>
-        </div>
+      {/* Floating Controls - Top Right, Minimal */}
+      <div className="absolute top-4 right-4 z-[100] flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+             "size-9 rounded-xl transition-all active:scale-90",
+             hasCopied ? "text-emerald-500 bg-emerald-500/10" : "text-foreground/70 hover:text-foreground hover:bg-muted/20"
+          )}
+          onClick={handleCopy}
+          title="Copy Code"
+        >
+          {hasCopied ? <Check className="size-4" /> : <Copy className="size-4" />}
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="size-9 rounded-xl text-muted-foreground hover:text-destructive transition-all hover:bg-destructive/10 active:scale-90"
+          onClick={onClose}
+          title="Close"
+        >
+          <X className="size-6" />
+        </Button>
+      </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 gap-2 rounded-lg px-2.5 text-[11.5px] font-semibold border-border/50 bg-background/50 hover:bg-muted transition-all"
-            onClick={() => {
-              navigator.clipboard.writeText(code);
-              toast.success("Source code copied to clipboard", {
-                 icon: <Copy className="size-3.5" />,
-                 style: { background: "#18181b", color: "#fafafa", border: "1px solid #27272a" }
-              });
-            }}
-          >
-            <Copy className="h-3.5 w-3.5" />
-            Copy Code
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="size-8 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
-            onClick={onClose}
-          >
-            <X className="size-4" />
-          </Button>
-        </div>
-      </header>
-
-      <div className="flex-1 min-h-0 bg-[#1e1e1e] scrollbar-none relative overflow-hidden">
+      <div className="flex-1 min-h-0 bg-[#1e1e1e] scrollbar-none relative overflow-hidden rounded-2xl">
         <CodeMirror
           value={code}
           height="100%"
