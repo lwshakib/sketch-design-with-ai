@@ -399,47 +399,7 @@ export function CanvasArea({
         <div className="pointer-events-none absolute inset-x-0 h-full flex items-center justify-center">
           {selectedArtifact && selectedArtifactIds.size === 1 && (
             <div className="bg-card/95 border-border/50 pointer-events-auto flex items-center gap-1.5 rounded-full border px-2 py-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-300 ring-1 ring-white/5">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-foreground/80 hover:text-foreground flex h-9 items-center gap-2 rounded-full px-4 text-[13px] font-medium transition-colors hover:bg-secondary/40"
-                  >
-                    <Sparkles className="text-primary h-4 w-4" />
-                    Generate
-                    <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="center"
-                  className="bg-card border-border text-foreground z-[100] w-56 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
-                >
-                  <DropdownMenuItem
-                    onClick={() => handleArtifactAction("more", selectedArtifact)}
-                    className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
-                  >
-                    <Plus className="text-primary h-4 w-4" />
-                    Create more pages
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleArtifactAction("regenerate", selectedArtifact)}
-                    className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
-                  >
-                    <RotateCcw className="text-primary h-4 w-4" />
-                    Regenerate
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleArtifactAction("variations", selectedArtifact)}
-                    className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
-                  >
-                    <Columns className="text-primary h-4 w-4" />
-                    Variations
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
 
-              <div className="bg-border/50 mx-1 h-4 w-[1px]" />
 
               <Button
                 variant="ghost"
