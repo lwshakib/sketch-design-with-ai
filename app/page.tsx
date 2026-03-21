@@ -34,6 +34,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Image from "next/image";
 import { uploadFileToCloudinary } from "@/lib/cloudinary-client";
 import { toast } from "sonner";
+import axios from "axios";
 
 const PROMPTS = {
   app: [
@@ -165,6 +166,7 @@ export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [projects, setProjects] = useState<any[]>([]);
+  const [credits, setCredits] = useState<number | null>(null);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -233,6 +235,11 @@ export default function Home() {
 
   useEffect(() => {
     if (isMounted) {
+      axios.get("/api/user/credits").then((res) => {
+        if (res.data && typeof res.data.credits === "number") {
+          setCredits(res.data.credits);
+        }
+      });
       fetchProjects();
     }
   }, [debouncedSearchQuery, isMounted]);
@@ -338,6 +345,11 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-4">
+          {credits !== null && isMounted && (
+            <span className="text-zinc-500 mr-2 hidden text-xs font-medium sm:block">
+              {credits} credits remaining
+            </span>
+          )}
           <ModeToggle />
           <UserMenu />
           <div className="lg:hidden">

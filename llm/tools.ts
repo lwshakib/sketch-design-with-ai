@@ -1,4 +1,5 @@
 import { inngest } from "@/inngest/client";
+import { getAndResetCredits } from "@/lib/credits";
 
 /**
  * Tool for extracting HTML content from a given URL.
@@ -88,6 +89,7 @@ export const generateScreen = {
     title: string;
     prompt: string;
     type: string;
+    userId?: string;
   }) => {
     try {
       console.log(`[Tool: generateScreen] Initiating for: ${args.title}`);
@@ -98,6 +100,7 @@ export const generateScreen = {
           title: args.title,
           prompt: args.prompt,
           type: args.type,
+          userId: args.userId,
         },
       });
 
@@ -111,6 +114,36 @@ export const generateScreen = {
         status: "error",
         message: `Failed to initiate design: ${error.message}`,
       };
+    }
+  },
+};
+
+/**
+ * Tool for the AI to check how many credits the user has left.
+ * AI should call this to plan generations within the user's budget.
+ */
+export const getUserCredits = {
+  description:
+    "Retrieve the user's remaining design credits. Use this to plan how many screens you can realistically suggest or generate.",
+  parameters: {
+    type: "object",
+    properties: {
+      userId: {
+        type: "string",
+        description: "The unique ID of the user.",
+      },
+    },
+    required: ["userId"],
+  },
+  execute: async ({ userId }: { userId: string }) => {
+    try {
+      const credits = await getAndResetCredits(userId);
+      return {
+        credits,
+        message: `You currently have ${credits} credits left. Generating each screen consumes exactly 1 credit.`,
+      };
+    } catch (error: any) {
+      return { error: `Failed to fetch credits: ${error.message}` };
     }
   },
 };

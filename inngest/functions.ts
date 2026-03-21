@@ -12,6 +12,7 @@ import { extractHtml as _extractHtml } from "../llm/tools";
 import {
   publishStatus,
 } from "./helpers";
+import { consumeCredit } from "../lib/credits";
 
 
 
@@ -27,9 +28,15 @@ export const generateScreen = inngest.createFunction(
         title,
         prompt,
         type,
+        userId,
       } = event.data;
 
-      // --- STEP 1: INITIAL PERSISTENCE ---
+      // --- STEP 1: CONSUME CREDIT ---
+      await step.run("consume-credit", async () => {
+        await consumeCredit(userId || "");
+      });
+
+      // --- STEP 2: INITIAL PERSISTENCE ---
       // Position the screen and create placeholder in DB
       const dbScreen = await step.run("init-screen-placeholder", async () => {
         const lastScreen = await prisma.screen.findFirst({
@@ -69,7 +76,7 @@ export const generateScreen = inngest.createFunction(
         type: type, // Pass the type here
       });
 
-      // --- STEP 2: GENERATE SCREEN CODE ---
+      // --- STEP 3: GENERATE SCREEN CODE ---
       const htmlCode = await step.run("generate-screen-code", async () => {
         const inspiration = getAllExamples();
         const systemPrompt =
@@ -123,7 +130,7 @@ export const generateScreen = inngest.createFunction(
         };
       });
 
-      // --- STEP 3: PERSIST & NOTIFY ---
+      // --- STEP 4: PERSIST & NOTIFY ---
       const finalScreen = await step.run("update-screen-db", async () => {
         return await prisma.screen.update({
           where: { id: dbScreen.id },

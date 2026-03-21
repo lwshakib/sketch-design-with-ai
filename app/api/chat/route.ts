@@ -5,7 +5,8 @@ import prisma from "@/lib/prisma";
 import { inngest } from "@/inngest/client";
 import { streamText as streamGLMText } from "@/llm/stream-text";
 import { UX_AGENT_SYSTEM_PROMPT } from "@/llm/prompts";
-import { generateScreen } from "@/llm/tools";
+import { generateScreen, getUserCredits } from "@/llm/tools";
+import { consumeCredit, getAndResetCredits } from "@/lib/credits";
 
 export async function POST(req: Request) {
   try {
@@ -67,12 +68,15 @@ export async function POST(req: Request) {
       content: (msg.parts as any)?.find((p: any) => p.type === "text")?.text || ""
     }));
 
-    // 3. Construct Project Context (Visible Screens)
+    // 3. Construct Project Context (Visible Screens) & Credits
+    const currentCredits = await getAndResetCredits(session.user.id);
     const existingScreensSummary = project.screens.length > 0 
       ? `\n\nExisting Screens in Project: ${project.screens.map(s => `"${s.title}"`).join(", ")}.`
       : "";
 
-    const projectContextPrompt = `${UX_AGENT_SYSTEM_PROMPT}${existingScreensSummary}\n\nStrictly follow the role of Sketch.`;
+    const creditContext = `\n\nUser Credits: ${currentCredits} remaining today. Each generated screen costs 1 credit. If credits are low, plan your generations carefully. If credits are exhausted, inform the user you cannot generate more screens until tomorrow.`;
+
+    const projectContextPrompt = `${UX_AGENT_SYSTEM_PROMPT}${existingScreensSummary}${creditContext}\n\nStrictly follow the role of Sketch. Your userId is ${session.user.id}.`;
 
     // 2. Normalize messages for GLM
     const normalizedMessages = (messages || []).map((msg: any) => ({
@@ -89,7 +93,7 @@ export async function POST(req: Request) {
         { role: "system", content: projectContextPrompt },
         ...normalizedHistory,
       ],
-      tools: { generateScreen },
+      tools: { generateScreen, getUserCredits },
       temperature: 0.7,
     });
 
@@ -162,17 +166,18 @@ export async function POST(req: Request) {
               try {
                 const args = JSON.parse(tc.args);
                 console.log(
-                  "[ChatAPI] Directly generating screen:",
+                  "[ChatAPI] Triggering background generation for:",
                   args.title,
                 );
 
-                // Trigger Screen Generation via Tool Execution
+                // Start Design via Tool Execution
                 await generateScreen.execute({
                   ...args,
-                  projectId, // Ensure correct projectId is passed
+                  projectId,
+                  userId: session.user.id,
                 });
 
-                // Send data part
+                // Send data part to notify the UI
                 controller.enqueue(
                   encoder.encode(
                     `2:[${JSON.stringify({
@@ -182,12 +187,27 @@ export async function POST(req: Request) {
                     })}]\n`,
                   ),
                 );
-              } catch (err) {
+              } catch (err: any) {
                 console.error(
                   "[ChatAPI] Failed to trigger generateScreen tool:",
                   err,
                 );
+                
+                if (err.message === "CREDITS_EXHAUSTED") {
+                    controller.enqueue(
+                      encoder.encode(
+                        `0:${JSON.stringify("\n\n⚠️ Credits Exhausted. Your daily limit of 10 screens has been reached. Please come back in 24 hours for a refresh.")}\n`,
+                      ),
+                    );
+                    break; // Stop further tool executions
+                }
               }
+            } else if (tc.name === "getUserCredits") {
+                 // The AI can call this to verify balance or confirm constraints
+                 const result = await getUserCredits.execute({ userId: session.user.id });
+                 controller.enqueue(
+                    encoder.encode(`2:[${JSON.stringify({ type: 'tool-result', tool: 'getUserCredits', ...result })}]\n`)
+                 );
             }
           }
 

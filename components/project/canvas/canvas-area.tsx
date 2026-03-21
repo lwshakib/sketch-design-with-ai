@@ -86,6 +86,7 @@ import {
 } from "@/components/ui/tooltip";
 import { LogoIcon } from "@/components/logo";
 import { toast } from "sonner";
+import axios from "axios";
 import { useProjectStore } from "@/hooks/use-project-store";
 import { SecondarySidebar } from "../secondary-sidebar";
 
@@ -216,6 +217,34 @@ export function CanvasArea({
     setSelectedEl,
   } = useProjectStore();
 
+  const [isMounted, setIsMounted] = React.useState(false);
+  const [credits, setCredits] = React.useState<number | null>(null);
+
+  const fetchCredits = React.useCallback(async () => {
+    try {
+      const res = await axios.get("/api/user/credits");
+      if (res.data && typeof res.data.credits === "number") {
+        setCredits(res.data.credits);
+      }
+    } catch (err) {
+      console.error("Failed to fetch credits:", err);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+    fetchCredits();
+  }, [fetchCredits]);
+
+  // Refetch credits after a generation is finished
+  const prevIsGenerating = React.useRef(isGenerating);
+  React.useEffect(() => {
+    if (prevIsGenerating.current && !isGenerating) {
+      fetchCredits();
+    }
+    prevIsGenerating.current = isGenerating;
+  }, [isGenerating, fetchCredits]);
+
   const selectedIndex = throttledArtifacts.findIndex(
     (a) => a.id && selectedArtifactIds.has(a.id),
   );
@@ -295,7 +324,7 @@ export function CanvasArea({
     };
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [selectedArtifact]);
+  }, [selectedArtifact, iframeRefs, throttledArtifacts, setSelectedArtifactIds, setSelectedEl, setSecondarySidebarMode]);
 
   React.useEffect(() => {
     if (isGenerating) {
@@ -584,6 +613,11 @@ export function CanvasArea({
         </div>
 
         <div className="pointer-events-auto flex items-center gap-4">
+          {credits !== null && isMounted && (
+            <span className="text-muted-foreground hidden text-[12px] font-medium sm:block">
+              {credits} credits remaining
+            </span>
+          )}
           <div className="flex h-8 w-8 items-center justify-center">
             {isSaving ? (
               <Loader2 className="text-foreground/40 h-4 w-4 animate-spin" />
