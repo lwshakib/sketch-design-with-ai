@@ -289,6 +289,8 @@ export default function ProjectPage() {
 
         if (event.data.status === "complete") {
           const eventMessageId = event.data.messageId;
+          const finishedScreen = event.data.screen;
+          
           setMessages((prev) => {
             const updated = [...prev];
             // Try to find by messageId first
@@ -315,15 +317,35 @@ export default function ProjectPage() {
               (m) =>
                 m.role === "assistant" &&
                 (m as any).status !== "completed" &&
-                // Either it has a plan, or it has a status that indicates activity, or it's a pending placeholder
-                ((m as any).plan ||
-                  (m as any).status === "generating" ||
-                  m.id?.toString().startsWith("pending-")),
+                ((m as any).plan || (m as any).status === "generating" || m.id?.toString().startsWith("pending-")),
             );
             setIsGenerating(stillBusy);
 
             return updated;
           });
+
+          if (finishedScreen) {
+             const updateFn = (prev: Artifact[]) => {
+               const updated = [...prev];
+               const idx = updated.findIndex((a) => a.id === finishedScreen.id || a.title === finishedScreen.title);
+               if (idx >= 0) {
+                 updated[idx] = {
+                   ...updated[idx],
+                   ...finishedScreen,
+                   isComplete: true,
+                 };
+                 setRegeneratingArtifactIds((prevRegen) => {
+                   const next = new Set(prevRegen);
+                   next.delete(finishedScreen.id);
+                   return next;
+                 });
+               }
+               return updated;
+             };
+             setArtifacts(updateFn);
+             setThrottledArtifacts(updateFn);
+          }
+
           if (event.data.isSilent) {
             toast.success("Screen updated successfully!");
             setRegeneratingArtifactIds(new Set()); // Clear all if silent complete
