@@ -9,6 +9,7 @@ export const useChat = (projectId: string) => {
     setMessages,
     isGenerating,
     setIsGenerating,
+    setIsTalking,
     setIsAgentLogOpen,
     is3xMode,
     selectedArtifactIds,
@@ -84,7 +85,7 @@ export const useChat = (projectId: string) => {
         setMessages((prev) => [...prev, newUserMessage]);
       }
 
-      setIsGenerating(true);
+      setIsTalking(true);
       setIsAgentLogOpen(true);
 
       try {
@@ -187,13 +188,14 @@ export const useChat = (projectId: string) => {
         console.error("Chat error:", err);
         toast.error("Engine encountered an error.");
       } finally {
-        setIsGenerating(false);
+        setIsTalking(false);
       }
     },
     [
       projectId,
       setMessages,
       setIsGenerating,
+      setIsTalking,
       setIsAgentLogOpen,
     ]
   );

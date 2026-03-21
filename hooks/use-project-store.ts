@@ -60,6 +60,7 @@ interface ProjectState {
   secondarySidebarMode: "none" | "properties";
   isCodeViewerOpen: boolean;
   isGenerating: boolean;
+  isTalking: boolean;
   viewingCode: string;
   viewingTitle: string;
   isRegenerateDialogOpen: boolean;
@@ -168,6 +169,7 @@ interface ProjectState {
   setSecondarySidebarMode: (mode: "none" | "properties") => void;
   setIsCodeViewerOpen: (open: boolean) => void;
   setIsGenerating: (generating: boolean) => void;
+  setIsTalking: (talking: boolean) => void;
   setViewingCode: (code: string) => void;
   setViewingTitle: (title: string) => void;
   setIsRegenerateDialogOpen: (open: boolean) => void;
@@ -243,6 +245,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   secondarySidebarMode: "none",
   isCodeViewerOpen: false,
   isGenerating: false,
+  isTalking: false,
   viewingCode: "",
   viewingTitle: "",
   isRegenerateDialogOpen: false,
@@ -345,6 +348,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
     set({ secondarySidebarMode }),
   setIsCodeViewerOpen: (isCodeViewerOpen) => set({ isCodeViewerOpen }),
   setIsGenerating: (isGenerating) => set({ isGenerating }),
+  setIsTalking: (isTalking) => set({ isTalking }),
   setViewingCode: (viewingCode) => set({ viewingCode }),
   setViewingTitle: (viewingTitle) => set({ viewingTitle }),
   setIsRegenerateDialogOpen: (isRegenerateDialogOpen) =>
@@ -467,6 +471,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
       secondarySidebarMode: "none",
       isCodeViewerOpen: false,
       isGenerating: false,
+      isTalking: false,
       viewingCode: "",
       viewingTitle: "",
       isRegenerateDialogOpen: false,

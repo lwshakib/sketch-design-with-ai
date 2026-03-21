@@ -190,6 +190,7 @@ export function CanvasArea({
     selectedArtifactIds,
     setSelectedArtifactIds,
     isGenerating,
+    isTalking,
     realtimeStatus,
     isAgentLogOpen,
     setIsAgentLogOpen,
@@ -203,6 +204,13 @@ export function CanvasArea({
     selectedIndex !== -1 ? throttledArtifacts[selectedIndex] : null;
 
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const logEndRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (isAgentLogOpen && logEndRef.current) {
+        logEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isAgentLogOpen]);
 
   React.useEffect(() => {
     if (textareaRef.current) {
@@ -217,6 +225,13 @@ export function CanvasArea({
   const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
   const [qrCodeUrl, setQrCodeUrl] = React.useState("");
   const [selectedTurnId, setSelectedTurnId] = React.useState<string | null>(null);
+  const [isTurnDetailVisible, setIsTurnDetailVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isGenerating) {
+        setIsTurnDetailVisible(true);
+    }
+  }, [isGenerating]);
 
   return (
     <main
@@ -250,34 +265,49 @@ export function CanvasArea({
       />
       
       {/* Turn Details Detail (Top Left) */}
-      {selectedTurnId && (
+      {(selectedTurnId || isGenerating) && isTurnDetailVisible && (
         <div className="pointer-events-none absolute top-[68px] left-6 z-[60] flex flex-col items-start gap-4" onMouseDown={(e) => e.stopPropagation()}>
           {(() => {
-            const userIdx = messages?.findIndex((m) => m.id === selectedTurnId);
+            const lastUserIdx = [...(messages || [])].reverse().findIndex(m => m.role === 'user');
+            const latestUserMsgId = lastUserIdx !== -1 ? messages![messages!.length - 1 - lastUserIdx].id : null;
+            
+            const targetId = isGenerating ? latestUserMsgId : selectedTurnId;
+            const userIdx = messages?.findIndex((m) => m.id === targetId);
+            
             if (userIdx === -1 || userIdx === undefined) return null;
             const userMsg = messages![userIdx];
+            // Find the assistant message that follows this user message
             const assistantMsg = messages?.slice(userIdx + 1).find((m) => m.role === "assistant");
             
             const getUserText = () => userMsg.parts?.find((p: any) => p.type === "text")?.text || "";
             const getAssistantText = () => {
-                 if (!assistantMsg) return "Generating response...";
-                 const text = assistantMsg.parts?.find((p: any) => p.type === "text")?.text || "The design was updated.";
+                 if (isGenerating && !assistantMsg) return "Generating response...";
+                 if (!assistantMsg) return "";
+                 const text = assistantMsg.parts?.find((p: any) => p.type === "text")?.text || "";
                  return text.replace(/<(artifact|artifact\s+.*?)>[\s\S]*?<\/artifact>/g, "").trim();
             }
 
             return (
-              <div className="bg-background/80 border-border pointer-events-auto flex max-h-[480px] w-[340px] flex-col gap-4 overflow-y-auto rounded-xl border p-4 shadow-xl backdrop-blur-3xl animate-in fade-in slide-in-from-top-2 duration-300 scrollbar-none ring-1 ring-black/5 lg:w-[400px]">
-                <div className="flex flex-col gap-3">
+              <div className="bg-background/80 border-border pointer-events-auto flex max-h-[480px] w-[340px] flex-col gap-4 overflow-y-auto rounded-xl border p-5 shadow-xl backdrop-blur-3xl animate-in fade-in slide-in-from-top-2 duration-300 scrollbar-none ring-1 ring-black/5 lg:w-[400px] relative">
+                <Button 
+                   variant="ghost" 
+                   size="icon" 
+                   className="absolute top-2 right-2 size-7 rounded-full hover:bg-muted"
+                   onClick={() => setIsTurnDetailVisible(false)}
+                >
+                   <X className="size-3.5" />
+                </Button>
+                <div className="flex flex-col gap-5">
                    {/* User Message */}
-                   <p className="text-[14px] font-medium leading-relaxed text-foreground/90">
+                   <p className="text-[13.5px] font-medium leading-relaxed text-foreground/90 py-0.5">
                      {getUserText().replace(/\[Context:.*?\]\s*/g, "").trim()}
                    </p>
 
-                   <hr className="border-border/10" />
+                   <hr className="border-border/10 w-full" />
 
                    {/* Assistant Message */}
-                   <div className="text-[13.5px] leading-relaxed text-muted-foreground">
-                     {getAssistantText()}
+                   <div className="text-[13px] leading-relaxed text-muted-foreground whitespace-pre-wrap py-0.5">
+                     {getAssistantText() || (isGenerating ? "Thinking..." : "")}
                    </div>
                 </div>
               </div>
@@ -340,18 +370,6 @@ export function CanvasArea({
             <span className="text-foreground whitespace-nowrap text-[15.5px] font-semibold tracking-tight">
               {project?.title || "Untitled Project"}
             </span>
-            {isGenerating && (
-              <div className="flex items-center gap-1.5 overflow-hidden">
-                <Sparkles className="text-primary h-3 w-3 animate-pulse shrink-0" />
-                <div className="text-[11px] text-muted-foreground font-medium animate-pulse max-w-[280px] lg:max-w-[400px] truncate transition-all duration-500">
-                  {(() => {
-                    const lastAssistant = [...(messages || [])].reverse().find(m => m.role === 'assistant');
-                    const text = lastAssistant?.parts?.find((p: any) => p.type === 'text')?.text || "";
-                    return text || "Architecting your vision...";
-                  })()}
-                </div>
-              </div>
-            )}
           </div>
         </div>
         
@@ -875,7 +893,14 @@ export function CanvasArea({
                   return (
                     <div
                       key={msg.id || i}
-                      onClick={() => setSelectedTurnId(prev => prev === msg.id ? null : msg.id)}
+                      onClick={() => {
+                        if (selectedTurnId === msg.id) {
+                           setIsTurnDetailVisible(!isTurnDetailVisible);
+                        } else {
+                           setSelectedTurnId(msg.id);
+                           setIsTurnDetailVisible(true);
+                        }
+                      }}
                       className={cn(
                         "group relative flex items-center gap-2 rounded-lg px-2.5 py-1.5 transition-all cursor-pointer",
                         selectedTurnId === msg.id
@@ -1017,7 +1042,7 @@ export function CanvasArea({
                           : "bg-muted text-muted-foreground scale-90 opacity-40 cursor-not-allowed",
                       )}
                     >
-                      {isGenerating ? (
+                      {isTalking ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <ArrowUp className="h-4 w-4" />
