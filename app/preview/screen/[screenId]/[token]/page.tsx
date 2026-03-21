@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { type Artifact } from "@/lib/artifact-renderer";
+import { type Artifact } from "@/lib/types";
 import { ScreenShareView } from "@/components/project/screen-share-view";
 import { notFound } from "next/navigation";
 
@@ -37,7 +37,7 @@ export default async function SingleScreenPreviewPage({
   const artifact: Artifact = {
     id: screen.id,
     title: screen.title,
-    content: screen.content,
+    html: screen.html,
     type: screen.type as any,
     x: screen.x,
     y: screen.y,

@@ -8,7 +8,7 @@
  */
 
 import { useRef, useEffect, useCallback } from "react";
-import { type Artifact } from "@/lib/artifact-renderer";
+import { type Artifact } from "@/lib/types";
 import { useProjectStore } from "@/hooks/use-project-store";
 
 /**

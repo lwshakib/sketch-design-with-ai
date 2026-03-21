@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { type Artifact } from "@/lib/artifact-renderer";
+import { type Artifact } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import {
   QrCode,
@@ -21,7 +21,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ArtifactFrame } from "@/components/project/canvas/artifact-frame";
+import { ScreenFrame } from "@/components/project/canvas/screen-frame";
 import { Logo } from "@/components/logo";
 import { QRCodeSVG } from "qrcode.react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -351,7 +351,7 @@ export function ProjectShareView({
                     backgroundColor: "#09090b",
                   }}
                 >
-                  <ArtifactFrame
+                  <ScreenFrame
                     artifact={{
                       ...artifact,
                       width: getWidth(artifact.type),
@@ -361,7 +361,6 @@ export function ProjectShareView({
                     isEditMode={false}
                     activeTool={activeTool}
                     isDraggingFrame={false}
-                    appliedTheme={null}
                     onRef={(idx, el) => {
                       if (el)
                         (el as any).dataset.artifactTitle = artifact.title;

@@ -17,7 +17,7 @@ export async function publishStatus({
   projectId: string;
   message: string;
   status: string;
-  messageId: string;
+  messageId?: string;
   currentScreen?: string;
   screenId?: string;
   screen?: any;

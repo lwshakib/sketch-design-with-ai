@@ -123,7 +123,7 @@ export function Sidebar({
                     >
                       {/* Project Preview Square */}
                       <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm transition-transform group-hover:scale-110 dark:border-zinc-800 dark:bg-zinc-900">
-                        {item.firstScreenContent ? (
+                        {item.firstScreenHtml ? (
                           <div
                             className="pointer-events-none absolute inset-0 origin-top-left"
                             style={{
@@ -139,7 +139,7 @@ export function Sidebar({
                                     /* Hide scrollbars */
                                     ::-webkit-scrollbar { display: none; }
                                   </style>
-                                  ${item.firstScreenContent}
+                                  ${item.firstScreenHtml}
                                 `}
                               className="pointer-events-none h-full w-full border-none"
                               title="preview"

@@ -18,7 +18,7 @@ export async function PATCH(
 
     const { screenId } = await params;
     const body = await req.json();
-    const { x, y, width, height, content } = body;
+    const { x, y, width, height, html } = body;
 
     const screen = await prisma.screen.update({
       where: {
@@ -32,7 +32,7 @@ export async function PATCH(
         y: y !== undefined ? y : undefined,
         width: width !== undefined ? width : undefined,
         height: height !== undefined ? height : undefined,
-        content: content !== undefined ? content : undefined,
+        html: html !== undefined ? html : undefined,
       },
     });
 

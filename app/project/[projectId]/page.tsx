@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useInngestSubscription } from "@inngest/realtime/hooks";
 import { fetchInngestToken } from "@/app/actions/inngest";
-import { extractArtifacts, type Artifact } from "@/lib/artifact-renderer";
+import { type Artifact } from "@/lib/types";
 import { CanvasArea } from "@/components/project/canvas/canvas-area";
 import { useCanvas } from "@/components/project/canvas/use-canvas";
 import { sanitizeDocumentHtml } from "@/components/project/utils";
@@ -247,9 +247,7 @@ export default function ProjectPage() {
           const updateFn = (prev: Artifact[]) => {
             // Match by ID if available, otherwise fallback to title
             const existingIdx = prev.findIndex(
-              (a) =>
-                (screenId && a.id === screenId) ||
-                (a.title === title && a.generationMessageId === eventMessageId),
+              (a) => (screenId && a.id === screenId) || a.title === title,
             );
             if (existingIdx !== -1) return prev;
 
@@ -271,12 +269,11 @@ export default function ProjectPage() {
               {
                 id: screenId,
                 title,
-                content: "",
+                html: "",
                 type: type as "web" | "app",
                 isComplete: false,
                 x: getNewX(prev, type),
                 y: 0,
-                generationMessageId: eventMessageId,
               },
             ];
           };
@@ -348,8 +345,6 @@ export default function ProjectPage() {
                 x: updated[idx].x,
                 y: updated[idx].y,
                 isComplete: true,
-                generationMessageId:
-                  eventMessageId || updated[idx].generationMessageId,
               };
               if (newScreen.id) {
                 setRegeneratingArtifactIds((prev) => {
@@ -360,11 +355,7 @@ export default function ProjectPage() {
               }
             } else {
               // Fallback to title matching if ID didn't find it (unlikely with new system)
-              const titleIdx = updated.findIndex(
-                (a) =>
-                  a.title === newScreen.title &&
-                  a.generationMessageId === eventMessageId,
-              );
+              const titleIdx = updated.findIndex((a) => a.title === newScreen.title);
               if (titleIdx >= 0) {
                 updated[titleIdx] = {
                   ...updated[titleIdx],
@@ -372,8 +363,6 @@ export default function ProjectPage() {
                   x: updated[titleIdx].x,
                   y: updated[titleIdx].y,
                   isComplete: true,
-                  generationMessageId:
-                    eventMessageId || updated[titleIdx].generationMessageId,
                 };
               } else {
                 const getNewX = (existing: any[], type: string) => {
@@ -602,117 +591,7 @@ export default function ProjectPage() {
     resetProjectState, // Added missing dependency
   ]);
 
-  useEffect(() => {
-    const lastAssistantMessage = messages
-      .filter((m) => m.role === "assistant")
-      .at(-1);
-    if (!lastAssistantMessage) {
-      if (messages.length === 0) {
-        setArtifacts([]);
-        setThrottledArtifacts([]);
-      }
-      return;
-    }
-    const combinedText = Array.isArray((lastAssistantMessage as any).parts)
-      ? (lastAssistantMessage as any).parts
-          .filter((p: any) => p.type === "text")
-          .map((p: any) => p.text)
-          .join("\n\n")
-      : "";
-
-    if (combinedText.length > 0) {
-      const artifactData = extractArtifacts(combinedText);
-      if (artifactData.length > 0) {
-        const getNewX = (existingArtifacts: any[], newType: string) => {
-          const lastArt = existingArtifacts[existingArtifacts.length - 1];
-          const getWidth = (t: string) =>
-            t === "app" ? 380 : t === "web" ? 1024 : 800;
-          return lastArt
-            ? (lastArt.x || 0) + (lastArt.width || getWidth(lastArt.type)) + 120
-            : -(getWidth(newType) / 2);
-        };
-        setArtifacts((prev) => {
-          const updated = [...prev];
-          let changed = false;
-          artifactData.forEach((newArt) => {
-            const existingIndex = updated.findIndex(
-              (a) =>
-                a.title === newArt.title &&
-                (a.generationMessageId === lastAssistantMessage.id ||
-                  !a.generationMessageId),
-            );
-            if (existingIndex >= 0) {
-              if (
-                updated[existingIndex].content !== newArt.content ||
-                updated[existingIndex].isComplete !== newArt.isComplete
-              ) {
-                updated[existingIndex] = {
-                  ...updated[existingIndex],
-                  content: newArt.content,
-                  isComplete: newArt.isComplete,
-                };
-                changed = true;
-              }
-            } else {
-              updated.push({
-                ...newArt,
-                x: getNewX(updated, newArt.type),
-                y: 0,
-              });
-              changed = true;
-            }
-          });
-          return changed ? updated : prev;
-        });
-        setThrottledArtifacts((prev) => {
-          const updated = [...prev];
-          let changed = false;
-          artifactData.forEach((newArt) => {
-            const existingIndex = updated.findIndex(
-              (a) =>
-                a.title === newArt.title &&
-                (a.generationMessageId === lastAssistantMessage.id ||
-                  !a.generationMessageId),
-            );
-            if (existingIndex === -1) {
-              updated.push({
-                ...newArt,
-                content: "",
-                x: getNewX(updated, newArt.type),
-                y: 0,
-                isComplete: false,
-              });
-              changed = true;
-            } else {
-              if (
-                chatStatus === "streaming" &&
-                updated[existingIndex].isComplete
-              ) {
-                updated[existingIndex] = {
-                  ...updated[existingIndex],
-                  isComplete: false,
-                };
-                changed = true;
-              }
-              if (
-                chatStatus === "ready" &&
-                !updated[existingIndex].isComplete &&
-                newArt.isComplete
-              ) {
-                updated[existingIndex] = {
-                  ...updated[existingIndex],
-                  content: newArt.content,
-                  isComplete: true,
-                };
-                changed = true;
-              }
-            }
-          });
-          return changed ? updated : prev;
-        });
-      }
-    }
-  }, [messages, chatStatus, setArtifacts, setThrottledArtifacts]);
+  // Removed redundant artifact extraction from assistant messages.
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -796,12 +675,12 @@ export default function ProjectPage() {
 
       const cleanHtml = sanitizeDocumentHtml(
         iframe.contentDocument,
-        targetArtifact.content,
+        targetArtifact.html,
       );
 
       // Update local state immediately
       const updateFn = (prev: Artifact[]) =>
-        prev.map((a) => (a.id === targetId ? { ...a, content: cleanHtml } : a));
+        prev.map((a) => (a.id === targetId ? { ...a, html: cleanHtml } : a));
       setThrottledArtifacts(updateFn);
       setArtifacts(updateFn);
 
@@ -810,7 +689,7 @@ export default function ProjectPage() {
         const res = await fetch(`/api/screens/${targetId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: cleanHtml }),
+          body: JSON.stringify({ html: cleanHtml }),
         });
 
         if (!res.ok) throw new Error("Failed to save changes");
@@ -1193,7 +1072,7 @@ Reference the existing screen code provided in the context.`;
     const artifact = throttledArtifacts[index];
     const dataUrl = await captureFrameImage(index);
     const zip = new JSZip();
-    zip.file("code.html", artifact.content);
+    zip.file("code.html", artifact.html);
     if (dataUrl)
       zip.file("screen.png", dataUrl.split(",")[1], { base64: true });
     const content = await zip.generateAsync({ type: "blob" });
@@ -1205,7 +1084,7 @@ Reference the existing screen code provided in the context.`;
 
   const openCodeViewer = (index: number) => {
     const artifact = throttledArtifacts[index];
-    setViewingCode(artifact.content);
+    setViewingCode(artifact.html);
     setViewingTitle(artifact.title);
     setIsCodeViewerOpen(true);
   };
@@ -1249,7 +1128,7 @@ Reference the existing screen code provided in the context.`;
           const folderName = artifact.title.replace(/\s+/g, "_");
           const folder = zip.folder(folderName);
           if (folder) {
-            folder.file("code.html", artifact.content);
+            folder.file("code.html", artifact.html);
             const dataUrl = await captureFrameImage(i);
             if (dataUrl) {
               folder.file("screen.png", dataUrl.split(",")[1], {

@@ -53,7 +53,6 @@ export async function POST(
             role: msg.role,
             parts: msg.parts || [],
             status: msg.status,
-            plan: msg.plan || {},
           },
         });
         oldToNewMessageId.set(msg.id, newMsg.id);
@@ -65,7 +64,7 @@ export async function POST(
         data: originalProject.screens.map((s) => ({
           projectId: project.id,
           title: s.title,
-          content: s.content,
+          html: s.html,
           type: s.type,
           x: s.x,
           y: s.y,
@@ -74,9 +73,6 @@ export async function POST(
           status: s.status,
           isLiked: s.isLiked,
           isDisliked: s.isDisliked,
-          generationMessageId: s.generationMessageId
-            ? oldToNewMessageId.get(s.generationMessageId) || null
-            : null,
         })),
       });
 

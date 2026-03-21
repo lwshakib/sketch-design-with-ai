@@ -1,40 +1,4206 @@
 {
-  "vision": "A seamless, mobile-first food delivery experience characterized by a modern, high-contrast design system (primary orange #e77e23) that supports both light and dark modes. The platform prioritizes intuitive navigation, rapid onboarding, and real-time order tracking to ensure a frictionless user journey from discovery to delivery.",
+  "app": "quickbite",
+  "type": "app",
   "screens": [
     {
-      "title": "Onboarding",
-      "description": "The initial user entry point designed to introduce the brand and guide new users through the setup process.",
-      "prompt": "Design a mobile onboarding screen for a food delivery app. The layout should feature a large, appetizing hero image of a gourmet burger, a clear 'Get Started' call-to-action button, and a step indicator showing the user's progress through the setup flow."
-    },
-    {
-      "title": "Dashboard / Discover",
-      "description": "The main hub for users to browse restaurants, search for food, and manage their delivery location.",
-      "prompt": "Design a mobile dashboard for a food delivery app. The interface should include a sticky header with location selection, a search bar, horizontal scrolling category chips (e.g., Burgers, Sushi, Pizza), and a vertical list of restaurant cards displaying ratings, delivery times, and cuisine types."
-    },
-    {
-      "title": "Restaurant Details",
-      "description": "A detailed view of a specific restaurant including menu items, ratings, and the ability to add items to the cart.",
-      "prompt": "Design a mobile restaurant detail page. The design should feature a full-width hero image of the food, restaurant metadata (rating, delivery fee, time), a sticky 'Add to Cart' button at the bottom, and a scrollable list of menu items with images, descriptions, and prices."
-    },
-    {
       "title": "Cart",
-      "description": "A screen allowing users to review selected items, adjust quantities, and proceed to checkout.",
-      "prompt": "Design a mobile shopping cart screen. The layout should display a list of added items with quantity controls (+/-), item descriptions, and individual prices, followed by a summary section showing the subtotal, delivery fee, and a large 'Checkout' button."
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "#2d221a",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": true,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": true,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "app_bottom_nav",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "navigation_bar",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "title": "Checkout",
-      "description": "The final step before payment, requiring address confirmation and payment method selection.",
-      "prompt": "Design a mobile checkout screen. The interface should include a delivery address section with a map preview, a payment method selector (card, cash, etc.), and a final order summary with the total amount due."
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "#f4f2f0",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": true,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": true,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "app_bottom_nav",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": true,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
-      "title": "Live Tracking",
-      "description": "A real-time view of the delivery driver's location and the order status.",
-      "prompt": "Design a mobile live order tracking screen. The visual should feature a map interface with a moving delivery icon, a progress timeline indicating the current status (e.g., 'Preparing', 'On the way'), and a driver contact card."
+      "title": "Dashboard",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "#322820",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": true,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": true,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": true,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "app_bottom_nav",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Discover",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "default_theme",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "title": "Forgot Password",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "#2d221a",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": true,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "app_bottom_nav",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Onboarding",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "default_theme",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": true,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": true,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Orders",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "#2d221a",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "cta_action",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "expressive_header",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              }
+            ]
+          },
+          {
+            "role": "navigation_bar",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": true,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "expressive_header",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": true,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": true,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": true,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              }
+            ]
+          },
+          {
+            "role": "navigation_bar",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Otp",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "default_theme",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": true,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              },
+              {
+                "role": "app_bottom_nav",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Payments",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "#2d2219",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "title": "Profile",
-      "description": "A user management screen allowing access to order history, payment methods, and app settings.",
-      "prompt": "Design a mobile user profile screen. The design should include a large profile avatar, user details, quick links to order history and payment methods, and a settings menu with toggles for notifications and dark mode."
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "default_theme",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": true,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "cta_action",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "expressive_header",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              }
+            ]
+          },
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "app_bottom_nav",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": true,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "navigation_bar",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Reset Password",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "#2d2118",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": true,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "layout_grid",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": true,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "aggressive",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Restaurant",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "default_theme",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": true,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": true,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": true,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "app_bottom_nav",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "title": "Search",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "#f4f2f0",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": true,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "app_bottom_nav",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Signin",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "#2d221a",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": true,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "cta_action",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "expressive_header",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              }
+            ]
+          },
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": true,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "layout_grid",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": true,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Signup",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "#cf6d1a",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": true,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "expressive_header",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "Tracking",
+      "dsl": {
+        "design_intent": {
+          "typography": "Inter (Modern)",
+          "background": "default_theme",
+          "master_style": {
+            "isGlass": false,
+            "isGradient": false,
+            "isBento": false,
+            "hasGlow": false,
+            "spacing": "standard",
+            "rounded": "standard"
+          }
+        },
+        "layout_patterns": [
+          {
+            "role": "element",
+            "traits": {
+              "isGlass": false,
+              "isGradient": false,
+              "isBento": false,
+              "hasGlow": false,
+              "spacing": "standard",
+              "rounded": "standard"
+            },
+            "components": [
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "cta_action",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "standard",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              },
+              {
+                "role": "element",
+                "traits": {
+                  "isGlass": false,
+                  "isGradient": false,
+                  "isBento": false,
+                  "hasGlow": false,
+                  "spacing": "aggressive",
+                  "rounded": "standard"
+                },
+                "components": [
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  },
+                  {
+                    "role": "element",
+                    "traits": {
+                      "isGlass": false,
+                      "isGradient": false,
+                      "isBento": false,
+                      "hasGlow": false,
+                      "spacing": "standard",
+                      "rounded": "standard"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }

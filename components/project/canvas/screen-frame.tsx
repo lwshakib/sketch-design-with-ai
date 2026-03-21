@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 
 /**
- * @file artifact-frame.tsx
- * @description Highly optimized Iframe wrapper for rendering design artifacts.
+ * @file screen-frame.tsx
+ * @description Highly optimized Iframe wrapper for rendering design screens.
  * It uses a "Virtual DOM" like approach for the iframe content: instead of updating
  * 'srcDoc' (which causes a full reload/white flash), it communicates with a script
  * inside the iframe via 'postMessage' to surgically update the body and styles.
@@ -10,14 +10,14 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
  */
 
 import { cn } from "@/lib/utils";
-import { type Artifact } from "@/lib/artifact-renderer";
+import { type Artifact } from "@/lib/types";
 import {
   getInjectedHTML,
   sanitizeDocumentHtml,
 } from "@/components/project/utils";
 
 // Optimized Iframe component to prevent reloads during live editing
-export interface ArtifactFrameProps {
+export interface ScreenFrameProps {
   artifact: Artifact;
   index: number;
   isEditMode: boolean;
@@ -27,10 +27,10 @@ export interface ArtifactFrameProps {
 }
 
 /**
- * ArtifactFrame is memoized to prevent unnecessary re-renders of the expensive iframe
+ * ScreenFrame is memoized to prevent unnecessary re-renders of the expensive iframe
  * unless its core properties or content actually change.
  */
-export const ArtifactFrame = React.memo(
+export const ScreenFrame = React.memo(
   ({
     artifact,
     index,
@@ -38,27 +38,27 @@ export const ArtifactFrame = React.memo(
     activeTool,
     isDraggingFrame,
     onRef,
-  }: ArtifactFrameProps) => {
+  }: ScreenFrameProps) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
     /**
      * Initial content set only once to avoid reloads.
      * Subsequent updates happen via window.postMessage.
      */
-    const [initialSrcDoc] = useState(() => getInjectedHTML(artifact.content));
-    const lastContentRef = useRef(artifact.content);
+    const [initialSrcDoc] = useState(() => getInjectedHTML(artifact.html));
+    const lastContentRef = useRef(artifact.html);
 
     // Use useEffect to handle content updates via postMessage instead of srcDoc
     useEffect(() => {
       // Only update via postMessage if content changed and it's not the initial content
-      if (artifact.content !== lastContentRef.current) {
+      if (artifact.html !== lastContentRef.current) {
         // IMPORTANT: Check if the content is already in the iframe to avoid wiping selection
         if (iframeRef.current?.contentDocument) {
           const currentContent = sanitizeDocumentHtml(
             iframeRef.current.contentDocument,
-            artifact.content,
+            artifact.html,
           );
-          if (currentContent === artifact.content) {
-            lastContentRef.current = artifact.content;
+          if (currentContent === artifact.html) {
+            lastContentRef.current = artifact.html;
             return;
           }
         }
@@ -66,21 +66,21 @@ export const ArtifactFrame = React.memo(
         // Only update if complete or a substantial new block is ready
         if (
           artifact.isComplete ||
-          artifact.content.length > lastContentRef.current.length + 200
+          artifact.html.length > lastContentRef.current.length + 200
         ) {
           if (iframeRef.current?.contentWindow) {
             iframeRef.current.contentWindow.postMessage(
               {
                 type: "UPDATE_CONTENT",
-                content: artifact.content,
+                content: artifact.html,
               },
               "*",
             );
           }
-          lastContentRef.current = artifact.content;
+          lastContentRef.current = artifact.html;
         }
       }
-    }, [artifact.content, artifact.isComplete]);
+    }, [artifact.html, artifact.isComplete]);
 
     return (
       <iframe
@@ -106,4 +106,4 @@ export const ArtifactFrame = React.memo(
   },
 );
 
-ArtifactFrame.displayName = "ArtifactFrame";
+ScreenFrame.displayName = "ScreenFrame";

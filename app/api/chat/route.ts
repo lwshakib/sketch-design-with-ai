@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { inngest } from "@/inngest/client";
-import { streamText as streamGLMText } from "@/llm/generate-text";
+import { streamText as streamGLMText } from "@/llm/stream-text";
 import { UX_AGENT_SYSTEM_PROMPT } from "@/llm/prompts";
 import { generateScreen } from "@/llm/tools";
 
@@ -37,8 +37,10 @@ export async function POST(req: Request) {
 
     // 2. Start streaming from GLM
     const workerStream = await streamGLMText({
-      system: UX_AGENT_SYSTEM_PROMPT,
-      messages: normalizedMessages,
+      messages: [
+        { role: "system", content: UX_AGENT_SYSTEM_PROMPT },
+        ...normalizedMessages,
+      ],
       tools: { generateScreen },
       temperature: 0.7,
     });
@@ -113,33 +115,17 @@ export async function POST(req: Request) {
                 const args = JSON.parse(tc.args);
                 console.log(
                   "[ChatAPI] Directly generating screen:",
-                  args.screenTitle,
+                  args.title,
                 );
-
-                // Create Assistant Message Placeholder
-                const assistantMsg = await prisma.message.create({
-                  data: {
-                    projectId,
-                    role: "assistant",
-                    parts: [
-                      {
-                        type: "text",
-                        text: `Generating screen: ${args.screenTitle}...`,
-                      },
-                    ],
-                    status: "generating",
-                  },
-                });
 
                 // Trigger Screen Generation
                 await inngest.send({
                   name: "app/screen.generate",
                   data: {
-                    projectId,
-                    is3xMode,
-                    assistantMessageId: assistantMsg.id,
-                    screenTitle: args.screenTitle,
-                    screenContent: args.screenContent,
+                    projectId: args.projectId,
+                    title: args.title,
+                    prompt: args.prompt,
+                    type: args.type,
                   },
                 });
 
@@ -149,8 +135,7 @@ export async function POST(req: Request) {
                     `2:[${JSON.stringify({
                       type: "tool-result",
                       tool: "generateScreen",
-                      screenTitle: args.screenTitle,
-                      messageId: assistantMsg.id,
+                      title: args.title,
                     })}]\n`,
                   ),
                 );

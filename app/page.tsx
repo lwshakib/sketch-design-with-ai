@@ -634,7 +634,7 @@ function MobileMenu({
                       >
                         {/* Project Preview Square */}
                         <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-transform group-hover:scale-110 dark:border-zinc-800 dark:bg-zinc-900">
-                          {item.firstScreenContent ? (
+                          {item.firstScreenHtml ? (
                             <div
                               className="pointer-events-none absolute inset-0 origin-top-left"
                               style={{
@@ -649,7 +649,7 @@ function MobileMenu({
                                         body { overflow: hidden; margin: 0; padding: 0; }
                                         ::-webkit-scrollbar { display: none; }
                                       </style>
-                                      ${item.firstScreenContent}
+                                      ${item.firstScreenHtml}
                                     `}
                                 className="pointer-events-none h-full w-full border-none"
                                 title="preview"

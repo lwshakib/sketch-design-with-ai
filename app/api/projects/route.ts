@@ -27,7 +27,7 @@ export async function GET(req: Request) {
         { title: { contains: search, mode: "insensitive" } },
         {
           screens: {
-            some: { content: { contains: search, mode: "insensitive" } },
+            some: { html: { contains: search, mode: "insensitive" } },
           },
         },
       ];
@@ -49,7 +49,7 @@ export async function GET(req: Request) {
           select: {
             id: true,
             type: true,
-            content: true,
+            html: true,
           },
         },
       },
@@ -64,7 +64,7 @@ export async function GET(req: Request) {
     const transformedProjects = projects.map((p) => ({
       ...p,
       firstScreenType: p.screens?.[0]?.type || null,
-      firstScreenContent: p.screens?.[0]?.content || null,
+      firstScreenHtml: p.screens?.[0]?.html || null,
       screens: undefined,
     }));
 

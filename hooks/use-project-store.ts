@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { type Artifact } from "@/lib/artifact-renderer";
+import { type Artifact } from "@/lib/types";
 
 export interface Project {
   id: string;

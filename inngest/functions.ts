@@ -8,7 +8,6 @@ import {
 import { getAllExamples } from "../llm/helpers";
 import prisma from "../lib/prisma";
 import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
-import { extractArtifacts } from "../lib/artifact-renderer";
 import { extractHtml as _extractHtml } from "../llm/tools";
 import {
   publishStatus,
@@ -19,15 +18,15 @@ import {
 
 // --- direct: generate a single screen ---
 export const generateScreen = inngest.createFunction(
-  { id: "generate-screen", retries: 5 },
+  { id: "generate-screen" },
   { event: "app/screen.generate" },
   async ({ event, step, publish }) => {
     try {
       const {
         projectId,
-        assistantMessageId,
-        screenTitle,
-        screenContent,
+        title,
+        prompt,
+        type,
       } = event.data;
 
       // --- STEP 1: INITIAL PERSISTENCE ---
@@ -47,15 +46,14 @@ export const generateScreen = inngest.createFunction(
         return await prisma.screen.create({
           data: {
             projectId,
-            title: screenTitle,
-            content: "", // Placeholder
-            type: "app",
+            title: title,
+            html: "", // Placeholder
+            type: type as any,
             status: "generating",
             x: currentX,
             y: 0,
             width,
             height: null,
-            generationMessageId: assistantMessageId,
           },
         });
       });
@@ -64,23 +62,22 @@ export const generateScreen = inngest.createFunction(
       await publishStatus({
         publish,
         projectId,
-        message: `Building ${screenTitle}...`,
+        message: `Building ${title}...`,
         status: "generating",
-        currentScreen: screenTitle,
+        currentScreen: title,
         screenId: dbScreen.id,
-        messageId: assistantMessageId,
       });
 
       // --- STEP 2: GENERATE SCREEN CODE ---
-      const generated = await step.run("generate-screen-code", async () => {
+      const htmlCode = await step.run("generate-screen-code", async () => {
         const inspiration = getAllExamples();
         const systemPrompt =
           ScreenGenerationPrompt +
           "\n\nCRITICAL: You are generating a single, high-fidelity screen. Do not use placeholders. Ensure all content is realistic.";
 
-        // Fetch the most recent screen for design consistency if it exists
+        // Fetch the most recent completed screen for design consistency if it exists
         const recentScreen = await prisma.screen.findFirst({
-          where: { projectId },
+          where: { projectId, status: "completed" },
           orderBy: { createdAt: "desc" },
           take: 1,
         });
@@ -89,18 +86,18 @@ export const generateScreen = inngest.createFunction(
           ? [
               {
                 role: "assistant",
-                content: `Project Design Continuity: Previously, I generated the "${recentScreen.title}" screen. Use its style (colors, typography, corner radius) as a foundation for consistency. Here is its code for reference:\n\n${recentScreen.content}`,
+                content: `Recent Screen Context: I recently generated the "${recentScreen.title}" screen. Here is its code for reference to ensure continuity:\n\n${recentScreen.html}`,
               },
             ]
           : [];
 
         const { text } = await generateText({
-          system: systemPrompt,
           messages: [
+            { role: "system", content: systemPrompt },
             ...contextMessages,
             {
               role: "user",
-              content: `Now generate the "${screenTitle}" (type: app) screen based on these instructions:\n\n${screenContent}`,
+              content: `Now generate the "${title}" (type: ${type}) screen based on these instructions:\n\n${prompt}`,
             },
             {
               role: "user",
@@ -108,21 +105,21 @@ export const generateScreen = inngest.createFunction(
             },
             {
               role: "user",
-              content: `CRITICAL FORMAT: Wrap the final code in a single <artifact type="app" title="${screenTitle}"> block. Use strict Tailwind classes.`,
+              content: `MANDATORY: Output ONLY the raw HTML and CSS. No markdown code blocks, no conversation, no artifacts.`,
             },
           ] as any,
           maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
-          temperature: 0.7,
+          temperature: 0.5, // Lower temperature for more strict adherence to format
         });
 
-        const artifacts = extractArtifacts(text);
-        return (
-          artifacts[0] || {
-            title: screenTitle,
-            content: text,
-            type: "app",
-          }
-        );
+        // Simple cleaning to remove any accidental markdown wrapping
+        const cleanText = text.replace(/^```html\s*/i, "").replace(/```$/i, "").trim();
+
+        return {
+          title: title,
+          html: cleanText,
+          type: type as any,
+        };
       });
 
       // --- STEP 3: PERSIST & NOTIFY ---
@@ -130,39 +127,13 @@ export const generateScreen = inngest.createFunction(
         return await prisma.screen.update({
           where: { id: dbScreen.id },
           data: {
-            title: generated.title || screenTitle,
-            content: generated.content,
-            type: (generated.type as any) || "app",
+            title: htmlCode.title || title,
+            html: htmlCode.html,
+            type: (htmlCode.type as any) || "app",
             status: "completed",
             updatedAt: new Date(),
           },
         });
-      });
-
-      // Update the final assistant message
-      await step.run("finalize-message", async () => {
-        await prisma.message.update({
-          where: { id: assistantMessageId },
-          data: {
-            parts: [
-              {
-                type: "text",
-                text: `I have architected and generated the **${screenTitle}** screen on your canvas based on our discussion.`,
-              },
-            ],
-            status: "completed",
-          },
-        });
-      });
-
-      // Notify UI of completion
-      await publishStatus({
-        publish,
-        projectId,
-        message: `${screenTitle} complete.`,
-        status: "partial_complete",
-        screen: finalScreen,
-        messageId: assistantMessageId,
       });
 
       await publishStatus({
@@ -170,7 +141,7 @@ export const generateScreen = inngest.createFunction(
         projectId,
         message: "Generation complete.",
         status: "complete",
-        messageId: assistantMessageId,
+        screen: finalScreen,
       });
 
       return { success: true };
@@ -183,7 +154,6 @@ export const generateScreen = inngest.createFunction(
         message:
           error.message || "An error occurred while generating the screen.",
         status: "error",
-        messageId: event.data.assistantMessageId,
       });
 
       if (error instanceof NonRetriableError) {

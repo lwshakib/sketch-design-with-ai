@@ -147,7 +147,7 @@ export function GenerationStatus({
             artifact = projectArtifacts.find((a) => a.title === planItem.title);
           }
 
-          const hasContent = !!artifact?.content;
+          const hasContent = !!artifact?.html;
           const isPlaceholder = planItem.id === "placeholder-pulse";
           // A screen is considered not available if we are complete but the matching artifact is missing from the global state
           const isNotAvailable = isComplete && !isPlaceholder && !artifact;
@@ -186,7 +186,7 @@ export function GenerationStatus({
                                        ::-webkit-scrollbar { display: none; }
                                      </style>
                                    </head>
-                                   <body>${artifact?.content}</body>
+                                   <body>${artifact?.html}</body>
                                  </html>
                                `}
                           />

@@ -148,7 +148,7 @@ export function ProjectDialogs({
   const handleCopyCode = () => {
     if (exportArtifactIndex !== null) {
       const art = throttledArtifacts[exportArtifactIndex];
-      const html = getInjectedHTML(art.content);
+      const html = getInjectedHTML(art.html);
       navigator.clipboard.writeText(html);
       setHasCopied(true);
       toast.success("Code copied to clipboard");

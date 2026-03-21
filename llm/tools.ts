@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 /**
  * Tool for extracting HTML content from a given URL.
  * Plain object implementation (no AI SDK dependency).
@@ -7,9 +5,16 @@ import { z } from "zod";
 export const extractHtml = {
   description:
     "Extract HTML content and text from a URL to understand its structure and design.",
-  parameters: z.object({
-    url: z.string().describe("The URL of the website to extract content from."),
-  }),
+  parameters: {
+    type: "object",
+    properties: {
+      url: {
+        type: "string",
+        description: "The URL of the website to extract content from.",
+      },
+    },
+    required: ["url"],
+  },
   execute: async ({ url }: { url: string }) => {
     try {
       console.log(`[Tool] Extracting HTML from: ${url}`);
@@ -53,19 +58,34 @@ export const extractHtml = {
 export const generateScreen = {
   description:
     "Generate a new design screen based on architectural and visual descriptions. Call this once for each new screen you want to create.",
-  parameters: z.object({
-    screenTitle: z
-      .string()
-      .describe("A concise title for the screen (e.g. 'Hero Section', 'Project Dashboard')."),
-    screenContent: z
-      .string()
-      .describe("Detailed instructions for the screen layout, components, and style."),
-  }),
-  execute: async (args: { screenTitle: string; screenContent: string }) => {
-    // This tool is primarily intercepted by the chat route or handled via side-effects.
+  parameters: {
+    type: "object",
+    properties: {
+      projectId: {
+        type: "string",
+        description: "The unique ID of the current project.",
+      },
+      title: {
+        type: "string",
+        description: "A concise title for the screen (e.g. 'Hero Section', 'Project Dashboard').",
+      },
+      prompt: {
+        type: "string",
+        description: "Comprehensive instructions for the screen layout (left/right/top/bottom), components, and style.",
+      },
+      type: {
+        type: "string",
+        enum: ["app", "web"],
+        description: "The platform type for this screen.",
+      },
+    },
+    required: ["projectId", "title", "prompt", "type"],
+  },
+  execute: async (args: { projectId: string; title: string; prompt: string; type: string }) => {
+    // This tool is primarily intercepted by the chat route for background processing.
     return { 
       success: true, 
-      message: `Design protocol initiated for "${args.screenTitle}". Generation is now running in the background.`,
+      message: `Design protocol initiated for "${args.title}" (${args.type}). Generation is now running in the background.`,
       ...args 
     };
   },

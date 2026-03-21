@@ -66,7 +66,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { stripArtifact } from "@/lib/artifact-renderer";
+// stripArtifact removed as we no longer use artifact tags.
 import { useProjectStore } from "@/hooks/use-project-store";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 
@@ -417,11 +417,8 @@ export function ChatSidebar({
                                           .filter(Boolean);
 
                                         const messageArtifacts =
-                                          throttledArtifacts.filter(
-                                            (a) =>
-                                              a.generationMessageId ===
-                                                msg.id ||
-                                              planScreenIds.includes(a.id),
+                                          throttledArtifacts.filter((a) =>
+                                            planScreenIds.includes(a.id),
                                           );
 
                                         const showStatus =
@@ -436,7 +433,7 @@ export function ChatSidebar({
                                             {!hasPlan && textPart && (
                                               <div className="text-foreground/90 text-[15px] leading-relaxed">
                                                 <MessageResponse>
-                                                  {stripArtifact(textPart)}
+                                                  {textPart}
                                                 </MessageResponse>
                                               </div>
                                             )}
@@ -577,7 +574,7 @@ export function ChatSidebar({
                                                                         ::-webkit-scrollbar { display: none; }
                                                                       </style>
                                                                     </head>
-                                                                    <body>${screen.content || ""}</body>
+                                                                    <body>${screen.html || ""}</body>
                                                                   </html>
                                                                 `}
                                                                 />
@@ -734,7 +731,7 @@ export function ChatSidebar({
                                               ::-webkit-scrollbar { display: none; }
                                             </style>
                                           </head>
-                                          <body>${art.content}</body>
+                                          <body>${art.html}</body>
                                         </html>
                                       `}
                             />

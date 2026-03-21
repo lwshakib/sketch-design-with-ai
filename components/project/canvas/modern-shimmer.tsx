@@ -10,19 +10,13 @@ import React from "react";
 
 export const ModernShimmer = ({
   type = "app",
-  appliedTheme,
 }: {
   type?: "web" | "app" | string;
-  appliedTheme?: any;
 }) => {
   const _isWeb = type === "web";
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-50 flex flex-col gap-10 overflow-hidden p-10"
-      style={{
-        backgroundColor:
-          appliedTheme?.cssVars?.background || "var(--background)",
-      }}
+      className="pointer-events-none absolute inset-0 z-50 flex flex-col gap-10 overflow-hidden p-10 bg-background"
     >
       {/* Standard Shimmer Overlay */}
       <div

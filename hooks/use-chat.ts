@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useProjectStore } from "./use-project-store";
 import { toast } from "sonner";
-import { type Artifact } from "@/lib/artifact-renderer";
+import { type Artifact } from "@/lib/types";
 
 export const useChat = (projectId: string) => {
   const {
@@ -60,7 +60,7 @@ export const useChat = (projectId: string) => {
         selectedScreens: selectedScreens.map((s) => ({
           id: s.id,
           title: s.title,
-          content: s.content,
+          html: s.html,
         })),
         isSilent,
       };

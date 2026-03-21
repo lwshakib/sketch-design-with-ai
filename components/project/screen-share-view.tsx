@@ -9,7 +9,7 @@
  */
 
 import React, { useState, useRef, useEffect } from "react";
-import { type Artifact } from "@/lib/artifact-renderer";
+import { type Artifact } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import {
   ZoomIn,
@@ -26,7 +26,7 @@ import {
   Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ArtifactFrame } from "@/components/project/canvas/artifact-frame";
+import { ScreenFrame } from "@/components/project/canvas/screen-frame";
 import { Logo } from "@/components/logo";
 import { QRCodeSVG } from "qrcode.react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -376,13 +376,12 @@ export function ScreenShareView({ project, artifact }: ScreenShareViewProps) {
               }
             }}
           >
-            <ArtifactFrame
+            <ScreenFrame
               artifact={{ ...artifact, width: getWidth(), height: undefined }}
               index={0}
               isEditMode={false}
               activeTool={activeTool}
               isDraggingFrame={false}
-              appliedTheme={null}
               onRef={(i, el) => (iframeRef.current = el)}
             />
           </div>

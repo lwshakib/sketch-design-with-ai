@@ -63,8 +63,8 @@ import {
 import { cn } from "@/lib/utils";
 import { UserMenu } from "@/components/user-menu";
 import { ModeToggle } from "@/components/mode-toggle";
-import { type Artifact } from "@/lib/artifact-renderer";
-import { ArtifactFrame } from "./artifact-frame";
+import { type Artifact } from "@/lib/types";
+import { ScreenFrame } from "./screen-frame";
 import { ModernShimmer } from "./modern-shimmer";
 import { CanvasToolbar } from "./canvas-toolbar";
 import Image from "next/image";
@@ -738,7 +738,7 @@ export function CanvasArea({
                           : undefined,
                     }}
                   >
-                    {((!artifact.isComplete && !artifact.content) ||
+                    {((!artifact.isComplete && !artifact.html) ||
                       (artifact.id &&
                         regeneratingArtifactIds.has(artifact.id))) && (
                       <ModernShimmer
@@ -754,7 +754,7 @@ export function CanvasArea({
                           : "opacity-100",
                       )}
                     >
-                      <ArtifactFrame
+                      <ScreenFrame
                         artifact={artifact}
                         index={index}
                         isEditMode={isEditMode}
@@ -939,7 +939,7 @@ export function CanvasArea({
                                         body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
                                       </style>
                                     </head>
-                                    <body>${art.content}</body>
+                                    <body>${art.html}</body>
                                   </html>
                                 `}
                               />
