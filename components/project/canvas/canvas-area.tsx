@@ -336,11 +336,23 @@ export function CanvasArea({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <div className="flex items-center">
+          <div className="flex flex-col">
             <span className="text-foreground whitespace-nowrap text-[15.5px] font-semibold tracking-tight">
               {project?.title || "Untitled Project"}
             </span>
-           </div>
+            {isGenerating && (
+              <div className="flex items-center gap-1.5 overflow-hidden">
+                <Sparkles className="text-primary h-3 w-3 animate-pulse shrink-0" />
+                <div className="text-[11px] text-muted-foreground font-medium animate-pulse max-w-[280px] lg:max-w-[400px] truncate transition-all duration-500">
+                  {(() => {
+                    const lastAssistant = [...(messages || [])].reverse().find(m => m.role === 'assistant');
+                    const text = lastAssistant?.parts?.find((p: any) => p.type === 'text')?.text || "";
+                    return text || "Architecting your vision...";
+                  })()}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         
         {/* Dynamic Center Toolbar for Selected Artifact */}

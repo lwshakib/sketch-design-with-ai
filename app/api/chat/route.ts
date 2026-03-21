@@ -118,15 +118,10 @@ export async function POST(req: Request) {
                   args.title,
                 );
 
-                // Trigger Screen Generation
-                await inngest.send({
-                  name: "app/screen.generate",
-                  data: {
-                    projectId: args.projectId,
-                    title: args.title,
-                    prompt: args.prompt,
-                    type: args.type,
-                  },
+                // Trigger Screen Generation via Tool Execution
+                await generateScreen.execute({
+                  ...args,
+                  projectId, // Ensure correct projectId is passed
                 });
 
                 // Send data part

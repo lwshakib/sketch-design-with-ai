@@ -1,3 +1,5 @@
+import { inngest } from "@/inngest/client";
+
 /**
  * Tool for extracting HTML content from a given URL.
  * Plain object implementation (no AI SDK dependency).
@@ -81,12 +83,34 @@ export const generateScreen = {
     },
     required: ["projectId", "title", "prompt", "type"],
   },
-  execute: async (args: { projectId: string; title: string; prompt: string; type: string }) => {
-    // This tool is primarily intercepted by the chat route for background processing.
-    return { 
-      success: true, 
-      message: `Design protocol initiated for "${args.title}" (${args.type}). Generation is now running in the background.`,
-      ...args 
-    };
+  execute: async (args: {
+    projectId: string;
+    title: string;
+    prompt: string;
+    type: string;
+  }) => {
+    try {
+      console.log(`[Tool: generateScreen] Initiating for: ${args.title}`);
+      await inngest.send({
+        name: "app/screen.generate",
+        data: {
+          projectId: args.projectId,
+          title: args.title,
+          prompt: args.prompt,
+          type: args.type,
+        },
+      });
+
+      return {
+        status: "success",
+        message: `Design protocol initiated for "${args.title}" (${args.type}). Generation is now running in the background.`,
+      };
+    } catch (error: any) {
+      console.error("[Tool: generateScreen] Error:", error);
+      return {
+        status: "error",
+        message: `Failed to initiate design: ${error.message}`,
+      };
+    }
   },
 };
