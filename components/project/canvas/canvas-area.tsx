@@ -266,7 +266,11 @@ export function CanvasArea({
       
       {/* Turn Details Detail (Top Left) */}
       {(selectedTurnId || isGenerating) && isTurnDetailVisible && (
-        <div className="pointer-events-none absolute top-[68px] left-6 z-[60] flex flex-col items-start gap-4" onMouseDown={(e) => e.stopPropagation()}>
+        <div 
+           className="pointer-events-none absolute top-[68px] left-6 z-[60] flex flex-col items-start gap-4" 
+           onMouseDown={(e) => e.stopPropagation()}
+           onWheel={(e) => e.stopPropagation()}
+        >
           {(() => {
             const lastUserIdx = [...(messages || [])].reverse().findIndex(m => m.role === 'user');
             const latestUserMsgId = lastUserIdx !== -1 ? messages![messages!.length - 1 - lastUserIdx].id : null;
@@ -874,7 +878,11 @@ export function CanvasArea({
       </div>
 
       {/* Agent Log / History (Bottom Left) */}
-      <div className="pointer-events-none absolute bottom-6 left-6 z-[60] flex flex-col items-start gap-2.5" onMouseDown={(e) => e.stopPropagation()}>
+      <div 
+         className="pointer-events-none absolute bottom-6 left-6 z-[60] flex flex-col items-start gap-2.5" 
+         onMouseDown={(e) => e.stopPropagation()}
+         onWheel={(e) => e.stopPropagation()}
+      >
         {/* Minimal History Window */}
         {isAgentLogOpen && (
           <div className="bg-background/80 border-border pointer-events-auto flex max-h-[300px] w-[280px] flex-col gap-1 overflow-y-auto rounded-xl border p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 scrollbar-none ring-1 ring-black/5">

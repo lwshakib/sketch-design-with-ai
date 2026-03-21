@@ -26,7 +26,16 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. Persist User Message
+    // 1. Fetch Project State & Persist User Message
+    const project = await prisma.project.findUnique({
+       where: { id: projectId },
+       include: { screens: true }
+    });
+
+    if (!project) {
+        return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
     const lastUserMessage = messages?.[messages.length - 1];
     if (lastUserMessage && lastUserMessage.role === "user") {
       await prisma.message.create({
@@ -35,16 +44,35 @@ export async function POST(req: Request) {
           role: "user",
           parts: lastUserMessage.parts || [
             { 
-              type: "text", 
-              text: typeof lastUserMessage.content === "string" 
-                ? lastUserMessage.content 
-                : lastUserMessage.content?.[0]?.text || "" 
+               type: "text", 
+               text: typeof lastUserMessage.content === "string" 
+                 ? lastUserMessage.content 
+                 : lastUserMessage.content?.[0]?.text || "" 
             }
           ],
           status: "completed",
         },
       });
     }
+
+    // 2. Fetch Full History for Context
+    const dbMessages = await prisma.message.findMany({
+       where: { projectId },
+       orderBy: { createdAt: "asc" },
+       take: 50
+    });
+
+    const normalizedHistory = dbMessages.map((msg) => ({
+      role: msg.role,
+      content: (msg.parts as any)?.find((p: any) => p.type === "text")?.text || ""
+    }));
+
+    // 3. Construct Project Context (Visible Screens)
+    const existingScreensSummary = project.screens.length > 0 
+      ? `\n\nExisting Screens in Project: ${project.screens.map(s => `"${s.title}"`).join(", ")}.`
+      : "";
+
+    const projectContextPrompt = `${UX_AGENT_SYSTEM_PROMPT}${existingScreensSummary}\n\nStrictly follow the role of Sketch.`;
 
     // 2. Normalize messages for GLM
     const normalizedMessages = (messages || []).map((msg: any) => ({
@@ -55,11 +83,11 @@ export async function POST(req: Request) {
           : msg.parts?.find((p: any) => p.type === "text")?.text || msg.content?.[0]?.text || "",
     }));
 
-    // 2. Start streaming from GLM
+    // 4. Start streaming from GLM
     const workerStream = await streamGLMText({
       messages: [
-        { role: "system", content: UX_AGENT_SYSTEM_PROMPT },
-        ...normalizedMessages,
+        { role: "system", content: projectContextPrompt },
+        ...normalizedHistory,
       ],
       tools: { generateScreen },
       temperature: 0.7,
