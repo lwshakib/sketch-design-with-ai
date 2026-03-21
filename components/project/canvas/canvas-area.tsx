@@ -87,6 +87,7 @@ import {
 import { LogoIcon } from "@/components/logo";
 import { toast } from "sonner";
 import { useProjectStore } from "@/hooks/use-project-store";
+import { SecondarySidebar } from "../secondary-sidebar";
 
 const SELECTION_BLUE = "#3b82f6";
 
@@ -133,6 +134,8 @@ interface CanvasAreaProps {
   handleDuplicateProject: () => void;
   /** Global action to delete the entire project */
   handleDeleteProject: () => void;
+  /** Global action to persist current workspace state */
+  onSave: () => void;
 
   // Chat/Generation Handlers
   handleCustomSubmit: (e: React.FormEvent) => void;
@@ -161,6 +164,7 @@ export function CanvasArea({
   handleCustomSubmit,
   handleFileUpload,
   fileInputRef,
+  onSave,
 }: CanvasAreaProps) {
   const {
     zoom,
@@ -209,6 +213,7 @@ export function CanvasArea({
     isAgentLogOpen,
     setIsAgentLogOpen,
     messages,
+    setSelectedEl,
   } = useProjectStore();
 
   const selectedIndex = throttledArtifacts.findIndex(
@@ -239,6 +244,59 @@ export function CanvasArea({
   const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
   const [qrCodeUrl, setQrCodeUrl] = React.useState("");
 
+  const [selectedElementInfo, setSelectedElementInfo] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === "ELEMENT_CLICKED") {
+        // Find which artifact this message came from by checking iframe sources
+        let artifactTitle = null;
+        for (const title in iframeRefs.current) {
+          const iframe = iframeRefs.current[title];
+          if (iframe && iframe.contentWindow === event.source) {
+            artifactTitle = title;
+            break;
+          }
+        }
+
+        if (artifactTitle) {
+           const artifact = throttledArtifacts.find(a => a.title === artifactTitle);
+           if (artifact && artifact.id) {
+             setSelectedArtifactIds(new Set([artifact.id]));
+           }
+
+           setSelectedElementInfo({
+             ...event.data,
+             artifactTitle: artifactTitle
+           });
+
+           // Find and set the real HTMLElement reference in the store
+           const iframe = iframeRefs.current[artifactTitle];
+           if (iframe && iframe.contentDocument) {
+             const getElementByPath = (doc: Document, path: number[]) => {
+               let el: any = doc.body;
+               for (const index of path) {
+                 if (el && el.children[index]) el = el.children[index];
+                 else return null;
+               }
+               return el;
+             };
+             const el = getElementByPath(iframe.contentDocument, event.data.path);
+             if (el) {
+               setSelectedEl(el as HTMLElement);
+               setSecondarySidebarMode("properties");
+             }
+           }
+        }
+      }
+      if (event.data.type === "SELECTION_CLEARED") {
+        setSelectedElementInfo(null);
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [selectedArtifact]);
+
   React.useEffect(() => {
     if (isGenerating) {
         setIsTurnDetailVisible(true);
@@ -255,6 +313,7 @@ export function CanvasArea({
       onClick={(e) => {
         if (e.target === e.currentTarget) {
            setSelectedArtifactIds(new Set());
+           setSelectedElementInfo(null);
            if (activeTool === "edit") {
               setSecondarySidebarMode("none");
            }
@@ -1105,6 +1164,9 @@ export function CanvasArea({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Properties Inspector (Right Overlay) */}
+      <SecondarySidebar commitEdits={() => onSave()} />
     </main>
   );
 }

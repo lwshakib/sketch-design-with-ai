@@ -481,6 +481,18 @@ export function useCanvas({
     if (!element || loading) return;
 
     const handleWheelNative = (e: WheelEvent) => {
+      // Prevent canvas interaction if scrolling over a scrollable UI element
+      let target = e.target as HTMLElement | null;
+      while (target && target !== element) {
+        if (target.scrollHeight > target.clientHeight) {
+            const style = window.getComputedStyle(target);
+            if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
+                return; // Let the container handle its own scroll
+            }
+        }
+        target = target.parentElement;
+      }
+
       if (e.ctrlKey || e.metaKey) {
         e.preventDefault();
         const scaleFactor = Math.pow(1.2, -e.deltaY / 120);

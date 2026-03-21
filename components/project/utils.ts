@@ -296,11 +296,19 @@ export const getInjectedHTML = (html: string) => {
           selectedEl.classList.add('edit-selected-highlight');
           clearHover();
           
+          var rect = target.getBoundingClientRect();
           window.parent.postMessage({ 
             type: 'ELEMENT_CLICKED', 
             tagName: target.tagName,
             id: target.id,
-            className: target.className
+            className: target.className,
+            path: getElementPath(target),
+            rect: {
+              top: rect.top,
+              left: rect.left,
+              width: rect.width,
+              height: rect.height
+            }
           }, '*');
         };
 
@@ -383,11 +391,19 @@ export const getInjectedHTML = (html: string) => {
                 if (newEl) {
                     selectedEl = newEl;
                     selectedEl.classList.add('edit-selected-highlight');
+                    var r = selectedEl.getBoundingClientRect();
                     window.parent.postMessage({ 
                       type: 'ELEMENT_CLICKED', 
                       tagName: selectedEl.tagName,
                       id: selectedEl.id,
-                      className: selectedEl.className
+                      className: selectedEl.className,
+                      path: savedPath,
+                      rect: {
+                        top: r.top,
+                        left: r.left,
+                        width: r.width,
+                        height: r.height
+                      }
                     }, '*');
                 } else {
                     selectedEl = null;
