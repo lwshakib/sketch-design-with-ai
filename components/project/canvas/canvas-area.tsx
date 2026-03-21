@@ -46,7 +46,17 @@ import {
   Rocket,
   User,
   History,
+  Minus,
+  Hand,
+  MousePointer2,
+  Save,
+  Undo,
+  Redo,
+  Layout,
+  Layers,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { QRCodeSVG } from "qrcode.react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
@@ -310,8 +320,14 @@ export function CanvasArea({
                    <hr className="border-border/10 w-full" />
 
                    {/* Assistant Message */}
-                   <div className="text-[13px] leading-relaxed text-muted-foreground whitespace-pre-wrap py-0.5">
-                     {getAssistantText() || (isGenerating ? "Thinking..." : "")}
+                   <div className="text-[13px] leading-relaxed text-muted-foreground py-0.5">
+                     {assistantMsg || isGenerating ? (
+                        <div className="prose prose-sm dark:prose-invert prose-p:leading-relaxed prose-pre:bg-muted/50 max-w-none">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {getAssistantText() || (isGenerating ? "Thinking..." : "")}
+                            </ReactMarkdown>
+                        </div>
+                     ) : null}
                    </div>
                 </div>
               </div>
