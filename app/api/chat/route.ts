@@ -26,13 +26,33 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. Normalize messages for GLM
+    // 1. Persist User Message
+    const lastUserMessage = messages?.[messages.length - 1];
+    if (lastUserMessage && lastUserMessage.role === "user") {
+      await prisma.message.create({
+        data: {
+          projectId,
+          role: "user",
+          parts: lastUserMessage.parts || [
+            { 
+              type: "text", 
+              text: typeof lastUserMessage.content === "string" 
+                ? lastUserMessage.content 
+                : lastUserMessage.content?.[0]?.text || "" 
+            }
+          ],
+          status: "completed",
+        },
+      });
+    }
+
+    // 2. Normalize messages for GLM
     const normalizedMessages = (messages || []).map((msg: any) => ({
       role: msg.role,
       content:
         typeof msg.content === "string"
           ? msg.content
-          : msg.content?.[0]?.text || "",
+          : msg.parts?.find((p: any) => p.type === "text")?.text || msg.content?.[0]?.text || "",
     }));
 
     // 2. Start streaming from GLM
