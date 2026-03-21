@@ -115,6 +115,9 @@ export default function ProjectPage() {
     resetProjectState,
     setIsVariationsSheetOpen,
     setVariationsArtifactIndex,
+    setIsTalking,
+    setSelectedTurnId,
+    setIsTurnDetailVisible,
   } = useProjectStore();
 
   const { sendMessage, chatStatus, chatError } = useChat(projectId);
@@ -332,6 +335,8 @@ export default function ProjectPage() {
                  updated[idx] = {
                    ...updated[idx],
                    ...finishedScreen,
+                   x: updated[idx].x, // Preserve placeholder X
+                   y: updated[idx].y, // Preserve placeholder Y
                    isComplete: true,
                  };
                  setRegeneratingArtifactIds((prevRegen) => {

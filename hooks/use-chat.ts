@@ -11,6 +11,8 @@ export const useChat = (projectId: string) => {
     setIsGenerating,
     setIsTalking,
     setIsAgentLogOpen,
+    setSelectedTurnId,
+    setIsTurnDetailVisible,
     is3xMode,
     selectedArtifactIds,
     throttledArtifacts,
@@ -87,6 +89,8 @@ export const useChat = (projectId: string) => {
 
       setIsTalking(true);
       setIsAgentLogOpen(true);
+      setSelectedTurnId(newUserMessage.id);
+      setIsTurnDetailVisible(true);
 
       try {
         const messagesForApi = [...currentMessages, newUserMessage];
@@ -197,6 +201,8 @@ export const useChat = (projectId: string) => {
       setIsGenerating,
       setIsTalking,
       setIsAgentLogOpen,
+      setSelectedTurnId,
+      setIsTurnDetailVisible,
     ]
   );
 
