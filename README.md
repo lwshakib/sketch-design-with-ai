@@ -5,8 +5,9 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-19.2.3-61DAFB)](https://react.dev/)
+[![React](https://img.shields.io/badge/React-19.2.4-61DAFB)](https://react.dev/)
 [![Prisma](https://img.shields.io/badge/Prisma-7.2-2D3748)](https://www.prisma.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC)](https://tailwindcss.com/)
 
 ## 🚀 Overview
 
@@ -20,30 +21,35 @@
 - 🎭 **Variations & Iteration**: Generate multiple design variations with automated retry logic for high-fidelity results
 - 💻 **Export to Code**: Get production-ready code (HTML/React/CSS) instantly
 - 📱 **Responsive Design**: Generate designs that work seamlessly across all device sizes with mobile-first previews
+- 💳 **Credit System**: Managed daily allowance for AI generations to ensure sustainable usage
 
 ## 🏗️ Architecture
 
 ```mermaid
 graph TD
     User([User])
-    subgraph Client ["Client Side (Next.js)"]
+    subgraph Client ["Client Side (Next.js 16)"]
         UI[User Interface]
         Canvas[Infinite Canvas]
+        Preview[Real-time Preview]
     end
 
-    subgraph Server ["Server Side (Next.js API Routes)"]
+    subgraph Server ["Server Side (Next.js API & Inngest)"]
         Auth[Better Auth]
-        InngestAPI[Inngest Functions]
-        ProjectAPI[Project API]
+        InngestAPI[Inngest Background Jobs]
+        ProjectAPI[Project & Credits API]
+        LLM[LLM Integration Layer]
     end
 
     subgraph Services ["External Services"]
-        Gemini[Google Gemini AI]
-        InngestCloud[Inngest Dev Server / Cloud]
+        Gemini[Google Gemini 2.0 Flash]
+        InngestCloud[Inngest Event Bus]
+        Cloudinary[Cloudinary Media]
     end
 
     subgraph Data ["Data Layer"]
         DB[(PostgreSQL)]
+        Prisma[Prisma ORM 7.2]
     end
 
     User -->|Interacts| UI
@@ -52,13 +58,16 @@ graph TD
     UI -->|API Requests| ProjectAPI
 
     ProjectAPI -->|CRUD| DB
-    ProjectAPI -->|Trigger Event| InngestCloud
+    ProjectAPI -->|Check Credits| DB
+    ProjectAPI -->|Trigger Generation| InngestCloud
 
     InngestCloud -->|Execute Function| InngestAPI
-    InngestAPI -->|Generate Content| Gemini
-    InngestAPI -->|Store Result| DB
+    InngestAPI -->|Stream Generation| Gemini
+    InngestAPI -->|Consume Credit| DB
+    InngestAPI -->|Persist Design| DB
 
     Auth -->|Persist Session| DB
+    Canvas -->|Upload Assets| Cloudinary
 ```
 
 ## 🎬 App Demos
@@ -99,51 +108,41 @@ graph TD
 - **Code Export**: Get clean, production-ready HTML, CSS, and React code
 - **Responsive Previews**: View designs in Mobile, Tablet, and Desktop modes with live sidebar thumbnails
 
-### Project Management
+### Managed Ecosystem
 
-- **User Authentication**: Secure login with Better Auth
-- **Project Organization**: Create and manage multiple design projects
-- **Version History**: Track all design iterations through message history
-- **Cloud Storage**: All projects saved to PostgreSQL database
+- **Credit System**: Users receive 10 daily credits (resets at 12 AM) to power AI generations
+- **User Authentication**: Secure login with Better Auth (OAuth & Credentials)
+- **Project Organization**: Create and manage multiple design projects with infinite canvas
+- **Version History**: Track all design iterations through persistent message history
+- **Cloud Storage**: All projects and designs saved to PostgreSQL database via Prisma
 
 ### Developer Experience
 
-- **Modern Tech Stack**: Built with Next.js 16, React 19, and TypeScript
-- **Component Library**: Extensive UI components with Radix UI
-- **Code Editor**: Monaco Editor integration for code viewing/editing
+- **Modern Tech Stack**: Built with Next.js 16 (App Router), React 19, and TypeScript 5
+- **Tailwind CSS 4**: Utilizing the latest in styling technology for high performance
+- **Inngest Integration**: Robust background job processing for long-running AI tasks
+- **Code Editor**: Integrated code viewer with syntax highlighting (Shiki/CodeMirror)
 - **Export Options**: Download designs as HTML, images, or ZIP files
 
 ## 🛠️ Tech Stack
 
-### Frontend
-
-- **Framework**: [Next.js 16.1.1](https://nextjs.org/) with App Router
-- **Language**: [TypeScript 5](https://www.typescriptlang.org/)
-- **UI Library**: [React 19.2.3](https://react.dev/)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **Animations**: [Framer Motion 12](https://www.framer.com/motion/)
-- **Components**: [Radix UI](https://www.radix-ui.com/) + [shadcn/ui](https://ui.shadcn.com/)
-
-### Backend & Database
-
-- **Database**: [PostgreSQL](https://www.postgresql.org/) with [Prisma ORM 7.2](https://www.prisma.io/)
-- **Authentication**: [Better Auth 1.4](https://www.better-auth.com/)
-- **AI Integration**: [Google AI SDK](https://ai.google.dev/) with Gemini 2.0 Flash
-
-### Additional Tools
-
-- **Canvas**: HTML5 Canvas API
-- **Code Editor**: [Monaco Editor](https://microsoft.github.io/monaco-editor/)
-- **Image Processing**: [html2canvas](https://html2canvas.hertzen.com/)
-- **File Handling**: [JSZip](https://stuk.github.io/jszip/)
-- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
+| Category | Technologies |
+| :--- | :--- |
+| **Frontend** | [Next.js 16.1](https://nextjs.org/), [React 19](https://react.dev/), [TypeScript 5](https://www.typescriptlang.org/), [Tailwind CSS 4](https://tailwindcss.com/) |
+| **Animation** | [Framer Motion 12](https://www.framer.com/motion/), [Motion](https://motion.dev/) |
+| **Components** | [Radix UI](https://www.radix-ui.com/), [shadcn/ui](https://ui.shadcn.com/) |
+| **Backend** | [Better Auth 1.4](https://www.better-auth.com/), [Inngest 3.5](https://www.inngest.com/) |
+| **Database** | [PostgreSQL](https://www.postgresql.org/), [Prisma ORM 7.2](https://www.prisma.io/) |
+| **AI** | [Google Gemini 2.0 Flash](https://ai.google.dev/) via [Vercel AI SDK](https://sdk.vercel.ai/) |
+| **Utilities** | [Zustand](https://zustand-demo.pmnd.rs/), [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/) |
+| **Media** | [Cloudinary](https://cloudinary.com/), [html2canvas](https://html2canvas.hertzen.com/) |
 
 ## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed:
 
 - **Node.js**: v18.17 or higher ([Download](https://nodejs.org/))
-- **Bun**: Latest version ([Install](https://bun.sh/)) or npm/pnpm/yarn
+- **Bun**: Latest version ([Install](https://bun.sh/))
 - **PostgreSQL**: v14 or higher ([Download](https://www.postgresql.org/download/))
 - **Git**: For version control ([Download](https://git-scm.com/))
 
@@ -158,245 +157,106 @@ cd sketch-design-with-ai
 
 ### 2. Install Dependencies
 
-Using Bun (recommended):
-
 ```bash
 bun install
 ```
 
-Or using npm:
-
-```bash
-npm install
-```
-
 ### 3. Environment Setup
 
-Create a `.env` file in the root directory. You can start by copying the example file:
+Create a `.env` file and fill in the required variables:
 
 ```bash
 cp .env.example .env
 ```
 
-Then fill in the following variables:
+**Required Environment Variables:**
 
 ```env
 # Database
-DATABASE_URL="postgresql://username:password@localhost:5432/sketch_wireframe_db"
+DATABASE_URL="postgresql://user:pass@localhost:5432/sketch_wireframe_db"
 
 # Google AI (Gemini)
-GOOGLE_GENERATIVE_AI_API_KEY="your_gemini_api_key_here"
+GOOGLE_GENERATIVE_AI_API_KEY="your_gemini_api_key"
 
 # Better Auth
-BETTER_AUTH_SECRET="your_secret_key_here"
+BETTER_AUTH_SECRET="your_generated_secret"
 BETTER_AUTH_URL="http://localhost:3000"
 
-# Cloudinary (Optional - for image uploads)
+# Cloudinary (Optional)
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your_cloud_name"
 CLOUDINARY_API_KEY="your_api_key"
 CLOUDINARY_API_SECRET="your_api_secret"
 ```
 
-**Getting API Keys:**
-
-- **Google Gemini API**: Get your free API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
-- **Cloudinary** (Optional): Sign up at [Cloudinary](https://cloudinary.com/) for image hosting
-
-### 4. Database Setup
-
-Initialize and migrate the database:
+### 4. Database Initialization
 
 ```bash
-# Generate Prisma Client
-bun run db:generate
-
-# Run database migrations
+# Generate the Prisma client & run migrations
 bun run db:migrate
-
-# (Optional) Open Prisma Studio to view your database
-bun run db:studio
 ```
 
-### 5. Run the Inngest Dev Server
+### 5. Start the Services
 
-In a separate terminal, run the Inngest dev server to handle background jobs and AI generation:
-
-```bash
-npx --ignore-scripts=false inngest-cli@latest dev
-```
-
-This will start the Inngest dashboard at [http://localhost:8288](http://localhost:8288).
-
-### 6. Run the Development Server
-
-In another terminal, run the Next.js development server:
+You need both the Inngest dev server and the Next.js dev server running:
 
 ```bash
+# Terminal 1: Inngest Dev Server
+bun run inngest
+
+# Terminal 2: Next.js App
 bun dev
-# or
-npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+Open [http://localhost:3000](http://localhost:3000) to start designing.
 
 ## 📁 Project Structure
 
-```
-sketch-design-with-ai/
-├── app/                      # Next.js App Router
-│   ├── (auth)/              # Authentication pages
-│   ├── api/                 # API routes
-│   │   ├── chat/           # AI chat endpoint
-│   │   └── projects/       # Project CRUD operations
-│   ├── project/            # Project workspace
-│   │   └── [projectId]/    # Dynamic project page
-│   ├── account/            # User account settings
-│   ├── layout.tsx          # Root layout
-│   └── page.tsx            # Main landing page & Project Selector
-├── components/              # React components
-│   ├── ui/                 # Reusable UI components
-│   ├── logo.tsx            # App logo
-│   ├── user-menu.tsx       # User menu
-│   └── ...                 # Other components
-├── context/                 # React Context providers
-├── hooks/                   # Custom React hooks
-├── lib/                     # Utility functions
-│   ├── artifact-renderer.ts # Design rendering logic
-│   ├── auth.ts             # Authentication utilities
-│   └── utils.ts            # General utilities
-├── llm/                     # AI/LLM configuration
-│   ├── model.ts            # AI model configuration
-│   └── prompts.ts          # AI prompt templates
-├── prisma/                  # Database schema & migrations
-│   └── schema.prisma       # Prisma schema
-├── public/                  # Static assets
-├── .env                     # Environment variables (gitignored)
-├── package.json            # Dependencies
-└── tsconfig.json           # TypeScript configuration
-```
+- `app/`: Next.js App Router (Pages & API Routes)
+- `components/`: UI components (Radix/Shadcn)
+- `inngest/`: Background job definitions & workflow logic
+- `llm/`: AI integration, prompts, and tool configurations
+- `lib/`: Shared utilities, auth logic, and credit management
+- `prisma/`: Database schema and migrations
+- `hooks/`: Custom React hooks for global state and UI logic
+- `public/`: Static assets and icons
 
 ## 🎯 Usage Guide
 
-### Creating Your First Design
-
-1. **Sign Up/Login**: Create an account or sign in
-2. **Create Project**: Click "New Project" on the dashboard
-3. **Sketch Your Idea**: Use the canvas to sketch your UI concept
-4. **AI Generation**:
-   - Type a prompt describing your design (e.g., "Create a modern landing page with hero section")
-   - Or upload a sketch image
-   - Click "Generate Design"
-5. **Review & Iterate**: The AI will generate a design. Chat with it to refine
-6. **Export**: Download as HTML, view code, or export as image
-
-### Working with Themes
-
-1. Select a design frame
-2. Click the theme icon in the toolbar
-3. Choose from preset themes or let AI generate a custom theme
-4. Apply theme to see instant updates
-
-### Exporting Designs
-
-- **View Code**: Click the code icon to see HTML/CSS
-- **Export HTML**: Download as a complete HTML file
-- **Export Image**: Save as PNG using html2canvas
-- **Export ZIP**: Get all project files in a ZIP archive
-
-## 🗄️ Database Schema
-
-The application uses PostgreSQL with Prisma ORM. Key models:
-
-- **User**: User accounts with authentication
-- **Session**: User sessions for Better Auth
-- **Account**: OAuth and credential accounts
-- **Project**: Design projects with canvas data
-- **Message**: AI chat messages with design artifacts
-
-See `prisma/schema.prisma` for the complete schema.
+1. **Dashboard**: Manage your projects or start a new one.
+2. **Infinite Canvas**: Drag, zoom, and organize your design frames.
+3. **AI Chat**: Interact with the AI to generate new screens or modify existing ones.
+4. **Toolbox**: Use traditional drawing tools to guide the AI with sketches.
+5. **Credits**: Monitor your daily usage (10 credits/day) in the user menu.
+6. **Export**: Get your code as HTML/CSS/React or as a PNG image.
 
 ## 🚀 Deployment
 
-### Deploy to Vercel (Recommended)
+### Vercel Deployment
 
-1. Push your code to GitHub
-2. Import project to [Vercel](https://vercel.com)
-3. Add environment variables in Vercel dashboard
-4. Deploy!
+1. Set up a PostgreSQL database (e.g., Neon or Supabase).
+2. Configure environment variables in Vercel.
+3. Ensure the `postinstall` script runs `bun run db:generate`.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/lwshakib/sketch-design-with-ai)
 
-### Database Hosting
-
-For production, use a managed PostgreSQL service:
-
-- [Vercel Postgres](https://vercel.com/storage/postgres)
-- [Supabase](https://supabase.com/)
-- [Neon](https://neon.tech/)
-- [Railway](https://railway.app/)
-
-## 📜 Available Scripts
-
-```bash
-# Development
-bun run inngest      # Start Inngest dev server
-bun dev              # Start dev server
-bun build            # Build for production
-bun start            # Start production server
-bun lint             # Run ESLint
-
-# Database
-bun run db:generate  # Generate Prisma Client
-bun run db:migrate   # Run migrations
-bun run db:studio    # Open Prisma Studio
-bun run db:reset     # Reset database (⚠️ destructive)
-```
-
 ## 🤝 Contributing
 
-We love contributions! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
-### Quick Contribution Guide
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+### Quick Start
+1. Fork the repo
+2. Create your branch: `git checkout -b feat/my-new-feature`
+3. Commit your changes: `git commit -m 'feat: add some cool feature'`
+4. Push to the branch: `git push origin feat/my-new-feature`
 5. Open a Pull Request
 
-## 📝 Code of Conduct
+## 📜 Code of Conduct
 
-Please read our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) to understand the standards we expect from our community.
+Everyone participating in this project is expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Google Gemini](https://ai.google.dev/) for powerful AI capabilities
-- [Vercel](https://vercel.com/) for Next.js and hosting
-- [Radix UI](https://www.radix-ui.com/) for accessible components
-- [shadcn/ui](https://ui.shadcn.com/) for beautiful UI components
-- All our amazing [contributors](https://github.com/lwshakib/sketch-design-with-ai/graphs/contributors)
-
-## 📧 Contact & Support
-
-- **Author**: Shakib Khan ([@lwshakib](https://github.com/lwshakib))
-- **Email**: lwshakib@gmail.com
-- **Issues**: [GitHub Issues](https://github.com/lwshakib/sketch-design-with-ai/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/lwshakib/sketch-design-with-ai/discussions)
-
-## 🗺️ Roadmap
-
-- [ ] Real-time collaboration
-- [ ] More AI model options (Claude, GPT-4)
-- [ ] Component library export
-- [ ] Figma plugin integration
-- [ ] Version control for designs
-- [ ] Team workspaces
-- [ ] Advanced theme editor
-- [ ] Mobile app
 
 ---
 
@@ -406,6 +266,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ⭐ Star this repo if you find it helpful!
 
-[Report Bug](https://github.com/lwshakib/sketch-design-with-ai/issues) · [Request Feature](https://github.com/lwshakib/sketch-design-with-ai/issues) · [Documentation](https://github.com/lwshakib/sketch-design-with-ai/wiki)
+[Report Bug](https://github.com/lwshakib/sketch-design-with-ai/issues) · [Request Feature](https://github.com/lwshakib/sketch-design-with-ai/issues)
 
 </div>
