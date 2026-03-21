@@ -81,6 +81,21 @@ export const ScreenFrame = React.memo(
         }
       }
     }, [artifact.html, artifact.isComplete]);
+    
+    const effectivelyInEditMode = isEditMode || activeTool === "edit";
+
+    // Synchronize edit mode with the iframe internal state
+    useEffect(() => {
+        if (iframeRef.current?.contentWindow) {
+            iframeRef.current.contentWindow.postMessage(
+              {
+                type: "SET_EDIT_MODE",
+                enabled: effectivelyInEditMode,
+              },
+              "*",
+            );
+        }
+    }, [effectivelyInEditMode]);
 
     return (
       <iframe
@@ -93,12 +108,11 @@ export const ScreenFrame = React.memo(
         scrolling="no"
         className={cn(
           "h-full w-full overflow-hidden border-none",
-          (activeTool === "select" ||
-            activeTool === "hand" ||
-            isDraggingFrame) &&
-            !isEditMode
-            ? "pointer-events-none"
-            : "pointer-events-auto",
+          (activeTool === "edit" || effectivelyInEditMode) 
+            ? "pointer-events-auto"
+            : (activeTool === "select" || activeTool === "hand" || isDraggingFrame)
+              ? "pointer-events-none"
+              : "pointer-events-auto",
         )}
         title={artifact.title}
       />
