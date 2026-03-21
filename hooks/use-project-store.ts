@@ -49,7 +49,7 @@ interface ProjectState {
   selectionBox: { x1: number; y1: number; x2: number; y2: number } | null;
 
   // Interaction State
-  activeTool: "select" | "hand" | "interact";
+  activeTool: "select" | "hand" | "interact" | "edit";
   isPanning: boolean;
   isDraggingFrame: boolean;
   isResizing: boolean;
@@ -161,7 +161,7 @@ interface ProjectState {
     box: { x1: number; y1: number; x2: number; y2: number } | null,
   ) => void;
 
-  setActiveTool: (tool: "select" | "hand" | "interact") => void;
+  setActiveTool: (tool: "select" | "hand" | "interact" | "edit") => void;
   setIsPanning: (isPanning: boolean) => void;
   setIsDraggingFrame: (isDraggingFrame: boolean) => void;
   setIsResizing: (isResizing: boolean) => void;

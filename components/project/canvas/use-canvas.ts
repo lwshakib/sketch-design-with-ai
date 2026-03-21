@@ -532,6 +532,10 @@ export function useCanvas({
         setActiveTool("hand");
         previousToolRef.current = null;
       }
+      if (e.key.toLowerCase() === "e") {
+        setActiveTool("edit");
+        previousToolRef.current = null;
+      }
       if (e.key.toLowerCase() === "i") {
         setActiveTool("interact");
         previousToolRef.current = null;

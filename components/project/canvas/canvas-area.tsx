@@ -253,7 +253,12 @@ export function CanvasArea({
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onClick={(e) => {
-        if (e.target === e.currentTarget) setSelectedArtifactIds(new Set());
+        if (e.target === e.currentTarget) {
+           setSelectedArtifactIds(new Set());
+           if (activeTool === "edit") {
+              setSecondarySidebarMode("none");
+           }
+        }
       }}
       className={cn(
         "bg-background relative flex flex-1 flex-col overflow-hidden",
@@ -363,22 +368,6 @@ export function CanvasArea({
                 <LayoutGrid className="mr-2.5 h-4 w-4 opacity-70" />
                 <span>Go to projects</span>
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="opacity-50" />
-              <DropdownMenuItem
-                onClick={_handleDownloadFullProject}
-                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
-              >
-                <Download className="mr-2.5 h-4 w-4 opacity-70" />
-                <span>Download project</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={_handleDuplicateProject}
-                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
-              >
-                <Copy className="mr-2.5 h-4 w-4 opacity-70" />
-                <span>Duplicate project</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="opacity-50" />
               <DropdownMenuItem
                 onClick={_handleDeleteProject}
                 className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
@@ -400,26 +389,6 @@ export function CanvasArea({
           {selectedArtifact && selectedArtifactIds.size === 1 && (
             <div className="bg-card/95 border-border/50 pointer-events-auto flex items-center gap-1.5 rounded-full border px-2 py-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-300 ring-1 ring-white/5">
 
-
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                   if (secondarySidebarMode === "properties") {
-                      setSecondarySidebarMode("none");
-                   } else {
-                      setSecondarySidebarMode("properties");
-                      setActiveTool("select");
-                   }
-                }}
-                className={cn(
-                  "h-9 w-9 rounded-full transition-all hover:bg-secondary/40",
-                  secondarySidebarMode === "properties" && "bg-primary/10 text-primary"
-                )}
-                title="Edit Mode"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
 
               <Button
                 variant="ghost"
@@ -519,72 +488,38 @@ export function CanvasArea({
 
               <div className="bg-border/50 mx-1 h-4 w-[1px]" />
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-foreground/80 hover:text-foreground h-9 w-9 rounded-full transition-all hover:bg-secondary/40"
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="bg-card border-border text-foreground z-[100] w-52 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
-                >
-                  <DropdownMenuItem
-                    onClick={() => {
-                      if (selectedIndex !== -1) {
-                         setTimeout(() => openCodeViewer(selectedIndex), 10);
-                      }
-                    }}
-                    className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px]"
-                  >
-                    <Code className="text-muted-foreground h-4 w-4" />
-                    View Code
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setExportArtifactIndex(selectedIndex);
-                      setIsExportSheetOpen(true);
-                    }}
-                    className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px]"
-                  >
-                    <Share2 className="text-muted-foreground h-4 w-4" />
-                    Export
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                     onClick={() => {
-                        if (project?.shareToken && selectedArtifact.id) {
-                           setQrCodeUrl(`${window.location.origin}/preview/screen/${selectedArtifact.id}/${project.shareToken}`);
-                           setIsQrDialogOpen(true);
-                        } else {
-                           toast.error("Project must be shared first");
-                        }
-                     }}
-                     className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px]"
-                  >
-                    <QrCode className="text-muted-foreground h-4 w-4" />
-                    Show QR Code
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleExportZip(selectedIndex)}
-                    className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px]"
-                  >
-                    <Download className="text-muted-foreground h-4 w-4" />
-                    Download
-                  </DropdownMenuItem>
-                  <div className="bg-border my-1 h-px opacity-50" />
-                  <DropdownMenuItem
-                    onClick={() => deleteArtifact(selectedIndex)}
-                    className="hover:bg-destructive/10 text-destructive flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setExportArtifactIndex(selectedIndex);
+                  setIsExportSheetOpen(true);
+                }}
+                className="h-9 w-9 rounded-full transition-all hover:bg-secondary/40"
+                title="Export"
+              >
+                <Share2 className="h-4 w-4" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleExportZip(selectedIndex)}
+                className="h-9 w-9 rounded-full transition-all hover:bg-secondary/40"
+                title="Download"
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => deleteArtifact(selectedIndex)}
+                className="hover:bg-destructive/10 text-destructive h-9 w-9 rounded-full transition-all"
+                title="Delete"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           )}
         </div>
@@ -643,6 +578,12 @@ export function CanvasArea({
                   onMouseDown={(e) => {
                     if (activeTool === "select") {
                       startDraggingFrame(e, index);
+                    } else if (activeTool === "edit") {
+                      e.stopPropagation();
+                      if (artifact.id) {
+                        setSelectedArtifactIds(new Set([artifact.id]));
+                        setSecondarySidebarMode("properties");
+                      }
                     }
                   }}
                   onDoubleClick={() => {

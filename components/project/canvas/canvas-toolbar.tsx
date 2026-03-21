@@ -1,10 +1,4 @@
-/**
- * @file canvas-toolbar.tsx
- * @description The main floating toolbar for the workspace canvas.
- * Allows users to toggle between the 'Select' tool (for interacting/moving frames)
- * and the 'Hand' tool (for panning across the infinite canvas).
- */
-import { Hand, MousePointer2 } from "lucide-react";
+import { Hand, MousePointer2, Pencil } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/hooks/use-project-store";
@@ -22,7 +16,7 @@ export function CanvasToolbar() {
 
   return (
     <div className="pointer-events-auto absolute right-6 top-1/2 z-50 -translate-y-1/2">
-      <div className="bg-card/80 border-border/50 flex flex-col items-center gap-1 rounded-2xl border p-1 shadow-2xl backdrop-blur-xl">
+      <div className="bg-card/80 border-border/50 flex flex-col items-center gap-1 rounded-2xl border p-1 shadow-2xl backdrop-blur-xl transition-all hover:shadow-primary/5">
         <button
           onClick={() => setActiveTool("select")}
           className={toolbarButtonClass(activeTool === "select")}
@@ -38,6 +32,14 @@ export function CanvasToolbar() {
           aria-label="Hand Tool"
         >
           <Hand className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => setActiveTool("edit")}
+          className={toolbarButtonClass(activeTool === "edit")}
+          title="Edit Mode (E)"
+          aria-label="Edit Tool"
+        >
+          <Pencil className="h-4 w-4" />
         </button>
       </div>
     </div>
