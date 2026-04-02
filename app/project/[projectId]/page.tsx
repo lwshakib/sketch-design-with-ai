@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { uploadFileToS3 } from "@/lib/s3-client";
 import { useInngestSubscription } from "@inngest/realtime/hooks";
 import { fetchInngestToken } from "@/app/actions/inngest";
 import { type Artifact } from "@/lib/types";
@@ -585,9 +585,9 @@ export default function ProjectPage() {
           setIsGenerating(true);
           sendMessage({
             text: content,
-            files: initialAttachments.map((url: string) => ({
+            files: initialAttachments.map((path: string) => ({
               type: "file" as const,
-              url,
+              path,
               mediaType: "image/*",
             })),
           });
@@ -923,23 +923,11 @@ export default function ProjectPage() {
       const file = fileList[i];
       const placeholderUrl = newPlaceholders[i].url;
       try {
-        const sigRes = await fetch("/api/cloudinary-signature");
-        const sigData = await sigRes.json();
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("api_key", sigData.apiKey);
-        formData.append("timestamp", sigData.timestamp.toString());
-        formData.append("signature", sigData.signature);
-        formData.append("folder", sigData.folder || "sketch-design-with-ai");
-        const uploadRes = await fetch(
-          `https://api.cloudinary.com/v1_1/${sigData.cloudName}/upload`,
-          { method: "POST", body: formData },
-        );
-        const uploadData = await uploadRes.json();
+        const { path } = await uploadFileToS3(file);
         setAttachments((prev) =>
           prev.map((attr) =>
             attr.url === placeholderUrl
-              ? { url: uploadData.secure_url, isUploading: false }
+              ? { ...attr, path, isUploading: false }
               : attr,
           ),
         );
@@ -966,7 +954,8 @@ export default function ProjectPage() {
       text,
       files: attachments?.map((a) => ({
         type: "file" as const,
-        url: a.url,
+        path: a.path,
+        url: a.url, // Keep preview URL
         mediaType: "image/*",
       })),
     });

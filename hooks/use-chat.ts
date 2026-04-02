@@ -44,8 +44,8 @@ export const useChat = (projectId: string) => {
         contextualText = `[Context: User has selected the following screens: ${screenTitles}. Please refer to or modify these if applicable.]\n\n${params.text}`;
       }
 
-      const imageUrls =
-        params.files?.map((f: any) => f.url).filter(Boolean) || [];
+      const imagePaths =
+        params.files?.map((f: any) => f.path || f.url).filter(Boolean) || [];
       
       const newUserMessage = {
         id: `u-${Date.now()}`,
@@ -103,7 +103,7 @@ export const useChat = (projectId: string) => {
                 ? m.content
                 : m.parts?.find((p: any) => p.type === "text")?.text || "",
           })),
-          imageUrls,
+          imagePaths,
           is3xMode: currentIs3xMode,
           ...options?.body,
         };

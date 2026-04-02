@@ -2,11 +2,9 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { inngest } from "@/inngest/client";
-import { streamText as streamGLMText } from "@/llm/stream-text";
-import { UX_AGENT_SYSTEM_PROMPT } from "@/llm/prompts";
-import { generateScreen, getUserCredits } from "@/llm/tools";
-import { consumeCredit, getAndResetCredits } from "@/lib/credits";
+import { UX_AGENT_SYSTEM_PROMPT } from "@/lib/prompts";
+import { aiService } from "@/services/ai.services";
+import { getAndResetCredits } from "@/lib/credits";
 
 export async function POST(req: Request) {
   try {
@@ -18,7 +16,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { messages, projectId, is3xMode, imageUrls } = await req.json();
+    const { messages, projectId, imagePaths = [] } = await req.json();
 
     if (!projectId) {
       return NextResponse.json(
@@ -44,31 +42,25 @@ export async function POST(req: Request) {
           projectId,
           role: "user",
           parts: lastUserMessage.parts || [
-            { 
-               type: "text", 
-               text: typeof lastUserMessage.content === "string" 
-                 ? lastUserMessage.content 
-                 : lastUserMessage.content?.[0]?.text || "" 
-            }
+            {
+              type: "text",
+              text:
+                typeof lastUserMessage.content === "string"
+                  ? lastUserMessage.content
+                  : lastUserMessage.content?.[0]?.text || "",
+            },
+            ...(imagePaths?.map((path: string) => ({
+              type: "image",
+              url: path,
+              mediaType: "image/png",
+            })) || []),
           ],
           status: "completed",
         },
       });
     }
 
-    // 2. Fetch Full History for Context
-    const dbMessages = await prisma.message.findMany({
-       where: { projectId },
-       orderBy: { createdAt: "asc" },
-       take: 50
-    });
-
-    const normalizedHistory = dbMessages.map((msg) => ({
-      role: msg.role,
-      content: (msg.parts as any)?.find((p: any) => p.type === "text")?.text || ""
-    }));
-
-    // 3. Construct Project Context (Visible Screens) & Credits
+    // 2. Construct Project Context
     const currentCredits = await getAndResetCredits(session.user.id);
     const existingScreensSummary = project.screens.length > 0 
       ? `\n\nExisting Screens in Project: ${project.screens.map(s => `"${s.title}"`).join(", ")}.`
@@ -78,157 +70,97 @@ export async function POST(req: Request) {
 
     const projectContextPrompt = `${UX_AGENT_SYSTEM_PROMPT}${existingScreensSummary}${creditContext}\n\nStrictly follow the role of Sketch. Your userId is ${session.user.id}.`;
 
-    // 2. Normalize messages for GLM
     const normalizedMessages = (messages || []).map((msg: any) => ({
-      role: msg.role,
+      role: msg.role === "data" ? "tool" : msg.role,
       content:
         typeof msg.content === "string"
           ? msg.content
           : msg.parts?.find((p: any) => p.type === "text")?.text || msg.content?.[0]?.text || "",
+      ...(msg.role === "assistant" && msg.tool_calls ? { tool_calls: msg.tool_calls } : {}),
+      ...(msg.role === "tool" ? { tool_call_id: msg.tool_call_id, name: msg.name } : {}),
     }));
 
-    // 4. Start streaming from GLM
-    const workerStream = await streamGLMText({
-      messages: [
+    // 3. Start streaming from AIService
+    const serviceStream = await aiService.streamText(
+      [
         { role: "system", content: projectContextPrompt },
-        ...normalizedHistory,
+        ...normalizedMessages,
       ],
-      tools: { generateScreen, getUserCredits },
-      temperature: 0.7,
-    });
+      {
+        context: {
+          userId: session.user.id,
+          projectId: projectId,
+        },
+        onFinish: async ({ content }) => {
+          if (content.trim()) {
+            await prisma.message.create({
+              data: {
+                projectId,
+                role: "assistant",
+                parts: [{ type: "text", text: content }],
+                status: "completed",
+              },
+            });
+          }
+        },
+      }
+    );
 
-    if (!workerStream) throw new Error("Failed to initialize GLM stream");
+    if (!serviceStream) throw new Error("Failed to initialize AI stream");
 
     const encoder = new TextEncoder();
-    const reader = workerStream.getReader();
+    const reader = (serviceStream as ReadableStream).getReader();
 
     const stream = new ReadableStream({
       async start(controller) {
-        const decoder = new TextDecoder();
-        let buffer = "";
-        let fullContent = "";
-        let toolCallsBuffer: Record<string, any> = {};
+        const textDecoder = new TextDecoder();
+        let lineBuffer = "";
 
         try {
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-
-            const chunk = decoder.decode(value, { stream: true });
-            buffer += chunk;
-
-            const lines = buffer.split("\n");
-            buffer = lines.pop() || "";
+            
+            lineBuffer += textDecoder.decode(value, { stream: true });
+            const lines = lineBuffer.split("\n");
+            lineBuffer = lines.pop() || "";
 
             for (const line of lines) {
-              if (line.startsWith("data: ") && line !== "data: [DONE]") {
+              const trimmed = line.trim();
+              if (trimmed.startsWith("data: ")) {
                 try {
-                  const data = JSON.parse(line.slice(6));
-                  const delta = data.choices[0].delta;
-
-                  // Handle Text
-                  if (delta.content) {
-                    fullContent += delta.content;
-                    // Format for useChat (text part prefix is 0:)
-                    controller.enqueue(
-                      encoder.encode(`0:${JSON.stringify(delta.content)}\n`),
-                    );
-                  }
-
-                  // Handle Tool Calls (Accumulate for final execution)
-                  if (delta.tool_calls) {
-                    for (const tc of delta.tool_calls) {
-                      const index = tc.index;
-                      if (!toolCallsBuffer[index]) {
-                        toolCallsBuffer[index] = {
-                          id: tc.id,
-                          name: tc.function?.name || "",
-                          args: tc.function?.arguments || "",
-                        };
-                      } else {
-                        if (tc.function?.arguments) {
-                          toolCallsBuffer[index].args += tc.function.arguments;
-                        }
-                      }
+                  const event = JSON.parse(trimmed.slice(6));
+                  
+                  if (event.type === "text") {
+                    controller.enqueue(encoder.encode(`0:${JSON.stringify(event.content)}\n`));
+                  } else if (event.type === "reasoning") {
+                    // Send reasoning as a ghost text or ignore. Here we send it as a separate 0: part for visibility
+                    controller.enqueue(encoder.encode(`0:${JSON.stringify(event.content)}\n`));
+                  } else if (event.type === "tool_result") {
+                    // Map tool results back to useChat data part (2:)
+                    const toolResult = event.result;
+                    controller.enqueue(encoder.encode(`2:[${JSON.stringify({ 
+                        type: "tool-result", 
+                        tool: event.name, 
+                        ...toolResult 
+                    })}]\n`));
+                    
+                    // Specific toast message for generateScreen successfully called
+                    if (event.name === "generateScreen" && toolResult.status === "success") {
+                         controller.enqueue(encoder.encode(`0:${JSON.stringify("\n\n✨ Design protocol initiated. I'm building " + (event.args?.title || "your screen") + " now.")}\n`));
                     }
+                  } else if (event.type === "error") {
+                    controller.enqueue(encoder.encode(`3:${JSON.stringify(event.message)}\n`));
                   }
                 } catch (e) {
-                  // Skip invalid JSON lines
+                  // Skip invalid JSON
                 }
               }
             }
-          }
-
-          // 3. Process Accumulated Tool Calls
-          const toolCallArray = Object.values(toolCallsBuffer);
-          for (const tc of toolCallArray) {
-            if (tc.name === "generateScreen") {
-              try {
-                const args = JSON.parse(tc.args);
-                console.log(
-                  "[ChatAPI] Triggering background generation for:",
-                  args.title,
-                );
-
-                // Start Design via Tool Execution
-                await generateScreen.execute({
-                  ...args,
-                  projectId,
-                  userId: session.user.id,
-                });
-
-                // Send data part to notify the UI
-                controller.enqueue(
-                  encoder.encode(
-                    `2:[${JSON.stringify({
-                      type: "tool-result",
-                      tool: "generateScreen",
-                      title: args.title,
-                    })}]\n`,
-                  ),
-                );
-              } catch (err: any) {
-                console.error(
-                  "[ChatAPI] Failed to trigger generateScreen tool:",
-                  err,
-                );
-                
-                if (err.message === "CREDITS_EXHAUSTED") {
-                    controller.enqueue(
-                      encoder.encode(
-                        `0:${JSON.stringify("\n\n⚠️ Credits Exhausted. Your daily limit of 10 screens has been reached. Please come back in 24 hours for a refresh.")}\n`,
-                      ),
-                    );
-                    break; // Stop further tool executions
-                }
-              }
-            } else if (tc.name === "getUserCredits") {
-                 // The AI can call this to verify balance or confirm constraints
-                 const result = await getUserCredits.execute({ userId: session.user.id });
-                 controller.enqueue(
-                    encoder.encode(`2:[${JSON.stringify({ type: 'tool-result', tool: 'getUserCredits', ...result })}]\n`)
-                 );
-            }
-          }
-
-          // 4. Persistence (Save the final assistant message if not just tool calls)
-          if (fullContent.trim()) {
-            await prisma.message.create({
-              data: {
-                projectId,
-                role: "assistant",
-                parts: [{ type: "text", text: fullContent }],
-                status: "completed",
-              },
-            });
           }
         } catch (error) {
-          console.error("[ChatAPI] Read Loop Error:", error);
-          controller.enqueue(
-            encoder.encode(
-              `3:${JSON.stringify("Connection lost. Please try again.")}\n`,
-            ),
-          );
+          console.error("[ChatAPI] Bridge Loop Error:", error);
+          controller.enqueue(encoder.encode(`3:${JSON.stringify("Connection lost. Please try again.")}\n`));
         } finally {
           controller.close();
           reader.releaseLock();

@@ -32,7 +32,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Image from "next/image";
-import { uploadFileToCloudinary } from "@/lib/cloudinary-client";
+import { uploadFileToS3 } from "@/lib/s3-client";
 import { toast } from "sonner";
 import axios from "axios";
 
@@ -149,10 +149,11 @@ const ProjectSkeleton = () => (
 import { useRouter } from "next/navigation";
 
 interface Attachment {
-  url: string;
+  url: string; // The preview URL (blob or signed)
+  path?: string; // The S3 path
   isUploading: boolean;
-  file?: File; // Add file property for the actual File object
-  type?: string; // Add type property for file type
+  file?: File;
+  type?: string;
 }
 
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
@@ -274,7 +275,7 @@ export default function Home() {
           `pending_prompt_${project.id}`,
           JSON.stringify({
             content: inputValue,
-            attachments: attachments.map((a) => a.url),
+            attachments: attachments.map((a) => a.path).filter(Boolean),
           }),
         );
       }
@@ -310,11 +311,11 @@ export default function Home() {
     for (let i = 0; i < newAttachments.length; i++) {
       const attachment = newAttachments[i];
       try {
-        const result = await uploadFileToCloudinary(attachment.file);
+        const result = await uploadFileToS3(attachment.file);
         setAttachments((prev) =>
           prev.map((a) =>
             a.url === attachment.url
-              ? { ...a, url: result.secureUrl, isUploading: false }
+              ? { ...a, path: result.path, isUploading: false }
               : a,
           ),
         );

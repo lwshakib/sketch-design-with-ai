@@ -17,7 +17,7 @@ interface ProjectState {
   // Content State
   artifacts: Artifact[];
   throttledArtifacts: Artifact[];
-  attachments: { url: string; isUploading: boolean }[];
+  attachments: { url: string; path?: string; isUploading: boolean }[];
   input: string;
   designPlan: { screens: any[]; _markdown?: string };
   realtimeStatus: {
@@ -107,10 +107,10 @@ interface ProjectState {
   ) => void;
   setAttachments: (
     val:
-      | { url: string; isUploading: boolean }[]
+      | { url: string; path?: string; isUploading: boolean }[]
       | ((
-          prev: { url: string; isUploading: boolean }[],
-        ) => { url: string; isUploading: boolean }[]),
+          prev: { url: string; path?: string; isUploading: boolean }[],
+        ) => { url: string; path?: string; isUploading: boolean }[]),
   ) => void;
   setInput: (input: string) => void;
   setDesignPlan: (designPlan: { screens: any[]; _markdown?: string }) => void;

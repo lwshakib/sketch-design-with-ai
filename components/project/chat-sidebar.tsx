@@ -69,6 +69,7 @@ import {
 // stripArtifact removed as we no longer use artifact tags.
 import { useProjectStore } from "@/hooks/use-project-store";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
+import { useSignedUrls } from "@/hooks/use-signed-urls";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
@@ -131,6 +132,23 @@ export function ChatSidebar({
 
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  // Extract all S3 paths from message history for resolution
+  const s3Paths = React.useMemo(() => {
+    const paths: string[] = [];
+    messages.forEach((msg: any) => {
+      if (msg.parts) {
+        msg.parts.forEach((p: any) => {
+          if (p.type === "image" && p.url && !p.url.startsWith("http")) {
+            paths.push(p.url);
+          }
+        });
+      }
+    });
+    return Array.from(new Set(paths));
+  }, [messages]);
+
+  const { urlMap } = useSignedUrls(s3Paths);
 
   /**
    * Scrolls the message list to the bottom smoothly.
@@ -445,7 +463,7 @@ export function ChatSidebar({
                                                   <MessageAttachment
                                                     key={imgIdx}
                                                     data={{
-                                                      url: p.url,
+                                                      url: p.url?.startsWith("http") ? p.url : urlMap[p.url] || p.url,
                                                       mediaType:
                                                         p.mediaType ||
                                                         "image/png",
@@ -516,7 +534,7 @@ export function ChatSidebar({
                                                   <MessageAttachment
                                                     key={imgIdx}
                                                     data={{
-                                                      url: p.url,
+                                                      url: p.url?.startsWith("http") ? p.url : urlMap[p.url] || p.url,
                                                       mediaType:
                                                         p.mediaType ||
                                                         "image/png",

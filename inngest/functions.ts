@@ -1,11 +1,11 @@
 import { inngest } from "./client";
 import { NonRetriableError } from "inngest";
-import { generateText } from "../llm/generate-text";
+import { aiService } from "../services/ai.services";
 import { z } from "zod";
 import {
   ScreenGenerationPrompt,
-} from "../llm/prompts";
-import { getAllExamples } from "../llm/helpers";
+} from "../lib/prompts";
+import { getAllBlueprints } from "../lib/get-all-blueprints";
 import prisma from "../lib/prisma";
 import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
 import { extractHtml as _extractHtml } from "../llm/tools";
@@ -78,7 +78,7 @@ export const generateScreen = inngest.createFunction(
 
       // --- STEP 3: GENERATE SCREEN CODE ---
       const htmlCode = await step.run("generate-screen-code", async () => {
-        const inspiration = getAllExamples();
+        const inspiration = getAllBlueprints();
         const systemPrompt =
           ScreenGenerationPrompt +
           "\n\nCRITICAL: You are generating a single, high-fidelity screen. Do not use placeholders. Ensure all content is realistic.";
@@ -99,8 +99,8 @@ export const generateScreen = inngest.createFunction(
             ]
           : [];
 
-        const { text } = await generateText({
-          messages: [
+        const { text } = await aiService.generateText(
+          [
             { role: "system", content: systemPrompt },
             ...contextMessages,
             {
@@ -109,16 +109,18 @@ export const generateScreen = inngest.createFunction(
             },
             {
               role: "user",
-              content: `Here are several high-fidelity design examples available. Use them as references for component structure and quality:\n\n${inspiration}`,
+              content: `Here are several high-fidelity design blueprints available. Use them as references for component structure and quality:\n\n${inspiration}`,
             },
             {
               role: "user",
               content: `MANDATORY: Output ONLY the raw HTML and CSS. No markdown code blocks, no conversation, no artifacts.`,
             },
           ] as any,
-          maxOutputTokens: MAXIMUM_OUTPUT_TOKENS,
-          temperature: 0.5, // Lower temperature for more strict adherence to format
-        });
+          {
+            max_tokens: MAXIMUM_OUTPUT_TOKENS,
+            temperature: 0.5, // Lower temperature for more strict adherence to format
+          }
+        );
 
         // Simple cleaning to remove any accidental markdown wrapping
         const cleanText = text.replace(/^```html\s*/i, "").replace(/```$/i, "").trim();
