@@ -8,7 +8,6 @@ import {
 import { getAllBlueprints } from "../lib/get-all-blueprints";
 import prisma from "../lib/prisma";
 import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
-import { extractHtml as _extractHtml } from "../llm/tools";
 import {
   publishStatus,
 } from "./helpers";
@@ -119,6 +118,7 @@ export const generateScreen = inngest.createFunction(
           {
             max_tokens: MAXIMUM_OUTPUT_TOKENS,
             temperature: 0.5, // Lower temperature for more strict adherence to format
+            projectId: projectId, // Enable prompt caching / x-session-affinity
           }
         );
 

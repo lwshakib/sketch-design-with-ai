@@ -2,13 +2,13 @@ import * as env from "@/lib/env";
 import { 
   CHAT_MODEL_ID 
 } from "@/lib/constants";
-import { generateScreen as generateScreenTool, getUserCredits as getUserCreditsTool } from "@/llm/tools";
+import { inngest } from "@/inngest/client";
+import { getAndResetCredits } from "@/lib/credits";
 
 export interface StreamTextOptions {
   context?: {
     userId: string;
     projectId: string;
-    notebookId?: string;
   };
   onFinish?: (result: { content: string; reasoning?: string; toolInvocations: any[] }) => Promise<void>;
   abortSignal?: AbortSignal;
@@ -68,8 +68,8 @@ export class AIService {
       Authorization: `Bearer ${this.apiKey}`,
     };
 
-    if (context?.notebookId) {
-      headers["x-session-affinity"] = context.notebookId;
+    if (context?.projectId) {
+      headers["x-session-affinity"] = context.projectId;
     }
 
     const history = messages.map((m: any) => ({
@@ -213,7 +213,7 @@ export class AIService {
                     tool_call_id: tc.id, 
                     name: toolName,
                     content: "Error: Tool not found" 
-                  });
+                    });
                 }
               }
             } else {
@@ -241,17 +241,17 @@ export class AIService {
    */
   async generateText(
     messages: any[],
-    options?: { temperature?: number; max_tokens?: number; notebookId?: string }
+    options?: { temperature?: number; max_tokens?: number; projectId?: string }
   ): Promise<{ text: string }> {
-    const { temperature, max_tokens, notebookId } = options || {};
+    const { temperature, max_tokens, projectId } = options || {};
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.apiKey}`,
     };
 
-    if (notebookId) {
-      headers["x-session-affinity"] = notebookId;
+    if (projectId) {
+      headers["x-session-affinity"] = projectId;
     }
 
     const response = await fetch(this.gatewayUrl, {
@@ -279,15 +279,15 @@ export class AIService {
    */
   async generateObject<T>(
     messages: any[],
-    options?: { notebookId?: string }
+    options?: { projectId?: string }
   ): Promise<T> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.apiKey}`,
     };
 
-    if (options?.notebookId) {
-      headers["x-session-affinity"] = options.notebookId;
+    if (options?.projectId) {
+      headers["x-session-affinity"] = options.projectId;
     }
 
     const response = await fetch(this.gatewayUrl, {
@@ -326,24 +326,130 @@ export class AIService {
     return {
       generateScreen: {
         name: "generateScreen",
-        description: generateScreenTool.description,
-        parameters: generateScreenTool.parameters,
-        execute: async (args) => {
-          return await generateScreenTool.execute({
-            ...args,
-            userId: context.userId,
-            projectId: context.projectId,
-          });
+        description: "Generate a new design screen based on architectural and visual descriptions. Call this once for each new screen you want to create.",
+        parameters: {
+          type: "object",
+          properties: {
+            projectId: {
+              type: "string",
+              description: "The unique ID of the current project.",
+            },
+            title: {
+              type: "string",
+              description: "A concise title for the screen (e.g. 'Hero Section', 'Project Dashboard').",
+            },
+            prompt: {
+              type: "string",
+              description: "Comprehensive instructions for the screen layout (left/right/top/bottom), components, and style.",
+            },
+            type: {
+              type: "string",
+              enum: ["app", "web"],
+              description: "The platform type for this screen.",
+            },
+          },
+          required: ["projectId", "title", "prompt", "type"],
+        },
+        execute: async (args: any) => {
+          try {
+            console.log(`[Tool: generateScreen] Initiating for: ${args.title}`);
+            await inngest.send({
+              name: "app/screen.generate",
+              data: {
+                projectId: args.projectId || context.projectId,
+                title: args.title,
+                prompt: args.prompt,
+                type: args.type,
+                userId: context.userId,
+              },
+            });
+
+            return {
+              status: "success",
+              message: `Design protocol initiated for "${args.title}" (${args.type}). Generation is now running in the background.`,
+            };
+          } catch (error: any) {
+            console.error("[Tool: generateScreen] Error:", error);
+            return {
+              status: "error",
+              message: `Failed to initiate design: ${error.message}`,
+            };
+          }
         },
       },
       getUserCredits: {
         name: "getUserCredits",
-        description: getUserCreditsTool.description,
-        parameters: getUserCreditsTool.parameters,
-        execute: async (args) => {
-          return await getUserCreditsTool.execute({
-            userId: context.userId,
-          });
+        description: "Retrieve the user's remaining design credits. Use this to plan how many screens you can realistically suggest or generate.",
+        parameters: {
+          type: "object",
+          properties: {
+            userId: {
+              type: "string",
+              description: "The unique ID of the user.",
+            },
+          },
+          required: ["userId"],
+        },
+        execute: async (args: any) => {
+          try {
+            const credits = await getAndResetCredits(args.userId || context.userId);
+            return {
+              credits,
+              message: `You currently have ${credits} credits left. Generating each screen consumes exactly 1 credit.`,
+            };
+          } catch (error: any) {
+            return { error: `Failed to fetch credits: ${error.message}` };
+          }
+        },
+      },
+      extractHtml: {
+        name: "extractHtml",
+        description: "Extract HTML content and text from a URL to understand its structure and design.",
+        parameters: {
+          type: "object",
+          properties: {
+            url: {
+              type: "string",
+              description: "The URL of the website to extract content from.",
+            },
+          },
+          required: ["url"],
+        },
+        execute: async ({ url }: { url: string }) => {
+          try {
+            console.log(`[Tool] Extracting HTML from: ${url}`);
+            const response = await fetch(url);
+            if (!response.ok) {
+              return { error: `Failed to fetch: ${response.statusText}` };
+            }
+
+            const html = await response.text();
+
+            // Basic cleaning to avoid token bloat
+            const titleMatch = html.match(/<title>(.*?)<\/title>/i);
+            const title = titleMatch ? titleMatch[1] : "No Title";
+
+            const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+            let body = bodyMatch ? bodyMatch[1] : html;
+
+            // Remove scripts and styles
+            body = body
+              .replace(/<script[\s\S]*?<\/script>/gi, "")
+              .replace(/<style[\s\S]*?<\/style>/gi, "")
+              .replace(/<[^>]+>/g, " ")
+              .replace(/\s+/g, " ")
+              .trim()
+              .substring(0, 5000); // 5000 characters for better context
+
+            return {
+              url,
+              title,
+              content: body,
+            };
+          } catch (error: any) {
+            console.error(`[Tool] Error extracting HTML:`, error);
+            return { error: error.message };
+          }
         },
       },
     };
