@@ -35,6 +35,24 @@ import Image from "next/image";
 import { uploadFileToS3 } from "@/lib/s3-client";
 import { toast } from "sonner";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+
+import {
+  PromptInput,
+  PromptInputAttachments,
+  PromptInputAttachment,
+  PromptInputBody,
+  PromptInputFooter,
+  PromptInputTextarea,
+  PromptInputSubmit,
+  PromptInputAddAttachments,
+  PromptInputProvider,
+  usePromptInputController,
+  PromptInputSpeechButton,
+} from "@/components/ai-elements/prompt-input";
+
+
+// Constants and Helpers stay outside
 
 const PROMPTS = {
   app: [
@@ -146,8 +164,17 @@ const ProjectSkeleton = () => (
   </div>
 );
 
-import { useRouter } from "next/navigation";
 
+// Home component serves as the entry point with the provider
+export default function Home() {
+  return (
+    <PromptInputProvider>
+      <HomeContent />
+    </PromptInputProvider>
+  );
+}
+
+// Attachment interface for legacy reference if needed, though PromptInput handles its own
 interface Attachment {
   url: string; // The preview URL (blob or signed)
   path?: string; // The S3 path
@@ -156,15 +183,10 @@ interface Attachment {
   type?: string;
 }
 
-import { useWorkspaceStore } from "@/hooks/use-workspace-store";
-
-export default function Home() {
-  const {} = useWorkspaceStore();
-  const [inputValue, setInputValue] = useState("");
+function HomeContent() {
+  const { textInput } = usePromptInputController();
   const [isMounted, setIsMounted] = useState(false);
-  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [projects, setProjects] = useState<any[]>([]);
   const [credits, setCredits] = useState<number | null>(null);
@@ -245,21 +267,29 @@ export default function Home() {
     }
   }, [debouncedSearchQuery, isMounted]);
 
-  const onSubmit = async () => {
-    if (!inputValue.trim() && attachments.length === 0) return;
-
-
-    if (attachments.some((a) => a.isUploading)) {
-      toast.error("Please wait for images to finish uploading");
-      return;
-    }
+  const onSubmit = async ({ text, files }: { text: string, files: any[] }) => {
+    if (!text.trim() && files.length === 0) return;
 
     setIsSubmitting(true);
     try {
+      // 1. Upload files to S3
+      const uploadedAttachments = await Promise.all(
+        files.map(async (filePart) => {
+          // Convert data URL to File
+          const res = await fetch(filePart.url);
+          const blob = await res.blob();
+          const file = new File([blob], filePart.filename || "attachment", { type: filePart.mediaType });
+          
+          const result = await uploadFileToS3(file);
+          return result.path;
+        })
+      );
+
+      // 2. Create project
       const response = await fetch("/api/projects", {
         method: "POST",
         body: JSON.stringify({
-          title: inputValue.slice(0, 30) || "Untitled Design",
+          title: text.slice(0, 30) || "Untitled Design",
         }),
       });
 
@@ -269,16 +299,14 @@ export default function Home() {
 
       const project = await response.json();
 
-      // Store initial prompt for the project page to pick up
-      if (inputValue.trim() || attachments.length > 0) {
-        sessionStorage.setItem(
-          `pending_prompt_${project.id}`,
-          JSON.stringify({
-            content: inputValue,
-            attachments: attachments.map((a) => a.path).filter(Boolean),
-          }),
-        );
-      }
+      // 3. Store initial prompt for the project page
+      sessionStorage.setItem(
+        `pending_prompt_${project.id}`,
+        JSON.stringify({
+          content: text,
+          attachments: uploadedAttachments,
+        }),
+      );
 
       router.push(`/project/${project.id}`);
     } catch (error) {
@@ -287,50 +315,6 @@ export default function Home() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    if (attachments.length + files.length > 3) {
-      toast.error("Maximum 3 images allowed");
-      return;
-    }
-
-    const newAttachments = Array.from(files).map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-      type: file.type,
-      isUploading: true,
-    }));
-
-    setAttachments((prev) => [...prev, ...newAttachments]);
-
-    // Process uploads
-    for (let i = 0; i < newAttachments.length; i++) {
-      const attachment = newAttachments[i];
-      try {
-        const result = await uploadFileToS3(attachment.file);
-        setAttachments((prev) =>
-          prev.map((a) =>
-            a.url === attachment.url
-              ? { ...a, path: result.path, isUploading: false }
-              : a,
-          ),
-        );
-      } catch (error) {
-        console.error("Upload failed", error);
-        toast.error(`Failed to upload ${attachment.file.name}`);
-        setAttachments((prev) => prev.filter((a) => a.url !== attachment.url));
-      }
-    }
-
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const removeAttachment = (index: number) => {
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   const sections = groupProjectsByDate(projects);
@@ -398,108 +382,35 @@ export default function Home() {
 
               {/* Premium Chat Input */}
               <div className="group relative w-full">
-                {/* Outer Glow Overlay */}
-                <div className="from-primary/10 via-accent/10 to-primary/10 pointer-events-none absolute -inset-[1px] rounded-[24px] bg-gradient-to-r opacity-0 blur-2xl transition-all duration-700 group-focus-within:opacity-100" />
-
-                <div className="group-focus-within:border-primary/20 relative space-y-4 rounded-[24px] border border-zinc-200 bg-white p-6 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] transition-all duration-500 group-focus-within:shadow-[0_0_60px_-10px_rgba(var(--primary-rgb),0.2)] dark:border-white/5 dark:bg-zinc-950 dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]">
-                  {/* Image Previews & Website URL */}
-                  <AnimatePresence>
-                    {attachments.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="flex flex-wrap gap-3 pb-2"
-                      >
-                        {attachments.map((attr, i) => (
-                          <div
-                            key={i}
-                            className="group/img relative h-20 w-20 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 shadow-sm dark:border-white/10 dark:bg-zinc-900"
-                          >
-                            <Image
-                              src={attr.url}
-                              alt="Attachment"
-                              fill
-                              className={cn(
-                                "h-full w-full object-cover",
-                                attr.isUploading && "opacity-40 blur-[2px]",
-                              )}
-                            />
-                            {attr.isUploading && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
-                              </div>
-                            )}
-                            <button
-                              onClick={() => removeAttachment(i)}
-                              className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover/img:opacity-100"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </div>
-                        ))}
-                      </motion.div>
+                <PromptInput
+                  onSubmit={onSubmit}
+                  className="group-focus-within:border-primary/20 relative flex flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] transition-all duration-500 group-focus-within:shadow-[0_0_60px_-10px_rgba(var(--primary-rgb),0.2)] dark:border-white/5 dark:bg-zinc-950 dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
+                >
+                  <PromptInputAttachments>
+                    {(file) => (
+                      <PromptInputAttachment key={file.id} data={file} />
                     )}
-                  </AnimatePresence>
-
-                  <textarea
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        onSubmit();
-                      }
-                    }}
-                    placeholder="Describe your design vision..."
-                    className="text-foreground hide-scrollbar h-24 w-full resize-none bg-transparent text-lg leading-relaxed font-medium outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
-                  />
-
-                  <div className="flex flex-col items-end gap-3 pt-2">
-                    <div className="flex w-full items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          className="hidden"
-                          ref={fileInputRef}
-                          onChange={handleFileUpload}
-                        />
-
-                        <button
-                          type="button"
-                          disabled
-                          className="flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 text-zinc-300 opacity-50 outline-none dark:border-white/5 dark:bg-zinc-900/50 dark:text-zinc-700"
-                        >
-                          <Plus className="h-5 w-5" />
-                        </button>
-
-                        <div className="mx-1 h-4 w-[1px] bg-zinc-200 dark:bg-white/10" />
-
-                        <p className="hidden text-[10px] font-bold text-zinc-400 sm:block dark:text-zinc-600">
+                  </PromptInputAttachments>
+                  <PromptInputBody>
+                    <PromptInputTextarea
+                      className="hide-scrollbar min-h-24 px-6 text-lg font-medium outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
+                      placeholder="Describe your design vision..."
+                    />
+                  </PromptInputBody>
+                  <PromptInputFooter className="px-4 pb-4">
+                    <div className="flex items-center gap-2">
+                       <PromptInputAddAttachments />
+                       <PromptInputSpeechButton />
+                       <p className="hidden text-[10px] font-bold text-zinc-400 sm:block dark:text-zinc-600">
                           Press Enter to Generate
                         </p>
-                      </div>
-
-                      <Button
-                        onClick={onSubmit}
-                        disabled={
-                          (!inputValue.trim() && attachments.length === 0) ||
-                          attachments.some((a) => a.isUploading) ||
-                          isSubmitting
-                        }
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground flex h-10 w-10 items-center justify-center rounded-full border border-black/5 p-0 shadow-xl transition-all disabled:opacity-30 dark:border-white/10"
-                      >
-                        {isSubmitting ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <ArrowRight className="h-5 w-5" />
-                        )}
-                      </Button>
                     </div>
-                  </div>
-                </div>
+                    <PromptInputSubmit
+                      status={isSubmitting ? "submitted" : undefined}
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground flex h-10 w-10 items-center justify-center rounded-full border border-black/5 p-0 shadow-xl transition-all disabled:opacity-30 dark:border-white/10"
+                    />
+                  </PromptInputFooter>
+                </PromptInput>
               </div>
 
               {/* Prompt Suggestions */}
@@ -521,7 +432,7 @@ export default function Home() {
                     <button
                       key={i}
                       onClick={() => {
-                        setInputValue(prompt);
+                        textInput.setInput(prompt);
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
                       className="dark:hover:border-primary/20 group rounded-xl border border-zinc-200 bg-white p-4 text-left text-xs leading-relaxed font-medium text-zinc-500 shadow-sm transition-all hover:border-zinc-300 hover:bg-zinc-50 active:scale-[0.98] dark:border-white/5 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-900/50"
@@ -541,6 +452,7 @@ export default function Home() {
   </div>
 );
 }
+
 
 interface MobileMenuProps {
   sections: any[];
