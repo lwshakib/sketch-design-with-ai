@@ -13,7 +13,9 @@
     "db:generate": "bun x prisma generate",
     "db:migrate": "bun x prisma generate && bun x prisma migrate dev --name init",
     "db:studio": "bun x prisma studio",
-    "db:reset": "bun x prisma migrate reset"
+    "db:reset": "bun x prisma migrate reset",
+    "bucket:setup": "ts-node scripts/bucket-setup.ts",
+    "bucket:teardown": "ts-node scripts/bucket-teardown.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1022.0",
