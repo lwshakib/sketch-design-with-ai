@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     // 1. Fetch Project State & Persist User Message
     const project = await prisma.project.findUnique({
        where: { id: projectId },
-       include: { screens: true }
+       include: { screens: true, themes: true }
     });
 
     if (!project) {
@@ -63,12 +63,18 @@ export async function POST(req: Request) {
     // 2. Construct Project Context
     const currentCredits = await getAndResetCredits(session.user.id);
     const existingScreensSummary = project.screens.length > 0 
-      ? `\n\nExisting Screens in Project: ${project.screens.map(s => `"${s.title}"`).join(", ")}.`
+      ? `\n\nExisting Screens in Project: ${project.screens.map(s => `"${s.title}" (Type: ${s.type})`).join(", ")}.`
       : "";
+
+    // Theme Enforcement Check
+    const hasTheme = (project.themes?.length || 0) > 0;
+    const themeEnforcement = !hasTheme
+        ? `\n\nCRITICAL MANDATE: This project currently HAS NO THEME. Before you agree to build ANY functional application screens, you MUST call the 'generateTheme' tool to establish the exact color variables and typography scale. Do not call generateScreen until generateTheme has been executed.`
+        : `\n\nTheme Status: A theme is already established for this project. Focus on functional screens.`;
 
     const creditContext = `\n\nUser Credits: ${currentCredits} remaining today. Each generated screen costs 1 credit. If credits are low, plan your generations carefully. If credits are exhausted, inform the user you cannot generate more screens until tomorrow.`;
 
-    const projectContextPrompt = `${UX_AGENT_SYSTEM_PROMPT}${existingScreensSummary}${creditContext}\n\nStrictly follow the role of Sketch. Your userId is ${session.user.id}.`;
+    const projectContextPrompt = `${UX_AGENT_SYSTEM_PROMPT}${existingScreensSummary}${themeEnforcement}${creditContext}\n\nStrictly follow the role of Sketch. Your userId is ${session.user.id}.`;
 
     const normalizedMessages = (messages || []).map((msg: any, idx: number) => {
       const isLastMessage = idx === (messages?.length || 0) - 1;

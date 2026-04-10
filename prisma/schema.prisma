@@ -24,14 +24,13 @@ model User {
   sessions      Session[]
   accounts      Account[]
   projects      Project[]
-  
-  credits       Int       @default(10)
+
+  credits         Int      @default(10)
   lastCreditReset DateTime @default(now())
-  
+
   @@unique([email])
   @@map("user")
 }
-
 
 model Session {
   id        String   @id
@@ -92,6 +91,7 @@ model Project {
   shareToken String?   @unique
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+  themes     Theme[]
 
   @@index([userId])
   @@map("project")
@@ -113,39 +113,58 @@ enum SCREEN_TYPE {
 }
 
 model Message {
-  id               String   @id @default(cuid())
-  role             MESSAGE_ROLE @default(user)
-  parts            Json?    // Array of { type: 'text', text: string } | { type: 'image', path: string, mediaType: string }
-  status           MESSAGE_STATUS @default(completed)
-  projectId        String
-  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdAt        DateTime @default(now())
+  id        String         @id @default(cuid())
+  role      MESSAGE_ROLE   @default(user)
+  parts     Json? // Array of { type: 'text', text: string } | { type: 'image', path: string, mediaType: string }
+  status    MESSAGE_STATUS @default(completed)
+  projectId String
+  project   Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
 
   @@index([projectId])
   @@map("message")
 }
 
 model Screen {
-  id        String   @id @default(cuid())
-  title     String
-  html      String   @db.Text
-  type      SCREEN_TYPE
-  x         Float    @default(0)
-  y         Float    @default(0)
-  width     Int?
-  height    Int?
-  isLiked   Boolean  @default(false)
-  isDisliked Boolean  @default(false)
-  
-  status    MESSAGE_STATUS @default(completed)
-  
-  
+  id         String      @id @default(cuid())
+  title      String
+  html       String      @db.Text
+  type       SCREEN_TYPE
+  x          Float       @default(0)
+  y          Float       @default(0)
+  width      Int?
+  height     Int?
+  isLiked    Boolean     @default(false)
+  isDisliked Boolean     @default(false)
+
+  status MESSAGE_STATUS @default(completed)
+
   projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([projectId])
   @@map("screen")
+}
+
+model Theme {
+  id        String  @id @default(cuid())
+  name      String  @default("Horizon Ethos")
+  variables Json // Holds color and typography variables
+  x         Float   @default(0)
+  y         Float   @default(0)
+  width     Int?    @default(1200)
+  height    Int?    @default(800)
+  isActive  Boolean @default(true)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@map("theme")
 }

@@ -374,6 +374,49 @@ export class AIService {
           }
         },
       },
+      generateTheme: {
+        name: "generateTheme",
+        description: "Generate a foundational Style Guide (Theme) screen for the project. MUST be called first before any other screen is generated.",
+        parameters: {
+          type: "object",
+          properties: {
+            title: {
+              type: "string",
+              description: "Must be 'Theme' or 'Style Guide'.",
+            },
+            prompt: {
+              type: "string",
+              description: "Instructions for base variables, colors, and typography scales based on the user's initial creative direction.",
+            },
+          },
+          required: ["title", "prompt"],
+        },
+        execute: async (args: any) => {
+          try {
+            console.log(`[Tool: generateTheme] Initiating Theme Protocol`);
+            await inngest.send({
+              name: "app/theme.generate",
+              data: {
+                projectId: context.projectId,
+                title: args.title || "Style Guide",
+                prompt: args.prompt,
+                userId: context.userId,
+              },
+            });
+
+            return {
+              status: "success",
+              message: `Theme protocol initiated. The Style Guide is now being generated in the background. Note: Tell the user you are establishing the design system first.`,
+            };
+          } catch (error: any) {
+            console.error("[Tool: generateTheme] Error:", error);
+            return {
+              status: "error",
+              message: `Failed to initiate theme design: ${error.message}`,
+            };
+          }
+        },
+      },
       getUserCredits: {
         name: "getUserCredits",
         description: "Retrieve your remaining design credits. Use this to plan how many screens you can realistically suggest or generate.",

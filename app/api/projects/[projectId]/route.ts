@@ -35,6 +35,11 @@ export async function GET(
             createdAt: "asc",
           },
         },
+        themes: {
+          orderBy: {
+            createdAt: "asc",
+          },
+        },
       },
     });
 
@@ -42,7 +47,34 @@ export async function GET(
       return new NextResponse("Not Found", { status: 404 });
     }
 
-    return NextResponse.json(project);
+    // Merge screens and themes for the frontend canvas
+    const mergedProject = {
+      ...project,
+      screens: undefined, // Clear out the split arrays
+      themes: undefined,
+      artifacts: [
+        ...project.themes.map(t => ({
+          id: t.id,
+          type: "theme",
+          title: t.name,
+          variables: t.variables,
+          x: t.x,
+          y: t.y,
+          width: t.width,
+          height: t.height,
+          createdAt: t.createdAt,
+          updatedAt: t.updatedAt,
+          isComplete: true,
+          status: "completed"
+        })),
+        ...project.screens.map(s => ({
+          ...s,
+          isComplete: s.status === "completed"
+        }))
+      ]
+    };
+
+    return NextResponse.json(mergedProject);
   } catch (error) {
     console.error("[PROJECT_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });

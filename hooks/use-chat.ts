@@ -202,6 +202,27 @@ export const useChat = (projectId: string) => {
               } catch (e) {
                 /* skip */
               }
+            } else if (line.startsWith("3:")) {
+              try {
+                // Parse it just to consume the payload, but we won't show raw errors to the user
+                JSON.parse(line.slice(2));
+                toast.error("AI Engine Failed", {
+                  description: "Internal server error. Please try again."
+                });
+                
+                // Immediately set message status to error and stop generation
+                setIsGenerating(false);
+                setMessages((prev) => {
+                  const updated = [...prev];
+                  const idx = updated.findIndex((m) => m.id === assistantId);
+                  if (idx !== -1) {
+                    updated[idx] = { ...updated[idx], status: "error" as any };
+                  }
+                  return updated;
+                });
+              } catch (e) {
+                /* skip */
+              }
             }
           }
         }
@@ -221,6 +242,7 @@ export const useChat = (projectId: string) => {
 
       } catch (err) {
         console.error("Chat error:", err);
+        setIsGenerating(false);
         toast.error("Engine encountered an error.");
       } finally {
         setIsTalking(false);

@@ -75,6 +75,7 @@ import { UserMenu } from "@/components/user-menu";
 import { ModeToggle } from "@/components/mode-toggle";
 import { type Artifact } from "@/lib/types";
 import { ScreenFrame } from "./screen-frame";
+import { ThemeFrame } from "./theme-frame";
 import { ModernShimmer } from "./modern-shimmer";
 import { CanvasToolbar } from "./canvas-toolbar";
 import Image from "next/image";
@@ -800,18 +801,22 @@ export function CanvasArea({
                           : "opacity-100",
                       )}
                     >
-                      <ScreenFrame
-                        artifact={artifact}
-                        index={index}
-                        isEditMode={isEditMode}
-                        activeTool={activeTool}
-                        isDraggingFrame={isDraggingFrame}
-                        onRef={(idx, el) => {
-                          if (el)
-                            (el as any).dataset.artifactTitle = artifact.title;
-                          iframeRefs.current[artifact.title] = el;
-                        }}
-                      />
+                      {artifact.type === "theme" ? (
+                        <ThemeFrame artifact={artifact} />
+                      ) : (
+                        <ScreenFrame
+                          artifact={artifact}
+                          index={index}
+                          isEditMode={isEditMode}
+                          activeTool={activeTool}
+                          isDraggingFrame={isDraggingFrame}
+                          onRef={(idx, el) => {
+                            if (el)
+                              (el as any).dataset.artifactTitle = artifact.title;
+                            iframeRefs.current[artifact.title] = el;
+                          }}
+                        />
+                      )}
                     </div>
                   </div>
 

@@ -80,6 +80,7 @@ import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 import { useSignedUrls } from "@/hooks/use-signed-urls";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { toast } from "sonner";
 
 /**
  * Interface for the ChatSidebar component props.
@@ -178,6 +179,14 @@ export function ChatSidebar({
     const timer = setTimeout(scrollToBottom, 50);
     return () => clearTimeout(timer);
   }, [messages, isGenerating, realtimeStatus]);
+
+  React.useEffect(() => {
+    if (error) {
+       toast.error("Internal server error", {
+         description: error.message || "An unexpected error occurred during generation."
+       });
+    }
+  }, [error]);
 
   if (!project) return null;
 

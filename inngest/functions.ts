@@ -4,6 +4,7 @@ import { aiService } from "../services/ai.services";
 import { z } from "zod";
 import {
   ScreenGenerationPrompt,
+  ThemeGenerationPrompt,
 } from "../lib/prompts";
 import prisma from "../lib/prisma";
 import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
@@ -93,7 +94,18 @@ export const generateScreen = inngest.createFunction(
           ScreenGenerationPrompt +
           "\n\nCRITICAL: You are generating a single, high-fidelity screen. Do not use placeholders. Ensure all content is realistic.";
 
-        // Fetch most recent screen for design continuity
+        // Fetch the project's active theme
+        let themeContext = "";
+        const projectTheme = await prisma.theme.findFirst({
+            where: { projectId, isActive: true },
+            orderBy: { createdAt: "desc" }
+        });
+        
+        if (projectTheme) {
+            themeContext = `\n\nCRITICAL THEME CONTEXT: You MUST strictly use the following design system variables for styling this screen to ensure consistency:\n${JSON.stringify(projectTheme.variables, null, 2)}\n\nDo NOT invent new color HEX codes. Use standard precise classes or inline variables to map to these design tokens.`;
+        }
+
+        // Fetch most recent screen for structural continuity
         const recentScreen = await prisma.screen.findFirst({
           where: { projectId, id: { not: dbScreen.id }, status: "completed" },
           orderBy: { createdAt: "desc" },
@@ -120,7 +132,7 @@ export const generateScreen = inngest.createFunction(
           : [];
 
         const rawMessages = [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: systemPrompt + themeContext },
           ...contextMessages,
           {
             role: "user",
@@ -220,3 +232,111 @@ export const dailyCreditReset = inngest.createFunction(
   },
 );
 */
+
+// --- Theme Generation Flow ---
+export const generateThemeFlow = inngest.createFunction(
+  { id: "generate-theme" },
+  { event: "app/theme.generate" },
+  async ({ event, step, publish }) => {
+    try {
+      const { projectId, title, prompt, userId } = event.data;
+
+      await step.run("check-project", async () => {
+        const project = await prisma.project.findUnique({ where: { id: projectId } });
+        if (!project) throw new NonRetriableError(`Project ${projectId} not found.`);
+      });
+
+      await step.run("consume-credit", async () => {
+        await consumeCredit(userId || "");
+      });
+
+      // Initial Placeholder
+      const dbTheme = await step.run("init-theme", async () => {
+        // Deactivate older themes
+        await prisma.theme.updateMany({
+           where: { projectId },
+           data: { isActive: false }
+        });
+      
+        return await prisma.theme.create({
+          data: {
+            projectId,
+            name: title || "Project Theme",
+            variables: {}, // Placeholder while generating
+            x: -1250, // Far left
+            y: -200, // Top area
+            isActive: true,
+          },
+        });
+      });
+
+      // Notify UI
+      await publishStatus({
+        publish,
+        projectId,
+        message: `Establishing Design System...`,
+        status: "generating",
+        currentScreen: "Theme",
+      });
+
+      // Generate JSON Variables
+      const themeVariables = await step.run("generate-theme-json", async () => {
+        const systemPrompt =
+          ThemeGenerationPrompt +
+          "\n\nCRITICAL: You are generating a structured JSON theme, not HTML. Determine the hex colors and fonts according to the user's prompt.";
+
+        const rawMessages = [
+          { role: "system", content: systemPrompt },
+          {
+            role: "user",
+            content: `Generate a unified theme based on: ${prompt}`,
+          },
+        ] as any;
+
+        const processedMessages = await aiService.processMessages(rawMessages);
+
+        // Define Zod schema implicitly by the prompt, or just rely on generateObject
+        // The generateObject uses JSON mode which helps, but we rely on a strong system prompt for the structure.
+        return await aiService.generateObject(processedMessages, { projectId });
+      });
+
+      // Update DB
+      const finalTheme = await step.run("update-theme-db", async () => {
+        return await prisma.theme.update({
+          where: { id: dbTheme.id },
+          data: {
+            variables: themeVariables as any,
+          },
+        });
+      });
+
+      await publishStatus({
+        publish,
+        projectId,
+        message: "Theme generation complete.",
+        status: "complete",
+        screen: {
+           id: finalTheme.id,
+           type: "theme",
+           title: finalTheme.name,
+           variables: finalTheme.variables,
+           isComplete: true
+        } as any, 
+      });
+
+      return { success: true };
+    } catch (error: any) {
+      console.error("[generateThemeFlow] Error:", error);
+      await publishStatus({
+        publish,
+        projectId: event.data.projectId,
+        message: error.message || "An error occurred while generating the theme.",
+        status: "error",
+      });
+      if (error instanceof NonRetriableError) {
+        return { error: error.message };
+      }
+      throw error;
+    }
+  }
+);

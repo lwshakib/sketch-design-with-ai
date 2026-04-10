@@ -6,7 +6,7 @@
 export type Artifact = {
   id?: string;
   html: string;
-  type: "web" | "app";
+  type: "web" | "app" | "theme";
   isComplete: boolean;
   title: string;
   x?: number;
@@ -16,4 +16,5 @@ export type Artifact = {
   isLiked?: boolean;
   isDisliked?: boolean;
   status?: "generating" | "completed";
+  variables?: any; // For Theme nodes
 };

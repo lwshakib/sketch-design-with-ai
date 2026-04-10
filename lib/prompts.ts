@@ -1,15 +1,29 @@
 export const CORE_DESIGN_PRINCIPLES = `### 💎 Design Principles (VIBRANT & ICONIC):
-1. **NO Device Mockups (MANDATORY)**: NEVER wrap your design in a "Phone Container", "Mobile Frame", "max-w-[400px]", or \`aspect-[9/19]\` wrapper. The <body> is the only container. Designs must be full-bleed and responsive.
-2. **Variable-First Theming**: You MUST define a :root { ... } block in the <style> tag with the following tokens:
+1. **Theme First (MANDATORY)**: A project MUST have a 'theme' screen (generated via \`generateTheme\`) before any functional screens are designed.
+2. **NO Device Mockups (MANDATORY)**: NEVER wrap your design in a "Phone Container", "Mobile Frame", "max-w-[400px]", or \`aspect-[9/19]\` wrapper. The <body> is the only container. Designs must be full-bleed and responsive.
+3. **Variable-First Theming**: You MUST define a :root { ... } block in the <style> tag with the following tokens:
    - --background, --foreground, --primary, --primary-foreground, --accent, --accent-foreground, --card, --card-foreground, --muted, --muted-foreground, --border, --radius.
 3. **Semantic Tailwind**: ALWAYS use Tailwind's semantic classes (e.g., bg-primary, text-muted-foreground, bg-card, border-border) mapped to your variables. DO NOT use hardcoded #hex codes in the HTML body.
 4. **Color Diversification**: DO NOT rely on Indigo/Blue. Select a unique, premium palette for every project (e.g., Emerald, Rose, Amber, Stone, Slate, Sky, Violet).
 5. **Depth (ZERO-FLAT-SPACE)**: 3-layer system: Background (subtle mesh), Surface (Cards), Floating (Modals). Use glassmorphism (backdrop-blur-2xl) for overlays.
 6. **Height Control**: NO 'vh' or 'vw' inside components. Use 'min-h-screen' on the <body>. For content areas, use specific px heights or heavy padding (py-12+).
 7. **8px Bento Grid**: Bento-style grids with asymmetric cards and aggressive padding (p-8+).
-8. **Typography**: Bold, expressive (Outfit/Inter). High contrast text-foreground.
-9. **Icons**: Lucide Icons (<i data-lucide="name"></i>). Call lucide.createIcons(); at end of body.
-10. **Full Screens ONLY**: No placeholders. Every output must be a complete, ready-to-use page.
+9. **Typography**: Bold, expressive (Outfit/Inter). High contrast text-foreground.
+10. **Icons**: Lucide Icons (<i data-lucide="name"></i>). Call lucide.createIcons(); at end of body.
+11. **Full Screens ONLY**: No placeholders. Every output must be a complete, ready-to-use page.
+`;
+
+export const ThemeGenerationPrompt = `Generate a high-fidelity 'Style Guide' screen.
+${CORE_DESIGN_PRINCIPLES}
+
+### 🎨 Bento Grid Layout Specification
+This screen MUST be a beautiful, responsive Bento-style grid showcasing the design system. Do not build an app layout (like a landing page or dashboard). Build a Style Guide.
+- **Root Variables**: Define all CSS variables (\`--primary\`, \`--background\`, etc.) in the \`<style>\` block. This establishes the project's theme.
+- **Palette Showcase**: Create lush, visually distinct cards for Primary, Secondary, Tertiary, and Neutral color ramps.
+- **Typography Scale**: Display the font scale (Headlines, Body text, Labels).
+- **Component Previews**: Include beautifully styled example components (e.g., Buttons, Inputs, Badges, Modals) using the defined variables.
+
+Make it look like a premium Dribbble presentation of a Design System.
 `;
 
 export const ScreenGenerationPrompt = `Generate production-ready HTML/Tailwind code using CSS Variables.
@@ -67,7 +81,8 @@ Your goal is to assist the user in brainstorming, architecting, and generating w
 
 ### 🛠️ YOUR CAPABILITIES:
 1. **Chat & Brainstorm**: Engage in deep design dialogue. Provide feedback on UX flows, color theory, and typography.
-2. **Generate Designs (generateScreen)**: When you have enough context to build a screen, call the 'generateScreen' tool. 
+2. **Generate Theme (generateTheme)**: Core mandate: You MUST call the 'generateTheme' tool FIRST for any new project or when asked to define the global style. This generates the foundational Style Guide screen.
+3. **Generate Screens (generateScreen)**: After a theme is established, call the 'generateScreen' tool to build functional app/web interfaces.
 
 ### 🎨 DESIGN STANDARDS:
 ${CORE_DESIGN_PRINCIPLES}
