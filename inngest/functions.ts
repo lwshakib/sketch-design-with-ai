@@ -5,11 +5,11 @@ import { z } from "zod";
 import {
   ScreenGenerationPrompt,
 } from "../lib/prompts";
-import { getAllBlueprints } from "../lib/get-all-blueprints";
 import prisma from "../lib/prisma";
 import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
 import {
   publishStatus,
+  sanitizeHtmlForContext,
 } from "./helpers";
 import { consumeCredit } from "../lib/credits";
 
@@ -29,6 +29,18 @@ export const generateScreen = inngest.createFunction(
         type,
         userId,
       } = event.data;
+
+      // --- PRE-CHECK: VERIFY PROJECT EXISTS ---
+      await step.run("check-project-exists", async () => {
+        const project = await prisma.project.findUnique({
+          where: { id: projectId },
+          select: { id: true },
+        });
+
+        if (!project) {
+          throw new NonRetriableError(`Project ${projectId} not found. Aborted.`);
+        }
+      });
 
       // --- STEP 1: CONSUME CREDIT ---
       await step.run("consume-credit", async () => {
@@ -77,50 +89,65 @@ export const generateScreen = inngest.createFunction(
 
       // --- STEP 3: GENERATE SCREEN CODE ---
       const htmlCode = await step.run("generate-screen-code", async () => {
-        const inspiration = getAllBlueprints();
         const systemPrompt =
           ScreenGenerationPrompt +
           "\n\nCRITICAL: You are generating a single, high-fidelity screen. Do not use placeholders. Ensure all content is realistic.";
 
-        // Fetch the most recent completed screen for design consistency if it exists
+        // Fetch most recent screen for design continuity
         const recentScreen = await prisma.screen.findFirst({
-          where: { projectId, status: "completed" },
+          where: { projectId, id: { not: dbScreen.id }, status: "completed" },
           orderBy: { createdAt: "desc" },
-          take: 1,
         });
+
+        // Fetch most recent message with images for visual context
+        const recentMessages = await prisma.message.findMany({
+          where: { projectId, role: "user" },
+          orderBy: { createdAt: "desc" },
+          take: 5
+        });
+
+        const recentScreenWithImages = recentMessages.find(m => 
+          (m.parts as any[] || []).some((p: any) => p.type === "image")
+        );
 
         const contextMessages = recentScreen
           ? [
               {
                 role: "assistant",
-                content: `Recent Screen Context: I recently generated the "${recentScreen.title}" screen. Here is its code for reference to ensure continuity:\n\n${recentScreen.html}`,
+                content: `Recent Screen Context: I recently generated the "${recentScreen.title}" screen. Here is its structural code for continuity:\n\n${sanitizeHtmlForContext(recentScreen.html)}`,
               },
             ]
           : [];
 
-        const { text } = await aiService.generateText(
-          [
-            { role: "system", content: systemPrompt },
-            ...contextMessages,
-            {
-              role: "user",
-              content: `Now generate the "${title}" (type: ${type}) screen based on these instructions:\n\n${prompt}`,
-            },
-            {
-              role: "user",
-              content: `Here are several high-fidelity design blueprints available. Use them as references for component structure and quality:\n\n${inspiration}`,
-            },
-            {
-              role: "user",
-              content: `MANDATORY: Output ONLY the raw HTML and CSS. No markdown code blocks, no conversation, no artifacts.`,
-            },
-          ] as any,
+        const rawMessages = [
+          { role: "system", content: systemPrompt },
+          ...contextMessages,
           {
-            max_tokens: MAXIMUM_OUTPUT_TOKENS,
-            temperature: 0.5, // Lower temperature for more strict adherence to format
-            projectId: projectId, // Enable prompt caching / x-session-affinity
-          }
-        );
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: `Now generate the "${title}" (type: ${type}) screen based on these instructions:\n\n${prompt}`,
+              },
+              ...(recentScreenWithImages?.parts as any[] || [])
+                .filter((p) => p.type === "image")
+                .slice(0, 2)
+                .map((p) => ({ type: "image_url", image_url: { url: p.path } })),
+            ],
+          },
+          {
+            role: "user",
+            content: `MANDATORY: Output ONLY the raw HTML and CSS. No markdown code blocks, no conversation, no artifacts.`,
+          },
+        ] as any;
+
+        const processedMessages = await aiService.processMessages(rawMessages);
+
+        const { text } = await aiService.generateText(processedMessages, {
+          temperature: 0.1,
+          max_tokens: MAXIMUM_OUTPUT_TOKENS,
+          projectId,
+        });
 
         // Simple cleaning to remove any accidental markdown wrapping
         const cleanText = text.replace(/^```html\s*/i, "").replace(/```$/i, "").trim();

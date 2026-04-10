@@ -106,7 +106,7 @@ export const getInjectedHTML = (html: string) => {
         margin: 0;
         padding: 0;
         min-height: 100%;
-        background-color: var(--background, #ffffff);
+        background-color: transparent;
         color: var(--foreground, #000000);
         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         line-height: 1.5;
@@ -176,8 +176,10 @@ export const getInjectedHTML = (html: string) => {
               var rect = el.getBoundingClientRect();
               var bottom = rect.top + rect.height + window.pageYOffset;
               
-              // Ignore elements that are likely fixed or absolute background blurs (often have very high or low top)
-              if (rect.height > 2000 && rect.top < -500) continue; 
+              // CRITICAL: Ignore fixed/absolute elements for height calculation
+              // These are often background glows/navbars that shouldn't define the scroll area
+              var style = window.getComputedStyle(el);
+              if (style.position === 'fixed' || style.position === 'absolute') continue;
 
               if (bottom > maxBottom) maxBottom = bottom;
             }

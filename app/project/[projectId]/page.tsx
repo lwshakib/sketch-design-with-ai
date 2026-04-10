@@ -21,6 +21,7 @@ import { VariationsSheet } from "@/components/project/variations-sheet";
 import { useProjectStore } from "@/hooks/use-project-store";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 import { useChat } from "@/hooks/use-chat";
+import { toast } from "sonner";
 
 export default function ProjectPage() {
   const params = useParams();
@@ -1202,7 +1203,7 @@ Reference the existing screen code provided in the context.`;
     const handler = () => handleDuplicateProjectRef.current();
     document.addEventListener("DUPLICATE_PROJECT", handler);
     return () => document.removeEventListener("DUPLICATE_PROJECT", handler);
-  }, []);
+  }, [projectId]);
 
   const updateProjectTitle = async (title: string) => {
     try {
@@ -1266,6 +1267,7 @@ Reference the existing screen code provided in the context.`;
         handleCustomSubmit={handleCustomSubmit}
         handleFileUpload={handleFileUpload}
         fileInputRef={fileInputRef}
+        onSave={handleSave}
       />
 
       <CodeViewerModal

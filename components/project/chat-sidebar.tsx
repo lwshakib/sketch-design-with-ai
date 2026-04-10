@@ -31,7 +31,15 @@ import {
   Settings,
   Command,
   User,
+  Brain,
 } from "lucide-react";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 import { GenerationStatus } from "./generation-status";
 import Image from "next/image";
@@ -139,8 +147,8 @@ export function ChatSidebar({
     messages.forEach((msg: any) => {
       if (msg.parts) {
         msg.parts.forEach((p: any) => {
-          if (p.type === "image" && p.url && !p.url.startsWith("http")) {
-            paths.push(p.url);
+          if (p.type === "image" && p.path && !p.path.startsWith("http")) {
+            paths.push(p.path);
           }
         });
       }
@@ -404,6 +412,9 @@ export function ChatSidebar({
                                         const textPart =
                                           parts.find((p) => p.type === "text")
                                             ?.text || "";
+                                        const reasoningPart =
+                                          parts.find((p) => p.type === "reasoning")
+                                            ?.text || "";
                                         const images = parts.filter(
                                           (p) => p.type === "image",
                                         );
@@ -447,6 +458,35 @@ export function ChatSidebar({
 
                                         return (
                                           <div className="flex flex-col gap-5">
+                                            {/* Reasoning Accordion */}
+                                            {reasoningPart && (
+                                              <Accordion
+                                                type="single"
+                                                collapsible
+                                                className="w-full"
+                                                defaultValue="reasoning"
+                                              >
+                                                <AccordionItem
+                                                  value="reasoning"
+                                                  className="border-none"
+                                                >
+                                                  <AccordionTrigger className="hover:bg-muted/50 rounded-lg py-1.5 transition-all hover:no-underline">
+                                                    <div className="flex items-center gap-2 px-1 text-[12px] font-bold tracking-tight text-muted-foreground transition-colors group-hover:text-primary">
+                                                      <div className="bg-primary/10 flex h-5 w-5 items-center justify-center rounded-md">
+                                                        <Sparkles className="size-3 animate-pulse text-primary" />
+                                                      </div>
+                                                      Design Logic
+                                                    </div>
+                                                  </AccordionTrigger>
+                                                  <AccordionContent className="pt-2">
+                                                    <div className="bg-muted/20 border-border/50 backdrop-blur-md rounded-xl border p-4 text-[13px] leading-relaxed text-muted-foreground/90 shadow-inner italic">
+                                                      {reasoningPart}
+                                                    </div>
+                                                  </AccordionContent>
+                                                </AccordionItem>
+                                              </Accordion>
+                                            )}
+
                                             {/* Main text content - only show at the top for chat (no plan) */}
                                             {!hasPlan && textPart && (
                                               <div className="text-foreground/90 text-[15px] leading-relaxed">
@@ -463,7 +503,7 @@ export function ChatSidebar({
                                                   <MessageAttachment
                                                     key={imgIdx}
                                                     data={{
-                                                      url: p.url?.startsWith("http") ? p.url : urlMap[p.url] || p.url,
+                                                      url: p.path?.startsWith("http") ? p.path : urlMap[p.path] || p.path,
                                                       mediaType:
                                                         p.mediaType ||
                                                         "image/png",
@@ -534,7 +574,7 @@ export function ChatSidebar({
                                                   <MessageAttachment
                                                     key={imgIdx}
                                                     data={{
-                                                      url: p.url?.startsWith("http") ? p.url : urlMap[p.url] || p.url,
+                                                      url: p.path?.startsWith("http") ? p.path : urlMap[p.path] || p.path,
                                                       mediaType:
                                                         p.mediaType ||
                                                         "image/png",

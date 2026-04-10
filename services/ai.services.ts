@@ -4,6 +4,7 @@ import {
 } from "@/lib/constants";
 import { inngest } from "@/inngest/client";
 import { getAndResetCredits } from "@/lib/credits";
+import { s3Service } from "./s3.services";
 
 export interface StreamTextOptions {
   context?: {
@@ -74,7 +75,7 @@ export class AIService {
 
     const history = messages.map((m: any) => ({
       role: m.role,
-      content: typeof m.content === "string" ? m.content : "",
+      content: m.content,
       tool_calls: m.tool_calls,
       tool_call_id: m.tool_call_id,
       name: m.name,
@@ -259,7 +260,7 @@ export class AIService {
       headers,
       body: JSON.stringify({
         model: CHAT_MODEL_ID,
-        messages,
+        messages: messages,
         temperature,
         max_tokens,
         stream: false,
@@ -295,7 +296,7 @@ export class AIService {
       headers,
       body: JSON.stringify({
         model: CHAT_MODEL_ID,
-        messages,
+        messages: messages,
         response_format: { type: "json_object" },
       }),
     });
@@ -330,10 +331,6 @@ export class AIService {
         parameters: {
           type: "object",
           properties: {
-            projectId: {
-              type: "string",
-              description: "The unique ID of the current project.",
-            },
             title: {
               type: "string",
               description: "A concise title for the screen (e.g. 'Hero Section', 'Project Dashboard').",
@@ -348,7 +345,7 @@ export class AIService {
               description: "The platform type for this screen.",
             },
           },
-          required: ["projectId", "title", "prompt", "type"],
+          required: ["title", "prompt", "type"],
         },
         execute: async (args: any) => {
           try {
@@ -356,7 +353,7 @@ export class AIService {
             await inngest.send({
               name: "app/screen.generate",
               data: {
-                projectId: args.projectId || context.projectId,
+                projectId: context.projectId,
                 title: args.title,
                 prompt: args.prompt,
                 type: args.type,
@@ -379,20 +376,15 @@ export class AIService {
       },
       getUserCredits: {
         name: "getUserCredits",
-        description: "Retrieve the user's remaining design credits. Use this to plan how many screens you can realistically suggest or generate.",
+        description: "Retrieve your remaining design credits. Use this to plan how many screens you can realistically suggest or generate.",
         parameters: {
           type: "object",
-          properties: {
-            userId: {
-              type: "string",
-              description: "The unique ID of the user.",
-            },
-          },
-          required: ["userId"],
+          properties: {},
+          required: [],
         },
-        execute: async (args: any) => {
+        execute: async () => {
           try {
-            const credits = await getAndResetCredits(args.userId || context.userId);
+            const credits = await getAndResetCredits(context.userId);
             return {
               credits,
               message: `You currently have ${credits} credits left. Generating each screen consumes exactly 1 credit.`,
@@ -453,6 +445,66 @@ export class AIService {
         },
       },
     };
+  }
+
+  /**
+   * External Vision Processing
+   * Finds image paths/URLs and converts them to base64 if they are from S3.
+   * Enforces 2-image limit.
+   */
+  public async processMessages(messages: any[]): Promise<any[]> {
+    return Promise.all(
+      messages.map(async (msg) => {
+        if (typeof msg.content === "string") return msg;
+        if (!Array.isArray(msg.content)) return msg;
+
+        let imageCount = 0;
+        const processedContent = await Promise.all(
+          msg.content.map(async (part: any) => {
+            if (part.type === "text") return part;
+            if (part.type === "image_url") {
+              const url = part.image_url.url;
+              if (!url || url.startsWith("data:")) return part;
+
+              if (imageCount >= 2) return null; // Enforce 2-image limit
+              imageCount++;
+
+              try {
+                if (url.startsWith("http")) {
+                  // External URL: Convert to base64 to bypass Gateway domain restrictions
+                  const response = await fetch(url);
+                  if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
+                  const buffer = Buffer.from(await response.arrayBuffer());
+                  const base64 = buffer.toString("base64");
+                  const ext = url.split(".").pop()?.toLowerCase() || "png";
+                  const mimeType = (ext === "jpg" || ext === "jpeg") ? "image/jpeg" : `image/${ext}`;
+                  return {
+                    type: "image_url",
+                    image_url: { url: `data:${mimeType};base64,${base64}` },
+                  };
+                } else {
+                  // S3 Path: Generate a signed URL for AI access
+                  const signedUrl = await s3Service.getSignedDownloadUrl(url);
+                  return {
+                    type: "image_url",
+                    image_url: { url: signedUrl },
+                  };
+                }
+              } catch (e) {
+                console.error(`[AIService] Vision processing failed for ${url}:`, e);
+                return null;
+              }
+            }
+            return part;
+          })
+        );
+
+        return {
+          ...msg,
+          content: processedContent.filter(Boolean),
+        };
+      })
+    );
   }
 }
 

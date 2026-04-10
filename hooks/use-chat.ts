@@ -121,6 +121,7 @@ export const useChat = (projectId: string) => {
 
         const decoder = new TextDecoder();
         let assistantContent = "";
+        let reasoningContent = "";
 
         while (true) {
           const { done, value } = await reader.read();
@@ -140,9 +141,39 @@ export const useChat = (projectId: string) => {
                   const updated = [...prev];
                   const idx = updated.findIndex((m) => m.id === assistantId);
                   if (idx !== -1) {
+                    const currentParts = updated[idx].parts || [];
+                    const filtered = currentParts.filter(
+                      (p: any) => p.type !== "text",
+                    );
                     updated[idx] = {
                       ...updated[idx],
-                      parts: [{ type: "text", text: assistantContent }],
+                      parts: [...filtered, { type: "text", text: assistantContent }],
+                      status: "streaming" as any,
+                    };
+                  }
+                  return updated;
+                });
+              } catch (e) {
+                /* skip */
+              }
+            } else if (line.startsWith("8:")) {
+              try {
+                const text = JSON.parse(line.slice(2));
+                reasoningContent += text;
+                setMessages((prev) => {
+                  const updated = [...prev];
+                  const idx = updated.findIndex((m) => m.id === assistantId);
+                  if (idx !== -1) {
+                    const currentParts = updated[idx].parts || [];
+                    const filtered = currentParts.filter(
+                      (p: any) => p.type !== "reasoning",
+                    );
+                    updated[idx] = {
+                      ...updated[idx],
+                      parts: [
+                        { type: "reasoning", text: reasoningContent },
+                        ...filtered,
+                      ],
                       status: "streaming" as any,
                     };
                   }

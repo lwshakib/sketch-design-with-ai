@@ -51,7 +51,7 @@ export async function POST(req: Request) {
             },
             ...(imagePaths?.map((path: string) => ({
               type: "image",
-              url: path,
+              path: path,
               mediaType: "image/png",
             })) || []),
           ],
@@ -70,41 +70,69 @@ export async function POST(req: Request) {
 
     const projectContextPrompt = `${UX_AGENT_SYSTEM_PROMPT}${existingScreensSummary}${creditContext}\n\nStrictly follow the role of Sketch. Your userId is ${session.user.id}.`;
 
-    const normalizedMessages = (messages || []).map((msg: any) => ({
-      role: msg.role === "data" ? "tool" : msg.role,
-      content:
-        typeof msg.content === "string"
-          ? msg.content
-          : msg.parts?.find((p: any) => p.type === "text")?.text || msg.content?.[0]?.text || "",
-      ...(msg.role === "assistant" && msg.tool_calls ? { tool_calls: msg.tool_calls } : {}),
-      ...(msg.role === "tool" ? { tool_call_id: msg.tool_call_id, name: msg.name } : {}),
-    }));
+    const normalizedMessages = (messages || []).map((msg: any, idx: number) => {
+      const isLastMessage = idx === (messages?.length || 0) - 1;
+      const role = msg.role === "data" ? "tool" : msg.role;
+      
+      // Basic text content extraction
+      const textContent = typeof msg.content === "string" 
+        ? msg.content 
+        : msg.parts?.find((p: any) => p.type === "text")?.text || msg.content?.[0]?.text || "";
+
+      // Handle Vision for User Messages
+      if (role === "user") {
+        const content: any[] = [{ type: "text", text: textContent }];
+        
+        // If this is the last message and we have imagePaths, attach them
+        if (isLastMessage && imagePaths.length > 0) {
+          imagePaths.slice(0, 2).forEach((path: string) => {
+            content.push({ type: "image_url", image_url: { url: path } });
+          });
+        }
+        
+        return { role, content };
+      }
+
+      return {
+        role,
+        content: textContent,
+        ...(msg.role === "assistant" && msg.tool_calls ? { tool_calls: msg.tool_calls } : {}),
+        ...(msg.role === "tool" ? { tool_call_id: msg.tool_call_id, name: msg.name } : {}),
+      };
+    });
 
     // 3. Start streaming from AIService
-    const serviceStream = await aiService.streamText(
-      [
-        { role: "system", content: projectContextPrompt },
-        ...normalizedMessages,
-      ],
-      {
-        context: {
-          userId: session.user.id,
-          projectId: projectId,
-        },
-        onFinish: async ({ content }) => {
-          if (content.trim()) {
-            await prisma.message.create({
-              data: {
-                projectId,
-                role: "assistant",
-                parts: [{ type: "text", text: content }],
-                status: "completed",
-              },
-            });
+    const processedMessages = await aiService.processMessages([
+      { role: "system", content: projectContextPrompt },
+      ...normalizedMessages,
+    ]);
+
+    const serviceStream = await aiService.streamText(processedMessages, {
+      context: {
+        userId: session.user.id,
+        projectId: projectId,
+      },
+      onFinish: async ({ content, reasoning }) => {
+        if (content.trim() || reasoning?.trim()) {
+          const parts = [];
+          if (reasoning?.trim()) {
+            parts.push({ type: "reasoning", text: reasoning });
           }
-        },
-      }
-    );
+          if (content.trim()) {
+            parts.push({ type: "text", text: content });
+          }
+
+          await prisma.message.create({
+            data: {
+              projectId,
+              role: "assistant",
+              parts,
+              status: "completed",
+            },
+          });
+        }
+      },
+    });
 
     if (!serviceStream) throw new Error("Failed to initialize AI stream");
 
@@ -120,7 +148,7 @@ export async function POST(req: Request) {
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            
+
             lineBuffer += textDecoder.decode(value, { stream: true });
             const lines = lineBuffer.split("\n");
             lineBuffer = lines.pop() || "";
@@ -130,12 +158,16 @@ export async function POST(req: Request) {
               if (trimmed.startsWith("data: ")) {
                 try {
                   const event = JSON.parse(trimmed.slice(6));
-                  
+
                   if (event.type === "text") {
-                    controller.enqueue(encoder.encode(`0:${JSON.stringify(event.content)}\n`));
+                    controller.enqueue(
+                      encoder.encode(`0:${JSON.stringify(event.content)}\n`),
+                    );
                   } else if (event.type === "reasoning") {
-                    // Send reasoning as a ghost text or ignore. Here we send it as a separate 0: part for visibility
-                    controller.enqueue(encoder.encode(`0:${JSON.stringify(event.content)}\n`));
+                    // Stream reasoning with prefix 8:
+                    controller.enqueue(
+                      encoder.encode(`8:${JSON.stringify(event.content)}\n`),
+                    );
                   } else if (event.type === "tool_result") {
                     // Map tool results back to useChat data part (2:)
                     const toolResult = event.result;

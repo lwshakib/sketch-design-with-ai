@@ -397,23 +397,23 @@ export function CanvasArea({
             }
 
             return (
-              <div className="bg-background/80 border-border pointer-events-auto flex max-h-[480px] w-[340px] flex-col gap-4 overflow-y-auto rounded-xl border p-5 shadow-xl backdrop-blur-3xl animate-in fade-in slide-in-from-top-2 duration-300 scrollbar-none ring-1 ring-black/5 lg:w-[400px] relative">
-                <Button 
-                   variant="ghost" 
-                   size="icon" 
-                   className="absolute top-2 right-2 size-7 rounded-full hover:bg-muted"
-                   onClick={() => setIsTurnDetailVisible(false)}
-                >
-                   <X className="size-3.5" />
-                </Button>
-                <div className="flex flex-col gap-5">
-                   {/* User Message */}
-                   <p className="text-[13.5px] font-medium leading-relaxed text-foreground/90 py-0.5">
-                     {getUserText().replace(/\[Context:.*?\]\s*/g, "").trim()}
-                   </p>
+              <div className="bg-background/90 border-border pointer-events-auto flex max-h-[480px] w-[340px] flex-col overflow-y-auto rounded-xl border shadow-2xl backdrop-blur-3xl animate-in fade-in slide-in-from-top-2 duration-300 scrollbar-none ring-1 ring-black/5 lg:w-[400px] relative">
+                {/* Sticky Header: User Message + Close Button */}
+                <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/10 flex items-start justify-between gap-4 p-5 pb-4">
+                  <p className="text-[13.5px] font-medium leading-relaxed text-foreground/90 flex-1 py-0.5">
+                    {getUserText().replace(/\[Context:.*?\]\s*/g, "").trim()}
+                  </p>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="size-7 rounded-full hover:bg-muted shrink-0"
+                    onClick={() => setIsTurnDetailVisible(false)}
+                  >
+                    <X className="size-3.5" />
+                  </Button>
+                </div>
 
-                   <hr className="border-border/10 w-full" />
-
+                <div className="flex flex-col gap-5 p-5 pt-4">
                    {/* Assistant Message */}
                    <div className="text-[13px] leading-relaxed text-muted-foreground py-0.5">
                      {assistantMsg || isGenerating ? (
@@ -934,6 +934,9 @@ export function CanvasArea({
                       )}>
                         {cleanText}
                       </span>
+                      {isGenerating && i === 0 && (
+                        <Loader2 className="h-3 w-3 animate-spin text-primary shrink-0 opacity-80" />
+                      )}
                     </div>
                   );
                 })}

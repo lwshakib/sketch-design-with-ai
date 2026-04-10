@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { Prisma } from "@/generated/prisma/client";
 
 export async function GET(
   req: Request,
@@ -77,7 +78,12 @@ export async function PATCH(
     });
 
     return NextResponse.json(project);
-  } catch (error) {
+  } catch (error: any) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2025") {
+        return new NextResponse("Project not found", { status: 404 });
+      }
+    }
     console.error("[PROJECT_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
@@ -106,7 +112,12 @@ export async function DELETE(
     });
 
     return NextResponse.json(project);
-  } catch (error) {
+  } catch (error: any) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2025") {
+        return new NextResponse("Project not found", { status: 404 });
+      }
+    }
     console.error("[PROJECT_DELETE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }

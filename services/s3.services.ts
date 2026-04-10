@@ -157,6 +157,29 @@ export class S3Service {
   }
 
   /**
+   * Retrieves an object's content as a Buffer.
+   * 
+   * @param path - The path of the object in the bucket.
+   * @returns The object content as a Buffer.
+   */
+  async getObjectBuffer(path: string): Promise<Buffer> {
+    const command = new GetObjectCommand({
+      Bucket: this.bucket,
+      Key: path,
+    });
+
+    const response = await this.client.send(command);
+    
+    // Convert stream to Buffer
+    const stream = response.Body as any;
+    const chunks: any[] = [];
+    for await (const chunk of stream) {
+        chunks.push(chunk);
+    }
+    return Buffer.concat(chunks);
+  }
+
+  /**
    * Direct access to the S3 client instance if needed.
    */
   getClient(): S3Client {
