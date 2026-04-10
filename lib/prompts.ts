@@ -1,28 +1,41 @@
 export const CORE_DESIGN_PRINCIPLES = `### 💎 Design Principles (VIBRANT & ICONIC):
-1. **Depth (ZERO-FLAT-SPACE)**: 3-layer system: Background, Surface (Cards), Floating (Modals). Use mesh gradients (primary/10 to accent/5), blurred glows, and glass backdrop-blur-2xl.
-2. **Chromatic Vibrancy**: Body MUST have a solid background color class AND text color: <body class="bg-[#hex] text-[#hex]">. This ensures no white gaps.
-3. **Height Control**: NO 'vh' or 'vw' inside components. Use 'min-h-screen' ONLY on the <body> for background coverage. For content areas, use specific pixel heights (min-h-[800px]) or heavy padding (py-24).
-4. **8px Bento Grid**: Bento-style grids with asymmetric cards. Aggressive padding (p-8+).
-5. **Typography**: Bold, expressive headers (Outfit/Inter). High contrast text-primary-foreground.
-6. **Component Standards**: Large font-black stats. Desktop top-nav (glass). App floating bottom-nav (h-20, blur-3xl).
-7. **App Architecture**: 9:19 Aspect Ratio. rounded-[2.5rem]+ sections. NO status bar.
-8. **Elite Aesthetics**: BAN plain white. Apple/Stripe-style depth. Use loremflickr.com (keep URLs under 100 chars).
-9. **Full Screens ONLY**: NO standalone components. Every output MUST be a complete screen with headers/nav.
-10. **Icons**: Lucide Icons (<i data-lucide="name"></i>). Fallback: Material Icons. CALL lucide.createIcons(); at end of body.
-11. **Maps**: Google Maps <iframe> in cards.
+1. **NO Device Mockups (MANDATORY)**: NEVER wrap your design in a "Phone Container", "Mobile Frame", "max-w-[400px]", or \`aspect-[9/19]\` wrapper. The <body> is the only container. Designs must be full-bleed and responsive.
+2. **Variable-First Theming**: You MUST define a :root { ... } block in the <style> tag with the following tokens:
+   - --background, --foreground, --primary, --primary-foreground, --accent, --accent-foreground, --card, --card-foreground, --muted, --muted-foreground, --border, --radius.
+3. **Semantic Tailwind**: ALWAYS use Tailwind's semantic classes (e.g., bg-primary, text-muted-foreground, bg-card, border-border) mapped to your variables. DO NOT use hardcoded #hex codes in the HTML body.
+4. **Color Diversification**: DO NOT rely on Indigo/Blue. Select a unique, premium palette for every project (e.g., Emerald, Rose, Amber, Stone, Slate, Sky, Violet).
+5. **Depth (ZERO-FLAT-SPACE)**: 3-layer system: Background (subtle mesh), Surface (Cards), Floating (Modals). Use glassmorphism (backdrop-blur-2xl) for overlays.
+6. **Height Control**: NO 'vh' or 'vw' inside components. Use 'min-h-screen' on the <body>. For content areas, use specific px heights or heavy padding (py-12+).
+7. **8px Bento Grid**: Bento-style grids with asymmetric cards and aggressive padding (p-8+).
+8. **Typography**: Bold, expressive (Outfit/Inter). High contrast text-foreground.
+9. **Icons**: Lucide Icons (<i data-lucide="name"></i>). Call lucide.createIcons(); at end of body.
+10. **Full Screens ONLY**: No placeholders. Every output must be a complete, ready-to-use page.
 `;
 
-export const ScreenGenerationPrompt = `Generate production-ready HTML/Tailwind code for a specific screen.
+export const ScreenGenerationPrompt = `Generate production-ready HTML/Tailwind code using CSS Variables.
 ${CORE_DESIGN_PRINCIPLES}
-- **isGlass**: backdrop-blur-2xl bg-background/80 border border-white/10.
-- **isGradient**: mesh gradients (bg-gradient-to-br from-primary/20 via-accent/10).
-- **hasGlow**: bg-primary/20 blur-[120px] rounded-full background elements.
-- **Bento**: 12-col grid with asymmetric cards.
-- **Consistency**: Layout/Headers/Nav MUST match historical context.
-- **Output**: ONLY raw HTML/CSS. NO markdown. Full screen only. NO placeholders. NO 'min-h-screen'.
 
-### 📝 Example Output:
+### 🎨 Variable Mapping Template (to be included in <style>):
+:root {
+  --background: #hex;
+  --foreground: #hex;
+  --primary: #hex;
+  --primary-foreground: #hex;
+  --accent: #hex;
+  --accent-foreground: #hex;
+  --card: #hex;
+  --card-foreground: #hex;
+  --muted: #hex;
+  --muted-foreground: #hex;
+  --border: #hex;
+  --radius: 1.5rem;
+}
 
+- **isGlass**: backdrop-blur-2xl bg-card/80 border border-border/50.
+- **isGradient**: Subtle bg-gradient-to-br from-primary/10 via-background to-accent/5.
+- **Output**: ONLY raw HTML. Full screen only. NO 'min-h-screen' on inner containers.
+
+### 📝 Example Output Structure:
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,8 +49,10 @@ ${CORE_DESIGN_PRINCIPLES}
         }
     </style>
 </head>
-<body class="bg-[var(--background)] text-[var(--foreground)]">
-    <!-- Full page layout here -->
+<body class="bg-[var(--background)] text-[var(--foreground)] min-h-screen">
+    <!-- Full page layout here using semantic classes like bg-primary, bg-card, etc. -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>
 `;

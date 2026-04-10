@@ -106,11 +106,12 @@ export const getInjectedHTML = (html: string) => {
         margin: 0;
         padding: 0;
         min-height: 100%;
-        background-color: transparent;
+        background-color: var(--background, #ffffff);
         color: var(--foreground, #000000);
-        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
         line-height: 1.5;
         -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
       }
       ::-webkit-scrollbar { display: none; }
       * { box-sizing: border-box; }
