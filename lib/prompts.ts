@@ -13,17 +13,33 @@ export const CORE_DESIGN_PRINCIPLES = `### 💎 Design Principles (VIBRANT & ICO
 11. **Full Screens ONLY**: No placeholders. Every output must be a complete, ready-to-use page.
 `;
 
-export const ThemeGenerationPrompt = `Generate a high-fidelity 'Style Guide' screen.
+export const ThemeGenerationPrompt = `Generate a high-fidelity 'Style Guide' (Design System) JSON object.
 ${CORE_DESIGN_PRINCIPLES}
 
-### 🎨 Bento Grid Layout Specification
-This screen MUST be a beautiful, responsive Bento-style grid showcasing the design system. Do not build an app layout (like a landing page or dashboard). Build a Style Guide.
-- **Root Variables**: Define all CSS variables (\`--primary\`, \`--background\`, etc.) in the \`<style>\` block. This establishes the project's theme.
-- **Palette Showcase**: Create lush, visually distinct cards for Primary, Secondary, Tertiary, and Neutral color ramps.
-- **Typography Scale**: Display the font scale (Headlines, Body text, Labels).
-- **Component Previews**: Include beautifully styled example components (e.g., Buttons, Inputs, Badges, Modals) using the defined variables.
+### 🎨 Brand Identity Specification
+- **Creative Name**: Generate a unique, premium-sounding brand name for this project (e.g., "Velvet & Rye", "Horizon Ethos", "Aura Link"). DO NOT use generic names like "Social App Theme" or "My Project".
+- **Variables**: Identify the primary, secondary, tertiary, and neutral colors (HEX).
+- **Typography**: Select a Headline, Body, and Label font family.
 
-Make it look like a premium Dribbble presentation of a Design System.
+### 📐 JSON Output Structure:
+{
+  "brandName": "The generated creative name",
+  "colors": {
+    "primary": "#hex",
+    "secondary": "#hex",
+    "tertiary": "#hex",
+    "neutral": "#hex",
+    "background": "#hex",
+    "foreground": "#hex"
+  },
+  "typography": {
+    "headline": "Font Name",
+    "body": "Font Name",
+    "label": "Font Name"
+  }
+}
+
+Output ONLY the raw JSON.
 `;
 
 export const ScreenGenerationPrompt = `Generate production-ready HTML/Tailwind code using CSS Variables.

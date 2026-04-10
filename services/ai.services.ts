@@ -388,6 +388,19 @@ export class AIService {
               type: "string",
               description: "Instructions for base variables, colors, and typography scales based on the user's initial creative direction.",
             },
+            pendingScreenTitle: {
+              type: "string",
+              description: "The title of the first functional screen to generate after the theme is established.",
+            },
+            pendingScreenPrompt: {
+              type: "string",
+              description: "The design instructions for the first functional screen.",
+            },
+            pendingScreenType: {
+              type: "string",
+              enum: ["app", "web"],
+              description: "The platform type for the pending screen.",
+            },
           },
           required: ["title", "prompt"],
         },
@@ -401,6 +414,11 @@ export class AIService {
                 title: args.title || "Style Guide",
                 prompt: args.prompt,
                 userId: context.userId,
+                pendingScreen: args.pendingScreenTitle ? {
+                   title: args.pendingScreenTitle,
+                   prompt: args.pendingScreenPrompt,
+                   type: args.pendingScreenType
+                } : undefined
               },
             });
 

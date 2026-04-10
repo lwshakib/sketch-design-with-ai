@@ -305,6 +305,7 @@ export const generateThemeFlow = inngest.createFunction(
         return await prisma.theme.update({
           where: { id: dbTheme.id },
           data: {
+            name: (themeVariables as any).brandName || dbTheme.name,
             variables: themeVariables as any,
           },
         });
@@ -323,6 +324,20 @@ export const generateThemeFlow = inngest.createFunction(
            isComplete: true
         } as any, 
       });
+
+      // --- Optional: Chain Pending Screen ---
+      if (event.data.pendingScreen) {
+        await step.sendEvent("trigger-chained-screen", {
+          name: "app/screen.generate",
+          data: {
+            projectId,
+            userId,
+            title: event.data.pendingScreen.title,
+            prompt: event.data.pendingScreen.prompt,
+            type: event.data.pendingScreen.type,
+          },
+        });
+      }
 
       return { success: true };
     } catch (error: any) {

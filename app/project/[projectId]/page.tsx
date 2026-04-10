@@ -551,10 +551,10 @@ export default function ProjectPage() {
           if (data.canvasData.canvasOffset)
             setCanvasOffset(data.canvasData.canvasOffset);
           if (data.canvasData.framePos) setFramePos(data.canvasData.framePos);
-          if (data.screens) {
-            const fetchedArtifacts = data.screens.map((s: any) => ({
+          if (data.artifacts) {
+            const fetchedArtifacts = data.artifacts.map((s: any) => ({
               ...s,
-              isComplete: s.status === "completed",
+              isComplete: s.status === "completed" || s.type === "theme",
             }));
             setArtifacts(fetchedArtifacts);
             setThrottledArtifacts(fetchedArtifacts);

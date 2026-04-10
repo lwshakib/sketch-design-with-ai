@@ -69,8 +69,11 @@ export async function POST(req: Request) {
     // Theme Enforcement Check
     const hasTheme = (project.themes?.length || 0) > 0;
     const themeEnforcement = !hasTheme
-        ? `\n\nCRITICAL MANDATE: This project currently HAS NO THEME. Before you agree to build ANY functional application screens, you MUST call the 'generateTheme' tool to establish the exact color variables and typography scale. Do not call generateScreen until generateTheme has been executed.`
-        : `\n\nTheme Status: A theme is already established for this project. Focus on functional screens.`;
+        ? `\n\nCRITICAL MANDATE: This project currently HAS NO THEME. You MUST call the 'generateTheme' tool first to establish the design system. 
+        IMPORTANT: If the user is asking to build a specific screen (e.g. "Build a login page"), call 'generateTheme' and put the login page details into the 'pendingScreenTitle' and 'pendingScreenPrompt' parameters. 
+        The system will then automatically generate that screen once the theme is finished. 
+        Do NOT call 'generateScreen' directly in the same turn if no theme exists.`
+        : `\n\nTheme Status: A theme is already established. You may now call 'generateScreen' directly for any new requests.`;
 
     const creditContext = `\n\nUser Credits: ${currentCredits} remaining today. Each generated screen costs 1 credit. If credits are low, plan your generations carefully. If credits are exhausted, inform the user you cannot generate more screens until tomorrow.`;
 
