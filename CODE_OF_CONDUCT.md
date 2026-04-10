@@ -53,6 +53,6 @@ Community leaders will follow these guidelines in determining the consequences f
 
 ---
 
-**Last Updated**: March 2026
+**Last Updated**: April 2026
 
 Thank you for helping make this a welcoming, friendly community for everyone!

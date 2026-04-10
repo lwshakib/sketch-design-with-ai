@@ -26,7 +26,7 @@ Everyone participating in this project is governed by our [Code of Conduct](CODE
 - **Bun**: Latest (Recommended)
 - **PostgreSQL**: v14+
 - **Git**
-- **Google Gemini API Key**: [Get one here](https://makersuite.google.com/app/apikey)
+- **Cloudflare AI Gateway API Key**: [Get one here](https://developers.cloudflare.com/ai-gateway/)
 
 ### Fork and Clone
 
@@ -49,18 +49,19 @@ Everyone participating in this project is governed by our [Code of Conduct](CODE
    ```bash
    cp .env.example .env
    ```
-   Fill in `DATABASE_URL`, `GOOGLE_GENERATIVE_AI_API_KEY`, and `BETTER_AUTH_SECRET`.
-3. **Database Initialization**:
+   Fill in `DATABASE_URL`, `CLOUDFLARE_AI_GATEWAY_API_KEY`, `CLOUDFLARE_AI_GATEWAY_ENDPOINT`, and `BETTER_AUTH_SECRET`.
+3. **Database & Storage Initialization**:
    ```bash
    bun run db:migrate
+   bun run bucket:setup
    ```
-   *Note: This generates the Prisma client into `./generated/prisma`.*
+   *Note: `db:migrate` generates the Prisma client into `./generated/prisma`.*
 
 ### Running the App
 
 1. **Start Inngest Dev Server** (Required for AI features):
    ```bash
-   bun run inngest
+   bun x inngest-cli@latest dev
    ```
 2. **Start Next.js**:
    ```bash
@@ -75,9 +76,10 @@ The project implements a daily credit limit (10 credits) per user.
 - **Testing**: To reset your credits during development, you can manually update the `lastCreditReset` field in the `User` table to a previous date using Prisma Studio (`bun run db:studio`).
 
 ### Inngest Workflows
-AI generation is handled asynchronously via Inngest to support streaming, multi-step retries, and background processing.
+AI generation is handled asynchronously via Inngest to support streaming, visual consistency (themes), and background processing.
 - **Files**: Check the `inngest/` directory for function definitions.
-- **Execution**: The `chat` API route triggers Inngest events which then call the LLM tools.
+- **Execution**: The AI tools in `services/ai.services.ts` trigger Inngest events which process the design logic.
+- **Realtime**: We use Inngest Realtime to push status updates from the background workers to the React Flow canvas.
 
 ### Prisma Configuration
 We use a custom output directory for the Prisma Client to avoid issues with some deployment environments.
@@ -87,7 +89,8 @@ We use a custom output directory for the Prisma Client to avoid issues with some
 ## 📝 Coding Standards
 
 - **TypeScript**: Mandatory for all logic. Use strict typing.
-- **React**: Use Functional Components and Hooks.
+- **React**: Use Functional Components and Hooks (React 19).
+- **Canvas**: Use `@xyflow/react` for spatial UI logic.
 - **Styling**: Tailwind CSS 4 only. Use the `cn()` utility for conditional classes.
 - **API**: Follow the standard response format `{ success: boolean, data?: any, error?: string }`.
 
@@ -101,9 +104,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## 🧪 Testing Guidelines
 
-- **Unit Tests**: Use Jest (`bun test`).
-- **E2E Tests**: Use Playwright (`bun run test:e2e`).
-- **New Features**: Must include relevant tests to ensure stability.
+Currently, the project is prioritizing feature stability. New core logic should be manually tested against the dev environment before submission. Automated testing suites (Vitest/Playwright) are planned for future milestones.
 
 ## 🙏 Thank You!
 

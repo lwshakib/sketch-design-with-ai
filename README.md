@@ -1,6 +1,6 @@
 # <img src="public/logo.svg" width="32" alt="Sketch Logo" /> Sketch - Design with AI
 
-> Transform your sketches into stunning, production-ready designs using the power of AI.
+> Build high-fidelity design systems and UI screens using the power of Agentic AI.
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black)](https://nextjs.org/)
@@ -13,15 +13,13 @@
 
 **Sketch** is an intelligent AI-powered design tool that transforms your ideas into reality. Whether you're a developer needing a quick UI mockup or a designer iterating on concepts, this tool empowers you to:
 
-- 🎨 **Text-to-Design**: Describe your idea in plain text and watch it come to life
-- 📸 **Screenshot-to-Code**: Upload a screenshot or wireframe to generate editable code
-- ✏️ **Sketch Integration**: Use the canvas to draw and iterate on concepts manually
-- 🤖 **AI-Powered Design**: Leverage Google Gemini 2.0 Flash AI to transform sketches into modern, aesthetically pleasing designs
-- 👁️ **Instant Preview**: See your design evolve in real-time with instant rendering and live project thumbnails
-- 🎭 **Variations & Iteration**: Generate multiple design variations with automated retry logic for high-fidelity results
-- 💻 **Export to Code**: Get production-ready code (HTML/React/CSS) instantly
-- 📱 **Responsive Design**: Generate designs that work seamlessly across all device sizes with mobile-first previews
-- 💳 **Credit System**: Managed daily allowance for AI generations to ensure sustainable usage
+- 🎨 **Text-to-Design**: Describe your idea in natural language and watch the AI generate multi-screen design systems.
+- 🖼️ **Theme Prototyping**: Automatically establish a consistent design system (colors, typography) before generating functional screens.
+- 🤖 **Agentic Design Generation**: Leverages Kimi K2.5 (via Cloudflare AI Gateway) for high-fidelity HTML/CSS production.
+- 👁️ **Infinite Canvas**: Manage your entire project visually on an infinite spatial workspace powered by React Flow.
+- ⚡ **Inngest Realtime**: Watch your designs come to life with live status updates pushed directly to the UI.
+- 💻 **Code Export**: Get production-ready, clean code (Tailwind HTML/CSS) instantly.
+- 💳 **Credit System**: Managed project-based credit allowance for sustainable AI generations.
 
 ## 🏗️ Architecture
 
@@ -30,21 +28,22 @@ graph TD
     User([User])
     subgraph Client ["Client Side (Next.js 16)"]
         UI[User Interface]
-        Canvas[Infinite Canvas]
-        Preview[Real-time Preview]
+        Canvas[Infinite Canvas / React Flow]
+        Realtime[Inngest Realtime Status]
     end
 
     subgraph Server ["Server Side (Next.js API & Inngest)"]
         Auth[Better Auth]
-        InngestAPI[Inngest Background Jobs]
-        ProjectAPI[Project & Credits API]
-        LLM[LLM Integration Layer]
+        InngestAPI[Inngest Background Workers]
+        ProjectAPI[Project & Credits Logic]
+        AIService[AI Service Gateway]
     end
 
     subgraph Services ["External Services"]
-        Gemini[Google Gemini 2.0 Flash]
+        Gateway[Cloudflare AI Gateway]
+        Kimi[Kimi K2.5 Model]
         InngestCloud[Inngest Event Bus]
-        Cloudinary[Cloudinary Media]
+        S3Storage[AWS S3 / R2 Storage]
     end
 
     subgraph Data ["Data Layer"]
@@ -53,21 +52,24 @@ graph TD
     end
 
     User -->|Interacts| UI
-    UI -->|Draws/Edits| Canvas
+    UI -->|Manages Canvas| Canvas
     UI -->|Authenticates| Auth
     UI -->|API Requests| ProjectAPI
+    
+    InngestCloud -.->|Realtime Updates| Realtime
 
     ProjectAPI -->|CRUD| DB
-    ProjectAPI -->|Check Credits| DB
     ProjectAPI -->|Trigger Generation| InngestCloud
 
-    InngestCloud -->|Execute Function| InngestAPI
-    InngestAPI -->|Stream Generation| Gemini
+    InngestCloud -->|Execute Workflow| InngestAPI
+    InngestAPI -->|Tool Calling| AIService
+    AIService -->|Stream/Generate| Gateway
+    Gateway -->|Inference| Kimi
     InngestAPI -->|Consume Credit| DB
     InngestAPI -->|Persist Design| DB
 
-    Auth -->|Persist Session| DB
-    Canvas -->|Upload Assets| Cloudinary
+    Auth -->|Session Management| DB
+    InngestAPI -->|Store Assets| S3Storage
 ```
 
 ## 🎬 App Demos
@@ -101,12 +103,12 @@ graph TD
 
 ### AI Capabilities
 
-- **Smart Design Generation**: AI understands context and generates pixel-perfect designs using Gemini 2.0 Flash
-- **Design Variations**: Create multiple visual explorations from a single prompt or screen
-- **Auto-Retry & Validation**: Intelligent system that retries generation if output is incomplete or faulty
-- **Theme Application**: Automatically apply consistent themes across your designs
-- **Code Export**: Get clean, production-ready HTML, CSS, and React code
-- **Responsive Previews**: View designs in Mobile, Tablet, and Desktop modes with live sidebar thumbnails
+- **Smart Design Generation**: Highly precise design generation using Kimi K2.5.
+- **Theme Orchestration**: Decoupled theme generation to ensure visual consistency across all project screens.
+- **Infinite Spatial Workspace**: Organize screens and themes on a zoomable React Flow canvas.
+- **Inngest Realtime**: Live progress tracking for every generation step.
+- **Code Export**: Get clean, production-ready HTML and CSS.
+- **Responsive Previews**: Immediate visualization of mobile and web outputs.
 
 ### Managed Ecosystem
 
@@ -129,13 +131,14 @@ graph TD
 | Category | Technologies |
 | :--- | :--- |
 | **Frontend** | [Next.js 16.1](https://nextjs.org/), [React 19](https://react.dev/), [TypeScript 5](https://www.typescriptlang.org/), [Tailwind CSS 4](https://tailwindcss.com/) |
+| **Canvas** | [@xyflow/react](https://reactflow.dev/) (React Flow) |
 | **Animation** | [Framer Motion 12](https://www.framer.com/motion/), [Motion](https://motion.dev/) |
-| **Components** | [Radix UI](https://www.radix-ui.com/), [shadcn/ui](https://ui.shadcn.com/) |
+| **Components** | [Radix UI](https://www.radix-ui.com/) |
 | **Backend** | [Better Auth 1.4](https://www.better-auth.com/), [Inngest 3.5](https://www.inngest.com/) |
 | **Database** | [PostgreSQL](https://www.postgresql.org/), [Prisma ORM 7.2](https://www.prisma.io/) |
-| **AI** | [Google Gemini 2.0 Flash](https://ai.google.dev/) via [Vercel AI SDK](https://sdk.vercel.ai/) |
-| **Utilities** | [Zustand](https://zustand-demo.pmnd.rs/), [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/) |
-| **Media** | [Cloudinary](https://cloudinary.com/), [html2canvas](https://html2canvas.hertzen.com/) |
+| **AI** | [Kimi K2.5](https://www.moonshot.cn/) via [Cloudflare AI Gateway](https://developers.cloudflare.com/ai-gateway/) |
+| **Utilities** | [Zustand](https://zustand-demo.pmnd.rs/), [tokenlens](https://github.com/infera-ai/tokenlens) |
+| **Storage** | [AWS S3](https://aws.amazon.com/s3/) (or compatible R2/Minio) |
 
 ## 📋 Prerequisites
 
@@ -173,26 +176,32 @@ cp .env.example .env
 
 ```env
 # Database
-DATABASE_URL="postgresql://user:pass@localhost:5432/sketch_wireframe_db"
+DATABASE_URL="postgresql://user:pass@localhost:5432/sketch_db"
 
-# Google AI (Gemini)
-GOOGLE_GENERATIVE_AI_API_KEY="your_gemini_api_key"
+# Cloudflare AI Gateway
+CLOUDFLARE_AI_GATEWAY_API_KEY="your_api_key"
+CLOUDFLARE_AI_GATEWAY_ENDPOINT="https://gateway.ai.cloudflare.com/v1/..."
 
 # Better Auth
 BETTER_AUTH_SECRET="your_generated_secret"
 BETTER_AUTH_URL="http://localhost:3000"
 
-# Cloudinary (Optional)
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your_cloud_name"
-CLOUDINARY_API_KEY="your_api_key"
-CLOUDINARY_API_SECRET="your_api_secret"
+# Media Storage (S3 / R2)
+AWS_REGION="auto"
+AWS_ENDPOINT="your_s3_endpoint"
+AWS_ACCESS_KEY_ID="your_access_key"
+AWS_SECRET_ACCESS_KEY="your_secret_key"
+AWS_S3_BUCKET_NAME="your_bucket_name"
 ```
 
-### 4. Database Initialization
+### 4. Database & Storage Setup
 
 ```bash
 # Generate the Prisma client & run migrations
 bun run db:migrate
+
+# Setup S3 bucket CORS and policies (optional script)
+bun run bucket:setup
 ```
 
 ### 5. Start the Services
@@ -201,7 +210,7 @@ You need both the Inngest dev server and the Next.js dev server running:
 
 ```bash
 # Terminal 1: Inngest Dev Server
-bun run inngest
+bun x inngest-cli@latest dev
 
 # Terminal 2: Next.js App
 bun dev
@@ -211,13 +220,13 @@ Open [http://localhost:3000](http://localhost:3000) to start designing.
 
 ## 📁 Project Structure
 
-- `app/`: Next.js App Router (Pages & API Routes)
-- `components/`: UI components (Radix/Shadcn)
-- `inngest/`: Background job definitions & workflow logic
-- `llm/`: AI integration, prompts, and tool configurations
+- `app/`: Next.js App Router (Pages, API, and Server Actions)
+- `components/`: UI components (Radix, Canvas, Editor)
+- `inngest/`: Background job definitions & realtime status logic
+- `services/`: AI Gateway service and S3 storage service
 - `lib/`: Shared utilities, auth logic, and credit management
-- `prisma/`: Database schema and migrations
-- `hooks/`: Custom React hooks for global state and UI logic
+- `prisma/`: Database schema and configuration
+- `generated/`: Generated Prisma Client (ignored by git)
 - `public/`: Static assets and icons
 
 ## 🎯 Usage Guide
