@@ -21,6 +21,7 @@ import {
   Tablet,
   MoreHorizontal,
   Menu,
+  Home,
   Code,
   Share2,
   Download,
@@ -452,6 +453,13 @@ export function CanvasArea({
             >
               <DropdownMenuItem
                 onClick={() => (window.location.href = "/")}
+                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
+              >
+                <Home className="mr-2.5 h-4 w-4 opacity-70" />
+                <span>Back to home</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => (window.location.href = "/projects")}
                 className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
               >
                 <LayoutGrid className="mr-2.5 h-4 w-4 opacity-70" />
