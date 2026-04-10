@@ -13,15 +13,14 @@ import {
   Smartphone,
   LogOut,
   Loader2,
-  ArrowLeft,
   CheckCircle2,
   Github,
 } from "lucide-react";
-import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { UserMenu } from "@/components/user-menu";
 import { ModeToggle } from "@/components/mode-toggle";
+import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 
 export default function AccountPage() {
@@ -201,15 +200,9 @@ export default function AccountPage() {
 
   return (
     <div className="bg-background text-foreground selection:bg-primary/30 min-h-screen font-sans transition-colors duration-500">
-      <header className="bg-background/80 border-border/50 sticky top-0 z-50 flex w-full items-center justify-between border-b px-6 py-2 backdrop-blur-md">
+      <header className="z-40 flex w-full items-center justify-between bg-background/50 px-6 py-4 backdrop-blur-md">
         <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="text-muted-foreground hover:text-foreground group inline-flex items-center gap-2 py-1 text-sm font-bold transition-all"
-          >
-            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            Back to Dashboard
-          </Link>
+          <Logo />
         </div>
         <div className="flex items-center gap-4">
           <ModeToggle />
