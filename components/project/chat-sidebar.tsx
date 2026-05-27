@@ -555,7 +555,7 @@ export function ChatSidebar({
                                       })()
                                     ) : (
                                       <div className="flex flex-col gap-4">
-                                        <div className="text-foreground/90 text-[15px] leading-relaxed">
+                                        <div className="bg-muted/20 border-border/50 backdrop-blur-md rounded-2xl border p-4 shadow-sm w-fit max-w-[90%] text-foreground/90 text-[14.5px] leading-relaxed">
                                           <MessageResponse>
                                             {(msg.parts as any[])
                                               ?.filter((p) => p.type === "text")
