@@ -267,7 +267,7 @@ export default function ProjectPage() {
               const currentWidth = getWidth(scrType);
               return last
                 ? (last.x || 0) + (last.width || getWidth(last.type)) + 120
-                : 200;
+                : -currentWidth / 2;
             };
             return [
               ...prev,
@@ -278,7 +278,7 @@ export default function ProjectPage() {
                 type: type as any,
                 isComplete: false,
                 x: type === "theme" ? -1250 : getNewX(prev, type),
-                y: type === "theme" ? -200 : 0,
+                y: type === "theme" ? -200 : -((type === "web" ? 700 : 800) / 2),
               },
             ];
           };
@@ -359,20 +359,21 @@ export default function ProjectPage() {
                      isComplete: true,
                    };
                  } else {
-                    const getNewX = (existing: any[], scrType: string) => {
-                      const existingScreens = existing.filter((a) => a.type !== "theme");
-                      const last = existingScreens[existingScreens.length - 1];
-                      const getWidth = (t: string) =>
-                        t === "app" ? 380 : t === "web" ? 1280 : 1024;
-                      return last
-                        ? (last.x || 0) + (last.width || getWidth(last.type)) + 120
-                        : 200;
-                    };
+                   const getNewX = (existing: any[], scrType: string) => {
+                     const existingScreens = existing.filter((a) => a.type !== "theme");
+                     const last = existingScreens[existingScreens.length - 1];
+                     const getWidth = (t: string) =>
+                       t === "app" ? 380 : t === "web" ? 1280 : 1024;
+                     const currentWidth = getWidth(scrType);
+                     return last
+                       ? (last.x || 0) + (last.width || getWidth(last.type)) + 120
+                       : -currentWidth / 2;
+                   };
                    updated.push({
                      ...finishedScreen,
                      isComplete: true,
                      x: finishedScreen.x !== undefined ? finishedScreen.x : (finishedScreen.type === "theme" ? -1250 : getNewX(updated, finishedScreen.type)),
-                     y: finishedScreen.y !== undefined ? finishedScreen.y : (finishedScreen.type === "theme" ? -200 : 0),
+                     y: finishedScreen.y !== undefined ? finishedScreen.y : (finishedScreen.type === "theme" ? -200 : -((finishedScreen.type === "web" ? 700 : 800) / 2)),
                    });
                  }
                }
@@ -428,15 +429,16 @@ export default function ProjectPage() {
                    const last = existingScreens[existingScreens.length - 1];
                    const getWidth = (t: string) =>
                      t === "app" ? 380 : t === "web" ? 1280 : 1024;
+                   const currentWidth = getWidth(scrType);
                    return last
                      ? (last.x || 0) + (last.width || getWidth(last.type)) + 120
-                     : 200;
+                     : -currentWidth / 2;
                  };
                 updated.push({
                   ...newScreen,
                   isComplete: true,
-                  x: newScreen.x || getNewX(updated, newScreen.type),
-                  y: newScreen.y || 0,
+                  x: newScreen.x !== undefined ? newScreen.x : getNewX(updated, newScreen.type),
+                  y: newScreen.y !== undefined ? newScreen.y : (newScreen.type === "theme" ? -200 : -((newScreen.type === "web" ? 700 : 800) / 2)),
                 });
               }
             }

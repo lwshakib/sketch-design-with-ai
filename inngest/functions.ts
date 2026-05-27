@@ -57,11 +57,12 @@ export const generateScreen = inngest.createFunction(
           orderBy: { x: "desc" },
         });
 
-        // Use a standard width based on type
+        // Use standard screen type and width
         const width = type === "web" ? 1280 : 380;
         const currentX = lastScreen
           ? lastScreen.x + (lastScreen.width || (lastScreen.type === "web" ? 1280 : 380)) + 120
-          : 200;
+          : -width / 2;
+        const currentY = -((type === "web" ? 700 : 800) / 2);
 
         return await prisma.screen.create({
           data: {
@@ -71,7 +72,7 @@ export const generateScreen = inngest.createFunction(
             type: type as any,
             status: "generating",
             x: currentX,
-            y: 0,
+            y: currentY,
             width,
             height: null,
           },
