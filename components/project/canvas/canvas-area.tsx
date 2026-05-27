@@ -59,7 +59,14 @@ import {
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { QRCodeSVG } from "qrcode.react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 import NumberFlow from "@number-flow/react";
 
@@ -90,6 +97,7 @@ import { LogoIcon } from "@/components/logo";
 import { toast } from "sonner";
 import axios from "axios";
 import { useProjectStore } from "@/hooks/use-project-store";
+import { useChat } from "@/hooks/use-chat";
 import { SecondarySidebar } from "../secondary-sidebar";
 
 const SELECTION_BLUE = "#3b82f6";
@@ -234,6 +242,7 @@ export function CanvasArea({
   }, []);
 
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
     fetchCredits();
   }, [fetchCredits]);
@@ -268,6 +277,56 @@ export function CanvasArea({
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 160)}px`;
     }
   }, [input]);
+
+  const { sendMessage } = useChat(project?.id || "");
+
+  // Filter project themes and currently active theme
+  const projectThemes = React.useMemo(() => {
+    return throttledArtifacts.filter((a) => a.type === "theme");
+  }, [throttledArtifacts]);
+
+  const activeTheme = React.useMemo(() => {
+    return projectThemes.find((t) => t.isActive);
+  }, [projectThemes]);
+
+  // Handler to activate a different theme
+  const handleSwitchTheme = async (themeId: string) => {
+    try {
+      const res = await fetch(`/api/themes/${themeId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: true }),
+      });
+      if (!res.ok) throw new Error("Failed to switch theme");
+      
+      const updateFn = (prev: any[]) =>
+        prev.map((a) =>
+          a.type === "theme"
+            ? { ...a, isActive: a.id === themeId }
+            : a
+        );
+      setArtifacts(updateFn);
+      setThrottledArtifacts(updateFn);
+      toast.success("Theme switched successfully!");
+    } catch (e) {
+      toast.error("Failed to switch theme");
+    }
+  };
+
+  // State for creating a new design system theme
+  const [isCreateThemeOpen, setIsCreateThemeOpen] = React.useState(false);
+  const [themePrompt, setThemePrompt] = React.useState("");
+
+  const handleCreateThemeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!themePrompt.trim()) return;
+
+    sendMessage({
+      text: `Create a new theme: ${themePrompt.trim()}`,
+    });
+    setThemePrompt("");
+    setIsCreateThemeOpen(false);
+  };
 
   const isEditMode = secondarySidebarMode === "properties";
   const _status = isGenerating ? "streaming" : "ready"; // Simplification for UI checks
@@ -1064,7 +1123,74 @@ export function CanvasArea({
                 />
 
                 <div className="flex items-center justify-between gap-3 px-1">
-                  <div className="flex items-center gap-2" />
+                  <div className="flex items-center gap-1.5">
+                    {/* Multi-theme Dropdown Select */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="bg-muted/40 border-border/50 text-foreground/80 hover:text-foreground flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[11px] font-semibold transition-all hover:bg-muted"
+                        >
+                          <Palette className="h-3 w-3 text-primary opacity-80" />
+                          <span className="max-w-[80px] truncate">
+                            {activeTheme ? activeTheme.title : "Select Theme"}
+                          </span>
+                          <ChevronDown className="h-2.5 w-2.5 opacity-50" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="start"
+                        className="bg-card border-border text-foreground z-[100] w-56 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
+                      >
+                        <div className="px-2.5 py-1 text-[9px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border/30 mb-1">
+                          Select Project Theme
+                        </div>
+                        {projectThemes.length === 0 ? (
+                          <div className="px-3 py-1.5 text-xs text-muted-foreground italic">
+                            No themes found
+                          </div>
+                        ) : (
+                          projectThemes.map((theme) => (
+                            <DropdownMenuItem
+                              key={theme.id}
+                              onClick={() => handleSwitchTheme(theme.id!)}
+                              className={cn(
+                                "hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-2.5 py-1.5 text-[11.5px] font-medium",
+                                theme.isActive && "text-primary font-semibold"
+                              )}
+                            >
+                              <div className="flex items-center gap-2 truncate max-w-[150px]">
+                                <div
+                                  className="size-3 rounded-full border shrink-0"
+                                  style={{ backgroundColor: theme.variables?.colors?.primary || "#6366f1" }}
+                                />
+                                <span className="truncate">{theme.title}</span>
+                              </div>
+                              {theme.isActive && (
+                                <Check className="h-3 w-3 text-primary shrink-0" />
+                              )}
+                            </DropdownMenuItem>
+                          ))
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    {/* Add Theme Button */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          onClick={() => setIsCreateThemeOpen(true)}
+                          variant="ghost"
+                          size="icon"
+                          className="bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/50 h-7 w-7 rounded-full p-0 flex items-center justify-center"
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Create a new theme</TooltipContent>
+                    </Tooltip>
+                  </div>
 
                   <div className="flex items-center gap-2">
                     <Button
@@ -1215,6 +1341,52 @@ export function CanvasArea({
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Theme Dialog */}
+      <Dialog open={isCreateThemeOpen} onOpenChange={setIsCreateThemeOpen}>
+        <DialogContent className="bg-background border-border text-foreground rounded-3xl p-6 shadow-2xl sm:max-w-md">
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="text-xl font-bold tracking-tight">
+               Create Theme (Design System)
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground text-xs leading-relaxed">
+               Describe the visual direction, base colors, and mood of the new style guide. The generator will create color ramps and typography tokens.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreateThemeSubmit} className="space-y-4 pt-3">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest px-1">
+                 Creative Prompt
+              </label>
+              <textarea
+                value={themePrompt}
+                onChange={(e) => setThemePrompt(e.target.value)}
+                placeholder="e.g. A retro cybernetic theme with neon green accents, dark charcoal cards, and futuristic monospaced headers..."
+                className="bg-secondary/40 border-border text-foreground placeholder:text-muted-foreground/40 focus:ring-primary/50 min-h-[100px] w-full rounded-2xl border px-4 py-3 text-xs leading-relaxed transition-all focus:ring-1 focus:outline-none resize-none"
+                autoFocus
+                required
+              />
+            </div>
+            <DialogFooter className="flex flex-row items-center gap-3 pt-2">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsCreateThemeOpen(false)}
+                className="text-muted-foreground hover:bg-secondary hover:text-foreground h-9 flex-1 rounded-xl text-xs font-semibold"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={!themePrompt.trim()}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold transition-all shadow-md"
+              >
+                Create Theme
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

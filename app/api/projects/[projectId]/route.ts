@@ -65,7 +65,8 @@ export async function GET(
           createdAt: t.createdAt,
           updatedAt: t.updatedAt,
           isComplete: true,
-          status: "completed"
+          status: "completed",
+          isActive: t.isActive
         })),
         ...project.screens.map(s => ({
           ...s,

@@ -17,4 +17,5 @@ export type Artifact = {
   isDisliked?: boolean;
   status?: "generating" | "completed";
   variables?: any; // For Theme nodes
+  isActive?: boolean;
 };
