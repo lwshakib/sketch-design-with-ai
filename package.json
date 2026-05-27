@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
     "postinstall": "pnpm exec prisma generate",

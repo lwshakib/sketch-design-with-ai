@@ -1,0 +1,58 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master, dev ]
+
+jobs:
+  build-and-verify:
+    name: Build and Verify Codebase
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_PUBLIC_BASE_URL: "http://localhost:3000"
+      AWS_REGION: "us-east-1"
+      AWS_S3_BUCKET_NAME: "dummy-bucket"
+      AWS_ACCESS_KEY_ID: "dummy-access-key-id"
+      AWS_SECRET_ACCESS_KEY: "dummy-secret-access-key"
+      DATABASE_URL: "postgresql://dummy_user:dummy_password@localhost:5432/dummy_db"
+      BETTER_AUTH_SECRET: "dummy_better_auth_secret_minimum_32_characters_long_value"
+      BETTER_AUTH_URL: "http://localhost:3000"
+      RESEND_API_KEY: "re_dummy_key"
+      GOOGLE_CLIENT_ID: "dummy_google_client_id"
+      GOOGLE_CLIENT_SECRET: "dummy_google_client_secret"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm run db:generate
+
+      - name: Check Code Formatting (Prettier)
+        run: pnpm run format:check
+
+      - name: Code Lint Check (ESLint)
+        run: pnpm run lint
+
+      - name: TypeScript Type Check (TSC)
+        run: pnpm run typecheck
+
+      - name: Production Build Check
+        run: pnpm run build

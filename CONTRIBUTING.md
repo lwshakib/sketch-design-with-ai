@@ -104,7 +104,15 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## 🧪 Testing Guidelines
 
-Currently, the project is prioritizing feature stability. New core logic should be manually tested against the dev environment before submission. Automated testing suites (Vitest/Playwright) are planned for future milestones.
+Currently, the project is prioritizing feature stability. New core logic should be manually tested against the dev environment before submission. 
+
+Please make sure to run the following validation scripts locally before opening a pull request:
+- **Code formatting**: `pnpm run format:check` (or `pnpm run format` to auto-fix styling)
+- **ESLint Linting**: `pnpm run lint`
+- **TypeScript Typechecking**: `pnpm run typecheck`
+- **Production Compilation**: `pnpm run build`
+
+Automated testing suites (Vitest/Playwright) are planned for future milestones.
 
 ## 🙏 Thank You!
 
