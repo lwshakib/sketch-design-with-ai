@@ -145,7 +145,7 @@ graph TD
 Before you begin, ensure you have the following installed:
 
 - **Node.js**: v18.17 or higher ([Download](https://nodejs.org/))
-- **Bun**: Latest version ([Install](https://bun.sh/))
+- **pnpm**: Latest version ([Install](https://pnpm.io/))
 - **PostgreSQL**: v14 or higher ([Download](https://www.postgresql.org/download/))
 - **Git**: For version control ([Download](https://git-scm.com/))
 
@@ -161,7 +161,7 @@ cd sketch-design-with-ai
 ### 2. Install Dependencies
 
 ```bash
-bun install
+pnpm install
 ```
 
 ### 3. Environment Setup
@@ -198,10 +198,10 @@ AWS_S3_BUCKET_NAME="your_bucket_name"
 
 ```bash
 # Generate the Prisma client & run migrations
-bun run db:migrate
+pnpm db:migrate
 
 # Setup S3 bucket CORS and policies (optional script)
-bun run bucket:setup
+pnpm bucket:setup
 ```
 
 ### 5. Start the Services
@@ -210,10 +210,10 @@ You need both the Inngest dev server and the Next.js dev server running:
 
 ```bash
 # Terminal 1: Inngest Dev Server
-bun x inngest-cli@latest dev
+pnpm exec inngest-cli@latest dev
 
 # Terminal 2: Next.js App
-bun dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to start designing.
@@ -244,7 +244,7 @@ Open [http://localhost:3000](http://localhost:3000) to start designing.
 
 1. Set up a PostgreSQL database (e.g., Neon or Supabase).
 2. Configure environment variables in Vercel.
-3. Ensure the `postinstall` script runs `bun run db:generate`.
+3. Ensure the `postinstall` script runs `pnpm db:generate`.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/lwshakib/sketch-design-with-ai)
 

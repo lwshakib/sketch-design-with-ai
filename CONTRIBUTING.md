@@ -23,7 +23,7 @@ Everyone participating in this project is governed by our [Code of Conduct](CODE
 ### Prerequisites
 
 - **Node.js**: v18.17+
-- **Bun**: Latest (Recommended)
+- **pnpm**: Latest (Recommended)
 - **PostgreSQL**: v14+
 - **Git**
 - **Cloudflare AI Gateway API Key**: [Get one here](https://developers.cloudflare.com/ai-gateway/)
@@ -43,7 +43,7 @@ Everyone participating in this project is governed by our [Code of Conduct](CODE
 
 1. **Install dependencies**:
    ```bash
-   bun install
+   pnpm install
    ```
 2. **Environment Variables**:
    ```bash
@@ -52,8 +52,8 @@ Everyone participating in this project is governed by our [Code of Conduct](CODE
    Fill in `DATABASE_URL`, `CLOUDFLARE_AI_GATEWAY_API_KEY`, `CLOUDFLARE_AI_GATEWAY_ENDPOINT`, and `BETTER_AUTH_SECRET`.
 3. **Database & Storage Initialization**:
    ```bash
-   bun run db:migrate
-   bun run bucket:setup
+   pnpm db:migrate
+   pnpm bucket:setup
    ```
    *Note: `db:migrate` generates the Prisma client into `./generated/prisma`.*
 
@@ -61,11 +61,11 @@ Everyone participating in this project is governed by our [Code of Conduct](CODE
 
 1. **Start Inngest Dev Server** (Required for AI features):
    ```bash
-   bun x inngest-cli@latest dev
+   pnpm exec inngest-cli@latest dev
    ```
 2. **Start Next.js**:
    ```bash
-   bun dev
+   pnpm dev
    ```
 
 ## 🏗️ Technical Architecture
@@ -73,7 +73,7 @@ Everyone participating in this project is governed by our [Code of Conduct](CODE
 ### AI Credit System
 The project implements a daily credit limit (10 credits) per user.
 - **Logic**: Found in `lib/credits.ts`.
-- **Testing**: To reset your credits during development, you can manually update the `lastCreditReset` field in the `User` table to a previous date using Prisma Studio (`bun run db:studio`).
+- **Testing**: To reset your credits during development, you can manually update the `lastCreditReset` field in the `User` table to a previous date using Prisma Studio (`pnpm db:studio`).
 
 ### Inngest Workflows
 AI generation is handled asynchronously via Inngest to support streaming, visual consistency (themes), and background processing.
