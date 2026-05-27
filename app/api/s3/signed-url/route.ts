@@ -1,4 +1,4 @@
-import { s3Service } from "@/services/s3.services";
+import { getSignedDownloadUrl } from "@/lib/s3";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       paths.map(async (path: string) => {
         try {
           if (path.startsWith("http")) return path; // Skip if it's already a URL
-          return await s3Service.getSignedDownloadUrl(path);
+          return await getSignedDownloadUrl(path);
         } catch (error) {
           console.error(`[API] Resolve Error for path: ${path}`, error);
           return null;

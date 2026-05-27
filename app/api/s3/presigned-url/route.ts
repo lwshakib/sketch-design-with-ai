@@ -1,4 +1,4 @@
-import { s3Service } from "@/services/s3.services";
+import { getPresignedUploadUrl } from "@/lib/s3";
 import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const extension = fileName?.split(".").pop() || contentType.split("/")[1];
     const path = `${folder}/${uuidv4()}.${extension}`;
 
-    const presignedUrl = await s3Service.getPresignedUploadUrl(path, contentType);
+    const presignedUrl = await getPresignedUploadUrl(path, contentType);
 
     return NextResponse.json({
       uploadUrl: presignedUrl,
