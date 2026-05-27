@@ -723,9 +723,13 @@ export function CanvasArea({
                       artifact.isComplete) && (
                       <div className="pointer-events-none absolute -top-7 right-0 left-0 flex items-center justify-between px-1 select-none">
                         <span
-                          className="text-[12px] font-bold"
+                          className="text-[12px] font-bold truncate whitespace-nowrap overflow-hidden text-ellipsis"
                           style={{
                             color: "var(--primary)",
+                            transform: `scale(${1 / (zoom * 0.5)})`,
+                            transformOrigin: "left bottom",
+                            display: "inline-block",
+                            maxWidth: "75%",
                           }}
                         >
                           {artifact.title || "Untitled Screen"}
@@ -735,6 +739,8 @@ export function CanvasArea({
                             className="h-3.5 w-3.5"
                             style={{
                               color: "var(--muted-foreground)",
+                              transform: `scale(${1 / (zoom * 0.5)})`,
+                              transformOrigin: "right bottom",
                             }}
                           />
                         </div>
