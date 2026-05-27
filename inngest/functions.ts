@@ -1,13 +1,14 @@
 import { inngest } from "./client";
 import { NonRetriableError } from "inngest";
-import { aiService } from "../services/ai.services";
+import { processMessages } from "../llm/utils";
+import { generateText } from "../llm/generateText";
+import { generateObject } from "../llm/generateObject";
 import { z } from "zod";
 import {
   ScreenGenerationPrompt,
   ThemeGenerationPrompt,
 } from "../lib/prompts";
 import prisma from "../lib/prisma";
-import { MAXIMUM_OUTPUT_TOKENS } from "../lib/constants";
 import {
   publishStatus,
   sanitizeHtmlForContext,
@@ -56,11 +57,11 @@ export const generateScreen = inngest.createFunction(
           orderBy: { x: "desc" },
         });
 
-        // Use a standard app width for placeholder (380px)
-        const width = 380;
+        // Use a standard width based on type
+        const width = type === "web" ? 1280 : 380;
         const currentX = lastScreen
-          ? lastScreen.x + (lastScreen.width || 380) + 120
-          : 0;
+          ? lastScreen.x + (lastScreen.width || (lastScreen.type === "web" ? 1280 : 380)) + 120
+          : 200;
 
         return await prisma.screen.create({
           data: {
@@ -102,7 +103,50 @@ export const generateScreen = inngest.createFunction(
         });
         
         if (projectTheme) {
-            themeContext = `\n\nCRITICAL THEME CONTEXT: You MUST strictly use the following design system variables for styling this screen to ensure consistency:\n${JSON.stringify(projectTheme.variables, null, 2)}\n\nDo NOT invent new color HEX codes. Use standard precise classes or inline variables to map to these design tokens.`;
+            const vars = (projectTheme.variables as any) || {};
+            const colors = vars.colors || {};
+            const typography = vars.typography || {};
+            
+            // Check if the background is dark or light using YIQ formula
+            const isDark = (() => {
+              const bg = colors.background || "#080808";
+              let hex = bg.replace(/^#/, "");
+              if (hex.length === 3) {
+                hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+              }
+              if (hex.length !== 6) return true;
+              const r = parseInt(hex.substring(0, 2), 16);
+              const g = parseInt(hex.substring(2, 4), 16);
+              const b = parseInt(hex.substring(4, 6), 16);
+              const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+              return yiq < 128; // Less than 128 means background is dark
+            })();
+            
+            const modeInstruction = isDark 
+              ? "CRITICAL MODE INSTRUCTION: The active theme is strictly DARK MODE (dark background, light text). You MUST build a dark-theme user interface. Ensure cards have dark backgrounds (e.g. bg-[#141414] or bg-black/40), text is light (text-white/text-zinc-200), and all components are optimized for high-contrast dark-theme styling."
+              : "CRITICAL MODE INSTRUCTION: The active theme is strictly LIGHT MODE (light background, dark text). You MUST build a light-theme user interface. Do NOT use dark backgrounds or dark cards! Ensure cards have light glassmorphic backgrounds (e.g. bg-white/70 or bg-zinc-50 border-zinc-200/60), text is dark/charcoal (text-zinc-900/text-zinc-800), and all components are optimized for high-contrast light-theme styling.";
+
+            themeContext = `
+\n\nCRITICAL THEME CONTEXT: The active theme for this project is loaded. You MUST strictly use these colors and typography properties to ensure design consistency across all screens:
+<style_guide_context>
+:root {
+  --background: ${colors.background || "#080808"};
+  --foreground: ${colors.foreground || "#ffffff"};
+  --primary: ${colors.primary || "#6366f1"};
+  --secondary: ${colors.secondary || "#ec4899"};
+  --tertiary: ${colors.tertiary || "#14b8a6"};
+  --neutral: ${colors.neutral || "#94a3b8"};
+  --border: ${isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.08)"};
+  --card: ${isDark ? "#141414" : "#ffffff"};
+  --font-headline: '${typography.headline || "Inter"}', sans-serif;
+  --font-body: '${typography.body || "Inter"}', sans-serif;
+}
+</style_guide_context>
+
+${modeInstruction}
+
+Do NOT invent new colors. Ensure all layout containers, text headers, buttons, cards, hover styles, and active borders strictly map to the active theme colors listed above. Avoid any blue or indigo defaults unless they are explicitly part of the active theme above!
+`;
         }
 
         // Fetch most recent screen for structural continuity
@@ -153,11 +197,9 @@ export const generateScreen = inngest.createFunction(
           },
         ] as any;
 
-        const processedMessages = await aiService.processMessages(rawMessages);
+        const processedMessages = await processMessages(rawMessages);
 
-        const { text } = await aiService.generateText(processedMessages, {
-          temperature: 0.1,
-          max_tokens: MAXIMUM_OUTPUT_TOKENS,
+        const { text } = await generateText(processedMessages, {
           projectId,
         });
 
@@ -173,12 +215,14 @@ export const generateScreen = inngest.createFunction(
 
       // --- STEP 4: PERSIST & NOTIFY ---
       const finalScreen = await step.run("update-screen-db", async () => {
+        const finalType = (htmlCode.type as any) || type || "app";
         return await prisma.screen.update({
           where: { id: dbScreen.id },
           data: {
             title: htmlCode.title || title,
             html: htmlCode.html,
-            type: (htmlCode.type as any) || "app",
+            type: finalType,
+            width: finalType === "web" ? 1280 : 380,
             status: "completed",
             updatedAt: new Date(),
           },
@@ -277,6 +321,8 @@ export const generateThemeFlow = inngest.createFunction(
         message: `Establishing Design System...`,
         status: "generating",
         currentScreen: "Theme",
+        screenId: dbTheme.id,
+        type: "theme",
       });
 
       // Generate JSON Variables
@@ -293,11 +339,11 @@ export const generateThemeFlow = inngest.createFunction(
           },
         ] as any;
 
-        const processedMessages = await aiService.processMessages(rawMessages);
+        const processedMessages = await processMessages(rawMessages);
 
         // Define Zod schema implicitly by the prompt, or just rely on generateObject
         // The generateObject uses JSON mode which helps, but we rely on a strong system prompt for the structure.
-        return await aiService.generateObject(processedMessages, { projectId });
+        return await generateObject(processedMessages, { projectId });
       });
 
       // Update DB
