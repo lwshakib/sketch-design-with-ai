@@ -649,7 +649,7 @@ export function CanvasArea({
           "absolute inset-0 flex select-none",
           throttledArtifacts.length === 0
             ? "items-center justify-center pb-20"
-            : "items-start justify-center pt-36",
+            : "items-center justify-center",
         )}
       >
         {throttledArtifacts.length > 0 ? (

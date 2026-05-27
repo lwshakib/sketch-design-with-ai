@@ -266,8 +266,8 @@ export function useCanvas({
           // The actual scale applied is zoom * 0.5
           const actualScale = zoom * 0.5;
           const originX = rect.width / 2;
-          // pt-36 = 144px. If empty, centered.
-          const originY = artifacts.length === 0 ? rect.height / 2 : 144;
+          // Center vertically.
+          const originY = rect.height / 2;
 
           const ax1 = originX + canvasOffset.x + (art.x || 0) * actualScale;
           const ay1 = originY + canvasOffset.y + (art.y || 0) * actualScale;
@@ -436,10 +436,8 @@ export function useCanvas({
       const rect = previewRef.current?.getBoundingClientRect();
       if (!rect) return;
 
-      // The content is centered horizontally (OriginX = width / 2)
-      // and pinned to the top (OriginY = 144 or centerY if empty)
       const originX = rect.width / 2;
-      const originY = artifacts.length === 0 ? rect.height / 2 : 144;
+      const originY = rect.height / 2;
 
       // Convert screen-relative mx/my to origin-relative coordinates (our "world space")
       const localMx = mx - originX;

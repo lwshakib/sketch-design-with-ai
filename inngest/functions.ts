@@ -56,12 +56,33 @@ export const generateScreen = inngest.createFunction(
           where: { projectId },
           orderBy: { x: "desc" },
         });
+        const lastTheme = await prisma.theme.findFirst({
+          where: { projectId },
+          orderBy: { x: "desc" },
+        });
+
+        let lastX = null;
+        let lastWidth = 1280;
+
+        if (lastScreen && lastTheme) {
+          if (lastScreen.x > lastTheme.x) {
+            lastX = lastScreen.x;
+            lastWidth = lastScreen.width || (lastScreen.type === "web" ? 1280 : 380);
+          } else {
+            lastX = lastTheme.x;
+            lastWidth = lastTheme.width || 1280;
+          }
+        } else if (lastScreen) {
+          lastX = lastScreen.x;
+          lastWidth = lastScreen.width || (lastScreen.type === "web" ? 1280 : 380);
+        } else if (lastTheme) {
+          lastX = lastTheme.x;
+          lastWidth = lastTheme.width || 1280;
+        }
 
         // Use standard screen type and width
         const width = type === "web" ? 1280 : 380;
-        const currentX = lastScreen
-          ? lastScreen.x + (lastScreen.width || (lastScreen.type === "web" ? 1280 : 380)) + 120
-          : -width / 2;
+        const currentX = lastX !== null ? lastX + lastWidth + 120 : -width / 2;
         const currentY = -((type === "web" ? 700 : 800) / 2);
 
         return await prisma.screen.create({
@@ -302,14 +323,45 @@ export const generateThemeFlow = inngest.createFunction(
            where: { projectId },
            data: { isActive: false }
         });
+
+        const lastScreen = await prisma.screen.findFirst({
+          where: { projectId },
+          orderBy: { x: "desc" },
+        });
+        const lastTheme = await prisma.theme.findFirst({
+          where: { projectId },
+          orderBy: { x: "desc" },
+        });
+
+        let lastX = null;
+        let lastWidth = 1280;
+
+        if (lastScreen && lastTheme) {
+          if (lastScreen.x > lastTheme.x) {
+            lastX = lastScreen.x;
+            lastWidth = lastScreen.width || (lastScreen.type === "web" ? 1280 : 380);
+          } else {
+            lastX = lastTheme.x;
+            lastWidth = lastTheme.width || 1280;
+          }
+        } else if (lastScreen) {
+          lastX = lastScreen.x;
+          lastWidth = lastScreen.width || (lastScreen.type === "web" ? 1280 : 380);
+        } else if (lastTheme) {
+          lastX = lastTheme.x;
+          lastWidth = lastTheme.width || 1280;
+        }
+
+        const currentX = lastX !== null ? lastX + lastWidth + 120 : -1280 / 2;
+        const currentY = -700 / 2;
       
         return await prisma.theme.create({
           data: {
             projectId,
             name: title || "Project Theme",
             variables: {}, // Placeholder while generating
-            x: -1250, // Far left
-            y: -200, // Top area
+            x: currentX,
+            y: currentY,
             isActive: true,
           },
         });
@@ -368,6 +420,8 @@ export const generateThemeFlow = inngest.createFunction(
            type: "theme",
            title: finalTheme.name,
            variables: finalTheme.variables,
+           x: finalTheme.x,
+           y: finalTheme.y,
            isComplete: true
         } as any, 
       });

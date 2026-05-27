@@ -433,7 +433,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
     const effectiveScale = targetZoom * 0.5;
     const mainHeight =
       typeof window !== "undefined" ? window.innerHeight : 1000;
-    const topPadding = 144;
+    const topPadding = mainHeight / 2;
 
     const artifactWidth =
       artifact.width || (artifact.type === "app" ? 380 : 1024);
