@@ -1,11 +1,5 @@
 import React, { SVGProps } from "react";
-import { Outfit } from "next/font/google";
 import { cn } from "@/lib/utils";
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-});
 
 export interface LogoIconProps extends SVGProps<SVGSVGElement> {
   className?: string;
@@ -46,8 +40,7 @@ export const CustomTextLogo = ({
   return (
     <div
       className={cn(
-        "relative flex items-center select-none tracking-tighter",
-        outfit.className,
+        "relative flex items-center select-none tracking-tighter font-outfit",
         className,
       )}
       style={{ fontSize: size }}

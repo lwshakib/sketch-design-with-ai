@@ -3,7 +3,8 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { UX_AGENT_SYSTEM_PROMPT } from "@/lib/prompts";
-import { aiService } from "@/services/ai.services";
+import { processMessages } from "@/llm/utils";
+import { streamText } from "@/llm/streamText";
 import { getAndResetCredits } from "@/lib/credits";
 
 export async function POST(req: Request) {
@@ -110,13 +111,13 @@ export async function POST(req: Request) {
       };
     });
 
-    // 3. Start streaming from AIService
-    const processedMessages = await aiService.processMessages([
+    // 3. Start streaming
+    const processedMessages = await processMessages([
       { role: "system", content: projectContextPrompt },
       ...normalizedMessages,
     ]);
 
-    const serviceStream = await aiService.streamText(processedMessages, {
+    const serviceStream = await streamText(processedMessages, {
       context: {
         userId: session.user.id,
         projectId: projectId,
