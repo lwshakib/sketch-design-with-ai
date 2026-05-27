@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { LayoutGrid, LogOut, User, Home } from "lucide-react";
+import { LogOut, User, Home } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function UserMenu() {
@@ -61,10 +61,6 @@ export function UserMenu() {
         <DropdownMenuItem onClick={() => router.push("/")}>
           <Home className="mr-2 h-4 w-4" />
           <span>Home</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push("/projects")}>
-          <LayoutGrid className="mr-2 h-4 w-4 rotate-45" />
-          <span>Projects</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push("/account")}>
           <User className="mr-2 h-4 w-4" />

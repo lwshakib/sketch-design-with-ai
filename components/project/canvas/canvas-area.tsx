@@ -459,13 +459,6 @@ export function CanvasArea({
                 <span>Back to home</span>
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => (window.location.href = "/projects")}
-                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
-              >
-                <LayoutGrid className="mr-2.5 h-4 w-4 opacity-70" />
-                <span>Go to projects</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
                 onClick={_handleDeleteProject}
                 className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
               >
@@ -497,93 +490,97 @@ export function CanvasArea({
                 <Code className="h-4 w-4" />
               </Button>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-foreground/80 hover:text-foreground flex h-9 items-center gap-2 rounded-full px-3 text-[13px] font-medium transition-colors hover:bg-secondary/40"
-                  >
-                    {(() => {
-                      const mode = artifactPreviewModes[selectedArtifact.title] || selectedArtifact.type;
-                      if (mode === "app") return <Smartphone className="h-4 w-4 opacity-70" />;
-                      if (mode === "tablet") return <Tablet className="h-4 w-4 opacity-70" />;
-                      return <Monitor className="h-4 w-4 opacity-70" />;
-                    })()}
-                    <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="center"
-                  className="bg-card border-border text-foreground z-[100] w-48 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
-                >
-                  <DropdownMenuItem
-                    onClick={() => {
-                        const newModes = { ...artifactPreviewModes, [selectedArtifact.title]: "app" as const };
-                        setArtifactPreviewModes(newModes);
-                    }}
-                    className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[13px]"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Smartphone className="h-4 w-4" /> App
-                    </div>
-                    <span className="text-muted-foreground text-[10px]">380px</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                        const newModes = { ...artifactPreviewModes, [selectedArtifact.title]: "web" as const };
-                        setArtifactPreviewModes(newModes);
-                    }}
-                    className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[13px]"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Monitor className="h-4 w-4" /> Web
-                    </div>
-                    <span className="text-muted-foreground text-[10px]">1280px</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                        const newModes = { ...artifactPreviewModes, [selectedArtifact.title]: "tablet" as const };
-                        setArtifactPreviewModes(newModes);
-                    }}
-                    className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[13px]"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Tablet className="h-4 w-4" /> Tablet
-                    </div>
-                    <span className="text-muted-foreground text-[10px]">768px</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {selectedArtifact.type !== "theme" && (
+                <>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-foreground/80 hover:text-foreground flex h-9 items-center gap-2 rounded-full px-3 text-[13px] font-medium transition-colors hover:bg-secondary/40"
+                      >
+                        {(() => {
+                          const mode = artifactPreviewModes[selectedArtifact.title] || selectedArtifact.type;
+                          if (mode === "app") return <Smartphone className="h-4 w-4 opacity-70" />;
+                          if (mode === "tablet") return <Tablet className="h-4 w-4 opacity-70" />;
+                          return <Monitor className="h-4 w-4 opacity-70" />;
+                        })()}
+                        <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="center"
+                      className="bg-card border-border text-foreground z-[100] w-48 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
+                    >
+                      <DropdownMenuItem
+                        onClick={() => {
+                            const newModes = { ...artifactPreviewModes, [selectedArtifact.title]: "app" as const };
+                            setArtifactPreviewModes(newModes);
+                        }}
+                        className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[13px]"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Smartphone className="h-4 w-4" /> App
+                        </div>
+                        <span className="text-muted-foreground text-[10px]">380px</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                            const newModes = { ...artifactPreviewModes, [selectedArtifact.title]: "web" as const };
+                            setArtifactPreviewModes(newModes);
+                        }}
+                        className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[13px]"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Monitor className="h-4 w-4" /> Web
+                        </div>
+                        <span className="text-muted-foreground text-[10px]">1280px</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                            const newModes = { ...artifactPreviewModes, [selectedArtifact.title]: "tablet" as const };
+                            setArtifactPreviewModes(newModes);
+                        }}
+                        className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[13px]"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Tablet className="h-4 w-4" /> Tablet
+                        </div>
+                        <span className="text-muted-foreground text-[10px]">768px</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
-              <div className="bg-border/50 mx-1 h-4 w-[1px]" />
+                  <div className="bg-border/50 mx-1 h-4 w-[1px]" />
 
-              <div className="flex items-center gap-1 px-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleFeedback(selectedIndex, selectedArtifact.isLiked ? "none" : "like")}
-                  className={cn(
-                    "h-8 w-8 rounded-full transition-all hover:bg-secondary/40",
-                    selectedArtifact.isLiked ? "text-primary bg-primary/10" : "text-foreground/40"
-                  )}
-                >
-                  <ThumbsUp className={cn("h-3.5 w-3.5", selectedArtifact.isLiked && "fill-current")} />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleFeedback(selectedIndex, selectedArtifact.isDisliked ? "none" : "dislike")}
-                  className={cn(
-                    "h-8 w-8 rounded-full transition-all hover:bg-secondary/40",
-                    selectedArtifact.isDisliked ? "text-red-500 bg-red-500/10" : "text-foreground/40"
-                  )}
-                >
-                  <ThumbsDown className={cn("h-3.5 w-3.5", selectedArtifact.isDisliked && "fill-current")} />
-                </Button>
-              </div>
+                  <div className="flex items-center gap-1 px-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleFeedback(selectedIndex, selectedArtifact.isLiked ? "none" : "like")}
+                      className={cn(
+                        "h-8 w-8 rounded-full transition-all hover:bg-secondary/40",
+                        selectedArtifact.isLiked ? "text-primary bg-primary/10" : "text-foreground/40"
+                      )}
+                    >
+                      <ThumbsUp className={cn("h-3.5 w-3.5", selectedArtifact.isLiked && "fill-current")} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleFeedback(selectedIndex, selectedArtifact.isDisliked ? "none" : "dislike")}
+                      className={cn(
+                        "h-8 w-8 rounded-full transition-all hover:bg-secondary/40",
+                        selectedArtifact.isDisliked ? "text-red-500 bg-red-500/10" : "text-foreground/40"
+                      )}
+                    >
+                      <ThumbsDown className={cn("h-3.5 w-3.5", selectedArtifact.isDisliked && "fill-current")} />
+                    </Button>
+                  </div>
 
-              <div className="bg-border/50 mx-1 h-4 w-[1px]" />
+                  <div className="bg-border/50 mx-1 h-4 w-[1px]" />
+                </>
+              )}
 
               <Button
                 variant="ghost"
@@ -788,7 +785,7 @@ export function CanvasArea({
                       transition: isResizing
                         ? "none"
                         : "width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                      backgroundColor: "var(--background)",
+                      backgroundColor: artifact.type === "theme" ? ((artifact.variables as any)?.colors?.background || "var(--background)") : "var(--background)",
                       borderColor:
                         artifact.id && selectedArtifactIds.has(artifact.id)
                           ? SELECTION_BLUE
