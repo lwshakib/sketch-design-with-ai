@@ -260,13 +260,14 @@ export default function ProjectPage() {
             );
             const type = event.data.type || planItem?.type || "web";
             const getNewX = (existing: any[], scrType: string) => {
-              const last = existing[existing.length - 1];
+              const existingScreens = existing.filter((a) => a.type !== "theme");
+              const last = existingScreens[existingScreens.length - 1];
               const getWidth = (t: string) =>
-                t === "app" ? 380 : t === "web" ? 1024 : 800;
+                t === "app" ? 380 : t === "web" ? 1280 : 1024;
               const currentWidth = getWidth(scrType);
               return last
                 ? (last.x || 0) + (last.width || getWidth(last.type)) + 120
-                : -(currentWidth / 2);
+                : 200;
             };
             return [
               ...prev,
@@ -274,10 +275,10 @@ export default function ProjectPage() {
                 id: screenId,
                 title,
                 html: "",
-                type: type as "web" | "app",
+                type: type as any,
                 isComplete: false,
-                x: getNewX(prev, type),
-                y: 0,
+                x: type === "theme" ? -1250 : getNewX(prev, type),
+                y: type === "theme" ? -200 : 0,
               },
             ];
           };
@@ -336,8 +337,8 @@ export default function ProjectPage() {
                  updated[idx] = {
                    ...updated[idx],
                    ...finishedScreen,
-                   x: updated[idx].x, // Preserve placeholder X
-                   y: updated[idx].y, // Preserve placeholder Y
+                   x: updated[idx].x !== undefined ? updated[idx].x : (finishedScreen.x !== undefined ? finishedScreen.x : 0),
+                   y: updated[idx].y !== undefined ? updated[idx].y : (finishedScreen.y !== undefined ? finishedScreen.y : 0),
                    isComplete: true,
                  };
                  setRegeneratingArtifactIds((prevRegen) => {
@@ -345,6 +346,35 @@ export default function ProjectPage() {
                    next.delete(finishedScreen.id);
                    return next;
                  });
+               } else {
+                 // Fallback for placeholder matching or fresh append
+                 const placeholderIdx = updated.findIndex(
+                   (a) => (!a.id && a.title === "Theme" && finishedScreen.type === "theme") ||
+                          (!a.id && a.title === finishedScreen.title)
+                 );
+                 if (placeholderIdx >= 0) {
+                   updated[placeholderIdx] = {
+                     ...updated[placeholderIdx],
+                     ...finishedScreen,
+                     isComplete: true,
+                   };
+                 } else {
+                    const getNewX = (existing: any[], scrType: string) => {
+                      const existingScreens = existing.filter((a) => a.type !== "theme");
+                      const last = existingScreens[existingScreens.length - 1];
+                      const getWidth = (t: string) =>
+                        t === "app" ? 380 : t === "web" ? 1280 : 1024;
+                      return last
+                        ? (last.x || 0) + (last.width || getWidth(last.type)) + 120
+                        : 200;
+                    };
+                   updated.push({
+                     ...finishedScreen,
+                     isComplete: true,
+                     x: finishedScreen.x !== undefined ? finishedScreen.x : (finishedScreen.type === "theme" ? -1250 : getNewX(updated, finishedScreen.type)),
+                     y: finishedScreen.y !== undefined ? finishedScreen.y : (finishedScreen.type === "theme" ? -200 : 0),
+                   });
+                 }
                }
                return updated;
              };
@@ -393,14 +423,15 @@ export default function ProjectPage() {
                   isComplete: true,
                 };
               } else {
-                const getNewX = (existing: any[], type: string) => {
-                  const last = existing[existing.length - 1];
-                  const getWidth = (t: string) =>
-                    t === "app" ? 380 : t === "web" ? 1024 : 800;
-                  return last
-                    ? (last.x || 0) + (last.width || getWidth(last.type)) + 120
-                    : -(getWidth(type) / 2);
-                };
+                 const getNewX = (existing: any[], scrType: string) => {
+                   const existingScreens = existing.filter((a) => a.type !== "theme");
+                   const last = existingScreens[existingScreens.length - 1];
+                   const getWidth = (t: string) =>
+                     t === "app" ? 380 : t === "web" ? 1280 : 1024;
+                   return last
+                     ? (last.x || 0) + (last.width || getWidth(last.type)) + 120
+                     : 200;
+                 };
                 updated.push({
                   ...newScreen,
                   isComplete: true,
