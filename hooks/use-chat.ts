@@ -219,7 +219,7 @@ export const useChat = (projectId: string) => {
                     prev.map((a) => (a.id === screenId ? { ...a, html } : a))
                   );
                 } else if (data?.[0]?.type === "theme-created") {
-                  const theme = { ...data[0].theme, isActive: true };
+                  const theme = { ...data[0].theme, isActive: true, isComplete: true };
                   const state = useProjectStore.getState();
                   state.setArtifacts((prev) => {
                     const filtered = prev.map((a) =>
@@ -245,7 +245,7 @@ export const useChat = (projectId: string) => {
                   state.setArtifacts((prev) =>
                     prev.map((a) => {
                       if (a.id === themeId) {
-                        return { ...a, title, variables, isActive: true };
+                        return { ...a, title, variables, isActive: true, isComplete: true };
                       }
                       if (a.type === "theme") {
                         return { ...a, isActive: false };
@@ -256,7 +256,7 @@ export const useChat = (projectId: string) => {
                   state.setThrottledArtifacts((prev) =>
                     prev.map((a) => {
                       if (a.id === themeId) {
-                        return { ...a, title, variables, isActive: true };
+                        return { ...a, title, variables, isActive: true, isComplete: true };
                       }
                       if (a.type === "theme") {
                         return { ...a, isActive: false };

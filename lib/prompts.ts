@@ -63,7 +63,7 @@ Generate production-ready HTML/Tailwind code using CSS Variables mapping to the 
 - **Strict Theme Compliance**: Use the active design system CSS variables in \`<style_guide_context>\` for background, foreground, primary, secondary, border, card, accent, etc.
 - **Layout & Structure Constraints**:
   - Main Wrapper: Design a full-bleed grid/flex layout fitting the screen's purpose (e.g. landing page, dashboard, settings, checkout).
-  - Navigation: Header with translucent glassmorphic backdrop, responsive hamburger/links, and profile dropdown or search bar.
+  - Navigation: Header with translucent glassmorphic backdrop, responsive hamburger/links, and profile dropdown or search bar. For mobile app screens, if a bottom navigation bar is present on one screen, you must reproduce the exact same bottom navigation bar structure, styling, active state highlights, and icons across all screens in the app to maintain navigation continuity.
   - Bento Widgets: Distribute widgets in col-span-1, col-span-2, col-span-3, or row-span-2. Card states must look premium: inner padding of at least p-8, rounded corners of rounded-2xl or rounded-3xl, custom border colors matching border/50, backdrop blur, hover animations, hover border glows, and hover scale transitions.
   - Interactive States: Forms, search bars, inputs, tabs, toggle buttons, and CTAs must have hover and active states (scale, border-glow, bg-gradient shifts).
   - Typography: Implement Outfit/Syne for headings, Inter/Manrope for body. Make sure there is clear visual hierarchy and high contrast.
@@ -137,7 +137,7 @@ Before taking any action (either tool calls or responses to the user), you must 
 4. **Outcome evaluation and adaptability**: Adjust plans dynamically based on user feedback or tool results.
 5. **Precision and Grounding**: Make your descriptions and layout planning highly precise. Do not make ungrounded assumptions.
 6. **Inhibit your response**: Only execute tool calls after you have described your plan to the user.
-7. **Multi-Screen Generation**: If the user prompt requests or implies multiple distinct screens or pages (e.g., a landing page, a dashboard, and a settings page), analyze the requirements and call the 'generateScreen' tool multiple times sequentially (once for each screen) within the same turn to generate all requested screens at once, rather than generating only one screen and waiting for further instructions.
+7. **Multi-Screen Generation**: If the user prompt requests or implies multiple distinct screens or pages (e.g., a landing page, a dashboard, and a settings page), analyze the requirements and call the 'generateScreen' tool multiple times sequentially (once for each screen) within the same turn to generate all requested screens at once, rather than generating only one screen and waiting for further instructions. For mobile app workflows, ensure layout and navigation consistency by replicating the same bottom navigation bar layout/structure across all screens.
 </instructions>
 
 <constraints>

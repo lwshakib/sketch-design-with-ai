@@ -555,9 +555,9 @@ export function CanvasArea({
               <div className="bg-background/90 border-border pointer-events-auto flex max-h-[480px] w-[340px] flex-col overflow-y-auto rounded-xl border shadow-2xl backdrop-blur-3xl animate-in fade-in slide-in-from-top-2 duration-300 scrollbar-none ring-1 ring-black/5 lg:w-[400px] relative">
                 {/* Sticky Header: User Message + Close Button */}
                 <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/10 flex items-start justify-between gap-4 p-5 pb-4">
-                  <p className="text-[13.5px] font-medium leading-relaxed text-foreground/90 flex-1 py-0.5">
+                  <div className="text-[13.5px] font-medium leading-relaxed text-foreground/90 flex-1 py-0.5 max-h-[80px] overflow-y-auto pr-1">
                     {getUserText().replace(/\[Context:.*?\]\s*/g, "").trim()}
-                  </p>
+                  </div>
                   <Button 
                     variant="ghost" 
                     size="icon" 
@@ -982,7 +982,7 @@ export function CanvasArea({
                           : undefined,
                     }}
                   >
-                    {((!artifact.isComplete && !artifact.html) ||
+                    {(((artifact.type === "theme" ? !artifact.variables : (!artifact.isComplete && !artifact.html))) ||
                       (artifact.id &&
                         regeneratingArtifactIds.has(artifact.id))) && (
                       <ModernShimmer
