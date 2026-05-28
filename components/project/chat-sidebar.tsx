@@ -534,21 +534,25 @@ export function ChatSidebar({
                               <div className="flex items-center gap-3">
                                 {message.role === "user" ? (
                                   <Avatar className="h-8 w-8 shrink-0 border">
-                                    <AvatarImage
-                                      src={(session.data?.user as any)?.image}
-                                      alt={session.data?.user?.name || "User"}
-                                    />
-                                    <AvatarFallback className="bg-muted text-muted-foreground text-[10px] font-bold">
-                                      {session.data?.user?.name ? (
-                                        session.data.user.name
-                                          .split(" ")
-                                          .map((n: string) => n[0])
-                                          .join("")
-                                          .toUpperCase()
-                                      ) : (
-                                        <User className="h-4 w-4" />
-                                      )}
-                                    </AvatarFallback>
+                                    {(session.data?.user as any)?.image ? (
+                                      <img
+                                        src={(session.data?.user as any).image}
+                                        alt={session.data?.user?.name || "User"}
+                                        className="aspect-square h-full w-full object-cover rounded-full"
+                                      />
+                                    ) : (
+                                      <AvatarFallback className="bg-muted text-muted-foreground text-[10px] font-bold">
+                                        {session.data?.user?.name ? (
+                                          session.data.user.name
+                                            .split(" ")
+                                            .map((n: string) => n[0])
+                                            .join("")
+                                            .toUpperCase()
+                                        ) : (
+                                          <User className="h-4 w-4" />
+                                        )}
+                                      </AvatarFallback>
+                                    )}
                                   </Avatar>
                                 ) : (
                                   <div className="bg-primary/10 border-primary/20 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border">

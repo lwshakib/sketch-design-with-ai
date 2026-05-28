@@ -40,8 +40,15 @@ export function UserMenu() {
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 outline-none">
           <Avatar className="h-8 w-8 border">
-            <AvatarImage src={user.image || ""} alt={user.name || ""} />
-            <AvatarFallback>{initials}</AvatarFallback>
+            {user.image ? (
+              <img
+                src={user.image}
+                alt={user.name || "User"}
+                className="aspect-square h-full w-full object-cover rounded-full"
+              />
+            ) : (
+              <AvatarFallback>{initials}</AvatarFallback>
+            )}
           </Avatar>
         </button>
       </DropdownMenuTrigger>
