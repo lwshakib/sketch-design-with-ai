@@ -714,7 +714,7 @@ export function ChatSidebar({
                                           <MessageResponse>
                                             {(msg.parts as any[])
                                               ?.filter((p) => p.type === "text")
-                                              .map((p) => p.text)
+                                              .map((p) => (p.text || "").replace(/\[Context:.*?\]\s*/g, "").trim())
                                               .join("\n\n")}
                                           </MessageResponse>
                                         </div>
@@ -939,25 +939,48 @@ export function ChatSidebar({
                       <TooltipTrigger asChild>
                         <div className="group border-border bg-muted/50 hover:border-primary/50 relative h-16 w-16 cursor-help overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md">
                           {/* Scaled Preview */}
-                          <div className="pointer-events-none absolute inset-0 h-[2000px] w-[1024px] origin-top-left scale-[calc(64/1024)] opacity-100 transition-opacity">
-                            <iframe
-                              title={`mini-preview-input-${id}`}
-                              className="h-full w-full border-none"
-                              srcDoc={`
-                                        <!DOCTYPE html>
-                                        <html>
-                                          <head>
-                                            <script src="https://cdn.tailwindcss.com"></script>
-                                            <style>
-                                              body { margin: 0; padding: 0; overflow: hidden; background: transparent; height: auto; }
-                                              ::-webkit-scrollbar { display: none; }
-                                            </style>
-                                          </head>
-                                          <body>${art.html}</body>
-                                        </html>
-                                      `}
-                            />
-                          </div>
+                          {art.type === "theme" ? (
+                            <div className="pointer-events-none flex h-full w-full flex-wrap p-1 gap-1 bg-card animate-in fade-in duration-300">
+                              {(() => {
+                                const themeColors = (art.variables as any)?.colors || {
+                                  primary: "#3b82f6",
+                                  secondary: "#10b981",
+                                  accent: "#f59e0b",
+                                  background: "#ffffff",
+                                };
+                                return (
+                                  <>
+                                    <div className="flex-1 min-w-[26px] h-full rounded-md" style={{ backgroundColor: themeColors.primary }} />
+                                    <div className="flex-1 min-w-[26px] h-full rounded-md" style={{ backgroundColor: themeColors.secondary }} />
+                                    <div className="w-full flex gap-1 mt-1">
+                                      <div className="flex-1 h-[24px] rounded-md" style={{ backgroundColor: themeColors.accent }} />
+                                      <div className="flex-1 h-[24px] rounded-md border border-border/30" style={{ backgroundColor: themeColors.background }} />
+                                    </div>
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          ) : (
+                            <div className="pointer-events-none absolute inset-0 h-[2000px] w-[1024px] origin-top-left scale-[calc(64/1024)] opacity-100 transition-opacity">
+                              <iframe
+                                title={`mini-preview-input-${id}`}
+                                className="h-full w-full border-none"
+                                srcDoc={`
+                                          <!DOCTYPE html>
+                                          <html>
+                                            <head>
+                                              <script src="https://cdn.tailwindcss.com"></script>
+                                              <style>
+                                                body { margin: 0; padding: 0; overflow: hidden; background: transparent; height: auto; }
+                                                ::-webkit-scrollbar { display: none; }
+                                              </style>
+                                            </head>
+                                            <body>${art.html}</body>
+                                          </html>
+                                        `}
+                              />
+                            </div>
+                          )}
 
                           {/* Hover Selection Overlay */}
                           <div className="bg-primary/0 group-hover:bg-primary/5 absolute inset-0 transition-colors" />

@@ -8,6 +8,8 @@
  */
 
 import { useRef, useEffect, useCallback } from "react";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
 import { type Artifact } from "@/lib/types";
 import { useProjectStore } from "@/hooks/use-project-store";
 
@@ -28,6 +30,7 @@ export function useCanvas({
   onSave,
   previewRef,
 }: UseCanvasProps) {
+  const { theme, setTheme } = useTheme();
   const {
     zoom,
     setZoom,
@@ -525,6 +528,22 @@ export function useCanvas({
       const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
       if (isModalOpen) return;
 
+      // Toggle dark/light mode when pressing 'D' or 'd'
+      if (e.key.toLowerCase() === "d") {
+        setTheme(theme === "dark" ? "light" : "dark");
+      }
+
+      // Delete selected artifacts using Delete or Backspace key
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedArtifactIds.size > 0) {
+        e.preventDefault();
+        const updateFn = (prev: Artifact[]) =>
+          prev.filter((art) => !art.id || !selectedArtifactIds.has(art.id));
+        setThrottledArtifacts(updateFn);
+        setArtifacts(updateFn);
+        setSelectedArtifactIds(new Set());
+        toast.success("Element removed");
+      }
+
       // Tool Switching (Press & Hold)
       if (e.key === " " && activeTool !== "hand" && !e.repeat) {
         previousToolRef.current = activeTool;
@@ -611,6 +630,8 @@ export function useCanvas({
     setCanvasOffset,
     activeTool,
     setActiveTool,
+    theme,
+    setTheme,
   ]);
 
   return {

@@ -232,6 +232,8 @@ export function CanvasArea({
     setIsAgentLogOpen,
     messages,
     setSelectedEl,
+    setIsEditTitleDialogOpen,
+    setEditingTitle,
   } = useProjectStore();
 
   const [isMounted, setIsMounted] = React.useState(false);
@@ -514,11 +516,11 @@ export function CanvasArea({
     >
       {/* Grid Background */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
+        className="pointer-events-none absolute inset-0 text-foreground opacity-[0.05] dark:opacity-[0.1]"
         style={{
           backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
-          backgroundSize: `${20 * zoom * 0.5}px ${20 * zoom * 0.5}px`,
-          transform: `translate(${canvasOffset.x % (20 * zoom * 0.5)}px, ${canvasOffset.y % (20 * zoom * 0.5)}px)`,
+          backgroundSize: `${24 * zoom}px ${24 * zoom}px`,
+          transform: `translate(${canvasOffset.x % (24 * zoom)}px, ${canvasOffset.y % (24 * zoom)}px)`,
         }}
       />
       
@@ -610,6 +612,16 @@ export function CanvasArea({
                 <span>Back to home</span>
               </DropdownMenuItem>
               <DropdownMenuItem
+                onClick={() => {
+                  setEditingTitle(project?.title || "");
+                  setIsEditTitleDialogOpen(true);
+                }}
+                className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
+              >
+                <Pencil className="mr-2.5 h-4 w-4 opacity-70" />
+                <span>Rename project</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
                 onClick={_handleDeleteProject}
                 className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-[13px] font-medium"
               >
@@ -619,7 +631,7 @@ export function CanvasArea({
             </DropdownMenuContent>
           </DropdownMenu>
           <div className="flex flex-col">
-            <span className="text-foreground whitespace-nowrap text-[15.5px] font-semibold tracking-tight">
+            <span className="text-foreground whitespace-nowrap text-[13.5px] font-semibold tracking-tight">
               {project?.title || "Untitled Project"}
             </span>
           </div>
@@ -949,11 +961,13 @@ export function CanvasArea({
                         return "700px";
                       })(),
                       minHeight:
-                        artifactPreviewModes[artifact.title] === "app" ||
-                        (artifact.type === "app" &&
-                          !artifactPreviewModes[artifact.title])
-                          ? "800px"
-                          : "400px",
+                        artifact.type === "theme"
+                          ? "360px"
+                          : artifactPreviewModes[artifact.title] === "app" ||
+                            (artifact.type === "app" &&
+                              !artifactPreviewModes[artifact.title])
+                            ? "800px"
+                            : "400px",
                       transition: isResizing
                         ? "none"
                         : "width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -1174,24 +1188,47 @@ export function CanvasArea({
                       <Tooltip key={id}>
                         <TooltipTrigger asChild>
                           <div className="group border-border bg-card/50 hover:border-primary/50 relative h-12 w-12 cursor-help overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md">
-                            <div className="pointer-events-none absolute inset-0 h-[2000px] w-[1024px] origin-top-left scale-[calc(48/1024)] opacity-100">
-                              <iframe
-                                title={`mini-preview-${id}`}
-                                className="h-full w-full border-none"
-                                srcDoc={`
-                                  <!DOCTYPE html>
-                                  <html>
-                                    <head>
-                                      <script src="https://cdn.tailwindcss.com"></script>
-                                      <style>
-                                        body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
-                                      </style>
-                                    </head>
-                                    <body>${art.html}</body>
-                                  </html>
-                                `}
-                              />
-                            </div>
+                             {art.type === "theme" ? (
+                              <div className="pointer-events-none flex h-full w-full flex-wrap p-0.5 gap-0.5 bg-card">
+                                {(() => {
+                                  const themeColors = (art.variables as any)?.colors || {
+                                    primary: "#3b82f6",
+                                    secondary: "#10b981",
+                                    accent: "#f59e0b",
+                                    background: "#ffffff",
+                                  };
+                                  return (
+                                    <>
+                                      <div className="flex-1 min-w-[20px] h-full rounded-sm" style={{ backgroundColor: themeColors.primary }} />
+                                      <div className="flex-1 min-w-[20px] h-full rounded-sm" style={{ backgroundColor: themeColors.secondary }} />
+                                      <div className="w-full flex gap-0.5 mt-0.5">
+                                        <div className="flex-1 h-[18px] rounded-sm" style={{ backgroundColor: themeColors.accent }} />
+                                        <div className="flex-1 h-[18px] rounded-sm border border-border/30" style={{ backgroundColor: themeColors.background }} />
+                                      </div>
+                                    </>
+                                  );
+                                })()}
+                              </div>
+                            ) : (
+                              <div className="pointer-events-none absolute inset-0 h-[2000px] w-[1024px] origin-top-left scale-[calc(48/1024)] opacity-100">
+                                <iframe
+                                  title={`mini-preview-${id}`}
+                                  className="h-full w-full border-none"
+                                  srcDoc={`
+                                    <!DOCTYPE html>
+                                    <html>
+                                      <head>
+                                        <script src="https://cdn.tailwindcss.com"></script>
+                                        <style>
+                                          body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
+                                        </style>
+                                      </head>
+                                      <body>${art.html}</body>
+                                    </html>
+                                  `}
+                                />
+                              </div>
+                            )}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -1395,29 +1432,29 @@ export function CanvasArea({
       <CanvasToolbar />
 
       {/* Bottom Right Controls */}
-      <div className="bg-card/80 border-border/50 pointer-events-auto absolute right-6 bottom-6 z-50 flex items-center gap-1 rounded-2xl border p-1 shadow-2xl backdrop-blur-xl" onMouseDown={(e) => e.stopPropagation()}>
+      <div className="bg-card/85 border-border/40 pointer-events-auto absolute right-6 bottom-6 z-50 flex items-center gap-1 rounded-full border p-1.5 px-2 shadow-2xl backdrop-blur-xl hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300" onMouseDown={(e) => e.stopPropagation()}>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setZoom((prev) => Math.max(0.1, prev - 0.1))}
-          className="text-muted-foreground hover:text-foreground h-10 w-10 rounded-xl transition-all hover:bg-transparent"
+          className="text-muted-foreground hover:text-foreground hover:bg-muted/60 h-9 w-9 rounded-full transition-all duration-200 hover:scale-105 focus:outline-none"
           title="Zoom Out"
         >
-          <ZoomOut className="h-5 w-5" />
+          <ZoomOut className="h-4.5 w-4.5" />
         </Button>
-        <div className="text-muted-foreground min-w-[40px] text-center text-[11px] font-bold">
+        <div className="text-muted-foreground font-mono text-[11px] font-bold min-w-[40px] text-center select-none">
           {Math.round(zoom * 100)}%
         </div>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setZoom((prev) => Math.min(5, prev + 0.1))}
-          className="text-muted-foreground hover:text-foreground h-10 w-10 rounded-xl transition-all hover:bg-transparent"
+          className="text-muted-foreground hover:text-foreground hover:bg-muted/60 h-9 w-9 rounded-full transition-all duration-200 hover:scale-105 focus:outline-none"
           title="Zoom In"
         >
-          <ZoomIn className="h-5 w-5" />
+          <ZoomIn className="h-4.5 w-4.5" />
         </Button>
-        <div className="bg-border/50 mx-1 h-4 w-[1px]" />
+        <div className="bg-border/50 mx-1.5 h-4 w-[1px]" />
         <Button
           variant="ghost"
           size="icon"
@@ -1426,10 +1463,10 @@ export function CanvasArea({
             setCanvasOffset({ x: 0, y: 0 });
             setFramePos({ x: 0, y: 0 });
           }}
-          className="text-muted-foreground hover:text-foreground h-10 w-10 rounded-xl transition-all hover:bg-transparent"
+          className="text-muted-foreground hover:text-foreground hover:bg-muted/60 h-9 w-9 rounded-full transition-all duration-200 hover:scale-105 focus:outline-none"
           title="Reset View"
         >
-          <RotateCcw className="h-5 w-5" />
+          <RotateCcw className="h-4.5 w-4.5" />
         </Button>
       </div>
 

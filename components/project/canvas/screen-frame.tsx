@@ -43,7 +43,7 @@ export const ScreenFrame = React.memo(
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const activeTheme = useProjectStore(
       useCallback(
-        (state) => state.throttledArtifacts.find((a) => a.type === "theme" && a.isActive),
+        (state) => state.artifacts.find((a) => a.type === "theme" && a.isActive),
         [],
       )
     );

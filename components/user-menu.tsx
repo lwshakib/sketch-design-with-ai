@@ -25,7 +25,7 @@ export function UserMenu() {
     ? (user.image.startsWith("http") ? user.image : urlMap[user.image])
     : null;
 
-  if (!session) {
+  if (!session || !user) {
     return (
       <Button variant="outline" size="sm" onClick={() => router.push("/sign-in")}>
         Login

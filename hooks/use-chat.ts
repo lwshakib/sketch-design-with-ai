@@ -219,34 +219,50 @@ export const useChat = (projectId: string) => {
                     prev.map((a) => (a.id === screenId ? { ...a, html } : a))
                   );
                 } else if (data?.[0]?.type === "theme-created") {
-                  const theme = data[0].theme;
+                  const theme = { ...data[0].theme, isActive: true };
                   const state = useProjectStore.getState();
                   state.setArtifacts((prev) => {
                     const filtered = prev.map((a) =>
                       a.type === "theme" ? { ...a, isActive: false } : a
                     );
-                    if (filtered.some((a) => a.id === theme.id)) return filtered;
+                    if (filtered.some((a) => a.id === theme.id)) {
+                      return filtered.map((a) => a.id === theme.id ? theme : a);
+                    }
                     return [...filtered, theme];
                   });
                   state.setThrottledArtifacts((prev) => {
                     const filtered = prev.map((a) =>
                       a.type === "theme" ? { ...a, isActive: false } : a
                     );
-                    if (filtered.some((a) => a.id === theme.id)) return filtered;
+                    if (filtered.some((a) => a.id === theme.id)) {
+                      return filtered.map((a) => a.id === theme.id ? theme : a);
+                    }
                     return [...filtered, theme];
                   });
                 } else if (data?.[0]?.type === "theme-progress") {
                   const { themeId, variables, title } = data[0];
                   const state = useProjectStore.getState();
                   state.setArtifacts((prev) =>
-                    prev.map((a) =>
-                      a.id === themeId ? { ...a, title, variables } : a
-                    )
+                    prev.map((a) => {
+                      if (a.id === themeId) {
+                        return { ...a, title, variables, isActive: true };
+                      }
+                      if (a.type === "theme") {
+                        return { ...a, isActive: false };
+                      }
+                      return a;
+                    })
                   );
                   state.setThrottledArtifacts((prev) =>
-                    prev.map((a) =>
-                      a.id === themeId ? { ...a, title, variables } : a
-                    )
+                    prev.map((a) => {
+                      if (a.id === themeId) {
+                        return { ...a, title, variables, isActive: true };
+                      }
+                      if (a.type === "theme") {
+                        return { ...a, isActive: false };
+                      }
+                      return a;
+                    })
                   );
                 }
               } catch (e) {
@@ -278,6 +294,7 @@ export const useChat = (projectId: string) => {
         }
 
         // Finalize assistant message
+        setIsGenerating(false);
         setMessages((prev) => {
           const updated = [...prev];
           const idx = updated.findIndex((m) => m.id === assistantId);

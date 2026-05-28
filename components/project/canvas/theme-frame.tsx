@@ -75,6 +75,7 @@ function getContrastColor(hex: string): string {
  * Helper to check if a theme color is dark.
  */
 function isThemeDark(bg: string): boolean {
+  if (!bg || typeof bg !== "string") return true; // Default dark
   bg = bg.replace(/^#/, "");
   if (bg.length > 6) bg = bg.substring(0, 6);
   if (bg.length === 3) bg = bg[0] + bg[0] + bg[1] + bg[1] + bg[2] + bg[2];
@@ -124,13 +125,13 @@ function ColorRamp({ label, hex, isDark }: { label: string; hex: string; isDark:
 
 export function ThemeFrame({ artifact }: ThemeFrameProps) {
   const variables = artifact.variables || {};
-  const colors = variables.colors || {
-    primary: "#6366f1",
-    secondary: "#ec4899",
-    tertiary: "#14b8a6",
-    neutral: "#94a3b8",
-    background: "#080808",
-    foreground: "#ffffff"
+  const colors = {
+    primary: variables?.colors?.primary || "#6366f1",
+    secondary: variables?.colors?.secondary || "#ec4899",
+    tertiary: variables?.colors?.tertiary || "#14b8a6",
+    neutral: variables?.colors?.neutral || "#94a3b8",
+    background: variables?.colors?.background || "#080808",
+    foreground: variables?.colors?.foreground || "#ffffff"
   };
   const typography = variables.typography || {
     headline: "Inter",
