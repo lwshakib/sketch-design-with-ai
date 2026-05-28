@@ -868,32 +868,45 @@ export function CanvasArea({
                   {artifact.id &&
                     (selectedArtifactIds.has(artifact.id) ||
                       isDraggingFrame ||
-                      artifact.isComplete) && (
-                      <div className="pointer-events-none absolute -top-7 right-0 left-0 flex items-center justify-between px-1 select-none">
-                        <span
-                          className="text-[12px] font-bold truncate whitespace-nowrap overflow-hidden text-ellipsis"
+                      artifact.isComplete) && (() => {
+                      const wVal = (() => {
+                        const mode = artifactPreviewModes[artifact.title];
+                        if (mode === "app") return 380;
+                        if (mode === "web") return 1280;
+                        if (mode === "tablet") return 768;
+                        return artifact.width
+                          ? artifact.width
+                          : artifact.type === "app"
+                            ? 380
+                            : 1280;
+                      })();
+                      const scaleFactor = 1 / (zoom * 0.5);
+                      const containerWidth = wVal * (zoom * 0.5);
+                      return (
+                        <div
+                          className="pointer-events-none absolute -top-7 left-0 flex items-center justify-between px-1 select-none overflow-hidden h-6 gap-2"
                           style={{
-                            color: "var(--primary)",
-                            transform: `scale(${1 / (zoom * 0.5)})`,
+                            width: `${containerWidth}px`,
+                            transform: `scale(${scaleFactor})`,
                             transformOrigin: "left bottom",
-                            display: "inline-block",
-                            maxWidth: "75%",
                           }}
                         >
-                          {artifact.title || "Untitled Screen"}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <Code
-                            className="h-3.5 w-3.5"
+                          <span
+                            className="text-[12px] font-bold truncate whitespace-nowrap overflow-hidden text-ellipsis flex-1 min-w-0"
                             style={{
-                              color: "var(--muted-foreground)",
-                              transform: `scale(${1 / (zoom * 0.5)})`,
-                              transformOrigin: "right bottom",
+                              color: "var(--primary)",
                             }}
-                          />
+                          >
+                            {artifact.title || "Untitled Screen"}
+                          </span>
+                          <div className="flex items-center shrink-0">
+                            <Code
+                              className="h-3.5 w-3.5 text-muted-foreground"
+                            />
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      );
+                    })()}
 
                   <div
                     className={cn(
@@ -919,7 +932,13 @@ export function CanvasArea({
                         // Manual resize takes absolute priority
                         if (artifact.height) return `${artifact.height}px`;
 
-                        if (artifact.type === "theme") return "672px";
+                        if (artifact.type === "theme") return "524px";
+
+                        const isApp =
+                          artifact.type === "app" ||
+                          artifactPreviewModes[artifact.title] === "app";
+
+                        if (isApp) return "800px";
 
                         const dynamicHeight =
                           dynamicFrameHeights[artifact.title];
@@ -927,7 +946,7 @@ export function CanvasArea({
                         if (dynamicHeight && dynamicHeight > 100)
                           return `${dynamicHeight}px`;
 
-                        return artifact.type === "app" ? "800px" : "700px";
+                        return "700px";
                       })(),
                       minHeight:
                         artifactPreviewModes[artifact.title] === "app" ||

@@ -215,8 +215,31 @@ export async function POST(req: Request) {
                   } else if (event.type === "reasoning") {
                     // Stream reasoning with prefix 8:
                     controller.enqueue(
-                      encoder.encode(`8:${JSON.stringify(event.content)}\n`),
+                       encoder.encode(`8:${JSON.stringify(event.content)}\n`),
                     );
+                  } else if (event.type === "screen_created") {
+                    controller.enqueue(encoder.encode(`2:[${JSON.stringify({
+                        type: "screen-created",
+                        screen: event.screen
+                    })}]\n`));
+                  } else if (event.type === "screen_progress") {
+                    controller.enqueue(encoder.encode(`2:[${JSON.stringify({
+                        type: "screen-progress",
+                        screenId: event.screenId,
+                        html: event.html
+                    })}]\n`));
+                  } else if (event.type === "theme_created") {
+                    controller.enqueue(encoder.encode(`2:[${JSON.stringify({
+                        type: "theme-created",
+                        theme: event.theme
+                    })}]\n`));
+                  } else if (event.type === "theme_progress") {
+                    controller.enqueue(encoder.encode(`2:[${JSON.stringify({
+                        type: "theme-progress",
+                        themeId: event.themeId,
+                        variables: event.variables,
+                        title: event.title
+                    })}]\n`));
                   } else if (event.type === "tool_result") {
                     // Map tool results back to useChat data part (2:)
                     const toolResult = event.result;

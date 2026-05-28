@@ -9,7 +9,6 @@ import { headers } from "next/headers";
  * @type {string[]}
  */
 export const publicRoutes = [
-  "/api/inngest",
   "/preview",
   "/verify-email",
   "/reset-password",

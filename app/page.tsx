@@ -188,6 +188,7 @@ function HomeContent() {
   const { textInput } = usePromptInputController();
   const [isMounted, setIsMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const [projects, setProjects] = useState<any[]>([]);
   const [credits, setCredits] = useState<number | null>(null);
@@ -339,15 +340,14 @@ function HomeContent() {
           <ModeToggle />
           <UserMenu />
           <div className="lg:hidden">
-            <MobileMenu
-              sections={sections}
-              loading={loadingProjects}
-              isLoadingMore={isLoadingMore}
-              hasMore={hasMore}
-              loadMore={() => fetchProjects(true)}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-            />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="text-zinc-500 hover:text-foreground h-9 w-9 p-0 transition-colors outline-none"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </header>
@@ -450,8 +450,43 @@ function HomeContent() {
         </div>
       </main>
     </div>
-  </div>
-);
+
+      {/* Mobile Animated Slide-in Sidebar */}
+      <AnimatePresence>
+        {isMobileSidebarOpen && (
+          <>
+            {/* Backdrop Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileSidebarOpen(false)}
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm lg:hidden"
+            />
+            {/* Slide-in Sidebar Container */}
+            <motion.div
+              initial={{ x: "-110%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-110%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-[84px] bottom-4 left-4 z-50 flex w-[calc(100%-32px)] max-w-[340px] sm:max-w-[360px] flex-col rounded-2xl border border-border/40 bg-secondary/15 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:bg-zinc-900/20 dark:shadow-none lg:hidden overflow-hidden"
+            >
+              <Sidebar
+                sections={sections}
+                loading={loadingProjects}
+                isLoadingMore={isLoadingMore}
+                hasMore={hasMore}
+                loadMore={() => fetchProjects(true)}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                className="h-full w-full border-none bg-transparent shadow-none"
+              />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }
 
 

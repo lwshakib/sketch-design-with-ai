@@ -1,5 +1,5 @@
 import { Type } from "@google/genai";
-import { inngest } from "@/inngest/client";
+import { generateScreenSync } from "@/lib/generation";
 
 export const generateScreenTool = {
   name: "generateScreen",
@@ -23,23 +23,22 @@ export const generateScreenTool = {
     },
     required: ["title", "prompt", "type"],
   },
-  execute: async (args: any, context: { userId: string; projectId: string }) => {
+  execute: async (args: any, context: { userId: string; projectId: string; onProgress?: (event: any) => void }) => {
     try {
       console.log(`[Tool: generateScreen] Initiating for: ${args.title}`);
-      await inngest.send({
-        name: "app/screen.generate",
-        data: {
-          projectId: context.projectId,
-          title: args.title,
-          prompt: args.prompt,
-          type: args.type,
-          userId: context.userId,
-        },
+      const result = await generateScreenSync({
+        projectId: context.projectId,
+        title: args.title,
+        prompt: args.prompt,
+        type: args.type,
+        userId: context.userId,
+        onProgress: context.onProgress,
       });
 
       return {
         status: "success",
-        message: `Design protocol initiated for "${args.title}" (${args.type}). Generation is now running in the background.`,
+        message: `Design protocol initiated for "${args.title}" (${args.type}). Generation complete.`,
+        screen: result.screen,
       };
     } catch (error: any) {
       console.error("[Tool: generateScreen] Error:", error);

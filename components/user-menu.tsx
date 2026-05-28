@@ -13,10 +13,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { LogOut, User, Home } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useSignedUrls } from "@/hooks/use-signed-urls";
 
 export function UserMenu() {
   const { data: session } = authClient.useSession();
   const router = useRouter();
+  const user = session?.user;
+
+  const { urlMap } = useSignedUrls(user?.image ? [user.image] : []);
+  const resolvedAvatarUrl = user?.image
+    ? (user.image.startsWith("http") ? user.image : urlMap[user.image])
+    : null;
 
   if (!session) {
     return (
@@ -26,7 +33,6 @@ export function UserMenu() {
     );
   }
 
-  const user = session.user;
   const initials = user.name
     ? user.name
         .split(" ")
@@ -40,9 +46,9 @@ export function UserMenu() {
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 outline-none">
           <Avatar className="h-8 w-8 border">
-            {user.image ? (
+            {resolvedAvatarUrl ? (
               <img
-                src={user.image}
+                src={resolvedAvatarUrl}
                 alt={user.name || "User"}
                 className="aspect-square h-full w-full object-cover rounded-full"
               />

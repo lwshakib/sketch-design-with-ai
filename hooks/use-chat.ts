@@ -198,6 +198,50 @@ export const useChat = (projectId: string) => {
                       return updated;
                     });
                   }
+                } else if (data?.[0]?.type === "screen-created") {
+                  const screen = data[0].screen;
+                  const state = useProjectStore.getState();
+                  state.setArtifacts((prev) => {
+                    if (prev.some((a) => a.id === screen.id)) return prev;
+                    return [...prev, screen];
+                  });
+                  state.setThrottledArtifacts((prev) => {
+                    if (prev.some((a) => a.id === screen.id)) return prev;
+                    return [...prev, screen];
+                  });
+                } else if (data?.[0]?.type === "screen-progress") {
+                  const { screenId, html } = data[0];
+                  const state = useProjectStore.getState();
+                  state.setArtifacts((prev) =>
+                    prev.map((a) => (a.id === screenId ? { ...a, html } : a))
+                  );
+                  state.setThrottledArtifacts((prev) =>
+                    prev.map((a) => (a.id === screenId ? { ...a, html } : a))
+                  );
+                } else if (data?.[0]?.type === "theme-created") {
+                  const theme = data[0].theme;
+                  const state = useProjectStore.getState();
+                  state.setArtifacts((prev) => {
+                    if (prev.some((a) => a.id === theme.id)) return prev;
+                    return [...prev, theme];
+                  });
+                  state.setThrottledArtifacts((prev) => {
+                    if (prev.some((a) => a.id === theme.id)) return prev;
+                    return [...prev, theme];
+                  });
+                } else if (data?.[0]?.type === "theme-progress") {
+                  const { themeId, variables, title } = data[0];
+                  const state = useProjectStore.getState();
+                  state.setArtifacts((prev) =>
+                    prev.map((a) =>
+                      a.id === themeId ? { ...a, title, variables } : a
+                    )
+                  );
+                  state.setThrottledArtifacts((prev) =>
+                    prev.map((a) =>
+                      a.id === themeId ? { ...a, title, variables } : a
+                    )
+                  );
                 }
               } catch (e) {
                 /* skip */
@@ -239,6 +283,26 @@ export const useChat = (projectId: string) => {
           }
           return updated;
         });
+
+        // Fetch fresh project status to update the canvas artifacts synchronously
+        try {
+          const freshRes = await fetch(`/api/projects/${projectId}`);
+          if (freshRes.ok) {
+            const freshData = await freshRes.json();
+            const state = useProjectStore.getState();
+            state.setProject(freshData);
+            if (freshData.artifacts) {
+              const fetchedArtifacts = freshData.artifacts.map((s: any) => ({
+                ...s,
+                isComplete: s.status === "completed" || s.type === "theme",
+              }));
+              state.setArtifacts(fetchedArtifacts);
+              state.setThrottledArtifacts(fetchedArtifacts);
+            }
+          }
+        } catch (fetchErr) {
+          console.error("Failed to sync project artifacts synchronously:", fetchErr);
+        }
 
       } catch (err) {
         console.error("Chat error:", err);

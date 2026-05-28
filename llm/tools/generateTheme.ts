@@ -1,5 +1,5 @@
 import { Type } from "@google/genai";
-import { inngest } from "@/inngest/client";
+import { generateThemeSync } from "@/lib/generation";
 
 export const generateThemeTool = {
   name: "generateTheme",
@@ -31,27 +31,29 @@ export const generateThemeTool = {
     },
     required: ["title", "prompt"],
   },
-  execute: async (args: any, context: { userId: string; projectId: string }) => {
+  execute: async (args: any, context: { userId: string; projectId: string; onProgress?: (event: any) => void }) => {
     try {
       console.log(`[Tool: generateTheme] Initiating Theme Protocol`);
-      await inngest.send({
-        name: "app/theme.generate",
-        data: {
-          projectId: context.projectId,
-          title: args.title || "Style Guide",
-          prompt: args.prompt,
-          userId: context.userId,
-          pendingScreen: args.pendingScreenTitle ? {
-             title: args.pendingScreenTitle,
-             prompt: args.pendingScreenPrompt,
-             type: args.pendingScreenType
-          } : undefined
-        },
+      const result = await generateThemeSync({
+        projectId: context.projectId,
+        title: args.title || "Style Guide",
+        prompt: args.prompt,
+        userId: context.userId,
+        onProgress: context.onProgress,
+        pendingScreen: args.pendingScreenTitle ? {
+           title: args.pendingScreenTitle,
+           prompt: args.pendingScreenPrompt,
+           type: args.pendingScreenType
+        } : undefined
       });
 
+      const hasPending = !!args.pendingScreenTitle;
       return {
         status: "success",
-        message: `Theme protocol initiated. The Style Guide is now being generated in the background. Note: Tell the user you are establishing the design system first.`,
+        message: hasPending 
+          ? `Theme protocol completed. The Style Guide has been successfully generated. Additionally, the first functional screen "${args.pendingScreenTitle}" has also been successfully generated. Do NOT call generateScreen for "${args.pendingScreenTitle}" as it is already created and present on the canvas.`
+          : `Theme protocol completed. The Style Guide has been successfully generated.`,
+        theme: result.theme,
       };
     } catch (error: any) {
       console.error("[Tool: generateTheme] Error:", error);

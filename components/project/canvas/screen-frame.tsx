@@ -11,6 +11,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 
 import { cn } from "@/lib/utils";
 import { type Artifact } from "@/lib/types";
+import { useProjectStore } from "@/hooks/use-project-store";
 import {
   getInjectedHTML,
   sanitizeDocumentHtml,
@@ -40,11 +41,18 @@ export const ScreenFrame = React.memo(
     onRef,
   }: ScreenFrameProps) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
+    const activeTheme = useProjectStore(
+      useCallback(
+        (state) => state.throttledArtifacts.find((a) => a.type === "theme" && a.isActive),
+        [],
+      )
+    );
+
     /**
      * Initial content set only once to avoid reloads.
      * Subsequent updates happen via window.postMessage.
      */
-    const [initialSrcDoc] = useState(() => getInjectedHTML(artifact.html));
+    const [initialSrcDoc] = useState(() => getInjectedHTML(artifact.html, activeTheme?.variables));
     const lastContentRef = useRef(artifact.html);
 
     // Use useEffect to handle content updates via postMessage instead of srcDoc
@@ -96,6 +104,32 @@ export const ScreenFrame = React.memo(
             );
         }
     }, [effectivelyInEditMode]);
+
+    // Synchronize theme variables
+    const syncTheme = useCallback(() => {
+      if (activeTheme?.variables && iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(
+          {
+            type: "UPDATE_THEME",
+            variables: activeTheme.variables,
+          },
+          "*",
+        );
+      }
+    }, [activeTheme?.variables]);
+
+    useEffect(() => {
+      syncTheme();
+    }, [activeTheme?.variables, syncTheme]);
+
+    useEffect(() => {
+      const iframe = iframeRef.current;
+      if (!iframe) return;
+      iframe.addEventListener("load", syncTheme);
+      return () => {
+        iframe.removeEventListener("load", syncTheme);
+      };
+    }, [syncTheme]);
 
     return (
       <iframe

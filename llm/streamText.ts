@@ -117,7 +117,9 @@ export async function streamText(messages: any[], options?: StreamTextOptions) {
               sendEvent({ type: "tool_call", id, name: toolName, args });
 
               try {
-                const result = await executeTool(toolName, args, context);
+                const result = await executeTool(toolName, args, context, (progressEvent: any) => {
+                  sendEvent(progressEvent);
+                });
                 sendEvent({ type: "tool_result", id, name: toolName, result, args });
 
                 finalToolInvocations.push({ toolCallId: id, toolName, args, result });
