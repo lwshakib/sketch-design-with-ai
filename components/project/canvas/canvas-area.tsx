@@ -932,7 +932,7 @@ export function CanvasArea({
                         // Manual resize takes absolute priority
                         if (artifact.height) return `${artifact.height}px`;
 
-                        if (artifact.type === "theme") return "524px";
+                        if (artifact.type === "theme") return "444px";
 
                         const isApp =
                           artifact.type === "app" ||

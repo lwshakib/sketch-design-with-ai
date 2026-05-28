@@ -339,16 +339,6 @@ function HomeContent() {
           )}
           <ModeToggle />
           <UserMenu />
-          <div className="lg:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMobileSidebarOpen(true)}
-              className="text-zinc-500 hover:text-foreground h-9 w-9 p-0 transition-colors outline-none"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-          </div>
         </div>
       </header>
 
@@ -450,6 +440,17 @@ function HomeContent() {
         </div>
       </main>
     </div>
+
+      {/* Floating Bottom-Left Drawer-Pull Mobile Sidebar Trigger */}
+      <div className="lg:hidden">
+        <button
+          onClick={() => setIsMobileSidebarOpen(true)}
+          className="fixed bottom-6 left-0 z-40 flex h-11 w-11 items-center justify-center rounded-r-2xl border border-l-0 border-border/40 bg-secondary/85 dark:bg-zinc-900/85 backdrop-blur-md text-zinc-500 hover:text-foreground shadow-lg transition-all active:scale-95 outline-none"
+          title="Open history"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      </div>
 
       {/* Mobile Animated Slide-in Sidebar */}
       <AnimatePresence>

@@ -222,12 +222,18 @@ export const useChat = (projectId: string) => {
                   const theme = data[0].theme;
                   const state = useProjectStore.getState();
                   state.setArtifacts((prev) => {
-                    if (prev.some((a) => a.id === theme.id)) return prev;
-                    return [...prev, theme];
+                    const filtered = prev.map((a) =>
+                      a.type === "theme" ? { ...a, isActive: false } : a
+                    );
+                    if (filtered.some((a) => a.id === theme.id)) return filtered;
+                    return [...filtered, theme];
                   });
                   state.setThrottledArtifacts((prev) => {
-                    if (prev.some((a) => a.id === theme.id)) return prev;
-                    return [...prev, theme];
+                    const filtered = prev.map((a) =>
+                      a.type === "theme" ? { ...a, isActive: false } : a
+                    );
+                    if (filtered.some((a) => a.id === theme.id)) return filtered;
+                    return [...filtered, theme];
                   });
                 } else if (data?.[0]?.type === "theme-progress") {
                   const { themeId, variables, title } = data[0];
