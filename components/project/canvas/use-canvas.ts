@@ -249,21 +249,25 @@ export function useCanvas({
         artifacts.forEach((art) => {
           if (!art.id) return;
           const mode = artifactPreviewModes[art.title];
-          const width =
-            art.width ||
-            (mode === "app"
-              ? 380
-              : mode === "web"
-                ? 1280
-                : mode === "tablet"
-                  ? 768
-                  : art.type === "app"
-                    ? 380
-                    : 1024);
-          const height =
-            art.height ||
-            dynamicFrameHeights[art.title] ||
-            (art.type === "theme" ? 360 : (art.type === "app" ? 800 : 700));
+          const width = (() => {
+            if (mode === "app") return 380;
+            if (mode === "web") return 1280;
+            if (mode === "tablet") return 768;
+            return art.width
+              ? art.width
+              : art.type === "app"
+                ? 380
+                : 1280;
+          })();
+          const height = (() => {
+            if (art.type === "theme") return 360;
+            if (art.height) return art.height;
+            const isApp = art.type === "app" || mode === "app";
+            if (isApp) return 800;
+            const dynamicHeight = dynamicFrameHeights[art.title];
+            if (dynamicHeight && dynamicHeight > 100) return dynamicHeight;
+            return 700;
+          })();
 
           // Artifact world to screen coordinates
           // The actual scale applied is zoom * 0.5
