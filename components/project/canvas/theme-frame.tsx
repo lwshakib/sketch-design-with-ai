@@ -100,16 +100,16 @@ function ColorRamp({ label, hex, isDark }: { label: string; hex: string; isDark:
     : "bg-white border-zinc-200/80 text-zinc-900 shadow-[0_6px_24px_rgba(0,0,0,0.02)]";
 
   return (
-    <div className={`border p-2.5 rounded-[16px] flex flex-col gap-1.5 h-[92px] justify-between shadow-sm ${cardBgClass}`}>
+    <div className={`border p-2 rounded-[12px] flex flex-col gap-1 h-[74px] justify-between shadow-sm ${cardBgClass}`}>
       <div 
-        className="rounded-lg p-2 flex justify-between items-center h-9 shadow-inner"
+        className="rounded-md p-1.5 flex justify-between items-center h-7 shadow-inner"
         style={{ backgroundColor: hex, color: contrastColor }}
       >
-        <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
-        <span className="text-[8px] font-mono opacity-80 uppercase font-semibold">{hex}</span>
+        <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
+        <span className="text-[7.5px] font-mono opacity-80 uppercase font-semibold">{hex}</span>
       </div>
       
-      <div className={`flex h-3 rounded-md overflow-hidden border ${isDark ? "border-white/5" : "border-zinc-200/40"}`}>
+      <div className={`flex h-2.5 rounded-sm overflow-hidden border ${isDark ? "border-white/5" : "border-zinc-200/40"}`}>
         {steps.map((lightness, idx) => (
           <div 
             key={idx}
@@ -167,10 +167,10 @@ export function ThemeFrame({ artifact }: ThemeFrameProps) {
       />
 
       {/* Bento Grid */}
-      <div className="flex-1 p-5 grid grid-cols-4 gap-3 overflow-hidden h-full">
+      <div className="flex-1 p-4 grid grid-cols-4 gap-2.5 overflow-hidden h-full">
         
         {/* Column 1: Palette */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2.5">
            <ColorRamp label="Primary" hex={colors.primary} isDark={isDark} />
            <ColorRamp label="Secondary" hex={colors.secondary} isDark={isDark} />
            <ColorRamp label="Tertiary" hex={colors.tertiary} isDark={isDark} />
@@ -178,90 +178,90 @@ export function ThemeFrame({ artifact }: ThemeFrameProps) {
         </div>
 
         {/* Column 2: Typography & Structure */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2.5">
            {/* Headline Card */}
-           <div className={`border p-3.5 rounded-[16px] flex flex-col justify-between h-[126px] shadow-sm ${cardBgClass}`}>
+           <div className={`border p-2.5 rounded-[12px] flex flex-col justify-between h-[102px] shadow-sm ${cardBgClass}`}>
               <div className="flex justify-between items-start">
-                  <span className={`text-[8px] font-bold uppercase tracking-widest ${textMutedClass}`}>Headline</span>
-                  <span className={`text-[10px] font-semibold ${textMutedLightClass}`}>{typography.headline}</span>
+                  <span className={`text-[7.5px] font-bold uppercase tracking-widest ${textMutedClass}`}>Headline</span>
+                  <span className={`text-[9.5px] font-semibold ${textMutedLightClass}`}>{typography.headline}</span>
               </div>
-              <div className="text-5xl font-normal text-center select-none" style={{ fontFamily: typography.headline }}>Aa</div>
+              <div className="text-4xl font-normal text-center select-none" style={{ fontFamily: typography.headline }}>Aa</div>
            </div>
 
            {/* Body Text Card */}
-           <div className={`border p-3.5 rounded-[16px] flex flex-col justify-between h-[126px] shadow-sm ${cardBgClass}`}>
+           <div className={`border p-2.5 rounded-[12px] flex flex-col justify-between h-[102px] shadow-sm ${cardBgClass}`}>
               <div className="flex justify-between items-start">
-                  <span className={`text-[8px] font-bold uppercase tracking-widest ${textMutedClass}`}>Body</span>
-                  <span className={`text-[10px] font-semibold ${textMutedLightClass}`}>{typography.body}</span>
+                  <span className={`text-[7.5px] font-bold uppercase tracking-widest ${textMutedClass}`}>Body</span>
+                  <span className={`text-[9.5px] font-semibold ${textMutedLightClass}`}>{typography.body}</span>
               </div>
-              <div className="text-5xl font-normal text-center select-none opacity-85" style={{ fontFamily: typography.body }}>Aa</div>
+              <div className="text-4xl font-normal text-center select-none opacity-85" style={{ fontFamily: typography.body }}>Aa</div>
            </div>
 
            {/* Label Card */}
-           <div className={`border p-3.5 rounded-[16px] flex flex-col justify-between h-[126px] shadow-sm ${cardBgClass}`}>
+           <div className={`border p-2.5 rounded-[12px] flex flex-col justify-between h-[102px] shadow-sm ${cardBgClass}`}>
               <div className="flex justify-between items-start">
-                  <span className={`text-[8px] font-bold uppercase tracking-widest ${textMutedClass}`}>Label</span>
-                  <span className={`text-[10px] font-semibold ${textMutedLightClass}`}>{typography.label}</span>
+                  <span className={`text-[7.5px] font-bold uppercase tracking-widest ${textMutedClass}`}>Label</span>
+                  <span className={`text-[9.5px] font-semibold ${textMutedLightClass}`}>{typography.label}</span>
               </div>
-              <div className="text-5xl font-normal text-center select-none opacity-70" style={{ fontFamily: typography.label }}>Aa</div>
+              <div className="text-4xl font-normal text-center select-none opacity-70" style={{ fontFamily: typography.label }}>Aa</div>
            </div>
         </div>
 
         {/* Column 3: Components & UI Details */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2.5">
            {/* Buttons Component */}
-           <div className={`border p-3.5 rounded-[16px] flex flex-col justify-center gap-2.5 h-[126px] shadow-sm ${cardBgClass}`}>
-              <div className="grid grid-cols-2 gap-2">
+           <div className={`border p-2.5 rounded-[12px] flex flex-col justify-center gap-2.5 h-[102px] shadow-sm ${cardBgClass}`}>
+              <div className="grid grid-cols-2 gap-1.5">
                  <button 
-                   className="w-full py-1.5 rounded-lg text-[10px] font-bold transition-all shadow-sm flex items-center justify-center cursor-default" 
+                   className="w-full py-1 rounded-md text-[9px] font-bold transition-all shadow-sm flex items-center justify-center cursor-default" 
                    style={{ backgroundColor: colors.primary, color: getContrastColor(colors.primary) }}
                  >
                    Primary
                  </button>
-                 <button className={`w-full py-1.5 rounded-lg text-[10px] font-bold flex items-center justify-center cursor-default ${isDark ? "bg-[#222] text-white" : "bg-zinc-100 border border-zinc-200 text-zinc-800"}`}>
+                 <button className={`w-full py-1 rounded-md text-[9px] font-bold flex items-center justify-center cursor-default ${isDark ? "bg-[#222] text-white" : "bg-zinc-100 border border-zinc-200 text-zinc-800"}`}>
                    Secondary
                  </button>
-                 <button className={`w-full py-1.5 rounded-lg text-[10px] font-bold flex items-center justify-center cursor-default ${isDark ? "bg-white text-black" : "bg-black text-white"}`}>
+                 <button className={`w-full py-1 rounded-md text-[9px] font-bold flex items-center justify-center cursor-default ${isDark ? "bg-white text-black" : "bg-black text-white"}`}>
                    Inverted
                  </button>
-                 <button className={`w-full py-1.5 rounded-lg text-[10px] font-bold border flex items-center justify-center cursor-default ${isDark ? "border-white/20 text-white/80" : "border-zinc-300 text-zinc-700"}`}>
+                 <button className={`w-full py-1 rounded-md text-[9px] font-bold border flex items-center justify-center cursor-default ${isDark ? "border-white/20 text-white/80" : "border-zinc-300 text-zinc-700"}`}>
                    Outlined
                  </button>
               </div>
            </div>
 
            {/* Skeleton Content */}
-           <div className={`border p-3.5 rounded-[16px] flex flex-col justify-center gap-2 h-[100px] shadow-sm ${cardBgClass}`}>
-              <div className="space-y-2">
-                 <div className="h-1.5 w-full rounded-full animate-pulse" style={{ backgroundColor: colors.primary }} />
-                 <div className="h-1.5 w-[85%] rounded-full animate-pulse" style={{ backgroundColor: colors.secondary }} />
-                 <div className="h-1.5 w-[55%] rounded-full animate-pulse" style={{ backgroundColor: colors.tertiary }} />
+           <div className={`border p-2.5 rounded-[12px] flex flex-col justify-center gap-1.5 h-[80px] shadow-sm ${cardBgClass}`}>
+              <div className="space-y-1.5">
+                 <div className="h-1 w-full rounded-full animate-pulse" style={{ backgroundColor: colors.primary }} />
+                 <div className="h-1 w-[85%] rounded-full animate-pulse" style={{ backgroundColor: colors.secondary }} />
+                 <div className="h-1 w-[55%] rounded-full animate-pulse" style={{ backgroundColor: colors.tertiary }} />
               </div>
            </div>
 
            {/* Sub-components Grid */}
-           <div className="grid grid-cols-2 gap-3 h-[152px]">
-              <div className={`border rounded-[16px] flex items-center justify-center p-3.5 shadow-sm ${cardBgClass}`}>
+           <div className="grid grid-cols-2 gap-2.5 h-[124px]">
+              <div className={`border rounded-[12px] flex items-center justify-center p-2.5 shadow-sm ${cardBgClass}`}>
                  <div 
-                   className="w-9 h-9 rounded-lg flex items-center justify-center shadow-md"
+                   className="w-7.5 h-7.5 rounded-lg flex items-center justify-center shadow-md"
                    style={{ 
                      backgroundColor: `${colors.tertiary}22`, 
                      color: colors.tertiary,
                      border: `1px solid ${colors.tertiary}33`
                    }}
                  >
-                    <Pencil size={16} />
+                    <Pencil size={14} />
                  </div>
               </div>
-              <div className={`border rounded-[16px] flex items-center justify-center p-3.5 shadow-sm ${cardBgClass}`}>
+              <div className={`border rounded-[12px] flex items-center justify-center p-2.5 shadow-sm ${cardBgClass}`}>
                  <button 
-                   className="px-2.5 py-1.5 rounded-md text-[10px] font-bold flex items-center gap-1 shadow-md cursor-default"
+                   className="px-2 py-1 rounded-md text-[9px] font-bold flex items-center gap-0.5 shadow-md cursor-default"
                    style={{ 
                      backgroundColor: colors.primary, 
                      color: getContrastColor(colors.primary) 
                    }}
                  >
-                    <Pencil size={10} />
+                    <Pencil size={9} />
                     <span>Label</span>
                  </button>
               </div>
@@ -269,74 +269,74 @@ export function ThemeFrame({ artifact }: ThemeFrameProps) {
         </div>
 
         {/* Column 4: Architecture */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2.5">
            {/* Search Architecture */}
-           <div className={`border p-3.5 rounded-[16px] flex items-center justify-center h-[96px] shadow-sm ${cardBgClass}`}>
-              <div className={`w-full border rounded-lg px-2.5 py-2 flex items-center gap-2 ${subBgClass}`}>
-                 <Search size={12} className={`${isDark ? "text-zinc-500" : "text-zinc-400"}`} />
-                 <span className={`text-[10px] font-medium ${isDark ? "text-zinc-500" : "text-zinc-500"}`}>Search</span>
+           <div className={`border p-2.5 rounded-[12px] flex items-center justify-center h-[80px] shadow-sm ${cardBgClass}`}>
+              <div className={`w-full border rounded-lg px-2 py-1.5 flex items-center gap-1.5 ${subBgClass}`}>
+                 <Search size={11} className={`${isDark ? "text-zinc-500" : "text-zinc-400"}`} />
+                 <span className={`text-[9px] font-medium ${isDark ? "text-zinc-500" : "text-zinc-500"}`}>Search</span>
               </div>
            </div>
 
            {/* Navigation Pill */}
-           <div className={`border p-3.5 rounded-[16px] flex items-center justify-center h-[126px] shadow-sm ${cardBgClass}`}>
-              <div className={`border rounded-full h-10 flex items-center px-2.5 gap-4 shadow-inner ${subBgClass}`}>
+           <div className={`border p-2.5 rounded-[12px] flex items-center justify-center h-[102px] shadow-sm ${cardBgClass}`}>
+              <div className={`border rounded-full h-8 flex items-center px-2 gap-3 shadow-inner ${subBgClass}`}>
                  <div 
-                   className="w-6.5 h-6.5 rounded-full flex items-center justify-center shadow-sm"
+                   className="w-5.5 h-5.5 rounded-full flex items-center justify-center shadow-sm"
                    style={{ 
                      backgroundColor: colors.primary, 
                      color: getContrastColor(colors.primary) 
                    }}
                  >
-                    <Home size={12} />
+                    <Home size={10} />
                  </div>
-                 <Search size={12} className={`${isDark ? "text-zinc-500" : "text-zinc-400"}`} />
-                 <User size={12} className={`${isDark ? "text-zinc-500" : "text-zinc-400"}`} />
+                 <Search size={10} className={`${isDark ? "text-zinc-500" : "text-zinc-400"}`} />
+                 <User size={10} className={`${isDark ? "text-zinc-500" : "text-zinc-400"}`} />
               </div>
            </div>
 
            {/* Icon Sets */}
-           <div className={`border p-3.5 rounded-[16px] flex items-center justify-center h-[156px] shadow-sm ${cardBgClass}`}>
-              <div className="flex gap-1.5">
+           <div className={`border p-2.5 rounded-[12px] flex items-center justify-center h-[124px] shadow-sm ${cardBgClass}`}>
+              <div className="flex gap-1">
                  <div 
-                   className="w-8 h-8 rounded-full flex items-center justify-center shadow-md animate-bounce"
+                   className="w-7 h-7 rounded-full flex items-center justify-center shadow-md animate-bounce"
                    style={{ 
                      backgroundColor: `${colors.primary}22`, 
                      color: colors.primary,
                      border: `1px solid ${colors.primary}33`
                    }}
                  >
-                    <Sparkles size={14} />
+                    <Sparkles size={12} />
                  </div>
                  <div 
-                   className="w-8 h-8 rounded-full flex items-center justify-center shadow-md animate-pulse"
+                   className="w-7 h-7 rounded-full flex items-center justify-center shadow-md animate-pulse"
                    style={{ 
                      backgroundColor: `${colors.secondary}22`, 
                      color: colors.secondary,
                      border: `1px solid ${colors.secondary}33`
                    }}
                  >
-                    <Shapes size={14} />
+                    <Shapes size={12} />
                  </div>
                  <div 
-                   className="w-8 h-8 rounded-full flex items-center justify-center shadow-md"
+                   className="w-7 h-7 rounded-full flex items-center justify-center shadow-md"
                    style={{ 
                      backgroundColor: `${colors.tertiary}22`, 
                      color: colors.tertiary,
                      border: `1px solid ${colors.tertiary}33`
                    }}
                  >
-                    <Tag size={14} />
+                    <Tag size={12} />
                  </div>
                  <div 
-                   className="w-8 h-8 rounded-full flex items-center justify-center shadow-md"
+                   className="w-7 h-7 rounded-full flex items-center justify-center shadow-md"
                    style={{ 
                      backgroundColor: "#ef444422", 
                      color: "#ef4444",
                      border: "1px solid #ef444433"
                    }}
                  >
-                    <Trash2 size={14} />
+                    <Trash2 size={12} />
                  </div>
               </div>
            </div>

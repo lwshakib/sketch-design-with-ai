@@ -929,10 +929,10 @@ export function CanvasArea({
                             : "1280px";
                       })(),
                       height: (() => {
+                        if (artifact.type === "theme") return "360px";
+
                         // Manual resize takes absolute priority
                         if (artifact.height) return `${artifact.height}px`;
-
-                        if (artifact.type === "theme") return "444px";
 
                         const isApp =
                           artifact.type === "app" ||

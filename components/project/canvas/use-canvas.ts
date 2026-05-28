@@ -260,7 +260,7 @@ export function useCanvas({
           const height =
             art.height ||
             dynamicFrameHeights[art.title] ||
-            (art.type === "theme" ? 672 : (art.type === "app" ? 800 : 700));
+            (art.type === "theme" ? 360 : (art.type === "app" ? 800 : 700));
 
           // Artifact world to screen coordinates
           // The actual scale applied is zoom * 0.5
@@ -357,7 +357,7 @@ export function useCanvas({
               : art.type === "app"
                 ? 380
                 : 1024;
-      const defaultHeight = dynamicFrameHeights[art.title] || (art.type === "theme" ? 672 : (art.type === "app" ? 800 : 700));
+      const defaultHeight = dynamicFrameHeights[art.title] || (art.type === "theme" ? 360 : (art.type === "app" ? 800 : 700));
 
       resizingStartSize.current = {
         width: art.width || defaultWidth,
