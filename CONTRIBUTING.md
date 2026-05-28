@@ -59,14 +59,11 @@ Everyone participating in this project is governed by our [Code of Conduct](CODE
 
 ### Running the App
 
-1. **Start Inngest Dev Server** (Required for AI features):
-   ```bash
-   pnpm exec inngest-cli@latest dev
-   ```
-2. **Start Next.js**:
-   ```bash
-   pnpm dev
-   ```
+Start the Next.js development server:
+
+```bash
+pnpm dev
+```
 
 ## 🏗️ Technical Architecture
 
@@ -77,13 +74,12 @@ The project implements a daily credit limit (10 credits) per user.
 - **Logic**: Found in `lib/credits.ts`.
 - **Testing**: To reset your credits during development, you can manually update the `lastCreditReset` field in the `User` table to a previous date using Prisma Studio (`pnpm db:studio`).
 
-### Inngest Workflows
+### Server-Sent Events (SSE) Stream
 
-AI generation is handled asynchronously via Inngest to support streaming, visual consistency (themes), and background processing.
+AI generation and real-time status updates are pushed directly to the UI using a direct Server-Sent Events (SSE) stream.
 
-- **Files**: Check the `inngest/` directory for function definitions.
-- **Execution**: The AI tools in `services/ai.services.ts` trigger Inngest events which process the design logic.
-- **Realtime**: We use Inngest Realtime to push status updates from the background workers to the React Flow canvas.
+- **Route**: Check `app/api/chat/route.ts` for the SSE streaming and LLM tool execution logic.
+- **Canvas Integration**: The spatial UI updates and theme colors are painted in real time as the SSE events stream from the server.
 
 ### Prisma Configuration
 

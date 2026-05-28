@@ -15,9 +15,9 @@
 
 - 🎨 **Text-to-Design**: Describe your idea in natural language and watch the AI generate multi-screen design systems.
 - 🖼️ **Theme Prototyping**: Automatically establish a consistent design system (colors, typography) before generating functional screens.
-- 🤖 **Agentic Design Generation**: Leverages Kimi K2.5 (via Cloudflare AI Gateway) for high-fidelity HTML/CSS production.
+- 🤖 **Agentic Design Generation**: Leverages Google Gemini (via the Gemini API) for high-fidelity HTML/CSS production.
 - 👁️ **Infinite Canvas**: Manage your entire project visually on an infinite spatial workspace powered by React Flow.
-- ⚡ **Inngest Realtime**: Watch your designs come to life with live status updates pushed directly to the UI.
+- ⚡ **Real-Time Stream**: Watch your designs come to life with live Server-Sent Events (SSE) status updates pushed directly to the UI.
 - 💻 **Code Export**: Get production-ready, clean code (Tailwind HTML/CSS) instantly.
 - 💳 **Credit System**: Managed project-based credit allowance for sustainable AI generations.
 
@@ -29,20 +29,18 @@ graph TD
     subgraph Client ["Client Side (Next.js 16)"]
         UI[User Interface]
         Canvas[Infinite Canvas / React Flow]
-        Realtime[Inngest Realtime Status]
+        Realtime[Real-Time SSE Status]
     end
 
-    subgraph Server ["Server Side (Next.js API & Inngest)"]
+    subgraph Server ["Server Side (Next.js 16 App Router)"]
         Auth[Better Auth]
-        InngestAPI[Inngest Background Workers]
+        ChatAPI[Chat Route Handler / SSE Stream]
         ProjectAPI[Project & Credits Logic]
-        AIService[AI Service Gateway]
+        GeminiClient[Google Gemini SDK Client]
     end
 
     subgraph Services ["External Services"]
-        Gateway[Cloudflare AI Gateway]
-        Kimi[Kimi K2.5 Model]
-        InngestCloud[Inngest Event Bus]
+        GeminiAPI[Google Gemini API]
         S3Storage[AWS S3 / R2 Storage]
     end
 
@@ -56,20 +54,18 @@ graph TD
     UI -->|Authenticates| Auth
     UI -->|API Requests| ProjectAPI
 
-    InngestCloud -.->|Realtime Updates| Realtime
+    ChatAPI -.->|Real-Time SSE Events| Realtime
 
     ProjectAPI -->|CRUD| DB
-    ProjectAPI -->|Trigger Generation| InngestCloud
 
-    InngestCloud -->|Execute Workflow| InngestAPI
-    InngestAPI -->|Tool Calling| AIService
-    AIService -->|Stream/Generate| Gateway
-    Gateway -->|Inference| Kimi
-    InngestAPI -->|Consume Credit| DB
-    InngestAPI -->|Persist Design| DB
+    UI -->|Trigger Generation| ChatAPI
+    ChatAPI -->|Stream Generation & Tool Calls| GeminiClient
+    GeminiClient -->|SDK Calls| GeminiAPI
+    ChatAPI -->|Consume Credit| DB
+    ChatAPI -->|Persist Design| DB
 
     Auth -->|Session Management| DB
-    InngestAPI -->|Store Assets| S3Storage
+    ChatAPI -->|Store Assets| S3Storage
 ```
 
 <div align="center">
@@ -88,10 +84,10 @@ graph TD
 
 ### AI Capabilities
 
-- **Smart Design Generation**: Highly precise design generation using Kimi K2.5.
+- **Smart Design Generation**: Highly precise design generation using Google Gemini.
 - **Theme Orchestration**: Decoupled theme generation to ensure visual consistency across all project screens.
 - **Infinite Spatial Workspace**: Organize screens and themes on a zoomable React Flow canvas.
-- **Inngest Realtime**: Live progress tracking for every generation step.
+- **Real-Time Stream**: Live Server-Sent Events (SSE) progress tracking for every generation step.
 - **Code Export**: Get clean, production-ready HTML and CSS.
 - **Responsive Previews**: Immediate visualization of mobile and web outputs.
 
@@ -107,7 +103,7 @@ graph TD
 
 - **Modern Tech Stack**: Built with Next.js 16 (App Router), React 19, and TypeScript 5
 - **Tailwind CSS 4**: Utilizing the latest in styling technology for high performance
-- **Inngest Integration**: Robust background job processing for long-running AI tasks
+- **SSE Streaming Integration**: Highly robust Server-Sent Events for real-time AI streaming
 - **Code Editor**: Integrated code viewer with syntax highlighting (Shiki/CodeMirror)
 - **Export Options**: Download designs as HTML, images, or ZIP files
 
@@ -119,9 +115,9 @@ graph TD
 | **Canvas**     | [@xyflow/react](https://reactflow.dev/) (React Flow)                                                                                                             |
 | **Animation**  | [Framer Motion 12](https://www.framer.com/motion/), [Motion](https://motion.dev/)                                                                                |
 | **Components** | [Radix UI](https://www.radix-ui.com/)                                                                                                                            |
-| **Backend**    | [Better Auth 1.4](https://www.better-auth.com/), [Inngest 3.5](https://www.inngest.com/)                                                                         |
+| **Backend**    | [Better Auth 1.4](https://www.better-auth.com/), Server-Sent Events (SSE)                                                                                        |
 | **Database**   | [PostgreSQL](https://www.postgresql.org/), [Prisma ORM 7.2](https://www.prisma.io/)                                                                              |
-| **AI**         | [Kimi K2.5](https://www.moonshot.cn/) via [Cloudflare AI Gateway](https://developers.cloudflare.com/ai-gateway/)                                                 |
+| **AI**         | [Google Gemini](https://ai.google.dev/) via the [Gemini API](https://ai.google.dev/gemini-api/docs)                                                              |
 | **Utilities**  | [Zustand](https://zustand-demo.pmnd.rs/), [tokenlens](https://github.com/infera-ai/tokenlens)                                                                    |
 | **Storage**    | [AWS S3](https://aws.amazon.com/s3/) (or compatible R2/Minio)                                                                                                    |
 
@@ -198,13 +194,9 @@ pnpm bucket:setup
 
 ### 5. Start the Services
 
-You need both the Inngest dev server and the Next.js dev server running:
+Start the Next.js development server:
 
 ```bash
-# Terminal 1: Inngest Dev Server
-pnpm exec inngest-cli@latest dev
-
-# Terminal 2: Next.js App
 pnpm dev
 ```
 
@@ -214,8 +206,6 @@ Open [http://localhost:3000](http://localhost:3000) to start designing.
 
 - `app/`: Next.js App Router (Pages, API, and Server Actions)
 - `components/`: UI components (Radix, Canvas, Editor)
-- `inngest/`: Background job definitions & realtime status logic
-- `services/`: AI Gateway service and S3 storage service
 - `lib/`: Shared utilities, auth logic, and credit management
 - `prisma/`: Database schema and configuration
 - `generated/`: Generated Prisma Client (ignored by git)
