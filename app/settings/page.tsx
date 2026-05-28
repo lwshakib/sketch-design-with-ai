@@ -1,19 +1,15 @@
 "use client";
 
 import React from "react";
-import {
-  ArrowLeft,
-  Settings,
-} from "lucide-react";
+import { ArrowLeft, Settings } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/components/user-menu";
 import { ModeToggle } from "@/components/mode-toggle";
 
-
 export default function SettingsPage() {
   return (
-    <div className="bg-background text-foreground min-h-screen font-sans flex flex-col">
+    <div className="bg-background text-foreground flex min-h-screen flex-col font-sans">
       <header className="bg-background/80 border-border/50 sticky top-0 z-50 flex w-full items-center justify-between border-b px-6 py-2 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <Link
@@ -30,15 +26,18 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+      <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
         <div className="bg-secondary/30 border-border/60 max-w-md space-y-6 rounded-3xl border p-12 shadow-sm backdrop-blur-sm">
           <div className="bg-background border-border mx-auto flex h-20 w-20 items-center justify-center rounded-3xl border shadow-lg">
             <Settings className="text-primary h-10 w-10" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">Workspace Settings</h1>
+            <h1 className="text-2xl font-bold tracking-tight">
+              Workspace Settings
+            </h1>
             <p className="text-muted-foreground text-sm">
-              Manage your project workspace and preferences. General settings are coming soon.
+              Manage your project workspace and preferences. General settings
+              are coming soon.
             </p>
           </div>
           <Button asChild className="rounded-xl px-8 font-bold">
@@ -49,4 +48,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

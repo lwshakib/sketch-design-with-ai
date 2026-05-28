@@ -47,7 +47,6 @@ export default async function SingleScreenPreviewPage({
     isComplete: true,
   };
 
-
   return (
     <ScreenShareView
       project={{

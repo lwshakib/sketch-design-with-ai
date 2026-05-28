@@ -4,7 +4,7 @@ import { processMessages } from "./utils";
 
 export async function generateText(
   messages: any[],
-  options?: { temperature?: number; max_tokens?: number; projectId?: string }
+  options?: { temperature?: number; max_tokens?: number; projectId?: string },
 ): Promise<{ text: string }> {
   const { temperature } = options || {};
 
@@ -36,7 +36,7 @@ export async function generateText(
 
 export async function* generateTextStream(
   messages: any[],
-  options?: { temperature?: number; max_tokens?: number; projectId?: string }
+  options?: { temperature?: number; max_tokens?: number; projectId?: string },
 ): AsyncGenerator<string, string, unknown> {
   const { temperature } = options || {};
 

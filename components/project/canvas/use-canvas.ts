@@ -253,11 +253,7 @@ export function useCanvas({
             if (mode === "app") return 380;
             if (mode === "web") return 1280;
             if (mode === "tablet") return 768;
-            return art.width
-              ? art.width
-              : art.type === "app"
-                ? 380
-                : 1280;
+            return art.width ? art.width : art.type === "app" ? 380 : 1280;
           })();
           const height = (() => {
             if (art.type === "theme") return 360;
@@ -364,7 +360,9 @@ export function useCanvas({
               : art.type === "app"
                 ? 380
                 : 1024;
-      const defaultHeight = dynamicFrameHeights[art.title] || (art.type === "theme" ? 360 : (art.type === "app" ? 800 : 700));
+      const defaultHeight =
+        dynamicFrameHeights[art.title] ||
+        (art.type === "theme" ? 360 : art.type === "app" ? 800 : 700);
 
       resizingStartSize.current = {
         width: art.width || defaultWidth,
@@ -486,17 +484,20 @@ export function useCanvas({
     if (!element || loading) return;
 
     const handleWheelNative = (e: WheelEvent) => {
-      const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+      const isModalOpen =
+        typeof document !== "undefined" &&
+        (!!document.querySelector('[role="dialog"]') ||
+          !!document.querySelector('[data-slot="dialog-content"]'));
       if (isModalOpen) return;
 
       // Prevent canvas interaction if scrolling over a scrollable UI element
       let target = e.target as HTMLElement | null;
       while (target && target !== element) {
         if (target.scrollHeight > target.clientHeight) {
-            const style = window.getComputedStyle(target);
-            if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
-                return; // Let the container handle its own scroll
-            }
+          const style = window.getComputedStyle(target);
+          if (style.overflowY === "auto" || style.overflowY === "scroll") {
+            return; // Let the container handle its own scroll
+          }
         }
         target = target.parentElement;
       }
@@ -529,7 +530,10 @@ export function useCanvas({
       );
       if (isInput) return;
 
-      const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+      const isModalOpen =
+        typeof document !== "undefined" &&
+        (!!document.querySelector('[role="dialog"]') ||
+          !!document.querySelector('[data-slot="dialog-content"]'));
       if (isModalOpen) return;
 
       // Toggle dark/light mode when pressing 'D' or 'd'
@@ -538,7 +542,10 @@ export function useCanvas({
       }
 
       // Delete selected artifacts using Delete or Backspace key
-      if ((e.key === "Delete" || e.key === "Backspace") && selectedArtifactIds.size > 0) {
+      if (
+        (e.key === "Delete" || e.key === "Backspace") &&
+        selectedArtifactIds.size > 0
+      ) {
         e.preventDefault();
         const updateFn = (prev: Artifact[]) =>
           prev.filter((art) => !art.id || !selectedArtifactIds.has(art.id));

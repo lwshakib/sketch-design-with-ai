@@ -121,7 +121,6 @@ export default function ProjectPage() {
 
   const { sendMessage, chatStatus, chatError } = useChat(projectId);
 
-
   const handlePersistArtifacts = async (indices: number[]) => {
     for (const index of indices) {
       const artifact = artifacts[index];
@@ -154,7 +153,6 @@ export default function ProjectPage() {
     onSave: () => debouncedSave(),
     previewRef,
   });
-
 
   const handleRetry = useCallback(() => {
     const { messages } = useProjectStore.getState();
@@ -202,7 +200,6 @@ export default function ProjectPage() {
             setArtifacts(fetchedArtifacts);
             setThrottledArtifacts(fetchedArtifacts);
           }
-
         } else {
           // New project or no canvas data: Reset to defaults
           setZoom(1);
@@ -217,7 +214,6 @@ export default function ProjectPage() {
             setIsGenerating(true);
           }
         }
-
 
         const pendingPromptRaw = sessionStorage.getItem(
           `pending_prompt_${projectId}`,
@@ -384,8 +380,6 @@ export default function ProjectPage() {
   useEffect(() => {
     commitEditsRef.current = commitEdits;
   }, [commitEdits]);
-
-
 
   const hoveredElRef = useRef<HTMLElement | null>(null);
   const selectedElRef = useRef<HTMLElement | null>(null);
@@ -590,7 +584,6 @@ export default function ProjectPage() {
     e.preventDefault();
     if (!input.trim() && attachments?.length === 0) return;
 
-
     const text = input.trim();
     setIsGenerating(true);
 
@@ -611,7 +604,6 @@ export default function ProjectPage() {
     action: "more" | "regenerate" | "variations",
     artifact: Artifact,
   ) => {
-
     let prompt = "";
     if (action === "more")
       prompt = `Analyze the project based on the "${artifact.title}" screen and architect additional screens (you decide how many, e.g., 2-3 or more) to complete the full user journey and application logic. Generate them now.`;
@@ -632,7 +624,6 @@ export default function ProjectPage() {
   };
 
   const handleRegenerateSubmit = async () => {
-
     const selectedId = Array.from(selectedArtifactIds)[0];
     const artifact = artifacts.find((a) => a.id === selectedId);
     if (!artifact || !artifact.id || isGenerating) return;

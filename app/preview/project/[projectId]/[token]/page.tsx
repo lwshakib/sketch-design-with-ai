@@ -46,7 +46,6 @@ export default async function ProjectPreviewPage({
     isComplete: true,
   }));
 
-
   return (
     <ProjectShareView
       project={{

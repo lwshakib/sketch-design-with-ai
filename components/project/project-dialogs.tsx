@@ -279,7 +279,7 @@ export function ProjectDialogs({
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteProject}
-              className="bg-red-500 text-white hover:bg-red-600 active:scale-[0.97] transition-all shadow-[0_2px_8px_rgba(239,68,68,0.25)] hover:shadow-[0_4px_12px_rgba(239,68,68,0.35)] h-8 flex-1 rounded-lg border-none text-[12px] font-semibold"
+              className="h-8 flex-1 rounded-lg border-none bg-red-500 text-[12px] font-semibold text-white shadow-[0_2px_8px_rgba(239,68,68,0.25)] transition-all hover:bg-red-600 hover:shadow-[0_4px_12px_rgba(239,68,68,0.35)] active:scale-[0.97]"
             >
               Delete Project
             </AlertDialogAction>

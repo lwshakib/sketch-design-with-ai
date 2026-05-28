@@ -26,7 +26,7 @@ export function CodeViewerModal({
 }: CodeViewerModalProps) {
   const { resolvedTheme } = useTheme();
   const [hasCopied, setHasCopied] = useState(false);
-  
+
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
     setHasCopied(true);
@@ -35,12 +35,12 @@ export function CodeViewerModal({
   };
 
   return (
-    <CustomModal 
-      isOpen={isOpen} 
-      onClose={onClose} 
+    <CustomModal
+      isOpen={isOpen}
+      onClose={onClose}
       className={cn(
-        "w-[98vw] h-[95vh] flex flex-col items-stretch shadow-2xl relative group transition-all duration-300",
-        resolvedTheme === "light" ? "border-border border" : "border-none"
+        "group relative flex h-[95vh] w-[98vw] flex-col items-stretch shadow-2xl transition-all duration-300",
+        resolvedTheme === "light" ? "border-border border" : "border-none",
       )}
     >
       {/* Floating Controls - Top Right, Minimal */}
@@ -49,19 +49,25 @@ export function CodeViewerModal({
           variant="ghost"
           size="icon"
           className={cn(
-             "size-9 rounded-xl transition-all active:scale-90",
-             hasCopied ? "text-emerald-500 bg-emerald-500/10" : "text-foreground/70 hover:text-foreground hover:bg-muted/20"
+            "size-9 rounded-xl transition-all active:scale-90",
+            hasCopied
+              ? "bg-emerald-500/10 text-emerald-500"
+              : "text-foreground/70 hover:text-foreground hover:bg-muted/20",
           )}
           onClick={handleCopy}
           title="Copy Code"
         >
-          {hasCopied ? <Check className="size-4" /> : <Copy className="size-4" />}
+          {hasCopied ? (
+            <Check className="size-4" />
+          ) : (
+            <Copy className="size-4" />
+          )}
         </Button>
-        
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="size-9 rounded-xl text-muted-foreground hover:text-destructive transition-all hover:bg-destructive/10 active:scale-90"
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 size-9 rounded-xl transition-all active:scale-90"
           onClick={onClose}
           title="Close"
         >
@@ -69,7 +75,7 @@ export function CodeViewerModal({
         </Button>
       </div>
 
-      <div className="flex-1 min-h-0 bg-[#1e1e1e] scrollbar-none relative overflow-hidden rounded-2xl">
+      <div className="relative min-h-0 flex-1 scrollbar-none overflow-hidden rounded-2xl bg-[#1e1e1e]">
         <CodeMirror
           value={code}
           height="100%"
@@ -84,7 +90,7 @@ export function CodeViewerModal({
             allowMultipleSelections: false,
             indentOnInput: false,
           }}
-          className="text-[14px] h-full"
+          className="h-full text-[14px]"
         />
       </div>
     </CustomModal>

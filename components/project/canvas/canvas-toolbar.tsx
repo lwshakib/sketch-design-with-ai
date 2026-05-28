@@ -15,8 +15,8 @@ export function CanvasToolbar() {
     );
 
   return (
-    <div className="pointer-events-auto absolute right-6 top-1/2 z-50 -translate-y-1/2">
-      <div className="bg-card/85 border-border/40 flex flex-col items-center gap-1.5 rounded-full border p-1.5 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:shadow-primary/5 hover:border-primary/20">
+    <div className="pointer-events-auto absolute top-1/2 right-6 z-50 -translate-y-1/2">
+      <div className="bg-card/85 border-border/40 hover:shadow-primary/5 hover:border-primary/20 flex flex-col items-center gap-1.5 rounded-full border p-1.5 shadow-2xl backdrop-blur-xl transition-all duration-300">
         <button
           onClick={() => setActiveTool("select")}
           className={toolbarButtonClass(activeTool === "select")}
@@ -53,4 +53,3 @@ export function CanvasToolbar() {
     </div>
   );
 }
-

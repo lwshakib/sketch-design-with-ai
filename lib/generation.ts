@@ -114,16 +114,26 @@ export async function generateScreenSync({
     ]);
 
     // Find active theme or last theme to determine row Y Y-coordinate
-    const activeTheme = themes.find(t => t.isActive) || themes[themes.length - 1];
-    const targetY = activeTheme ? activeTheme.y : -((type === "web" ? 700 : 800) / 2);
+    const activeTheme =
+      themes.find((t) => t.isActive) || themes[themes.length - 1];
+    const targetY = activeTheme
+      ? activeTheme.y
+      : -((type === "web" ? 700 : 800) / 2);
 
     const allArtifacts = [
-      ...screens.map(s => ({ x: s.x, y: s.y, width: s.width, type: s.type })),
-      ...themes.map(t => ({ x: t.x, y: t.y, width: t.width || 1200, type: "theme" })),
+      ...screens.map((s) => ({ x: s.x, y: s.y, width: s.width, type: s.type })),
+      ...themes.map((t) => ({
+        x: t.x,
+        y: t.y,
+        width: t.width || 1200,
+        type: "theme",
+      })),
     ];
 
     // Find elements on the same row (within 500px of targetY)
-    const rowElements = allArtifacts.filter((a) => a.y !== null && Math.abs(a.y - targetY) < 500);
+    const rowElements = allArtifacts.filter(
+      (a) => a.y !== null && Math.abs(a.y - targetY) < 500,
+    );
 
     let currentX;
     const width = type === "web" ? 1280 : 380;
@@ -132,7 +142,8 @@ export async function generateScreenSync({
     } else {
       let maxX = -99999;
       rowElements.forEach((el) => {
-        const getWidth = (t: string) => (t === "app" ? 380 : t === "web" ? 1280 : 1200);
+        const getWidth = (t: string) =>
+          t === "app" ? 380 : t === "web" ? 1280 : 1200;
         const w = el.width || getWidth(el.type);
         const right = (el.x || 0) + w;
         if (right > maxX) maxX = right;
@@ -186,9 +197,10 @@ export async function generateScreenSync({
     });
 
     // 3. Generate HTML code
-    const platformInstruction = type === "app"
-      ? "CRITICAL PLATFORM DIRECTIVE: You are generating a MOBILE APP UI (Viewport: 380px width, 800px height). You MUST design it strictly as a native mobile app screen, NOT a desktop website. Use compact elements: a mobile status bar (time, signal, battery icons), a clean header with a back button and title, vertical lists, swipable or tabbed selectors, a sticky bottom tab navigation bar (Home, Search, Cart, Profile), and high-contrast call-to-actions. Avoid wide desktop grid columns, large cards with p-12 padding, and horizontal top navigation links."
-      : "CRITICAL PLATFORM DIRECTIVE: You are generating a WEB PAGE/WEB APP UI (Desktop/Responsive layout). Use a full-bleed grid layout, responsive bento structure, horizontal top navigation header with branding and menu options, desktop search bars, and full-scale dashboard/landing page sections.";
+    const platformInstruction =
+      type === "app"
+        ? "CRITICAL PLATFORM DIRECTIVE: You are generating a MOBILE APP UI (Viewport: 380px width, 800px height). You MUST design it strictly as a native mobile app screen, NOT a desktop website. Use compact elements: a mobile status bar (time, signal, battery icons), a clean header with a back button and title, vertical lists, swipable or tabbed selectors, a sticky bottom tab navigation bar (Home, Search, Cart, Profile), and high-contrast call-to-actions. Avoid wide desktop grid columns, large cards with p-12 padding, and horizontal top navigation links."
+        : "CRITICAL PLATFORM DIRECTIVE: You are generating a WEB PAGE/WEB APP UI (Desktop/Responsive layout). Use a full-bleed grid layout, responsive bento structure, horizontal top navigation header with branding and menu options, desktop search bars, and full-scale dashboard/landing page sections.";
 
     const systemPrompt =
       ScreenGenerationPrompt +
@@ -217,7 +229,7 @@ export async function generateScreenSync({
         return yiq < 128; // Less than 128 means background is dark
       })();
 
-      const modeInstruction = isDark 
+      const modeInstruction = isDark
         ? "CRITICAL MODE INSTRUCTION: The active theme is strictly DARK MODE (dark background, light text). You MUST build a dark-theme user interface. Ensure cards have dark backgrounds (e.g. bg-[#141414] or bg-black/40), text is light (text-white/text-zinc-200), and all components are optimized for high-contrast dark-theme styling."
         : "CRITICAL MODE INSTRUCTION: The active theme is strictly LIGHT MODE (light background, dark text). You MUST build a light-theme user interface. Do NOT use dark backgrounds or dark cards! Ensure cards have light glassmorphic backgrounds (e.g. bg-white/70 or bg-zinc-50 border-zinc-200/60), text is dark/charcoal (text-zinc-900/text-zinc-800), and all components are optimized for high-contrast light-theme styling.";
 
@@ -254,11 +266,11 @@ Do NOT invent new colors. Ensure all layout containers, text headers, buttons, c
     const recentMessages = await prisma.message.findMany({
       where: { projectId, role: "user" },
       orderBy: { createdAt: "desc" },
-      take: 5
+      take: 5,
     });
 
-    const recentScreenWithImages = recentMessages.find(m => 
-      (m.parts as any[] || []).some((p: any) => p.type === "image")
+    const recentScreenWithImages = recentMessages.find((m) =>
+      ((m.parts as any[]) || []).some((p: any) => p.type === "image"),
     );
 
     const contextMessages = recentScreen
@@ -280,10 +292,13 @@ Do NOT invent new colors. Ensure all layout containers, text headers, buttons, c
             type: "text",
             text: `Now generate the "${title}" (type: ${type}) screen based on these instructions:\n\n${prompt}`,
           },
-          ...(recentScreenWithImages?.parts as any[] || [])
+          ...((recentScreenWithImages?.parts as any[]) || [])
             .filter((p) => p.type === "image")
             .slice(0, 2)
-            .map((p) => ({ type: "image_url", image_url: { url: p.path || p.url } })),
+            .map((p) => ({
+              type: "image_url",
+              image_url: { url: p.path || p.url },
+            })),
         ],
       },
       {
@@ -299,7 +314,10 @@ Do NOT invent new colors. Ensure all layout containers, text headers, buttons, c
     for await (const chunk of stream) {
       accumulatedText += chunk;
 
-      let cleanText = accumulatedText.replace(/^```html\s*/i, "").replace(/```$/i, "").trim();
+      let cleanText = accumulatedText
+        .replace(/^```html\s*/i, "")
+        .replace(/```$/i, "")
+        .trim();
 
       // Trigger progressive streaming updates back to client
       if (Date.now() - lastPublishTime > 100 && onProgress) {
@@ -312,7 +330,10 @@ Do NOT invent new colors. Ensure all layout containers, text headers, buttons, c
       }
     }
 
-    const cleanText = accumulatedText.replace(/^```html\s*/i, "").replace(/```$/i, "").trim();
+    const cleanText = accumulatedText
+      .replace(/^```html\s*/i, "")
+      .replace(/```$/i, "")
+      .trim();
 
     // Trigger final visual stream completion
     if (onProgress) {
@@ -351,7 +372,8 @@ Do NOT invent new colors. Ensure all layout containers, text headers, buttons, c
     console.error("[generateScreenSync] Error:", error);
     await publishRealtimeStatus({
       projectId,
-      message: error.message || "An error occurred while generating the screen.",
+      message:
+        error.message || "An error occurred while generating the screen.",
       status: "error",
     });
     throw error;
@@ -389,8 +411,8 @@ export async function generateThemeSync({
     // 2. Initial Placeholder setup
     // Deactivate older themes
     await prisma.theme.updateMany({
-       where: { projectId },
-       data: { isActive: false }
+      where: { projectId },
+      data: { isActive: false },
     });
 
     const themes = await prisma.theme.findMany({
@@ -401,7 +423,7 @@ export async function generateThemeSync({
     let chosenRow = 1;
     while (true) {
       const yCenter = getRowY(chosenRow);
-      const isOccupied = themes.some(t => Math.abs(t.y - yCenter) < 500);
+      const isOccupied = themes.some((t) => Math.abs(t.y - yCenter) < 500);
       if (!isOccupied) {
         break;
       }
@@ -410,7 +432,7 @@ export async function generateThemeSync({
 
     const currentY = getRowY(chosenRow);
     const currentX = -1200 / 2; // Theme width is 1200
-  
+
     const dbTheme = await prisma.theme.create({
       data: {
         projectId,
@@ -516,15 +538,15 @@ export async function generateThemeSync({
       message: "Theme generation complete.",
       status: "complete",
       screen: {
-         id: finalTheme.id,
-         type: "theme",
-         title: finalTheme.name,
-         variables: finalTheme.variables,
-         x: finalTheme.x,
-         y: finalTheme.y,
-         isComplete: true,
-         isActive: true
-      } as any, 
+        id: finalTheme.id,
+        type: "theme",
+        title: finalTheme.name,
+        variables: finalTheme.variables,
+        x: finalTheme.x,
+        y: finalTheme.y,
+        isComplete: true,
+        isActive: true,
+      } as any,
     });
 
     // 5. Chain pending screen generation

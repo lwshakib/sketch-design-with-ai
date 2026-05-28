@@ -182,12 +182,10 @@ export function ChatSidebar({
         body: JSON.stringify({ isActive: true }),
       });
       if (!res.ok) throw new Error("Failed to switch theme");
-      
+
       const updateFn = (prev: any[]) =>
         prev.map((a) =>
-          a.type === "theme"
-            ? { ...a, isActive: a.id === themeId }
-            : a
+          a.type === "theme" ? { ...a, isActive: a.id === themeId } : a,
         );
       setArtifacts(updateFn);
       setThrottledArtifacts(updateFn);
@@ -253,7 +251,7 @@ export function ChatSidebar({
 
       const updateFn = (prev: any[]) => {
         const updated = prev.map((a) =>
-          a.type === "theme" ? { ...a, isActive: false } : a
+          a.type === "theme" ? { ...a, isActive: false } : a,
         );
         return [...updated, newTheme];
       };
@@ -288,7 +286,6 @@ export function ChatSidebar({
     setDesignType("web");
     setIsNewDesignOpen(false);
   };
-
 
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
@@ -333,9 +330,10 @@ export function ChatSidebar({
 
   React.useEffect(() => {
     if (error) {
-       toast.error("Internal server error", {
-         description: error.message || "An unexpected error occurred during generation."
-       });
+      toast.error("Internal server error", {
+        description:
+          error.message || "An unexpected error occurred during generation.",
+      });
     }
   }, [error]);
 
@@ -538,7 +536,7 @@ export function ChatSidebar({
                                       <img
                                         src={(session.data?.user as any).image}
                                         alt={session.data?.user?.name || "User"}
-                                        className="aspect-square h-full w-full object-cover rounded-full"
+                                        className="aspect-square h-full w-full rounded-full object-cover"
                                       />
                                     ) : (
                                       <AvatarFallback className="bg-muted text-muted-foreground text-[10px] font-bold">
@@ -577,8 +575,9 @@ export function ChatSidebar({
                                           parts.find((p) => p.type === "text")
                                             ?.text || "";
                                         const reasoningPart =
-                                          parts.find((p) => p.type === "reasoning")
-                                            ?.text || "";
+                                          parts.find(
+                                            (p) => p.type === "reasoning",
+                                          )?.text || "";
                                         const images = parts.filter(
                                           (p) => p.type === "image",
                                         );
@@ -635,15 +634,15 @@ export function ChatSidebar({
                                                   className="border-none"
                                                 >
                                                   <AccordionTrigger className="hover:bg-muted/50 rounded-lg py-1.5 transition-all hover:no-underline">
-                                                    <div className="flex items-center gap-2 px-1 text-[12px] font-bold tracking-tight text-muted-foreground transition-colors group-hover:text-primary">
+                                                    <div className="text-muted-foreground group-hover:text-primary flex items-center gap-2 px-1 text-[12px] font-bold tracking-tight transition-colors">
                                                       <div className="bg-primary/10 flex h-5 w-5 items-center justify-center rounded-md">
-                                                        <Sparkles className="size-3 animate-pulse text-primary" />
+                                                        <Sparkles className="text-primary size-3 animate-pulse" />
                                                       </div>
                                                       Design Logic
                                                     </div>
                                                   </AccordionTrigger>
                                                   <AccordionContent className="pt-2">
-                                                    <div className="bg-muted/20 border-border/50 backdrop-blur-md rounded-xl border p-4 text-[13px] leading-relaxed text-muted-foreground/90 shadow-inner italic">
+                                                    <div className="bg-muted/20 border-border/50 text-muted-foreground/90 rounded-xl border p-4 text-[13px] leading-relaxed italic shadow-inner backdrop-blur-md">
                                                       {reasoningPart}
                                                     </div>
                                                   </AccordionContent>
@@ -667,7 +666,14 @@ export function ChatSidebar({
                                                   <MessageAttachment
                                                     key={imgIdx}
                                                     data={{
-                                                      url: p.url || (p.path?.startsWith("http") ? p.path : urlMap[p.path] || p.path),
+                                                      url:
+                                                        p.url ||
+                                                        (p.path?.startsWith(
+                                                          "http",
+                                                        )
+                                                          ? p.path
+                                                          : urlMap[p.path] ||
+                                                            p.path),
                                                       mediaType:
                                                         p.mediaType ||
                                                         "image/png",
@@ -710,11 +716,18 @@ export function ChatSidebar({
                                       })()
                                     ) : (
                                       <div className="flex flex-col gap-4">
-                                        <div className="bg-transparent p-0 w-fit max-w-[90%] text-foreground/90 text-[15px] leading-relaxed">
+                                        <div className="text-foreground/90 w-fit max-w-[90%] bg-transparent p-0 text-[15px] leading-relaxed">
                                           <MessageResponse>
                                             {(msg.parts as any[])
                                               ?.filter((p) => p.type === "text")
-                                              .map((p) => (p.text || "").replace(/\[Context:.*?\]\s*/g, "").trim())
+                                              .map((p) =>
+                                                (p.text || "")
+                                                  .replace(
+                                                    /\[Context:.*?\]\s*/g,
+                                                    "",
+                                                  )
+                                                  .trim(),
+                                              )
                                               .join("\n\n")}
                                           </MessageResponse>
                                         </div>
@@ -738,7 +751,14 @@ export function ChatSidebar({
                                                   <MessageAttachment
                                                     key={imgIdx}
                                                     data={{
-                                                      url: p.url || (p.path?.startsWith("http") ? p.path : urlMap[p.path] || p.path),
+                                                      url:
+                                                        p.url ||
+                                                        (p.path?.startsWith(
+                                                          "http",
+                                                        )
+                                                          ? p.path
+                                                          : urlMap[p.path] ||
+                                                            p.path),
                                                       mediaType:
                                                         p.mediaType ||
                                                         "image/png",
@@ -940,9 +960,10 @@ export function ChatSidebar({
                         <div className="group border-border bg-muted/50 hover:border-primary/50 relative h-16 w-16 cursor-help overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md">
                           {/* Scaled Preview */}
                           {art.type === "theme" ? (
-                            <div className="pointer-events-none flex h-full w-full flex-wrap p-1 gap-1 bg-card animate-in fade-in duration-300">
+                            <div className="bg-card animate-in fade-in pointer-events-none flex h-full w-full flex-wrap gap-1 p-1 duration-300">
                               {(() => {
-                                const themeColors = (art.variables as any)?.colors || {
+                                const themeColors = (art.variables as any)
+                                  ?.colors || {
                                   primary: "#3b82f6",
                                   secondary: "#10b981",
                                   accent: "#f59e0b",
@@ -950,11 +971,32 @@ export function ChatSidebar({
                                 };
                                 return (
                                   <>
-                                    <div className="flex-1 min-w-[26px] h-full rounded-md" style={{ backgroundColor: themeColors.primary }} />
-                                    <div className="flex-1 min-w-[26px] h-full rounded-md" style={{ backgroundColor: themeColors.secondary }} />
-                                    <div className="w-full flex gap-1 mt-1">
-                                      <div className="flex-1 h-[24px] rounded-md" style={{ backgroundColor: themeColors.accent }} />
-                                      <div className="flex-1 h-[24px] rounded-md border border-border/30" style={{ backgroundColor: themeColors.background }} />
+                                    <div
+                                      className="h-full min-w-[26px] flex-1 rounded-md"
+                                      style={{
+                                        backgroundColor: themeColors.primary,
+                                      }}
+                                    />
+                                    <div
+                                      className="h-full min-w-[26px] flex-1 rounded-md"
+                                      style={{
+                                        backgroundColor: themeColors.secondary,
+                                      }}
+                                    />
+                                    <div className="mt-1 flex w-full gap-1">
+                                      <div
+                                        className="h-[24px] flex-1 rounded-md"
+                                        style={{
+                                          backgroundColor: themeColors.accent,
+                                        }}
+                                      />
+                                      <div
+                                        className="border-border/30 h-[24px] flex-1 rounded-md border"
+                                        style={{
+                                          backgroundColor:
+                                            themeColors.background,
+                                        }}
+                                      />
                                     </div>
                                   </>
                                 );
@@ -1013,80 +1055,84 @@ export function ChatSidebar({
             )}
 
             {/* Theme & Design Control Bar */}
-            <div className="flex items-center justify-between border-b border-border/40 pb-3 mb-3 gap-2">
+            <div className="border-border/40 mb-3 flex items-center justify-between gap-2 border-b pb-3">
               <div className="flex items-center gap-1.5">
-                 {/* Multi-theme Dropdown Select */}
-                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                       <Button
-                          variant="outline"
-                          size="sm"
-                          className="bg-muted/40 border-border/50 text-foreground/80 hover:text-foreground flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[11px] font-semibold transition-all hover:bg-muted"
-                       >
-                          <Palette className="h-3 w-3 text-primary opacity-80" />
-                          <span className="max-w-[80px] truncate">
-                             {activeTheme ? activeTheme.title : "Select Theme"}
-                          </span>
-                          <ChevronDown className="h-2.5 w-2.5 opacity-50" />
-                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        align="start"
-                        className="bg-card border-border text-foreground z-[100] w-52 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
-                     >
-                        {projectThemes.length > 0 && (
-                           <>
-                              {projectThemes.map((theme) => (
-                                 <DropdownMenuItem
-                                    key={theme.id}
-                                    onClick={() => handleSwitchTheme(theme.id!)}
-                                    className={cn(
-                                       "hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-2.5 py-1.5 text-[11.5px] font-medium",
-                                       theme.isActive && "text-primary font-semibold"
-                                    )}
-                                 >
-                                    <div className="flex items-center gap-2 truncate max-w-[130px]">
-                                       <div 
-                                          className="size-3 rounded-full border shrink-0" 
-                                          style={{ backgroundColor: theme.variables?.colors?.primary || "#6366f1" }} 
-                                       />
-                                       <span className="truncate">{theme.title}</span>
-                                    </div>
-                                    {theme.isActive && (
-                                       <Check className="h-3 w-3 text-primary shrink-0" />
-                                    )}
-                                 </DropdownMenuItem>
-                              ))}
-                              <DropdownMenuSeparator className="bg-border/30 my-1" />
-                           </>
-                        )}
-                        <DropdownMenuItem
-                           onClick={() => setIsCustomThemeOpen(true)}
-                           className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 text-[11.5px] font-semibold text-foreground/80 hover:text-primary transition-colors"
-                        >
-                           <Plus className="h-3.5 w-3.5 text-primary opacity-80" />
-                           <span>Custom Theme</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                           onClick={() => setIsCreateThemeOpen(true)}
-                           className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 text-[11.5px] font-semibold text-foreground/80 hover:text-primary transition-colors"
-                        >
-                           <Sparkles className="h-3.5 w-3.5 text-primary opacity-80" />
-                           <span>AI Theme</span>
-                        </DropdownMenuItem>
-                     </DropdownMenuContent>
-                 </DropdownMenu>
+                {/* Multi-theme Dropdown Select */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-muted/40 border-border/50 text-foreground/80 hover:text-foreground hover:bg-muted flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[11px] font-semibold transition-all"
+                    >
+                      <Palette className="text-primary h-3 w-3 opacity-80" />
+                      <span className="max-w-[80px] truncate">
+                        {activeTheme ? activeTheme.title : "Select Theme"}
+                      </span>
+                      <ChevronDown className="h-2.5 w-2.5 opacity-50" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    className="bg-card border-border text-foreground z-[100] w-52 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
+                  >
+                    {projectThemes.length > 0 && (
+                      <>
+                        {projectThemes.map((theme) => (
+                          <DropdownMenuItem
+                            key={theme.id}
+                            onClick={() => handleSwitchTheme(theme.id!)}
+                            className={cn(
+                              "hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-2.5 py-1.5 text-[11.5px] font-medium",
+                              theme.isActive && "text-primary font-semibold",
+                            )}
+                          >
+                            <div className="flex max-w-[130px] items-center gap-2 truncate">
+                              <div
+                                className="size-3 shrink-0 rounded-full border"
+                                style={{
+                                  backgroundColor:
+                                    theme.variables?.colors?.primary ||
+                                    "#6366f1",
+                                }}
+                              />
+                              <span className="truncate">{theme.title}</span>
+                            </div>
+                            {theme.isActive && (
+                              <Check className="text-primary h-3 w-3 shrink-0" />
+                            )}
+                          </DropdownMenuItem>
+                        ))}
+                        <DropdownMenuSeparator className="bg-border/30 my-1" />
+                      </>
+                    )}
+                    <DropdownMenuItem
+                      onClick={() => setIsCustomThemeOpen(true)}
+                      className="hover:bg-muted text-foreground/80 hover:text-primary flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 text-[11.5px] font-semibold transition-colors"
+                    >
+                      <Plus className="text-primary h-3.5 w-3.5 opacity-80" />
+                      <span>Custom Theme</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setIsCreateThemeOpen(true)}
+                      className="hover:bg-muted text-foreground/80 hover:text-primary flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 text-[11.5px] font-semibold transition-colors"
+                    >
+                      <Sparkles className="text-primary h-3.5 w-3.5 opacity-80" />
+                      <span>AI Theme</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
 
               {/* New Design Button */}
               <Button
-                 onClick={() => setIsNewDesignOpen(true)}
-                 variant="ghost"
-                 size="sm"
-                 className="bg-primary/10 border border-primary/25 text-primary hover:bg-primary/20 flex h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-bold transition-all"
+                onClick={() => setIsNewDesignOpen(true)}
+                variant="ghost"
+                size="sm"
+                className="bg-primary/10 border-primary/25 text-primary hover:bg-primary/20 flex h-7 items-center gap-1 rounded-full border px-2.5 text-[11px] font-bold transition-all"
               >
-                 <Sparkles className="h-3 w-3" />
-                 <span>New Design</span>
+                <Sparkles className="h-3 w-3" />
+                <span>New Design</span>
               </Button>
             </div>
 
@@ -1178,7 +1224,6 @@ export function ChatSidebar({
                   </TooltipTrigger>
                   <TooltipContent>Generate 3 variations</TooltipContent>
                 </Tooltip>
-
               </div>
 
               <div className="flex flex-col items-end gap-2.5">
@@ -1221,22 +1266,24 @@ export function ChatSidebar({
         <DialogContent className="bg-background border-border text-foreground rounded-3xl p-6 shadow-2xl sm:max-w-md">
           <DialogHeader className="space-y-2">
             <DialogTitle className="text-xl font-bold tracking-tight">
-               Create Theme (Design System)
+              Create Theme (Design System)
             </DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs leading-relaxed">
-               Describe the visual direction, base colors, and mood of the new style guide. The generator will create color ramps and typography tokens.
+              Describe the visual direction, base colors, and mood of the new
+              style guide. The generator will create color ramps and typography
+              tokens.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateThemeSubmit} className="space-y-4 pt-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-muted-foreground px-1">
-                 Creative Prompt
+              <label className="text-muted-foreground px-1 text-xs font-semibold">
+                Creative Prompt
               </label>
               <textarea
                 value={themePrompt}
                 onChange={(e) => setThemePrompt(e.target.value)}
                 placeholder="e.g. A retro cybernetic theme with neon green accents, dark charcoal cards, and futuristic monospaced headers..."
-                className="bg-secondary/40 border-border text-foreground placeholder:text-muted-foreground/40 focus:ring-primary/50 min-h-[100px] w-full rounded-2xl border px-4 py-3 text-xs leading-relaxed transition-all focus:ring-1 focus:outline-none resize-none"
+                className="bg-secondary/40 border-border text-foreground placeholder:text-muted-foreground/40 focus:ring-primary/50 min-h-[100px] w-full resize-none rounded-2xl border px-4 py-3 text-xs leading-relaxed transition-all focus:ring-1 focus:outline-none"
                 autoFocus
                 required
               />
@@ -1253,7 +1300,7 @@ export function ChatSidebar({
               <Button
                 type="submit"
                 disabled={!themePrompt.trim()}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold transition-all shadow-md"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold shadow-md transition-all"
               >
                 Create Theme
               </Button>
@@ -1267,16 +1314,17 @@ export function ChatSidebar({
         <DialogContent className="bg-background border-border text-foreground rounded-3xl p-6 shadow-2xl sm:max-w-md">
           <DialogHeader className="space-y-2">
             <DialogTitle className="text-xl font-bold tracking-tight">
-               Generate New Design Screen
+              Generate New Design Screen
             </DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs leading-relaxed">
-               Specify the title and detailed creative prompt to add a new customized screen layout to your canvas flow.
+              Specify the title and detailed creative prompt to add a new
+              customized screen layout to your canvas flow.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleNewDesignSubmit} className="space-y-4 pt-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-muted-foreground px-1">
-                 Screen Title
+              <label className="text-muted-foreground px-1 text-xs font-semibold">
+                Screen Title
               </label>
               <input
                 type="text"
@@ -1290,48 +1338,48 @@ export function ChatSidebar({
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-muted-foreground px-1">
-                 Platform View
+              <label className="text-muted-foreground px-1 text-xs font-semibold">
+                Platform View
               </label>
               <div className="flex gap-2.5">
-                 <button
-                    type="button"
-                    onClick={() => setDesignType("web")}
-                    className={cn(
-                       "flex-1 h-9 rounded-xl border flex items-center justify-center gap-1.5 text-xs font-semibold transition-all",
-                       designType === "web"
-                          ? "bg-primary border-primary text-primary-foreground font-bold"
-                          : "bg-secondary/40 border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    )}
-                 >
-                    <Monitor className="h-3.5 w-3.5" />
-                    <span>Web Page</span>
-                 </button>
-                 <button
-                    type="button"
-                    onClick={() => setDesignType("app")}
-                    className={cn(
-                       "flex-1 h-9 rounded-xl border flex items-center justify-center gap-1.5 text-xs font-semibold transition-all",
-                       designType === "app"
-                          ? "bg-primary border-primary text-primary-foreground font-bold"
-                          : "bg-secondary/40 border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    )}
-                 >
-                    <Smartphone className="h-3.5 w-3.5" />
-                    <span>Mobile App</span>
-                 </button>
+                <button
+                  type="button"
+                  onClick={() => setDesignType("web")}
+                  className={cn(
+                    "flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl border text-xs font-semibold transition-all",
+                    designType === "web"
+                      ? "bg-primary border-primary text-primary-foreground font-bold"
+                      : "bg-secondary/40 border-border text-muted-foreground hover:bg-secondary hover:text-foreground",
+                  )}
+                >
+                  <Monitor className="h-3.5 w-3.5" />
+                  <span>Web Page</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDesignType("app")}
+                  className={cn(
+                    "flex h-9 flex-1 items-center justify-center gap-1.5 rounded-xl border text-xs font-semibold transition-all",
+                    designType === "app"
+                      ? "bg-primary border-primary text-primary-foreground font-bold"
+                      : "bg-secondary/40 border-border text-muted-foreground hover:bg-secondary hover:text-foreground",
+                  )}
+                >
+                  <Smartphone className="h-3.5 w-3.5" />
+                  <span>Mobile App</span>
+                </button>
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-muted-foreground px-1">
-                 Design Requirements
+              <label className="text-muted-foreground px-1 text-xs font-semibold">
+                Design Requirements
               </label>
               <textarea
                 value={designPrompt}
                 onChange={(e) => setDesignPrompt(e.target.value)}
                 placeholder="Describe key sections, widgets, tables, card lists, buttons, spacing alignment..."
-                className="bg-secondary/40 border-border text-foreground placeholder:text-muted-foreground/40 focus:ring-primary/50 min-h-[100px] w-full rounded-2xl border px-4 py-3 text-xs leading-relaxed transition-all focus:ring-1 focus:outline-none resize-none"
+                className="bg-secondary/40 border-border text-foreground placeholder:text-muted-foreground/40 focus:ring-primary/50 min-h-[100px] w-full resize-none rounded-2xl border px-4 py-3 text-xs leading-relaxed transition-all focus:ring-1 focus:outline-none"
                 required
               />
             </div>
@@ -1348,7 +1396,7 @@ export function ChatSidebar({
               <Button
                 type="submit"
                 disabled={!designTitle.trim() || !designPrompt.trim()}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold transition-all shadow-md"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold shadow-md transition-all"
               >
                 Generate Design
               </Button>
@@ -1362,16 +1410,20 @@ export function ChatSidebar({
         <DialogContent className="bg-background border-border text-foreground rounded-3xl p-6 shadow-2xl sm:max-w-md">
           <DialogHeader className="space-y-2">
             <DialogTitle className="text-xl font-bold tracking-tight">
-               Create Custom Theme
+              Create Custom Theme
             </DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs leading-relaxed">
-               Manually configure colors and typography tokens to establish your project's custom design system.
+              Manually configure colors and typography tokens to establish your
+              project's custom design system.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleCreateCustomThemeSubmit} className="space-y-4 pt-3">
+          <form
+            onSubmit={handleCreateCustomThemeSubmit}
+            className="space-y-4 pt-3"
+          >
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-muted-foreground px-1">
-                 Theme/Brand Name
+              <label className="text-muted-foreground px-1 text-xs font-semibold">
+                Theme/Brand Name
               </label>
               <input
                 type="text"
@@ -1386,47 +1438,96 @@ export function ChatSidebar({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-muted-foreground px-1">Primary Color</label>
-                <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-1.5">
-                  <input type="color" value={customPrimary} onChange={(e) => setCustomPrimary(e.target.value)} className="w-6 h-6 rounded-full border-none cursor-pointer p-0 bg-transparent shrink-0" />
-                  <span className="text-[11px] font-mono uppercase text-foreground">{customPrimary}</span>
+                <label className="text-muted-foreground px-1 text-xs font-semibold">
+                  Primary Color
+                </label>
+                <div className="bg-secondary/40 border-border flex items-center gap-2 rounded-xl border px-3 py-1.5">
+                  <input
+                    type="color"
+                    value={customPrimary}
+                    onChange={(e) => setCustomPrimary(e.target.value)}
+                    className="h-6 w-6 shrink-0 cursor-pointer rounded-full border-none bg-transparent p-0"
+                  />
+                  <span className="text-foreground font-mono text-[11px] uppercase">
+                    {customPrimary}
+                  </span>
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-muted-foreground px-1">Secondary Color</label>
-                <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-1.5">
-                  <input type="color" value={customSecondary} onChange={(e) => setCustomSecondary(e.target.value)} className="w-6 h-6 rounded-full border-none cursor-pointer p-0 bg-transparent shrink-0" />
-                  <span className="text-[11px] font-mono uppercase text-foreground">{customSecondary}</span>
+                <label className="text-muted-foreground px-1 text-xs font-semibold">
+                  Secondary Color
+                </label>
+                <div className="bg-secondary/40 border-border flex items-center gap-2 rounded-xl border px-3 py-1.5">
+                  <input
+                    type="color"
+                    value={customSecondary}
+                    onChange={(e) => setCustomSecondary(e.target.value)}
+                    className="h-6 w-6 shrink-0 cursor-pointer rounded-full border-none bg-transparent p-0"
+                  />
+                  <span className="text-foreground font-mono text-[11px] uppercase">
+                    {customSecondary}
+                  </span>
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-muted-foreground px-1">Background Color</label>
-                <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-1.5">
-                  <input type="color" value={customBackground} onChange={(e) => setCustomBackground(e.target.value)} className="w-6 h-6 rounded-full border-none cursor-pointer p-0 bg-transparent shrink-0" />
-                  <span className="text-[11px] font-mono uppercase text-foreground">{customBackground}</span>
+                <label className="text-muted-foreground px-1 text-xs font-semibold">
+                  Background Color
+                </label>
+                <div className="bg-secondary/40 border-border flex items-center gap-2 rounded-xl border px-3 py-1.5">
+                  <input
+                    type="color"
+                    value={customBackground}
+                    onChange={(e) => setCustomBackground(e.target.value)}
+                    className="h-6 w-6 shrink-0 cursor-pointer rounded-full border-none bg-transparent p-0"
+                  />
+                  <span className="text-foreground font-mono text-[11px] uppercase">
+                    {customBackground}
+                  </span>
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-muted-foreground px-1">Foreground (Text)</label>
-                <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-1.5">
-                  <input type="color" value={customForeground} onChange={(e) => setCustomForeground(e.target.value)} className="w-6 h-6 rounded-full border-none cursor-pointer p-0 bg-transparent shrink-0" />
-                  <span className="text-[11px] font-mono uppercase text-foreground">{customForeground}</span>
+                <label className="text-muted-foreground px-1 text-xs font-semibold">
+                  Foreground (Text)
+                </label>
+                <div className="bg-secondary/40 border-border flex items-center gap-2 rounded-xl border px-3 py-1.5">
+                  <input
+                    type="color"
+                    value={customForeground}
+                    onChange={(e) => setCustomForeground(e.target.value)}
+                    className="h-6 w-6 shrink-0 cursor-pointer rounded-full border-none bg-transparent p-0"
+                  />
+                  <span className="text-foreground font-mono text-[11px] uppercase">
+                    {customForeground}
+                  </span>
                 </div>
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-muted-foreground px-1">Typography Font</label>
-              <Select value={customFont} onValueChange={(val) => setCustomFont(val)}>
-                <SelectTrigger className="w-full bg-secondary/40 border-border text-foreground rounded-xl h-9 text-xs">
+              <label className="text-muted-foreground px-1 text-xs font-semibold">
+                Typography Font
+              </label>
+              <Select
+                value={customFont}
+                onValueChange={(val) => setCustomFont(val)}
+              >
+                <SelectTrigger className="bg-secondary/40 border-border text-foreground h-9 w-full rounded-xl text-xs">
                   <SelectValue placeholder="Select a font" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-border text-foreground z-[150]">
                   <SelectItem value="Inter">Inter (Modern & Clean)</SelectItem>
-                  <SelectItem value="Poppins">Poppins (Friendly & Rounded)</SelectItem>
-                  <SelectItem value="Playfair Display">Playfair Display (Elegant Serif)</SelectItem>
-                  <SelectItem value="Fira Code">Fira Code (Futuristic Monospace)</SelectItem>
-                  <SelectItem value="Outfit">Outfit (Geometric & Bold)</SelectItem>
+                  <SelectItem value="Poppins">
+                    Poppins (Friendly & Rounded)
+                  </SelectItem>
+                  <SelectItem value="Playfair Display">
+                    Playfair Display (Elegant Serif)
+                  </SelectItem>
+                  <SelectItem value="Fira Code">
+                    Fira Code (Futuristic Monospace)
+                  </SelectItem>
+                  <SelectItem value="Outfit">
+                    Outfit (Geometric & Bold)
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1443,7 +1544,7 @@ export function ChatSidebar({
               <Button
                 type="submit"
                 disabled={!customThemeName.trim()}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold transition-all shadow-md"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold shadow-md transition-all"
               >
                 Create Theme
               </Button>

@@ -14,13 +14,16 @@ export async function GET() {
     }
 
     const credits = await getAndResetCredits(session.user.id);
-    
-    return NextResponse.json({ 
-      credits, 
-      resetAt: "12:00 AM Today" // Just for readability
+
+    return NextResponse.json({
+      credits,
+      resetAt: "12:00 AM Today", // Just for readability
     });
   } catch (error) {
     console.error("[Credits API] Error:", error);
-    return NextResponse.json({ error: "Failed to fetch credits" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch credits" },
+      { status: 500 },
+    );
   }
 }

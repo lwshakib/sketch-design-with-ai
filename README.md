@@ -55,7 +55,7 @@ graph TD
     UI -->|Manages Canvas| Canvas
     UI -->|Authenticates| Auth
     UI -->|API Requests| ProjectAPI
-    
+
     InngestCloud -.->|Realtime Updates| Realtime
 
     ProjectAPI -->|CRUD| DB
@@ -72,24 +72,9 @@ graph TD
     InngestAPI -->|Store Assets| S3Storage
 ```
 
-## 🎬 App Demos
-
 <div align="center">
-  <p align="center">
-    <img src="public/app_demo/dark_demo.png" alt="Sketch Dark Mode" width="100%" />
-  </p>
-  <p align="center">
-    <em>Dark Mode: A sleek, professional workspace for your AI design iterations.</em>
-  </p>
-  
-  <br/>
-
-  <p align="center">
-    <img src="public/app_demo/light_demo.png" alt="Sketch Light Mode" width="100%" />
-  </p>
-  <p align="center">
-    <em>Light Mode: Clean, vibrant, and focused interface for maximum productivity.</em>
-  </p>
+  <img src="public/app_demo/light_demo.png" alt="Sketch Light Mode" width="49%" />
+  <img src="public/app_demo/dark_demo.png" alt="Sketch Dark Mode" width="49%" />
 </div>
 
 ## ✨ Key Features
@@ -128,17 +113,17 @@ graph TD
 
 ## 🛠️ Tech Stack
 
-| Category | Technologies |
-| :--- | :--- |
-| **Frontend** | [Next.js 16.1](https://nextjs.org/), [React 19](https://react.dev/), [TypeScript 5](https://www.typescriptlang.org/), [Tailwind CSS 4](https://tailwindcss.com/) |
-| **Canvas** | [@xyflow/react](https://reactflow.dev/) (React Flow) |
-| **Animation** | [Framer Motion 12](https://www.framer.com/motion/), [Motion](https://motion.dev/) |
-| **Components** | [Radix UI](https://www.radix-ui.com/) |
-| **Backend** | [Better Auth 1.4](https://www.better-auth.com/), [Inngest 3.5](https://www.inngest.com/) |
-| **Database** | [PostgreSQL](https://www.postgresql.org/), [Prisma ORM 7.2](https://www.prisma.io/) |
-| **AI** | [Kimi K2.5](https://www.moonshot.cn/) via [Cloudflare AI Gateway](https://developers.cloudflare.com/ai-gateway/) |
-| **Utilities** | [Zustand](https://zustand-demo.pmnd.rs/), [tokenlens](https://github.com/infera-ai/tokenlens) |
-| **Storage** | [AWS S3](https://aws.amazon.com/s3/) (or compatible R2/Minio) |
+| Category       | Technologies                                                                                                                                                     |
+| :------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Frontend**   | [Next.js 16.1](https://nextjs.org/), [React 19](https://react.dev/), [TypeScript 5](https://www.typescriptlang.org/), [Tailwind CSS 4](https://tailwindcss.com/) |
+| **Canvas**     | [@xyflow/react](https://reactflow.dev/) (React Flow)                                                                                                             |
+| **Animation**  | [Framer Motion 12](https://www.framer.com/motion/), [Motion](https://motion.dev/)                                                                                |
+| **Components** | [Radix UI](https://www.radix-ui.com/)                                                                                                                            |
+| **Backend**    | [Better Auth 1.4](https://www.better-auth.com/), [Inngest 3.5](https://www.inngest.com/)                                                                         |
+| **Database**   | [PostgreSQL](https://www.postgresql.org/), [Prisma ORM 7.2](https://www.prisma.io/)                                                                              |
+| **AI**         | [Kimi K2.5](https://www.moonshot.cn/) via [Cloudflare AI Gateway](https://developers.cloudflare.com/ai-gateway/)                                                 |
+| **Utilities**  | [Zustand](https://zustand-demo.pmnd.rs/), [tokenlens](https://github.com/infera-ai/tokenlens)                                                                    |
+| **Storage**    | [AWS S3](https://aws.amazon.com/s3/) (or compatible R2/Minio)                                                                                                    |
 
 ## 📋 Prerequisites
 
@@ -178,13 +163,14 @@ cp .env.example .env
 # Database
 DATABASE_URL="postgresql://user:pass@localhost:5432/sketch_db"
 
-# Cloudflare AI Gateway
-CLOUDFLARE_AI_GATEWAY_API_KEY="your_api_key"
-CLOUDFLARE_AI_GATEWAY_ENDPOINT="https://gateway.ai.cloudflare.com/v1/..."
+# Gemini API
+GEMINI_API_KEY="your_gemini_api_key"
 
 # Better Auth
 BETTER_AUTH_SECRET="your_generated_secret"
 BETTER_AUTH_URL="http://localhost:3000"
+GOOGLE_CLIENT_ID="your_google_client_id"
+GOOGLE_CLIENT_SECRET="your_google_client_secret"
 
 # Media Storage (S3 / R2)
 AWS_REGION="auto"
@@ -192,6 +178,12 @@ AWS_ENDPOINT="your_s3_endpoint"
 AWS_ACCESS_KEY_ID="your_access_key"
 AWS_SECRET_ACCESS_KEY="your_secret_key"
 AWS_S3_BUCKET_NAME="your_bucket_name"
+
+# Email (Resend)
+RESEND_API_KEY="your_resend_api_key"
+
+# Public Config
+NEXT_PUBLIC_BASE_URL="http://localhost:3000"
 ```
 
 ### 4. Database & Storage Setup
@@ -253,6 +245,7 @@ Open [http://localhost:3000](http://localhost:3000) to start designing.
 We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ### Quick Start
+
 1. Fork the repo
 2. Create your branch: `git checkout -b feat/my-new-feature`
 3. Commit your changes: `git commit -m 'feat: add some cool feature'`

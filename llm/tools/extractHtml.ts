@@ -2,7 +2,8 @@ import { Type } from "@google/genai";
 
 export const extractHtmlTool = {
   name: "extractHtml",
-  description: "Extract HTML content and text from a URL to understand its structure and design.",
+  description:
+    "Extract HTML content and text from a URL to understand its structure and design.",
   parameters: {
     type: Type.OBJECT,
     properties: {

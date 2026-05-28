@@ -52,7 +52,6 @@ import {
   PromptInputSpeechButton,
 } from "@/components/ai-elements/prompt-input";
 
-
 // Constants and Helpers stay outside
 
 const PROMPTS = {
@@ -165,7 +164,6 @@ const ProjectSkeleton = () => (
   </div>
 );
 
-
 // Home component serves as the entry point with the provider
 export default function Home() {
   return (
@@ -269,7 +267,7 @@ function HomeContent() {
     }
   }, [debouncedSearchQuery, isMounted]);
 
-  const onSubmit = async ({ text, files }: { text: string, files: any[] }) => {
+  const onSubmit = async ({ text, files }: { text: string; files: any[] }) => {
     if (!text.trim() && files.length === 0) return;
 
     setIsSubmitting(true);
@@ -280,11 +278,13 @@ function HomeContent() {
           // Convert data URL to File
           const res = await fetch(filePart.url);
           const blob = await res.blob();
-          const file = new File([blob], filePart.filename || "attachment", { type: filePart.mediaType });
-          
+          const file = new File([blob], filePart.filename || "attachment", {
+            type: filePart.mediaType,
+          });
+
           const result = await uploadFileToS3(file);
           return result.path;
-        })
+        }),
       );
 
       // 2. Create project
@@ -326,14 +326,14 @@ function HomeContent() {
   return (
     <div className="bg-background text-foreground flex h-screen w-full flex-col overflow-hidden font-sans transition-colors duration-500">
       {/* Full-Width Top Header */}
-      <header className="z-40 flex w-full items-center justify-between bg-background/50 px-6 py-4 backdrop-blur-md">
+      <header className="bg-background/50 z-40 flex w-full items-center justify-between px-6 py-4 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <Logo />
         </div>
 
         <div className="flex items-center gap-4">
           {credits !== null && isMounted && (
-            <span className="text-zinc-500 mr-2 hidden text-xs font-medium sm:block">
+            <span className="mr-2 hidden text-xs font-medium text-zinc-500 sm:block">
               {credits} credits remaining
             </span>
           )}
@@ -353,7 +353,7 @@ function HomeContent() {
             loadMore={() => fetchProjects(true)}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            className="h-full w-full rounded-2xl border border-border/40 bg-secondary/15 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:bg-zinc-900/20 dark:shadow-none"
+            className="border-border/40 bg-secondary/15 h-full w-full rounded-2xl border shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:bg-zinc-900/20 dark:shadow-none"
           />
         </div>
 
@@ -363,89 +363,89 @@ function HomeContent() {
           <div className="flex flex-1 overflow-hidden">
             {/* Center Workspace */}
             <div className="relative flex flex-1 flex-col items-center justify-center overflow-y-auto px-6 pb-20">
-            <div className="mb-12 w-full max-w-2xl space-y-12 pt-10">
-              {/* Main Title Row */}
-              <div className="flex flex-col items-center space-y-4 text-center">
-                <h1 className="text-foreground text-4xl leading-tight font-black tracking-tight md:text-5xl">
-                  Welcome to Sketch...
-                </h1>
-              </div>
+              <div className="mb-12 w-full max-w-2xl space-y-12 pt-10">
+                {/* Main Title Row */}
+                <div className="flex flex-col items-center space-y-4 text-center">
+                  <h1 className="text-foreground text-4xl leading-tight font-black tracking-tight md:text-5xl">
+                    Welcome to Sketch...
+                  </h1>
+                </div>
 
-              {/* Premium Chat Input */}
-              <div className="group relative w-full">
-                <PromptInput
-                  onSubmit={onSubmit}
-                  className="group-focus-within:border-primary/20 relative flex flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] transition-all duration-500 group-focus-within:shadow-[0_0_60px_-10px_rgba(var(--primary-rgb),0.2)] dark:border-white/5 dark:bg-zinc-950 dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
-                >
-                  <PromptInputAttachments>
-                    {(file) => (
-                      <PromptInputAttachment key={file.id} data={file} />
-                    )}
-                  </PromptInputAttachments>
-                  <PromptInputBody>
-                    <PromptInputTextarea
-                      className="hide-scrollbar min-h-24 px-6 text-lg font-medium outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
-                      placeholder="Describe your design vision..."
-                    />
-                  </PromptInputBody>
-                  <PromptInputFooter className="px-4 pb-4">
-                    <div className="flex items-center gap-2">
-                       <PromptInputAddAttachments />
-                       <PromptInputSpeechButton />
-                       <p className="hidden text-[10px] font-bold text-zinc-400 sm:block dark:text-zinc-600">
+                {/* Premium Chat Input */}
+                <div className="group relative w-full">
+                  <PromptInput
+                    onSubmit={onSubmit}
+                    className="group-focus-within:border-primary/20 relative flex flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] transition-all duration-500 group-focus-within:shadow-[0_0_60px_-10px_rgba(var(--primary-rgb),0.2)] dark:border-white/5 dark:bg-zinc-950 dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
+                  >
+                    <PromptInputAttachments>
+                      {(file) => (
+                        <PromptInputAttachment key={file.id} data={file} />
+                      )}
+                    </PromptInputAttachments>
+                    <PromptInputBody>
+                      <PromptInputTextarea
+                        className="hide-scrollbar min-h-24 px-6 text-lg font-medium outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
+                        placeholder="Describe your design vision..."
+                      />
+                    </PromptInputBody>
+                    <PromptInputFooter className="px-4 pb-4">
+                      <div className="flex items-center gap-2">
+                        <PromptInputAddAttachments />
+                        <PromptInputSpeechButton />
+                        <p className="hidden text-[10px] font-bold text-zinc-400 sm:block dark:text-zinc-600">
                           Press Enter to Generate
                         </p>
-                    </div>
-                    <PromptInputSubmit
-                      status={isSubmitting ? "submitted" : undefined}
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground flex h-10 w-10 items-center justify-center rounded-full border border-black/5 p-0 shadow-xl transition-all disabled:opacity-30 dark:border-white/10"
-                    />
-                  </PromptInputFooter>
-                </PromptInput>
-              </div>
-
-              {/* Prompt Suggestions */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between px-1">
-                  <h3 className="dark:text-muted-foreground text-sm font-medium text-zinc-500 capitalize">
-                    Try these prompts
-                  </h3>
-                  <button
-                    onClick={refreshPrompts}
-                    className="rounded-full p-2 text-zinc-400 transition-colors hover:bg-black/5 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-white/5 dark:hover:text-zinc-300"
-                    title="Refresh prompts"
-                  >
-                    <RotateCcw className="size-4" />
-                  </button>
+                      </div>
+                      <PromptInputSubmit
+                        status={isSubmitting ? "submitted" : undefined}
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground flex h-10 w-10 items-center justify-center rounded-full border border-black/5 p-0 shadow-xl transition-all disabled:opacity-30 dark:border-white/10"
+                      />
+                    </PromptInputFooter>
+                  </PromptInput>
                 </div>
-                <div className="flex flex-col gap-2">
-                  {shuffledPrompts.map((prompt: string, i: number) => (
+
+                {/* Prompt Suggestions */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between px-1">
+                    <h3 className="dark:text-muted-foreground text-sm font-medium text-zinc-500 capitalize">
+                      Try these prompts
+                    </h3>
                     <button
-                      key={i}
-                      onClick={() => {
-                        textInput.setInput(prompt);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="dark:hover:border-primary/20 group rounded-xl border border-zinc-200 bg-white p-4 text-left text-xs leading-relaxed font-medium text-zinc-500 shadow-sm transition-all hover:border-zinc-300 hover:bg-zinc-50 active:scale-[0.98] dark:border-white/5 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-900/50"
+                      onClick={refreshPrompts}
+                      className="rounded-full p-2 text-zinc-400 transition-colors hover:bg-black/5 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-white/5 dark:hover:text-zinc-300"
+                      title="Refresh prompts"
                     >
-                      <span className="transition-colors group-hover:text-zinc-900 dark:group-hover:text-zinc-200">
-                        {prompt}
-                      </span>
+                      <RotateCcw className="size-4" />
                     </button>
-                  ))}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {shuffledPrompts.map((prompt: string, i: number) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          textInput.setInput(prompt);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className="dark:hover:border-primary/20 group rounded-xl border border-zinc-200 bg-white p-4 text-left text-xs leading-relaxed font-medium text-zinc-500 shadow-sm transition-all hover:border-zinc-300 hover:bg-zinc-50 active:scale-[0.98] dark:border-white/5 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-900/50"
+                      >
+                        <span className="transition-colors group-hover:text-zinc-900 dark:group-hover:text-zinc-200">
+                          {prompt}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
 
       {/* Floating Bottom-Left Drawer-Pull Mobile Sidebar Trigger */}
       <div className="lg:hidden">
         <button
           onClick={() => setIsMobileSidebarOpen(true)}
-          className="fixed bottom-6 left-0 z-40 flex h-11 w-11 items-center justify-center rounded-r-2xl border border-l-0 border-border/40 bg-secondary/85 dark:bg-zinc-900/85 backdrop-blur-md text-zinc-500 hover:text-foreground shadow-lg transition-all active:scale-95 outline-none"
+          className="border-border/40 bg-secondary/85 hover:text-foreground fixed bottom-6 left-0 z-40 flex h-11 w-11 items-center justify-center rounded-r-2xl border border-l-0 text-zinc-500 shadow-lg backdrop-blur-md transition-all outline-none active:scale-95 dark:bg-zinc-900/85"
           title="Open history"
         >
           <Menu className="h-5 w-5" />
@@ -470,7 +470,7 @@ function HomeContent() {
               animate={{ x: 0 }}
               exit={{ x: "-110%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-[84px] bottom-4 left-4 z-50 flex w-[calc(100%-32px)] max-w-[340px] sm:max-w-[360px] flex-col rounded-2xl border border-border/40 bg-secondary/15 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:bg-zinc-900/20 dark:shadow-none lg:hidden overflow-hidden"
+              className="border-border/40 bg-secondary/15 fixed top-[84px] bottom-4 left-4 z-50 flex w-[calc(100%-32px)] max-w-[340px] flex-col overflow-hidden rounded-2xl border shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl sm:max-w-[360px] lg:hidden dark:bg-zinc-900/20 dark:shadow-none"
             >
               <Sidebar
                 sections={sections}
@@ -489,7 +489,6 @@ function HomeContent() {
     </div>
   );
 }
-
 
 interface MobileMenuProps {
   sections: any[];
@@ -544,7 +543,6 @@ function MobileMenu({
         </button>
       </DrawerTrigger>
       <DrawerContent className="bg-background border-border text-foreground max-h-[96vh]">
-
         {/* Search Bar matching Sidebar style */}
         <div className="px-6 py-4">
           <div className="group relative">
@@ -657,5 +655,3 @@ function MobileMenu({
     </Drawer>
   );
 }
-
-

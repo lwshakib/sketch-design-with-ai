@@ -71,7 +71,7 @@ export function Sidebar({
     <aside
       className={cn(
         "bg-sidebar border-sidebar-border h-screen w-[340px] flex-col border-r transition-colors duration-300",
-        className ? cn("flex", className) : "hidden lg:flex"
+        className ? cn("flex", className) : "hidden lg:flex",
       )}
     >
       {/* Search Header */}

@@ -12,7 +12,12 @@ interface CustomModalProps {
   className?: string;
 }
 
-export function CustomModal({ isOpen, onClose, children, className }: CustomModalProps) {
+export function CustomModal({
+  isOpen,
+  onClose,
+  children,
+  className,
+}: CustomModalProps) {
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -46,8 +51,8 @@ export function CustomModal({ isOpen, onClose, children, className }: CustomModa
             exit={{ opacity: 0, scale: 0.98, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className={cn(
-              "relative z-10 bg-card border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden",
-              className
+              "bg-card relative z-10 overflow-hidden rounded-2xl border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)]",
+              className,
             )}
           >
             {children}
@@ -55,6 +60,6 @@ export function CustomModal({ isOpen, onClose, children, className }: CustomModa
         </div>
       )}
     </AnimatePresence>,
-    document.body
+    document.body,
   );
 }

@@ -4,7 +4,7 @@ import { processMessages } from "./utils";
 
 export async function generateObject<T>(
   messages: any[],
-  options?: { projectId?: string }
+  options?: { projectId?: string },
 ): Promise<T> {
   // Preprocess messages
   const processed = await processMessages(messages);

@@ -23,8 +23,11 @@ export async function POST(req: NextRequest) {
       const { audioData } = await req.json();
       if (!audioData || typeof audioData !== "string") {
         return NextResponse.json(
-          { error: "Missing or invalid audioData (base64 string) in request body." },
-          { status: 400 }
+          {
+            error:
+              "Missing or invalid audioData (base64 string) in request body.",
+          },
+          { status: 400 },
         );
       }
       buffer = Buffer.from(audioData, "base64");
@@ -32,7 +35,10 @@ export async function POST(req: NextRequest) {
       const formData = await req.formData();
       const file = formData.get("file") as File;
       if (!file) {
-        return NextResponse.json({ error: "Audio file is required" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Audio file is required" },
+          { status: 400 },
+        );
       }
       const arrayBuffer = await file.arrayBuffer();
       buffer = Buffer.from(arrayBuffer);
@@ -48,7 +54,7 @@ export async function POST(req: NextRequest) {
     console.error("[Transcribe Route Error]:", error);
     return NextResponse.json(
       { error: error.message || "Failed to transcribe audio" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

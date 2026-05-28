@@ -49,13 +49,13 @@ Everyone participating in this project is governed by our [Code of Conduct](CODE
    ```bash
    cp .env.example .env
    ```
-   Fill in `DATABASE_URL`, `CLOUDFLARE_AI_GATEWAY_API_KEY`, `CLOUDFLARE_AI_GATEWAY_ENDPOINT`, and `BETTER_AUTH_SECRET`.
+   Fill in `DATABASE_URL`, `GEMINI_API_KEY`, and `BETTER_AUTH_SECRET`.
 3. **Database & Storage Initialization**:
    ```bash
    pnpm db:migrate
    pnpm bucket:setup
    ```
-   *Note: `db:migrate` generates the Prisma client into `./generated/prisma`.*
+   _Note: `db:migrate` generates the Prisma client into `./generated/prisma`._
 
 ### Running the App
 
@@ -71,18 +71,24 @@ Everyone participating in this project is governed by our [Code of Conduct](CODE
 ## 🏗️ Technical Architecture
 
 ### AI Credit System
+
 The project implements a daily credit limit (10 credits) per user.
+
 - **Logic**: Found in `lib/credits.ts`.
 - **Testing**: To reset your credits during development, you can manually update the `lastCreditReset` field in the `User` table to a previous date using Prisma Studio (`pnpm db:studio`).
 
 ### Inngest Workflows
+
 AI generation is handled asynchronously via Inngest to support streaming, visual consistency (themes), and background processing.
+
 - **Files**: Check the `inngest/` directory for function definitions.
 - **Execution**: The AI tools in `services/ai.services.ts` trigger Inngest events which process the design logic.
 - **Realtime**: We use Inngest Realtime to push status updates from the background workers to the React Flow canvas.
 
 ### Prisma Configuration
+
 We use a custom output directory for the Prisma Client to avoid issues with some deployment environments.
+
 - **Generator**: Defined in `prisma/schema.prisma` with `output = "../generated/prisma"`.
 - **Usage**: Import the client from `@/lib/prisma` which points to the correctly generated location.
 
@@ -97,6 +103,7 @@ We use a custom output directory for the Prisma Client to avoid issues with some
 ## 📝 Commit Message Guidelines
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/):
+
 - `feat(scope): ...`
 - `fix(scope): ...`
 - `docs: ...`
@@ -104,9 +111,10 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## 🧪 Testing Guidelines
 
-Currently, the project is prioritizing feature stability. New core logic should be manually tested against the dev environment before submission. 
+Currently, the project is prioritizing feature stability. New core logic should be manually tested against the dev environment before submission.
 
 Please make sure to run the following validation scripts locally before opening a pull request:
+
 - **Code formatting**: `pnpm run format:check` (or `pnpm run format` to auto-fix styling)
 - **ESLint Linting**: `pnpm run lint`
 - **TypeScript Typechecking**: `pnpm run typecheck`

@@ -32,14 +32,14 @@ export function SecondarySidebar({ commitEdits }: SecondarySidebarProps) {
   if (secondarySidebarMode === "none") return null;
 
   return (
-    <aside className="bg-card/95 border-border/50 absolute inset-y-0 right-0 z-[100] flex w-[320px] flex-col border-l shadow-2xl backdrop-blur-3xl animate-in slide-in-from-right duration-300">
+    <aside className="bg-card/95 border-border/50 animate-in slide-in-from-right absolute inset-y-0 right-0 z-[100] flex w-[320px] flex-col border-l shadow-2xl backdrop-blur-3xl duration-300">
       <div className="absolute top-3 right-3 z-[110]">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => {
-             setSecondarySidebarMode("none");
-             setSelectedEl(null);
+            setSecondarySidebarMode("none");
+            setSelectedEl(null);
           }}
           className="text-muted-foreground hover:text-foreground hover:bg-muted/50 h-8 w-8 rounded-full"
         >

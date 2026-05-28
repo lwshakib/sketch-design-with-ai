@@ -51,14 +51,14 @@ export async function POST(
         tertiary: "#14b8a6",
         neutral: "#94a3b8",
         background: "#080808",
-        foreground: "#ffffff"
+        foreground: "#ffffff",
       },
       typography: typography || {
         headline: "Inter",
         body: "Inter",
-        label: "Inter"
+        label: "Inter",
       },
-      brandName: name || "Design System"
+      brandName: name || "Design System",
     };
 
     const theme = await prisma.theme.create({
@@ -83,7 +83,7 @@ export async function POST(
       height: theme.height,
       isActive: theme.isActive,
       isComplete: true,
-      status: "completed"
+      status: "completed",
     });
   } catch (error) {
     console.error("[THEME_POST]", error);

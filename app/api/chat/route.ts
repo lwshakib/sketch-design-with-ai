@@ -29,44 +29,53 @@ export async function POST(req: Request) {
 
     // 1. Fetch Project State & Persist User Message
     const project = await prisma.project.findUnique({
-       where: { id: projectId },
-       include: { screens: true, themes: true }
+      where: { id: projectId },
+      include: { screens: true, themes: true },
     });
 
     if (!project) {
-        return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
     const messagesCount = await prisma.message.count({
-      where: { projectId }
+      where: { projectId },
     });
 
     const lastUserMessage = messages?.[messages.length - 1];
 
     // Automatically generate creative title via Gemini on first message
-    if (messagesCount === 0 && lastUserMessage && lastUserMessage.role === "user") {
+    if (
+      messagesCount === 0 &&
+      lastUserMessage &&
+      lastUserMessage.role === "user"
+    ) {
       try {
-        const promptText = typeof lastUserMessage.content === "string"
-          ? lastUserMessage.content
-          : lastUserMessage.content?.[0]?.text || "";
+        const promptText =
+          typeof lastUserMessage.content === "string"
+            ? lastUserMessage.content
+            : lastUserMessage.content?.[0]?.text || "";
 
         if (promptText) {
           const { text: aiTitle } = await generateText([
             {
               role: "system",
-              content: "You are a professional project naming assistant. Generate a creative, professional title for the project based on the user's design prompt. The title must be exactly 3 to 5 words long. Return ONLY the title, with no quotes, punctuation, or conversational filler."
+              content:
+                "You are a professional project naming assistant. Generate a creative, professional title for the project based on the user's design prompt. The title must be exactly 3 to 5 words long. Return ONLY the title, with no quotes, punctuation, or conversational filler.",
             },
             {
               role: "user",
-              content: promptText
-            }
+              content: promptText,
+            },
           ]);
-          
-          const cleanTitle = aiTitle.trim().replace(/^["']|["']$/g, "").trim();
+
+          const cleanTitle = aiTitle
+            .trim()
+            .replace(/^["']|["']$/g, "")
+            .trim();
           if (cleanTitle) {
             await prisma.project.update({
               where: { id: projectId },
-              data: { title: cleanTitle }
+              data: { title: cleanTitle },
             });
             project.title = cleanTitle;
           }
@@ -102,18 +111,19 @@ export async function POST(req: Request) {
 
     // 2. Construct Project Context
     const currentCredits = await getAndResetCredits(session.user.id);
-    const existingScreensSummary = project.screens.length > 0 
-      ? `\n\nExisting Screens in Project: ${project.screens.map(s => `"${s.title}" (Type: ${s.type})`).join(", ")}.`
-      : "";
+    const existingScreensSummary =
+      project.screens.length > 0
+        ? `\n\nExisting Screens in Project: ${project.screens.map((s) => `"${s.title}" (Type: ${s.type})`).join(", ")}.`
+        : "";
 
     // Theme Enforcement Check
     const hasTheme = (project.themes?.length || 0) > 0;
     const themeEnforcement = !hasTheme
-        ? `\n\nCRITICAL MANDATE: This project currently HAS NO THEME. You MUST call the 'generateTheme' tool first to establish the design system. 
+      ? `\n\nCRITICAL MANDATE: This project currently HAS NO THEME. You MUST call the 'generateTheme' tool first to establish the design system. 
         IMPORTANT: If the user is asking to build a specific screen (e.g. "Build a login page"), call 'generateTheme' and put the login page details into the 'pendingScreenTitle' and 'pendingScreenPrompt' parameters. 
         The system will then automatically generate that screen once the theme is finished. 
         Do NOT call 'generateScreen' directly in the same turn if no theme exists.`
-        : `\n\nTheme Status: A theme is already established. You may now call 'generateScreen' directly for any new requests.`;
+      : `\n\nTheme Status: A theme is already established. You may now call 'generateScreen' directly for any new requests.`;
 
     const creditContext = `\n\nUser Credits: ${currentCredits} remaining today. Each generated screen costs 1 credit. If credits are low, plan your generations carefully. If credits are exhausted, inform the user you cannot generate more screens until tomorrow.`;
 
@@ -122,31 +132,38 @@ export async function POST(req: Request) {
     const normalizedMessages = (messages || []).map((msg: any, idx: number) => {
       const isLastMessage = idx === (messages?.length || 0) - 1;
       const role = msg.role === "data" ? "tool" : msg.role;
-      
+
       // Basic text content extraction
-      const textContent = typeof msg.content === "string" 
-        ? msg.content 
-        : msg.parts?.find((p: any) => p.type === "text")?.text || msg.content?.[0]?.text || "";
+      const textContent =
+        typeof msg.content === "string"
+          ? msg.content
+          : msg.parts?.find((p: any) => p.type === "text")?.text ||
+            msg.content?.[0]?.text ||
+            "";
 
       // Handle Vision for User Messages
       if (role === "user") {
         const content: any[] = [{ type: "text", text: textContent }];
-        
+
         // If this is the last message and we have imagePaths, attach them
         if (isLastMessage && imagePaths.length > 0) {
           imagePaths.slice(0, 2).forEach((path: string) => {
             content.push({ type: "image_url", image_url: { url: path } });
           });
         }
-        
+
         return { role, content };
       }
 
       return {
         role,
         content: textContent,
-        ...(msg.role === "assistant" && msg.tool_calls ? { tool_calls: msg.tool_calls } : {}),
-        ...(msg.role === "tool" ? { tool_call_id: msg.tool_call_id, name: msg.name } : {}),
+        ...(msg.role === "assistant" && msg.tool_calls
+          ? { tool_calls: msg.tool_calls }
+          : {}),
+        ...(msg.role === "tool"
+          ? { tool_call_id: msg.tool_call_id, name: msg.name }
+          : {}),
       };
     });
 
@@ -215,46 +232,75 @@ export async function POST(req: Request) {
                   } else if (event.type === "reasoning") {
                     // Stream reasoning with prefix 8:
                     controller.enqueue(
-                       encoder.encode(`8:${JSON.stringify(event.content)}\n`),
+                      encoder.encode(`8:${JSON.stringify(event.content)}\n`),
                     );
                   } else if (event.type === "screen_created") {
-                    controller.enqueue(encoder.encode(`2:[${JSON.stringify({
-                        type: "screen-created",
-                        screen: event.screen
-                    })}]\n`));
+                    controller.enqueue(
+                      encoder.encode(
+                        `2:[${JSON.stringify({
+                          type: "screen-created",
+                          screen: event.screen,
+                        })}]\n`,
+                      ),
+                    );
                   } else if (event.type === "screen_progress") {
-                    controller.enqueue(encoder.encode(`2:[${JSON.stringify({
-                        type: "screen-progress",
-                        screenId: event.screenId,
-                        html: event.html
-                    })}]\n`));
+                    controller.enqueue(
+                      encoder.encode(
+                        `2:[${JSON.stringify({
+                          type: "screen-progress",
+                          screenId: event.screenId,
+                          html: event.html,
+                        })}]\n`,
+                      ),
+                    );
                   } else if (event.type === "theme_created") {
-                    controller.enqueue(encoder.encode(`2:[${JSON.stringify({
-                        type: "theme-created",
-                        theme: event.theme
-                    })}]\n`));
+                    controller.enqueue(
+                      encoder.encode(
+                        `2:[${JSON.stringify({
+                          type: "theme-created",
+                          theme: event.theme,
+                        })}]\n`,
+                      ),
+                    );
                   } else if (event.type === "theme_progress") {
-                    controller.enqueue(encoder.encode(`2:[${JSON.stringify({
-                        type: "theme-progress",
-                        themeId: event.themeId,
-                        variables: event.variables,
-                        title: event.title
-                    })}]\n`));
+                    controller.enqueue(
+                      encoder.encode(
+                        `2:[${JSON.stringify({
+                          type: "theme-progress",
+                          themeId: event.themeId,
+                          variables: event.variables,
+                          title: event.title,
+                        })}]\n`,
+                      ),
+                    );
                   } else if (event.type === "tool_result") {
                     // Map tool results back to useChat data part (2:)
                     const toolResult = event.result;
-                    controller.enqueue(encoder.encode(`2:[${JSON.stringify({ 
-                        type: "tool-result", 
-                        tool: event.name, 
-                        ...toolResult 
-                    })}]\n`));
-                    
+                    controller.enqueue(
+                      encoder.encode(
+                        `2:[${JSON.stringify({
+                          type: "tool-result",
+                          tool: event.name,
+                          ...toolResult,
+                        })}]\n`,
+                      ),
+                    );
+
                     // Specific toast message for generateScreen successfully called
-                    if (event.name === "generateScreen" && toolResult.status === "success") {
-                         controller.enqueue(encoder.encode(`0:${JSON.stringify("\n\n✨ Design protocol initiated. I'm building " + (event.args?.title || "your screen") + " now.")}\n`));
+                    if (
+                      event.name === "generateScreen" &&
+                      toolResult.status === "success"
+                    ) {
+                      controller.enqueue(
+                        encoder.encode(
+                          `0:${JSON.stringify("\n\n✨ Design protocol initiated. I'm building " + (event.args?.title || "your screen") + " now.")}\n`,
+                        ),
+                      );
                     }
                   } else if (event.type === "error") {
-                    controller.enqueue(encoder.encode(`3:${JSON.stringify(event.message)}\n`));
+                    controller.enqueue(
+                      encoder.encode(`3:${JSON.stringify(event.message)}\n`),
+                    );
                   }
                 } catch (e) {
                   // Skip invalid JSON
@@ -264,7 +310,11 @@ export async function POST(req: Request) {
           }
         } catch (error) {
           console.error("[ChatAPI] Bridge Loop Error:", error);
-          controller.enqueue(encoder.encode(`3:${JSON.stringify("Connection lost. Please try again.")}\n`));
+          controller.enqueue(
+            encoder.encode(
+              `3:${JSON.stringify("Connection lost. Please try again.")}\n`,
+            ),
+          );
         } finally {
           controller.close();
           reader.releaseLock();

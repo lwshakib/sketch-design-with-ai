@@ -27,7 +27,9 @@ export interface GeminiContent {
  * Preprocesses vision message contents (converts S3 paths and URLs into base64 inlineData)
  * and formats the message history for the Google GenAI SDK.
  */
-export async function processMessages(messages: any[]): Promise<GeminiContent[]> {
+export async function processMessages(
+  messages: any[],
+): Promise<GeminiContent[]> {
   return Promise.all(
     messages.map(async (msg) => {
       const role = msg.role === "assistant" ? "model" : msg.role;
@@ -81,12 +83,18 @@ export async function processMessages(messages: any[]): Promise<GeminiContent[]>
                 }
 
                 const response = await fetch(imageUrl);
-                if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
+                if (!response.ok)
+                  throw new Error(
+                    `Failed to fetch image: ${response.statusText}`,
+                  );
                 const buffer = Buffer.from(await response.arrayBuffer());
                 const base64 = buffer.toString("base64");
-                
+
                 const ext = url.split(".").pop()?.toLowerCase() || "png";
-                const mimeType = (ext === "jpg" || ext === "jpeg") ? "image/jpeg" : `image/${ext}`;
+                const mimeType =
+                  ext === "jpg" || ext === "jpeg"
+                    ? "image/jpeg"
+                    : `image/${ext}`;
 
                 return {
                   inlineData: {
@@ -95,13 +103,16 @@ export async function processMessages(messages: any[]): Promise<GeminiContent[]>
                   },
                 };
               } catch (e) {
-                console.error(`[processMessages] Vision processing failed for ${url}:`, e);
+                console.error(
+                  `[processMessages] Vision processing failed for ${url}:`,
+                  e,
+                );
                 return null;
               }
             }
 
             return null;
-          })
+          }),
         );
 
         return {
@@ -114,6 +125,6 @@ export async function processMessages(messages: any[]): Promise<GeminiContent[]>
         role,
         parts: [],
       };
-    })
+    }),
   );
 }

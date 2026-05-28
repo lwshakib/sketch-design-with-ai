@@ -27,6 +27,7 @@ We pledge to act and interact in ways that contribute to an open, welcoming, div
 ## Scope
 
 This Code of Conduct applies within all community spaces, including but not limited to:
+
 - GitHub repositories (issues, pull requests, discussions, code reviews)
 - Project communication channels (Discord, Slack, email lists)
 - Social media when representing the project
@@ -38,6 +39,7 @@ Community leaders and maintainers are responsible for clarifying and enforcing o
 ## Reporting Guidelines
 
 If you experience or witness unacceptable behavior, please report it by contacting:
+
 - **Project Lead**: Shakib Khan
 - **Email**: [lwshakib@gmail.com](mailto:lwshakib@gmail.com)
 
@@ -46,6 +48,7 @@ All reports will be handled with discretion and confidentiality.
 ## Enforcement Guidelines
 
 Community leaders will follow these guidelines in determining the consequences for any action they deem in violation of this Code of Conduct:
+
 1. **Correction**: A private, written warning.
 2. **Warning**: A warning with consequences for continued behavior.
 3. **Temporary Ban**: A temporary ban from project spaces.

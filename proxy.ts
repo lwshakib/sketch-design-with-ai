@@ -8,11 +8,7 @@ import { headers } from "next/headers";
  * These routes do not require authentication
  * @type {string[]}
  */
-export const publicRoutes = [
-  "/preview",
-  "/verify-email",
-  "/reset-password",
-];
+export const publicRoutes = ["/preview", "/verify-email", "/reset-password"];
 
 /**
  * An array of routes that are used for authentication

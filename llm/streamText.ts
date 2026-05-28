@@ -8,7 +8,11 @@ export interface StreamTextOptions {
     userId: string;
     projectId: string;
   };
-  onFinish?: (result: { content: string; reasoning?: string; toolInvocations: any[] }) => Promise<void>;
+  onFinish?: (result: {
+    content: string;
+    reasoning?: string;
+    toolInvocations: any[];
+  }) => Promise<void>;
   abortSignal?: AbortSignal;
 }
 
@@ -117,12 +121,28 @@ export async function streamText(messages: any[], options?: StreamTextOptions) {
               sendEvent({ type: "tool_call", id, name: toolName, args });
 
               try {
-                const result = await executeTool(toolName, args, context, (progressEvent: any) => {
-                  sendEvent(progressEvent);
+                const result = await executeTool(
+                  toolName,
+                  args,
+                  context,
+                  (progressEvent: any) => {
+                    sendEvent(progressEvent);
+                  },
+                );
+                sendEvent({
+                  type: "tool_result",
+                  id,
+                  name: toolName,
+                  result,
+                  args,
                 });
-                sendEvent({ type: "tool_result", id, name: toolName, result, args });
 
-                finalToolInvocations.push({ toolCallId: id, toolName, args, result });
+                finalToolInvocations.push({
+                  toolCallId: id,
+                  toolName,
+                  args,
+                  result,
+                });
                 responseParts.push({
                   functionResponse: {
                     name: toolName,
@@ -132,9 +152,20 @@ export async function streamText(messages: any[], options?: StreamTextOptions) {
                 });
               } catch (err: any) {
                 const msg = err instanceof Error ? err.message : String(err);
-                sendEvent({ type: "tool_result", id, name: toolName, error: msg, args });
+                sendEvent({
+                  type: "tool_result",
+                  id,
+                  name: toolName,
+                  error: msg,
+                  args,
+                });
 
-                finalToolInvocations.push({ toolCallId: id, toolName, args, result: `Error: ${msg}` });
+                finalToolInvocations.push({
+                  toolCallId: id,
+                  toolName,
+                  args,
+                  result: `Error: ${msg}`,
+                });
                 responseParts.push({
                   functionResponse: {
                     name: toolName,
@@ -159,7 +190,10 @@ export async function streamText(messages: any[], options?: StreamTextOptions) {
           controller.error(err);
         }
       } finally {
-        if (onFinish && (finalContent || finalReasoning || finalToolInvocations.length > 0)) {
+        if (
+          onFinish &&
+          (finalContent || finalReasoning || finalToolInvocations.length > 0)
+        ) {
           await onFinish({
             content: finalContent,
             reasoning: finalReasoning || undefined,

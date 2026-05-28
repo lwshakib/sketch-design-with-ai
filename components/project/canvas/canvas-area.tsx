@@ -276,7 +276,7 @@ export function CanvasArea({
 
   React.useEffect(() => {
     if (isAgentLogOpen && logEndRef.current) {
-        logEndRef.current.scrollIntoView({ behavior: "smooth" });
+      logEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isAgentLogOpen]);
 
@@ -307,12 +307,10 @@ export function CanvasArea({
         body: JSON.stringify({ isActive: true }),
       });
       if (!res.ok) throw new Error("Failed to switch theme");
-      
+
       const updateFn = (prev: any[]) =>
         prev.map((a) =>
-          a.type === "theme"
-            ? { ...a, isActive: a.id === themeId }
-            : a
+          a.type === "theme" ? { ...a, isActive: a.id === themeId } : a,
         );
       setArtifacts(updateFn);
       setThrottledArtifacts(updateFn);
@@ -378,7 +376,7 @@ export function CanvasArea({
 
       const updateFn = (prev: any[]) => {
         const updated = prev.map((a) =>
-          a.type === "theme" ? { ...a, isActive: false } : a
+          a.type === "theme" ? { ...a, isActive: false } : a,
         );
         return [...updated, newTheme];
       };
@@ -401,7 +399,8 @@ export function CanvasArea({
   const [isQrDialogOpen, setIsQrDialogOpen] = React.useState(false);
   const [qrCodeUrl, setQrCodeUrl] = React.useState("");
 
-  const [selectedElementInfo, setSelectedElementInfo] = React.useState<any>(null);
+  const [selectedElementInfo, setSelectedElementInfo] =
+    React.useState<any>(null);
 
   React.useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -417,33 +416,38 @@ export function CanvasArea({
         }
 
         if (artifactTitle) {
-           const artifact = throttledArtifacts.find(a => a.title === artifactTitle);
-           if (artifact && artifact.id) {
-             setSelectedArtifactIds(new Set([artifact.id]));
-           }
+          const artifact = throttledArtifacts.find(
+            (a) => a.title === artifactTitle,
+          );
+          if (artifact && artifact.id) {
+            setSelectedArtifactIds(new Set([artifact.id]));
+          }
 
-           setSelectedElementInfo({
-             ...event.data,
-             artifactTitle: artifactTitle
-           });
+          setSelectedElementInfo({
+            ...event.data,
+            artifactTitle: artifactTitle,
+          });
 
-           // Find and set the real HTMLElement reference in the store
-           const iframe = iframeRefs.current[artifactTitle];
-           if (iframe && iframe.contentDocument) {
-             const getElementByPath = (doc: Document, path: number[]) => {
-               let el: any = doc.body;
-               for (const index of path) {
-                 if (el && el.children[index]) el = el.children[index];
-                 else return null;
-               }
-               return el;
-             };
-             const el = getElementByPath(iframe.contentDocument, event.data.path);
-             if (el) {
-               setSelectedEl(el as HTMLElement);
-               setSecondarySidebarMode("properties");
-             }
-           }
+          // Find and set the real HTMLElement reference in the store
+          const iframe = iframeRefs.current[artifactTitle];
+          if (iframe && iframe.contentDocument) {
+            const getElementByPath = (doc: Document, path: number[]) => {
+              let el: any = doc.body;
+              for (const index of path) {
+                if (el && el.children[index]) el = el.children[index];
+                else return null;
+              }
+              return el;
+            };
+            const el = getElementByPath(
+              iframe.contentDocument,
+              event.data.path,
+            );
+            if (el) {
+              setSelectedEl(el as HTMLElement);
+              setSecondarySidebarMode("properties");
+            }
+          }
         }
       }
       if (event.data.type === "SELECTION_CLEARED") {
@@ -452,11 +456,18 @@ export function CanvasArea({
     };
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [selectedArtifact, iframeRefs, throttledArtifacts, setSelectedArtifactIds, setSelectedEl, setSecondarySidebarMode]);
+  }, [
+    selectedArtifact,
+    iframeRefs,
+    throttledArtifacts,
+    setSelectedArtifactIds,
+    setSelectedEl,
+    setSecondarySidebarMode,
+  ]);
 
   React.useEffect(() => {
     if (isGenerating) {
-        setIsTurnDetailVisible(true);
+      setIsTurnDetailVisible(true);
     }
   }, [isGenerating, setIsTurnDetailVisible]);
 
@@ -464,43 +475,58 @@ export function CanvasArea({
     <main
       ref={previewRef}
       onMouseDown={(e) => {
-        const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+        const isModalOpen =
+          typeof document !== "undefined" &&
+          (!!document.querySelector('[role="dialog"]') ||
+            !!document.querySelector('[data-slot="dialog-content"]'));
         if (isModalOpen) return;
         const target = e.target as HTMLElement;
         if (
           target.closest('[role="dialog"]') ||
           target.closest('[role="menu"]') ||
-          target.closest('[data-radix-portal]') ||
-          target.closest('.pointer-events-auto')
+          target.closest("[data-radix-portal]") ||
+          target.closest(".pointer-events-auto")
         ) {
           return;
         }
         handleMouseDown(e);
       }}
       onMouseMove={(e) => {
-        const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+        const isModalOpen =
+          typeof document !== "undefined" &&
+          (!!document.querySelector('[role="dialog"]') ||
+            !!document.querySelector('[data-slot="dialog-content"]'));
         if (isModalOpen) return;
         handleMouseMove(e);
       }}
       onMouseUp={() => {
-        const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+        const isModalOpen =
+          typeof document !== "undefined" &&
+          (!!document.querySelector('[role="dialog"]') ||
+            !!document.querySelector('[data-slot="dialog-content"]'));
         if (isModalOpen) return;
         handleMouseUp();
       }}
       onMouseLeave={() => {
-        const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+        const isModalOpen =
+          typeof document !== "undefined" &&
+          (!!document.querySelector('[role="dialog"]') ||
+            !!document.querySelector('[data-slot="dialog-content"]'));
         if (isModalOpen) return;
         handleMouseUp();
       }}
       onClick={(e) => {
-        const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+        const isModalOpen =
+          typeof document !== "undefined" &&
+          (!!document.querySelector('[role="dialog"]') ||
+            !!document.querySelector('[data-slot="dialog-content"]'));
         if (isModalOpen) return;
         if (e.target === e.currentTarget) {
-           setSelectedArtifactIds(new Set());
-           setSelectedElementInfo(null);
-           if (activeTool === "edit") {
-              setSecondarySidebarMode("none");
-           }
+          setSelectedArtifactIds(new Set());
+          setSelectedElementInfo(null);
+          if (activeTool === "edit") {
+            setSecondarySidebarMode("none");
+          }
         }
       }}
       className={cn(
@@ -516,52 +542,67 @@ export function CanvasArea({
     >
       {/* Grid Background */}
       <div
-        className="pointer-events-none absolute inset-0 text-foreground opacity-[0.05] dark:opacity-[0.1]"
+        className="text-foreground pointer-events-none absolute inset-0 opacity-[0.05] dark:opacity-[0.1]"
         style={{
           backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
           backgroundSize: `${24 * zoom}px ${24 * zoom}px`,
           transform: `translate(${canvasOffset.x % (24 * zoom)}px, ${canvasOffset.y % (24 * zoom)}px)`,
         }}
       />
-      
+
       {/* Turn Details Detail (Top Left) */}
       {(selectedTurnId || isGenerating) && isTurnDetailVisible && (
-        <div 
-           className="pointer-events-none absolute top-[68px] left-6 z-[60] flex flex-col items-start gap-4" 
-           onMouseDown={(e) => e.stopPropagation()}
-           onWheel={(e) => e.stopPropagation()}
+        <div
+          className="pointer-events-none absolute top-[68px] left-6 z-[60] flex flex-col items-start gap-4"
+          onMouseDown={(e) => e.stopPropagation()}
+          onWheel={(e) => e.stopPropagation()}
         >
           {(() => {
-            const lastUserIdx = [...(messages || [])].reverse().findIndex(m => m.role === 'user');
-            const latestUserMsgId = lastUserIdx !== -1 ? messages![messages!.length - 1 - lastUserIdx].id : null;
-            
+            const lastUserIdx = [...(messages || [])]
+              .reverse()
+              .findIndex((m) => m.role === "user");
+            const latestUserMsgId =
+              lastUserIdx !== -1
+                ? messages![messages!.length - 1 - lastUserIdx].id
+                : null;
+
             const targetId = isGenerating ? latestUserMsgId : selectedTurnId;
             const userIdx = messages?.findIndex((m) => m.id === targetId);
-            
+
             if (userIdx === -1 || userIdx === undefined) return null;
             const userMsg = messages![userIdx];
             // Find the assistant message that follows this user message
-            const assistantMsg = messages?.slice(userIdx + 1).find((m) => m.role === "assistant");
-            
-            const getUserText = () => userMsg.parts?.find((p: any) => p.type === "text")?.text || "";
+            const assistantMsg = messages
+              ?.slice(userIdx + 1)
+              .find((m) => m.role === "assistant");
+
+            const getUserText = () =>
+              userMsg.parts?.find((p: any) => p.type === "text")?.text || "";
             const getAssistantText = () => {
-                 if (isGenerating && !assistantMsg) return "Generating response...";
-                 if (!assistantMsg) return "";
-                 const text = assistantMsg.parts?.find((p: any) => p.type === "text")?.text || "";
-                 return text.replace(/<(artifact|artifact\s+.*?)>[\s\S]*?<\/artifact>/g, "").trim();
-            }
+              if (isGenerating && !assistantMsg)
+                return "Generating response...";
+              if (!assistantMsg) return "";
+              const text =
+                assistantMsg.parts?.find((p: any) => p.type === "text")?.text ||
+                "";
+              return text
+                .replace(/<(artifact|artifact\s+.*?)>[\s\S]*?<\/artifact>/g, "")
+                .trim();
+            };
 
             return (
-              <div className="bg-background/90 border-border pointer-events-auto flex max-h-[480px] w-[340px] flex-col overflow-y-auto rounded-xl border shadow-2xl backdrop-blur-3xl animate-in fade-in slide-in-from-top-2 duration-300 scrollbar-none ring-1 ring-black/5 lg:w-[400px] relative">
+              <div className="bg-background/90 border-border animate-in fade-in slide-in-from-top-2 pointer-events-auto relative flex max-h-[480px] w-[340px] scrollbar-none flex-col overflow-y-auto rounded-xl border shadow-2xl ring-1 ring-black/5 backdrop-blur-3xl duration-300 lg:w-[400px]">
                 {/* Sticky Header: User Message + Close Button */}
-                <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/10 flex items-start justify-between gap-4 p-5 pb-4">
-                  <div className="text-[13.5px] font-medium leading-relaxed text-foreground/90 flex-1 py-0.5 max-h-[80px] overflow-y-auto pr-1">
-                    {getUserText().replace(/\[Context:.*?\]\s*/g, "").trim()}
+                <div className="bg-background/95 border-border/10 sticky top-0 z-20 flex items-start justify-between gap-4 border-b p-5 pb-4 backdrop-blur-xl">
+                  <div className="text-foreground/90 max-h-[80px] flex-1 overflow-y-auto py-0.5 pr-1 text-[13.5px] leading-relaxed font-medium">
+                    {getUserText()
+                      .replace(/\[Context:.*?\]\s*/g, "")
+                      .trim()}
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="size-7 rounded-full hover:bg-muted shrink-0"
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="hover:bg-muted size-7 shrink-0 rounded-full"
                     onClick={() => setIsTurnDetailVisible(false)}
                   >
                     <X className="size-3.5" />
@@ -569,16 +610,17 @@ export function CanvasArea({
                 </div>
 
                 <div className="flex flex-col gap-5 p-5 pt-4">
-                   {/* Assistant Message */}
-                   <div className="text-[13px] leading-relaxed text-muted-foreground py-0.5">
-                     {assistantMsg || isGenerating ? (
-                        <div className="prose prose-sm dark:prose-invert prose-p:leading-relaxed prose-pre:bg-muted/50 max-w-none">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                {getAssistantText() || (isGenerating ? "Thinking..." : "")}
-                            </ReactMarkdown>
-                        </div>
-                     ) : null}
-                   </div>
+                  {/* Assistant Message */}
+                  <div className="text-muted-foreground py-0.5 text-[13px] leading-relaxed">
+                    {assistantMsg || isGenerating ? (
+                      <div className="prose prose-sm dark:prose-invert prose-p:leading-relaxed prose-pre:bg-muted/50 max-w-none">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {getAssistantText() ||
+                            (isGenerating ? "Thinking..." : "")}
+                        </ReactMarkdown>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             );
@@ -587,7 +629,10 @@ export function CanvasArea({
       )}
 
       {/* Preview Header */}
-      <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex h-16 items-center justify-between px-6" onMouseDown={(e) => e.stopPropagation()}>
+      <header
+        className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex h-16 items-center justify-between px-6"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <div className="pointer-events-auto flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -631,23 +676,21 @@ export function CanvasArea({
             </DropdownMenuContent>
           </DropdownMenu>
           <div className="flex flex-col">
-            <span className="text-foreground whitespace-nowrap text-[13.5px] font-semibold tracking-tight">
+            <span className="text-foreground text-[13.5px] font-semibold tracking-tight whitespace-nowrap">
               {project?.title || "Untitled Project"}
             </span>
           </div>
         </div>
-        
+
         {/* Dynamic Center Toolbar for Selected Artifact */}
-        <div className="pointer-events-none absolute inset-x-0 h-full flex items-center justify-center">
+        <div className="pointer-events-none absolute inset-x-0 flex h-full items-center justify-center">
           {selectedArtifact && selectedArtifactIds.size === 1 && (
-            <div className="bg-card/95 border-border/50 pointer-events-auto flex items-center gap-1.5 rounded-full border px-2 py-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-300 ring-1 ring-white/5">
-
-
+            <div className="bg-card/95 border-border/50 animate-in fade-in slide-in-from-top-2 pointer-events-auto flex items-center gap-1.5 rounded-full border px-2 py-1.5 shadow-2xl ring-1 ring-white/5 backdrop-blur-xl duration-300">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => openCodeViewer(selectedIndex)}
-                className="h-9 w-9 rounded-full transition-all hover:bg-secondary/40"
+                className="hover:bg-secondary/40 h-9 w-9 rounded-full transition-all"
                 title="View Code"
               >
                 <Code className="h-4 w-4" />
@@ -660,12 +703,18 @@ export function CanvasArea({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-foreground/80 hover:text-foreground flex h-9 items-center gap-2 rounded-full px-3 text-[13px] font-medium transition-colors hover:bg-secondary/40"
+                        className="text-foreground/80 hover:text-foreground hover:bg-secondary/40 flex h-9 items-center gap-2 rounded-full px-3 text-[13px] font-medium transition-colors"
                       >
                         {(() => {
-                          const mode = artifactPreviewModes[selectedArtifact.title] || selectedArtifact.type;
-                          if (mode === "app") return <Smartphone className="h-4 w-4 opacity-70" />;
-                          if (mode === "tablet") return <Tablet className="h-4 w-4 opacity-70" />;
+                          const mode =
+                            artifactPreviewModes[selectedArtifact.title] ||
+                            selectedArtifact.type;
+                          if (mode === "app")
+                            return (
+                              <Smartphone className="h-4 w-4 opacity-70" />
+                            );
+                          if (mode === "tablet")
+                            return <Tablet className="h-4 w-4 opacity-70" />;
                           return <Monitor className="h-4 w-4 opacity-70" />;
                         })()}
                         <ChevronDown className="h-3.5 w-3.5 opacity-50" />
@@ -677,39 +726,54 @@ export function CanvasArea({
                     >
                       <DropdownMenuItem
                         onClick={() => {
-                            const newModes = { ...artifactPreviewModes, [selectedArtifact.title]: "app" as const };
-                            setArtifactPreviewModes(newModes);
+                          const newModes = {
+                            ...artifactPreviewModes,
+                            [selectedArtifact.title]: "app" as const,
+                          };
+                          setArtifactPreviewModes(newModes);
                         }}
                         className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[13px]"
                       >
                         <div className="flex items-center gap-2">
                           <Smartphone className="h-4 w-4" /> App
                         </div>
-                        <span className="text-muted-foreground text-[10px]">380px</span>
+                        <span className="text-muted-foreground text-[10px]">
+                          380px
+                        </span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
-                            const newModes = { ...artifactPreviewModes, [selectedArtifact.title]: "web" as const };
-                            setArtifactPreviewModes(newModes);
+                          const newModes = {
+                            ...artifactPreviewModes,
+                            [selectedArtifact.title]: "web" as const,
+                          };
+                          setArtifactPreviewModes(newModes);
                         }}
                         className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[13px]"
                       >
                         <div className="flex items-center gap-2">
                           <Monitor className="h-4 w-4" /> Web
                         </div>
-                        <span className="text-muted-foreground text-[10px]">1280px</span>
+                        <span className="text-muted-foreground text-[10px]">
+                          1280px
+                        </span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
-                            const newModes = { ...artifactPreviewModes, [selectedArtifact.title]: "tablet" as const };
-                            setArtifactPreviewModes(newModes);
+                          const newModes = {
+                            ...artifactPreviewModes,
+                            [selectedArtifact.title]: "tablet" as const,
+                          };
+                          setArtifactPreviewModes(newModes);
                         }}
                         className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[13px]"
                       >
                         <div className="flex items-center gap-2">
                           <Tablet className="h-4 w-4" /> Tablet
                         </div>
-                        <span className="text-muted-foreground text-[10px]">768px</span>
+                        <span className="text-muted-foreground text-[10px]">
+                          768px
+                        </span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -720,24 +784,48 @@ export function CanvasArea({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleFeedback(selectedIndex, selectedArtifact.isLiked ? "none" : "like")}
+                      onClick={() =>
+                        handleFeedback(
+                          selectedIndex,
+                          selectedArtifact.isLiked ? "none" : "like",
+                        )
+                      }
                       className={cn(
-                        "h-8 w-8 rounded-full transition-all hover:bg-secondary/40",
-                        selectedArtifact.isLiked ? "text-primary bg-primary/10" : "text-foreground/40"
+                        "hover:bg-secondary/40 h-8 w-8 rounded-full transition-all",
+                        selectedArtifact.isLiked
+                          ? "text-primary bg-primary/10"
+                          : "text-foreground/40",
                       )}
                     >
-                      <ThumbsUp className={cn("h-3.5 w-3.5", selectedArtifact.isLiked && "fill-current")} />
+                      <ThumbsUp
+                        className={cn(
+                          "h-3.5 w-3.5",
+                          selectedArtifact.isLiked && "fill-current",
+                        )}
+                      />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleFeedback(selectedIndex, selectedArtifact.isDisliked ? "none" : "dislike")}
+                      onClick={() =>
+                        handleFeedback(
+                          selectedIndex,
+                          selectedArtifact.isDisliked ? "none" : "dislike",
+                        )
+                      }
                       className={cn(
-                        "h-8 w-8 rounded-full transition-all hover:bg-secondary/40",
-                        selectedArtifact.isDisliked ? "text-red-500 bg-red-500/10" : "text-foreground/40"
+                        "hover:bg-secondary/40 h-8 w-8 rounded-full transition-all",
+                        selectedArtifact.isDisliked
+                          ? "bg-red-500/10 text-red-500"
+                          : "text-foreground/40",
                       )}
                     >
-                      <ThumbsDown className={cn("h-3.5 w-3.5", selectedArtifact.isDisliked && "fill-current")} />
+                      <ThumbsDown
+                        className={cn(
+                          "h-3.5 w-3.5",
+                          selectedArtifact.isDisliked && "fill-current",
+                        )}
+                      />
                     </Button>
                   </div>
 
@@ -752,7 +840,7 @@ export function CanvasArea({
                   setExportArtifactIndex(selectedIndex);
                   setIsExportSheetOpen(true);
                 }}
-                className="h-9 w-9 rounded-full transition-all hover:bg-secondary/40"
+                className="hover:bg-secondary/40 h-9 w-9 rounded-full transition-all"
                 title="Export"
               >
                 <Share2 className="h-4 w-4" />
@@ -762,7 +850,7 @@ export function CanvasArea({
                 variant="ghost"
                 size="icon"
                 onClick={() => handleExportZip(selectedIndex)}
-                className="h-9 w-9 rounded-full transition-all hover:bg-secondary/40"
+                className="hover:bg-secondary/40 h-9 w-9 rounded-full transition-all"
                 title="Download"
               >
                 <Download className="h-4 w-4" />
@@ -875,12 +963,12 @@ export function CanvasArea({
                           : "transform 0.2s ease-out",
                   }}
                 >
-
                   {/* Frame Info Overlay */}
                   {artifact.id &&
                     (selectedArtifactIds.has(artifact.id) ||
                       isDraggingFrame ||
-                      artifact.isComplete) && (() => {
+                      artifact.isComplete) &&
+                    (() => {
                       const wVal = (() => {
                         const mode = artifactPreviewModes[artifact.title];
                         if (mode === "app") return 380;
@@ -896,7 +984,7 @@ export function CanvasArea({
                       const containerWidth = wVal * (zoom * 0.5);
                       return (
                         <div
-                          className="pointer-events-none absolute -top-7 left-0 flex items-center justify-between px-1 select-none overflow-hidden h-6 gap-2"
+                          className="pointer-events-none absolute -top-7 left-0 flex h-6 items-center justify-between gap-2 overflow-hidden px-1 select-none"
                           style={{
                             width: `${containerWidth}px`,
                             transform: `scale(${scaleFactor})`,
@@ -904,17 +992,15 @@ export function CanvasArea({
                           }}
                         >
                           <span
-                            className="text-[12px] font-bold truncate whitespace-nowrap overflow-hidden text-ellipsis flex-1 min-w-0"
+                            className="min-w-0 flex-1 truncate overflow-hidden text-[12px] font-bold text-ellipsis whitespace-nowrap"
                             style={{
                               color: "var(--primary)",
                             }}
                           >
                             {artifact.title || "Untitled Screen"}
                           </span>
-                          <div className="flex items-center shrink-0">
-                            <Code
-                              className="h-3.5 w-3.5 text-muted-foreground"
-                            />
+                          <div className="flex shrink-0 items-center">
+                            <Code className="text-muted-foreground h-3.5 w-3.5" />
                           </div>
                         </div>
                       );
@@ -964,14 +1050,18 @@ export function CanvasArea({
                         artifact.type === "theme"
                           ? "360px"
                           : artifactPreviewModes[artifact.title] === "app" ||
-                            (artifact.type === "app" &&
-                              !artifactPreviewModes[artifact.title])
+                              (artifact.type === "app" &&
+                                !artifactPreviewModes[artifact.title])
                             ? "800px"
                             : "400px",
                       transition: isResizing
                         ? "none"
                         : "width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                      backgroundColor: artifact.type === "theme" ? ((artifact.variables as any)?.colors?.background || "var(--background)") : "var(--background)",
+                      backgroundColor:
+                        artifact.type === "theme"
+                          ? (artifact.variables as any)?.colors?.background ||
+                            "var(--background)"
+                          : "var(--background)",
                       borderColor:
                         artifact.id && selectedArtifactIds.has(artifact.id)
                           ? SELECTION_BLUE
@@ -982,12 +1072,12 @@ export function CanvasArea({
                           : undefined,
                     }}
                   >
-                    {(((artifact.type === "theme" ? !artifact.variables : (!artifact.isComplete && !artifact.html))) ||
+                    {((artifact.type === "theme"
+                      ? !artifact.variables
+                      : !artifact.isComplete && !artifact.html) ||
                       (artifact.id &&
                         regeneratingArtifactIds.has(artifact.id))) && (
-                      <ModernShimmer
-                        type={artifact.type}
-                      />
+                      <ModernShimmer type={artifact.type} />
                     )}
 
                     <div
@@ -1009,7 +1099,8 @@ export function CanvasArea({
                           isDraggingFrame={isDraggingFrame}
                           onRef={(idx, el) => {
                             if (el)
-                              (el as any).dataset.artifactTitle = artifact.title;
+                              (el as any).dataset.artifactTitle =
+                                artifact.title;
                             iframeRefs.current[artifact.title] = el;
                           }}
                         />
@@ -1092,24 +1183,28 @@ export function CanvasArea({
       </div>
 
       {/* Agent Log / History (Bottom Left) */}
-      <div 
-         className="pointer-events-none absolute bottom-6 left-6 z-[60] flex flex-col items-start gap-2.5" 
-         onMouseDown={(e) => e.stopPropagation()}
-         onWheel={(e) => e.stopPropagation()}
+      <div
+        className="pointer-events-none absolute bottom-6 left-6 z-[60] flex flex-col items-start gap-2.5"
+        onMouseDown={(e) => e.stopPropagation()}
+        onWheel={(e) => e.stopPropagation()}
       >
         {/* Minimal History Window */}
         {isAgentLogOpen && (
-          <div className="bg-background/80 border-border pointer-events-auto flex max-h-[300px] w-[280px] flex-col gap-1 overflow-y-auto rounded-xl border p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 scrollbar-none ring-1 ring-black/5">
+          <div className="bg-background/80 border-border animate-in fade-in slide-in-from-bottom-2 pointer-events-auto flex max-h-[300px] w-[280px] scrollbar-none flex-col gap-1 overflow-y-auto rounded-xl border p-2 shadow-2xl ring-1 ring-black/5 backdrop-blur-2xl duration-300">
             <div className="flex flex-col gap-0.5">
               {messages
                 ?.filter((m) => !m.isSilent && m.role === "user")
                 .slice()
                 .reverse()
                 .map((msg, i) => {
-                  const textPart = msg.parts?.find((p: any) => p.type === "text");
+                  const textPart = msg.parts?.find(
+                    (p: any) => p.type === "text",
+                  );
                   const text = textPart?.text || "";
-                  const cleanText = text.replace(/\[Context:.*?\]\s*/g, "").trim(); 
-                  
+                  const cleanText = text
+                    .replace(/\[Context:.*?\]\s*/g, "")
+                    .trim();
+
                   if (!cleanText) return null;
 
                   return (
@@ -1117,27 +1212,31 @@ export function CanvasArea({
                       key={msg.id || i}
                       onClick={() => {
                         if (selectedTurnId === msg.id) {
-                           setIsTurnDetailVisible(!isTurnDetailVisible);
+                          setIsTurnDetailVisible(!isTurnDetailVisible);
                         } else {
-                           setSelectedTurnId(msg.id);
-                           setIsTurnDetailVisible(true);
+                          setSelectedTurnId(msg.id);
+                          setIsTurnDetailVisible(true);
                         }
                       }}
                       className={cn(
-                        "group relative flex items-center gap-2 rounded-lg px-2.5 py-1.5 transition-all cursor-pointer",
+                        "group relative flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 transition-all",
                         selectedTurnId === msg.id
-                          ? "bg-secondary/60 ring-1 ring-primary/10 shadow-sm" 
-                          : "hover:bg-secondary/40"
+                          ? "bg-secondary/60 ring-primary/10 shadow-sm ring-1"
+                          : "hover:bg-secondary/40",
                       )}
                     >
-                      <span className={cn(
-                        "text-[12px] font-medium leading-tight transition-colors flex-1 truncate",
-                        selectedTurnId === msg.id ? "text-foreground" : "text-muted-foreground",
-                      )}>
+                      <span
+                        className={cn(
+                          "flex-1 truncate text-[12px] leading-tight font-medium transition-colors",
+                          selectedTurnId === msg.id
+                            ? "text-foreground"
+                            : "text-muted-foreground",
+                        )}
+                      >
                         {cleanText}
                       </span>
                       {isGenerating && i === 0 && (
-                        <Loader2 className="h-3 w-3 animate-spin text-primary shrink-0 opacity-80" />
+                        <Loader2 className="text-primary h-3 w-3 shrink-0 animate-spin opacity-80" />
                       )}
                     </div>
                   );
@@ -1155,15 +1254,21 @@ export function CanvasArea({
         <Button
           variant="ghost"
           onClick={(e) => {
-             e.stopPropagation();
-             setIsAgentLogOpen(!isAgentLogOpen);
+            e.stopPropagation();
+            setIsAgentLogOpen(!isAgentLogOpen);
           }}
           className={cn(
-             "pointer-events-auto bg-background/50 border-border group flex items-center gap-2.5 rounded-full border px-4 h-10 text-[13px] font-medium text-muted-foreground backdrop-blur-md transition-all hover:bg-background/80 hover:text-foreground hover:shadow-lg",
-             isAgentLogOpen && "bg-background/80 text-foreground border-primary/20 shadow-lg"
+            "bg-background/50 border-border group text-muted-foreground hover:bg-background/80 hover:text-foreground pointer-events-auto flex h-10 items-center gap-2.5 rounded-full border px-4 text-[13px] font-medium backdrop-blur-md transition-all hover:shadow-lg",
+            isAgentLogOpen &&
+              "bg-background/80 text-foreground border-primary/20 shadow-lg",
           )}
         >
-          <Rocket className={cn("h-4 w-4 stroke-[1.5px] transition-colors", isAgentLogOpen ? "text-primary" : "text-muted-foreground")} />
+          <Rocket
+            className={cn(
+              "h-4 w-4 stroke-[1.5px] transition-colors",
+              isAgentLogOpen ? "text-primary" : "text-muted-foreground",
+            )}
+          />
           <span>Agent Log</span>
           {isAgentLogOpen ? (
             <ChevronDown className="h-4 w-4 opacity-50" />
@@ -1174,9 +1279,12 @@ export function CanvasArea({
       </div>
 
       {/* Floating Chat Input */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-4 z-[100] flex justify-center px-6" onMouseDown={(e) => e.stopPropagation()}>
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-4 z-[100] flex justify-center px-6"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <div className="pointer-events-auto w-full max-w-[600px]">
-          <div className="bg-background/70 border-border group/input flex flex-col gap-3 rounded-[24px] border p-3 shadow-2xl backdrop-blur-2xl transition-all focus-within:ring-1 focus-within:ring-primary/20">
+          <div className="bg-background/70 border-border group/input focus-within:ring-primary/20 flex flex-col gap-3 rounded-[24px] border p-3 shadow-2xl backdrop-blur-2xl transition-all focus-within:ring-1">
             <TooltipProvider>
               {/* Selected Artifacts Preview (Reference context) */}
               {selectedArtifactIds.size > 0 && (
@@ -1188,10 +1296,11 @@ export function CanvasArea({
                       <Tooltip key={id}>
                         <TooltipTrigger asChild>
                           <div className="group border-border bg-card/50 hover:border-primary/50 relative h-12 w-12 cursor-help overflow-hidden rounded-xl border shadow-sm transition-all hover:shadow-md">
-                             {art.type === "theme" ? (
-                              <div className="pointer-events-none flex h-full w-full flex-wrap p-0.5 gap-0.5 bg-card">
+                            {art.type === "theme" ? (
+                              <div className="bg-card pointer-events-none flex h-full w-full flex-wrap gap-0.5 p-0.5">
                                 {(() => {
-                                  const themeColors = (art.variables as any)?.colors || {
+                                  const themeColors = (art.variables as any)
+                                    ?.colors || {
                                     primary: "#3b82f6",
                                     secondary: "#10b981",
                                     accent: "#f59e0b",
@@ -1199,11 +1308,33 @@ export function CanvasArea({
                                   };
                                   return (
                                     <>
-                                      <div className="flex-1 min-w-[20px] h-full rounded-sm" style={{ backgroundColor: themeColors.primary }} />
-                                      <div className="flex-1 min-w-[20px] h-full rounded-sm" style={{ backgroundColor: themeColors.secondary }} />
-                                      <div className="w-full flex gap-0.5 mt-0.5">
-                                        <div className="flex-1 h-[18px] rounded-sm" style={{ backgroundColor: themeColors.accent }} />
-                                        <div className="flex-1 h-[18px] rounded-sm border border-border/30" style={{ backgroundColor: themeColors.background }} />
+                                      <div
+                                        className="h-full min-w-[20px] flex-1 rounded-sm"
+                                        style={{
+                                          backgroundColor: themeColors.primary,
+                                        }}
+                                      />
+                                      <div
+                                        className="h-full min-w-[20px] flex-1 rounded-sm"
+                                        style={{
+                                          backgroundColor:
+                                            themeColors.secondary,
+                                        }}
+                                      />
+                                      <div className="mt-0.5 flex w-full gap-0.5">
+                                        <div
+                                          className="h-[18px] flex-1 rounded-sm"
+                                          style={{
+                                            backgroundColor: themeColors.accent,
+                                          }}
+                                        />
+                                        <div
+                                          className="border-border/30 h-[18px] flex-1 rounded-sm border"
+                                          style={{
+                                            backgroundColor:
+                                              themeColors.background,
+                                          }}
+                                        />
                                       </div>
                                     </>
                                   );
@@ -1246,7 +1377,7 @@ export function CanvasArea({
                         </TooltipTrigger>
                         <TooltipContent
                           side="top"
-                          className="border-border bg-card text-xs font-bold text-foreground shadow-xl"
+                          className="border-border bg-card text-foreground text-xs font-bold shadow-xl"
                         >
                           Reference: {art.title || "Untitled Screen"}
                         </TooltipContent>
@@ -1268,7 +1399,7 @@ export function CanvasArea({
                     }
                   }}
                   placeholder="What would you like to change or create?"
-                  className="placeholder:text-muted-foreground/50 min-h-[1.5rem] w-full resize-none bg-transparent px-2 text-[14px] leading-relaxed text-foreground outline-none overflow-y-auto max-h-[160px]"
+                  className="placeholder:text-muted-foreground/50 text-foreground max-h-[160px] min-h-[1.5rem] w-full resize-none overflow-y-auto bg-transparent px-2 text-[14px] leading-relaxed outline-none"
                   rows={1}
                 />
 
@@ -1299,9 +1430,9 @@ export function CanvasArea({
                         <Button
                           variant="outline"
                           size="sm"
-                          className="bg-muted/40 border-border/50 text-foreground/80 hover:text-foreground flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[11px] font-semibold transition-all hover:bg-muted"
+                          className="bg-muted/40 border-border/50 text-foreground/80 hover:text-foreground hover:bg-muted flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[11px] font-semibold transition-all"
                         >
-                          <Palette className="h-3 w-3 text-primary opacity-80" />
+                          <Palette className="text-primary h-3 w-3 opacity-80" />
                           <span className="max-w-[80px] truncate">
                             {activeTheme ? activeTheme.title : "Select Theme"}
                           </span>
@@ -1320,18 +1451,25 @@ export function CanvasArea({
                                 onClick={() => handleSwitchTheme(theme.id!)}
                                 className={cn(
                                   "hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-2.5 py-1.5 text-[11.5px] font-medium",
-                                  theme.isActive && "text-primary font-semibold"
+                                  theme.isActive &&
+                                    "text-primary font-semibold",
                                 )}
                               >
-                                <div className="flex items-center gap-2 truncate max-w-[130px]">
+                                <div className="flex max-w-[130px] items-center gap-2 truncate">
                                   <div
-                                    className="size-3 rounded-full border shrink-0"
-                                    style={{ backgroundColor: theme.variables?.colors?.primary || "#6366f1" }}
+                                    className="size-3 shrink-0 rounded-full border"
+                                    style={{
+                                      backgroundColor:
+                                        theme.variables?.colors?.primary ||
+                                        "#6366f1",
+                                    }}
                                   />
-                                  <span className="truncate">{theme.title}</span>
+                                  <span className="truncate">
+                                    {theme.title}
+                                  </span>
                                 </div>
                                 {theme.isActive && (
-                                  <Check className="h-3 w-3 text-primary shrink-0" />
+                                  <Check className="text-primary h-3 w-3 shrink-0" />
                                 )}
                               </DropdownMenuItem>
                             ))}
@@ -1340,16 +1478,16 @@ export function CanvasArea({
                         )}
                         <DropdownMenuItem
                           onClick={() => setIsCustomThemeOpen(true)}
-                          className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 text-[11.5px] font-semibold text-foreground/80 hover:text-primary transition-colors"
+                          className="hover:bg-muted text-foreground/80 hover:text-primary flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 text-[11.5px] font-semibold transition-colors"
                         >
-                          <Plus className="h-3.5 w-3.5 text-primary opacity-80" />
+                          <Plus className="text-primary h-3.5 w-3.5 opacity-80" />
                           <span>Custom Theme</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => setIsCreateThemeOpen(true)}
-                          className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 text-[11.5px] font-semibold text-foreground/80 hover:text-primary transition-colors"
+                          className="hover:bg-muted text-foreground/80 hover:text-primary flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 text-[11.5px] font-semibold transition-colors"
                         >
-                          <Sparkles className="h-3.5 w-3.5 text-primary opacity-80" />
+                          <Sparkles className="text-primary h-3.5 w-3.5 opacity-80" />
                           <span>AI Theme</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -1368,7 +1506,7 @@ export function CanvasArea({
                         "h-9 w-9 shrink-0 rounded-full transition-all duration-300",
                         input.trim() || attachments.length > 0
                           ? "bg-primary text-primary-foreground hover:bg-primary/90 scale-100"
-                          : "bg-muted text-muted-foreground scale-90 opacity-40 cursor-not-allowed",
+                          : "bg-muted text-muted-foreground scale-90 cursor-not-allowed opacity-40",
                       )}
                     >
                       {isTalking ? (
@@ -1402,7 +1540,7 @@ export function CanvasArea({
                             prev.filter((_, i) => i !== idx),
                           )
                         }
-                        className="bg-background/80 hover:bg-destructive absolute top-1 right-1 flex size-5 items-center justify-center rounded-full text-foreground hover:text-destructive-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                        className="bg-background/80 hover:bg-destructive text-foreground hover:text-destructive-foreground absolute top-1 right-1 flex size-5 items-center justify-center rounded-full opacity-0 transition-opacity group-hover:opacity-100"
                       >
                         <X className="size-3" />
                       </button>
@@ -1432,7 +1570,10 @@ export function CanvasArea({
       <CanvasToolbar />
 
       {/* Bottom Right Controls */}
-      <div className="bg-card/85 border-border/40 pointer-events-auto absolute right-6 bottom-6 z-50 flex items-center gap-1 rounded-full border p-1.5 px-2 shadow-2xl backdrop-blur-xl hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300" onMouseDown={(e) => e.stopPropagation()}>
+      <div
+        className="bg-card/85 border-border/40 hover:shadow-primary/5 hover:border-primary/20 pointer-events-auto absolute right-6 bottom-6 z-50 flex items-center gap-1 rounded-full border p-1.5 px-2 shadow-2xl backdrop-blur-xl transition-all duration-300"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <Button
           variant="ghost"
           size="icon"
@@ -1442,7 +1583,7 @@ export function CanvasArea({
         >
           <ZoomOut className="h-4.5 w-4.5" />
         </Button>
-        <div className="text-muted-foreground font-mono text-[11px] font-bold min-w-[40px] text-center select-none">
+        <div className="text-muted-foreground min-w-[40px] text-center font-mono text-[11px] font-bold select-none">
           {Math.round(zoom * 100)}%
         </div>
         <Button
@@ -1469,7 +1610,6 @@ export function CanvasArea({
           <RotateCcw className="h-4.5 w-4.5" />
         </Button>
       </div>
-
 
       {/* QR Code Dialog */}
       <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
@@ -1513,22 +1653,24 @@ export function CanvasArea({
         <DialogContent className="bg-background border-border text-foreground rounded-3xl p-6 shadow-2xl sm:max-w-md">
           <DialogHeader className="space-y-2">
             <DialogTitle className="text-xl font-bold tracking-tight">
-               Create Theme (Design System)
+              Create Theme (Design System)
             </DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs leading-relaxed">
-               Describe the visual direction, base colors, and mood of the new style guide. The generator will create color ramps and typography tokens.
+              Describe the visual direction, base colors, and mood of the new
+              style guide. The generator will create color ramps and typography
+              tokens.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateThemeSubmit} className="space-y-4 pt-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-muted-foreground px-1">
-                 Creative Prompt
+              <label className="text-muted-foreground px-1 text-xs font-semibold">
+                Creative Prompt
               </label>
               <textarea
                 value={themePrompt}
                 onChange={(e) => setThemePrompt(e.target.value)}
                 placeholder="e.g. A retro cybernetic theme with neon green accents, dark charcoal cards, and futuristic monospaced headers..."
-                className="bg-secondary/40 border-border text-foreground placeholder:text-muted-foreground/40 focus:ring-primary/50 min-h-[100px] w-full rounded-2xl border px-4 py-3 text-xs leading-relaxed transition-all focus:ring-1 focus:outline-none resize-none"
+                className="bg-secondary/40 border-border text-foreground placeholder:text-muted-foreground/40 focus:ring-primary/50 min-h-[100px] w-full resize-none rounded-2xl border px-4 py-3 text-xs leading-relaxed transition-all focus:ring-1 focus:outline-none"
                 autoFocus
                 required
               />
@@ -1545,7 +1687,7 @@ export function CanvasArea({
               <Button
                 type="submit"
                 disabled={!themePrompt.trim()}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold transition-all shadow-md"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold shadow-md transition-all"
               >
                 Create Theme
               </Button>
@@ -1559,16 +1701,20 @@ export function CanvasArea({
         <DialogContent className="bg-background border-border text-foreground rounded-3xl p-6 shadow-2xl sm:max-w-md">
           <DialogHeader className="space-y-2">
             <DialogTitle className="text-xl font-bold tracking-tight">
-               Create Custom Theme
+              Create Custom Theme
             </DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs leading-relaxed">
-               Manually configure colors and typography tokens to establish your project's custom design system.
+              Manually configure colors and typography tokens to establish your
+              project's custom design system.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleCreateCustomThemeSubmit} className="space-y-4 pt-3">
+          <form
+            onSubmit={handleCreateCustomThemeSubmit}
+            className="space-y-4 pt-3"
+          >
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-muted-foreground px-1">
-                 Theme/Brand Name
+              <label className="text-muted-foreground px-1 text-xs font-semibold">
+                Theme/Brand Name
               </label>
               <input
                 type="text"
@@ -1583,47 +1729,96 @@ export function CanvasArea({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-muted-foreground px-1">Primary Color</label>
-                <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-1.5">
-                  <input type="color" value={customPrimary} onChange={(e) => setCustomPrimary(e.target.value)} className="w-6 h-6 rounded-full border-none cursor-pointer p-0 bg-transparent shrink-0" />
-                  <span className="text-[11px] font-mono uppercase text-foreground">{customPrimary}</span>
+                <label className="text-muted-foreground px-1 text-xs font-semibold">
+                  Primary Color
+                </label>
+                <div className="bg-secondary/40 border-border flex items-center gap-2 rounded-xl border px-3 py-1.5">
+                  <input
+                    type="color"
+                    value={customPrimary}
+                    onChange={(e) => setCustomPrimary(e.target.value)}
+                    className="h-6 w-6 shrink-0 cursor-pointer rounded-full border-none bg-transparent p-0"
+                  />
+                  <span className="text-foreground font-mono text-[11px] uppercase">
+                    {customPrimary}
+                  </span>
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-muted-foreground px-1">Secondary Color</label>
-                <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-1.5">
-                  <input type="color" value={customSecondary} onChange={(e) => setCustomSecondary(e.target.value)} className="w-6 h-6 rounded-full border-none cursor-pointer p-0 bg-transparent shrink-0" />
-                  <span className="text-[11px] font-mono uppercase text-foreground">{customSecondary}</span>
+                <label className="text-muted-foreground px-1 text-xs font-semibold">
+                  Secondary Color
+                </label>
+                <div className="bg-secondary/40 border-border flex items-center gap-2 rounded-xl border px-3 py-1.5">
+                  <input
+                    type="color"
+                    value={customSecondary}
+                    onChange={(e) => setCustomSecondary(e.target.value)}
+                    className="h-6 w-6 shrink-0 cursor-pointer rounded-full border-none bg-transparent p-0"
+                  />
+                  <span className="text-foreground font-mono text-[11px] uppercase">
+                    {customSecondary}
+                  </span>
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-muted-foreground px-1">Background Color</label>
-                <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-1.5">
-                  <input type="color" value={customBackground} onChange={(e) => setCustomBackground(e.target.value)} className="w-6 h-6 rounded-full border-none cursor-pointer p-0 bg-transparent shrink-0" />
-                  <span className="text-[11px] font-mono uppercase text-foreground">{customBackground}</span>
+                <label className="text-muted-foreground px-1 text-xs font-semibold">
+                  Background Color
+                </label>
+                <div className="bg-secondary/40 border-border flex items-center gap-2 rounded-xl border px-3 py-1.5">
+                  <input
+                    type="color"
+                    value={customBackground}
+                    onChange={(e) => setCustomBackground(e.target.value)}
+                    className="h-6 w-6 shrink-0 cursor-pointer rounded-full border-none bg-transparent p-0"
+                  />
+                  <span className="text-foreground font-mono text-[11px] uppercase">
+                    {customBackground}
+                  </span>
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-muted-foreground px-1">Foreground (Text)</label>
-                <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-1.5">
-                  <input type="color" value={customForeground} onChange={(e) => setCustomForeground(e.target.value)} className="w-6 h-6 rounded-full border-none cursor-pointer p-0 bg-transparent shrink-0" />
-                  <span className="text-[11px] font-mono uppercase text-foreground">{customForeground}</span>
+                <label className="text-muted-foreground px-1 text-xs font-semibold">
+                  Foreground (Text)
+                </label>
+                <div className="bg-secondary/40 border-border flex items-center gap-2 rounded-xl border px-3 py-1.5">
+                  <input
+                    type="color"
+                    value={customForeground}
+                    onChange={(e) => setCustomForeground(e.target.value)}
+                    className="h-6 w-6 shrink-0 cursor-pointer rounded-full border-none bg-transparent p-0"
+                  />
+                  <span className="text-foreground font-mono text-[11px] uppercase">
+                    {customForeground}
+                  </span>
                 </div>
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-muted-foreground px-1">Typography Font</label>
-              <Select value={customFont} onValueChange={(val) => setCustomFont(val)}>
-                <SelectTrigger className="w-full bg-secondary/40 border-border text-foreground rounded-xl h-9 text-xs">
+              <label className="text-muted-foreground px-1 text-xs font-semibold">
+                Typography Font
+              </label>
+              <Select
+                value={customFont}
+                onValueChange={(val) => setCustomFont(val)}
+              >
+                <SelectTrigger className="bg-secondary/40 border-border text-foreground h-9 w-full rounded-xl text-xs">
                   <SelectValue placeholder="Select a font" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-border text-foreground z-[150]">
                   <SelectItem value="Inter">Inter (Modern & Clean)</SelectItem>
-                  <SelectItem value="Poppins">Poppins (Friendly & Rounded)</SelectItem>
-                  <SelectItem value="Playfair Display">Playfair Display (Elegant Serif)</SelectItem>
-                  <SelectItem value="Fira Code">Fira Code (Futuristic Monospace)</SelectItem>
-                  <SelectItem value="Outfit">Outfit (Geometric & Bold)</SelectItem>
+                  <SelectItem value="Poppins">
+                    Poppins (Friendly & Rounded)
+                  </SelectItem>
+                  <SelectItem value="Playfair Display">
+                    Playfair Display (Elegant Serif)
+                  </SelectItem>
+                  <SelectItem value="Fira Code">
+                    Fira Code (Futuristic Monospace)
+                  </SelectItem>
+                  <SelectItem value="Outfit">
+                    Outfit (Geometric & Bold)
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1640,7 +1835,7 @@ export function CanvasArea({
               <Button
                 type="submit"
                 disabled={!customThemeName.trim()}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold transition-all shadow-md"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold shadow-md transition-all"
               >
                 Create Theme
               </Button>

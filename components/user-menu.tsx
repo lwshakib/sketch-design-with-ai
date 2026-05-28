@@ -22,12 +22,18 @@ export function UserMenu() {
 
   const { urlMap } = useSignedUrls(user?.image ? [user.image] : []);
   const resolvedAvatarUrl = user?.image
-    ? (user.image.startsWith("http") ? user.image : urlMap[user.image])
+    ? user.image.startsWith("http")
+      ? user.image
+      : urlMap[user.image]
     : null;
 
   if (!session || !user) {
     return (
-      <Button variant="outline" size="sm" onClick={() => router.push("/sign-in")}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => router.push("/sign-in")}
+      >
         Login
       </Button>
     );
@@ -50,7 +56,7 @@ export function UserMenu() {
               <img
                 src={resolvedAvatarUrl}
                 alt={user.name || "User"}
-                className="aspect-square h-full w-full object-cover rounded-full"
+                className="aspect-square h-full w-full rounded-full object-cover"
               />
             ) : (
               <AvatarFallback>{initials}</AvatarFallback>

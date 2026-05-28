@@ -16,7 +16,7 @@ export async function getAndResetCredits(userId: string) {
 
   const now = new Date();
   const lastReset = user.lastCreditReset;
-  
+
   // Reset if last reset was on a different day than today (today's start is > last reset)
   if (startOfDay(now).getTime() > startOfDay(lastReset).getTime()) {
     const updatedUser = await prisma.user.update({
@@ -40,7 +40,7 @@ export async function getAndResetCredits(userId: string) {
 export async function consumeCredit(userId: string) {
   // First ensure they are reset if needed
   await getAndResetCredits(userId);
-  
+
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { credits: true },

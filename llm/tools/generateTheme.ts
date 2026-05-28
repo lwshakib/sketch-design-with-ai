@@ -3,7 +3,8 @@ import { generateThemeSync } from "@/lib/generation";
 
 export const generateThemeTool = {
   name: "generateTheme",
-  description: "Generate a foundational Style Guide (Theme) screen for the project. MUST be called first before any other screen is generated.",
+  description:
+    "Generate a foundational Style Guide (Theme) screen for the project. MUST be called first before any other screen is generated.",
   parameters: {
     type: Type.OBJECT,
     properties: {
@@ -13,11 +14,13 @@ export const generateThemeTool = {
       },
       prompt: {
         type: Type.STRING,
-        description: "Instructions for base variables, colors, and typography scales based on the user's initial creative direction.",
+        description:
+          "Instructions for base variables, colors, and typography scales based on the user's initial creative direction.",
       },
       pendingScreenTitle: {
         type: Type.STRING,
-        description: "The title of the first functional screen to generate after the theme is established.",
+        description:
+          "The title of the first functional screen to generate after the theme is established.",
       },
       pendingScreenPrompt: {
         type: Type.STRING,
@@ -31,7 +34,14 @@ export const generateThemeTool = {
     },
     required: ["title", "prompt"],
   },
-  execute: async (args: any, context: { userId: string; projectId: string; onProgress?: (event: any) => void }) => {
+  execute: async (
+    args: any,
+    context: {
+      userId: string;
+      projectId: string;
+      onProgress?: (event: any) => void;
+    },
+  ) => {
     try {
       console.log(`[Tool: generateTheme] Initiating Theme Protocol`);
       const result = await generateThemeSync({
@@ -40,17 +50,19 @@ export const generateThemeTool = {
         prompt: args.prompt,
         userId: context.userId,
         onProgress: context.onProgress,
-        pendingScreen: args.pendingScreenTitle ? {
-           title: args.pendingScreenTitle,
-           prompt: args.pendingScreenPrompt,
-           type: args.pendingScreenType
-        } : undefined
+        pendingScreen: args.pendingScreenTitle
+          ? {
+              title: args.pendingScreenTitle,
+              prompt: args.pendingScreenPrompt,
+              type: args.pendingScreenType,
+            }
+          : undefined,
       });
 
       const hasPending = !!args.pendingScreenTitle;
       return {
         status: "success",
-        message: hasPending 
+        message: hasPending
           ? `Theme protocol completed. The Style Guide has been successfully generated. Additionally, the first functional screen "${args.pendingScreenTitle}" has also been successfully generated. Do NOT call generateScreen for "${args.pendingScreenTitle}" as it is already created and present on the canvas.`
           : `Theme protocol completed. The Style Guide has been successfully generated.`,
         theme: result.theme,

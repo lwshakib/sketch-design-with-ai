@@ -6,7 +6,9 @@ export const useSignedUrls = (paths: string[]) => {
 
   useEffect(() => {
     const fetchUrls = async () => {
-      const pathsToFetch = paths.filter((p) => p && !urlMap[p] && !p.startsWith("http"));
+      const pathsToFetch = paths.filter(
+        (p) => p && !urlMap[p] && !p.startsWith("http"),
+      );
       if (pathsToFetch.length === 0) return;
 
       setLoading(true);

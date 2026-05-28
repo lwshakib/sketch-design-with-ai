@@ -15,9 +15,7 @@ export const ModernShimmer = ({
 }) => {
   const _isWeb = type === "web";
   return (
-    <div
-      className="pointer-events-none absolute inset-0 z-50 flex flex-col gap-10 overflow-hidden p-10 bg-background"
-    >
+    <div className="bg-background pointer-events-none absolute inset-0 z-50 flex flex-col gap-10 overflow-hidden p-10">
       {/* Standard Shimmer Overlay */}
       <div
         className="absolute inset-0"

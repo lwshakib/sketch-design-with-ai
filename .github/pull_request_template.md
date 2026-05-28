@@ -9,6 +9,7 @@ Provide a detailed summary of the changes introduced in this Pull Request, inclu
 ## How to Verify / Test
 
 Explain step-by-step how to manually test your changes:
+
 1. ...
 2. ...
 

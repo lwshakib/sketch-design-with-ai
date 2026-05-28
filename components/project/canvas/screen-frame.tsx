@@ -43,16 +43,19 @@ export const ScreenFrame = React.memo(
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const activeTheme = useProjectStore(
       useCallback(
-        (state) => state.artifacts.find((a) => a.type === "theme" && a.isActive),
+        (state) =>
+          state.artifacts.find((a) => a.type === "theme" && a.isActive),
         [],
-      )
+      ),
     );
 
     /**
      * Initial content set only once to avoid reloads.
      * Subsequent updates happen via window.postMessage.
      */
-    const [initialSrcDoc] = useState(() => getInjectedHTML(artifact.html, activeTheme?.variables));
+    const [initialSrcDoc] = useState(() =>
+      getInjectedHTML(artifact.html, activeTheme?.variables),
+    );
     const lastContentRef = useRef(artifact.html);
 
     // Use useEffect to handle content updates via postMessage instead of srcDoc
@@ -89,20 +92,20 @@ export const ScreenFrame = React.memo(
         }
       }
     }, [artifact.html, artifact.isComplete]);
-    
+
     const effectivelyInEditMode = isEditMode || activeTool === "edit";
 
     // Synchronize edit mode with the iframe internal state
     useEffect(() => {
-        if (iframeRef.current?.contentWindow) {
-            iframeRef.current.contentWindow.postMessage(
-              {
-                type: "SET_EDIT_MODE",
-                enabled: effectivelyInEditMode,
-              },
-              "*",
-            );
-        }
+      if (iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(
+          {
+            type: "SET_EDIT_MODE",
+            enabled: effectivelyInEditMode,
+          },
+          "*",
+        );
+      }
     }, [effectivelyInEditMode]);
 
     // Synchronize theme variables
@@ -142,9 +145,11 @@ export const ScreenFrame = React.memo(
         scrolling="no"
         className={cn(
           "h-full w-full overflow-hidden border-none",
-          (activeTool === "edit" || effectivelyInEditMode) 
+          activeTool === "edit" || effectivelyInEditMode
             ? "pointer-events-auto"
-            : (activeTool === "select" || activeTool === "hand" || isDraggingFrame)
+            : activeTool === "select" ||
+                activeTool === "hand" ||
+                isDraggingFrame
               ? "pointer-events-none"
               : "pointer-events-auto",
         )}

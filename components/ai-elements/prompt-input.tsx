@@ -806,13 +806,10 @@ export const PromptInput = ({
         title="Upload files"
         type="file"
       />
-      <form
-        className="w-full"
-        onSubmit={handleSubmit}
-        ref={formRef}
-        {...props}
-      >
-        <InputGroup className={cn("overflow-hidden", className)}>{children}</InputGroup>
+      <form className="w-full" onSubmit={handleSubmit} ref={formRef} {...props}>
+        <InputGroup className={cn("overflow-hidden", className)}>
+          {children}
+        </InputGroup>
       </form>
     </>
   );
@@ -1152,7 +1149,10 @@ export const PromptInputSpeechButton = ({
 
   useEffect(() => {
     return () => {
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      if (
+        mediaRecorderRef.current &&
+        mediaRecorderRef.current.state !== "inactive"
+      ) {
         mediaRecorderRef.current.stop();
       }
     };
@@ -1203,8 +1203,7 @@ export const PromptInputSpeechButton = ({
             } else if (textareaRef?.current) {
               const textarea = textareaRef.current;
               const currentValue = textarea.value;
-              newValue =
-                currentValue + (currentValue ? " " : "") + transcript;
+              newValue = currentValue + (currentValue ? " " : "") + transcript;
 
               textarea.value = newValue;
               textarea.dispatchEvent(new Event("input", { bubbles: true }));
@@ -1244,7 +1243,8 @@ export const PromptInputSpeechButton = ({
     <PromptInputButton
       className={cn(
         "relative transition-all duration-200",
-        isRecording && "bg-destructive text-destructive-foreground hover:bg-destructive/80 animate-pulse",
+        isRecording &&
+          "bg-destructive text-destructive-foreground hover:bg-destructive/80 animate-pulse",
         className,
       )}
       disabled={isTranscribing}

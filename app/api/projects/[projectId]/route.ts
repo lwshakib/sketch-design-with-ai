@@ -53,7 +53,7 @@ export async function GET(
       screens: undefined, // Clear out the split arrays
       themes: undefined,
       artifacts: [
-        ...project.themes.map(t => ({
+        ...project.themes.map((t) => ({
           id: t.id,
           type: "theme",
           title: t.name,
@@ -66,13 +66,13 @@ export async function GET(
           updatedAt: t.updatedAt,
           isComplete: true,
           status: "completed",
-          isActive: t.isActive
+          isActive: t.isActive,
         })),
-        ...project.screens.map(s => ({
+        ...project.screens.map((s) => ({
           ...s,
-          isComplete: s.status === "completed"
-        }))
-      ]
+          isComplete: s.status === "completed",
+        })),
+      ],
     };
 
     return NextResponse.json(mergedProject);

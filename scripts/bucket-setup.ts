@@ -1,4 +1,9 @@
-import { S3Client, CreateBucketCommand, PutBucketCorsCommand, HeadBucketCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  CreateBucketCommand,
+  PutBucketCorsCommand,
+  HeadBucketCommand,
+} from "@aws-sdk/client-s3";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -30,7 +35,10 @@ async function setupBucket() {
       await s3Client.send(new HeadBucketCommand({ Bucket: bucketName }));
       console.log(`Bucket "${bucketName}" already exists.`);
     } catch (error: any) {
-      if (error.name === "NotFound" || error.$metadata?.httpStatusCode === 404) {
+      if (
+        error.name === "NotFound" ||
+        error.$metadata?.httpStatusCode === 404
+      ) {
         console.log(`Creating bucket "${bucketName}"...`);
         await s3Client.send(new CreateBucketCommand({ Bucket: bucketName }));
         console.log(`Bucket "${bucketName}" created successfully.`);
@@ -58,7 +66,6 @@ async function setupBucket() {
 
     await s3Client.send(new PutBucketCorsCommand(corsConfiguration));
     console.log("CORS configuration set successfully.");
-
   } catch (error) {
     console.error("Error setting up bucket:", error);
     process.exit(1);

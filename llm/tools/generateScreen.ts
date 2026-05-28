@@ -3,17 +3,20 @@ import { generateScreenSync } from "@/lib/generation";
 
 export const generateScreenTool = {
   name: "generateScreen",
-  description: "Generate a new design screen based on architectural and visual descriptions. Call this once for each new screen you want to create.",
+  description:
+    "Generate a new design screen based on architectural and visual descriptions. Call this once for each new screen you want to create.",
   parameters: {
     type: Type.OBJECT,
     properties: {
       title: {
         type: Type.STRING,
-        description: "A concise title for the screen (e.g. 'Hero Section', 'Project Dashboard').",
+        description:
+          "A concise title for the screen (e.g. 'Hero Section', 'Project Dashboard').",
       },
       prompt: {
         type: Type.STRING,
-        description: "Comprehensive instructions for the screen layout (left/right/top/bottom), components, and style.",
+        description:
+          "Comprehensive instructions for the screen layout (left/right/top/bottom), components, and style.",
       },
       type: {
         type: Type.STRING,
@@ -23,7 +26,14 @@ export const generateScreenTool = {
     },
     required: ["title", "prompt", "type"],
   },
-  execute: async (args: any, context: { userId: string; projectId: string; onProgress?: (event: any) => void }) => {
+  execute: async (
+    args: any,
+    context: {
+      userId: string;
+      projectId: string;
+      onProgress?: (event: any) => void;
+    },
+  ) => {
     try {
       console.log(`[Tool: generateScreen] Initiating for: ${args.title}`);
       const result = await generateScreenSync({

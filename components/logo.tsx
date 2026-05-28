@@ -40,18 +40,18 @@ export const CustomTextLogo = ({
   return (
     <div
       className={cn(
-        "relative flex items-center select-none tracking-tighter font-outfit",
+        "font-outfit relative flex items-center tracking-tighter select-none",
         className,
       )}
       style={{ fontSize: size }}
     >
-      <span className="font-black text-foreground transition-all duration-300 hover:tracking-normal">
+      <span className="text-foreground font-black transition-all duration-300 hover:tracking-normal">
         Ske
         <span className="from-primary to-primary/60 bg-gradient-to-br bg-clip-text text-transparent">
           tch
         </span>
       </span>
-      <div className="bg-primary absolute -right-2 top-1 h-1.5 w-1.5 rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
+      <div className="bg-primary absolute top-1 -right-2 h-1.5 w-1.5 rounded-full shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
     </div>
   );
 };

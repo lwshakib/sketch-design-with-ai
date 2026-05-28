@@ -1,9 +1,9 @@
-import { 
-  S3Client, 
-  DeleteBucketCommand, 
-  ListObjectsV2Command, 
+import {
+  S3Client,
+  DeleteBucketCommand,
+  ListObjectsV2Command,
   DeleteObjectsCommand,
-  HeadBucketCommand
+  HeadBucketCommand,
 } from "@aws-sdk/client-s3";
 import * as dotenv from "dotenv";
 
@@ -35,8 +35,13 @@ async function teardownBucket() {
     try {
       await s3Client.send(new HeadBucketCommand({ Bucket: bucketName }));
     } catch (error: any) {
-      if (error.name === "NotFound" || error.$metadata?.httpStatusCode === 404) {
-        console.log(`Bucket "${bucketName}" does not exist. Nothing to teardown.`);
+      if (
+        error.name === "NotFound" ||
+        error.$metadata?.httpStatusCode === 404
+      ) {
+        console.log(
+          `Bucket "${bucketName}" does not exist. Nothing to teardown.`,
+        );
         return;
       }
       throw error;
@@ -77,7 +82,6 @@ async function teardownBucket() {
     console.log(`Deleting bucket "${bucketName}"...`);
     await s3Client.send(new DeleteBucketCommand({ Bucket: bucketName }));
     console.log(`Bucket "${bucketName}" deleted successfully.`);
-
   } catch (error) {
     console.error("Error tearing down bucket:", error);
     process.exit(1);

@@ -61,7 +61,8 @@ const groupProjectsByDate = (projects: any[]) => {
 };
 
 export default function ProjectsPage() {
-  const { data: session, isPending: isSessionPending } = authClient.useSession();
+  const { data: session, isPending: isSessionPending } =
+    authClient.useSession();
   const router = useRouter();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,7 +70,10 @@ export default function ProjectsPage() {
   const debouncedSearch = useDebounce(searchQuery, 300);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [projectToDelete, setProjectToDelete] = useState<{ id: string, title: string } | null>(null);
+  const [projectToDelete, setProjectToDelete] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!isSessionPending && !session) {
@@ -97,7 +101,10 @@ export default function ProjectsPage() {
     fetchProjects();
   }, [session, debouncedSearch]);
 
-  const handleDeleteClick = (project: { id: string, title: string }, e: React.MouseEvent) => {
+  const handleDeleteClick = (
+    project: { id: string; title: string },
+    e: React.MouseEvent,
+  ) => {
     e.stopPropagation();
     setProjectToDelete(project);
     setIsDeleteDialogOpen(true);
@@ -105,7 +112,7 @@ export default function ProjectsPage() {
 
   const confirmDelete = async () => {
     if (!projectToDelete) return;
-    
+
     try {
       await axios.delete(`/api/projects/${projectToDelete.id}`);
       setProjects((prev) => prev.filter((p) => p.id !== projectToDelete.id));
@@ -129,9 +136,9 @@ export default function ProjectsPage() {
   const sections = groupProjectsByDate(projects);
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary/30 font-sans transition-colors duration-500">
+    <div className="bg-background text-foreground selection:bg-primary/30 min-h-screen font-sans transition-colors duration-500">
       {/* Unified Header */}
-      <header className="z-40 flex w-full items-center justify-between bg-background/50 px-6 py-4 backdrop-blur-md">
+      <header className="bg-background/50 z-40 flex w-full items-center justify-between px-6 py-4 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <Logo />
         </div>
@@ -146,10 +153,10 @@ export default function ProjectsPage() {
           {/* Page Header */}
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold tracking-tight">My Projects</h1>
-            <Button 
+            <Button
               variant="outline"
-              onClick={() => router.push("/")} 
-              className="rounded-full px-5 h-9 text-sm font-medium border-border/60 hover:bg-secondary transition-colors"
+              onClick={() => router.push("/")}
+              className="border-border/60 hover:bg-secondary h-9 rounded-full px-5 text-sm font-medium transition-colors"
             >
               <Plus className="mr-2 h-3.5 w-3.5" />
               New Project
@@ -164,14 +171,14 @@ export default function ProjectsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search your library..."
-              className="bg-secondary/40 border-border text-foreground placeholder:text-muted-foreground focus:border-primary/50 w-full rounded-2xl border py-2.5 pr-4 pl-11 text-sm font-medium transition-all outline-none focus:ring-4 focus:ring-primary/5"
+              className="bg-secondary/40 border-border text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:ring-primary/5 w-full rounded-2xl border py-2.5 pr-4 pl-11 text-sm font-medium transition-all outline-none focus:ring-4"
             />
           </div>
 
           <div className="space-y-10">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-primary opacity-30" />
+                <Loader2 className="text-primary h-8 w-8 animate-spin opacity-30" />
               </div>
             ) : projects.length === 0 ? (
               <div className="flex flex-col items-center justify-center space-y-4 py-24 text-center">
@@ -179,13 +186,15 @@ export default function ProjectsPage() {
                   <LayoutGrid className="text-muted-foreground/50 h-7 w-7" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">No projects found</p>
+                  <p className="text-muted-foreground text-sm font-medium">
+                    No projects found
+                  </p>
                 </div>
               </div>
             ) : (
               sections.map((section) => (
                 <div key={section.title} className="space-y-4">
-                  <h4 className="text-muted-foreground px-2 text-[11px] font-bold uppercase tracking-wider">
+                  <h4 className="text-muted-foreground px-2 text-[11px] font-bold tracking-wider uppercase">
                     {section.title}
                   </h4>
                   <div className="space-y-1">
@@ -238,7 +247,7 @@ export default function ProjectsPage() {
                           </div>
 
                           <div className="min-w-0 flex-1">
-                            <span className="text-foreground block truncate text-base font-bold leading-none">
+                            <span className="text-foreground block truncate text-base leading-none font-bold">
                               {item.title}
                             </span>
                             <p className="text-muted-foreground mt-1.5 block text-xs font-medium">
@@ -247,15 +256,20 @@ export default function ProjectsPage() {
                           </div>
 
                           {/* Subtle Delete Trigger */}
-                          <div className="opacity-0 group-hover/item:opacity-100 transition-opacity pr-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive"
-                                onClick={(e) => handleDeleteClick({ id: item.id, title: item.title }, e)}
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </Button>
+                          <div className="pr-2 opacity-0 transition-opacity group-hover/item:opacity-100">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="hover:bg-destructive/10 hover:text-destructive h-8 w-8 rounded-full"
+                              onClick={(e) =>
+                                handleDeleteClick(
+                                  { id: item.id, title: item.title },
+                                  e,
+                                )
+                              }
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
                           </div>
                         </button>
                       </motion.div>
@@ -269,7 +283,10 @@ export default function ProjectsPage() {
       </main>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent className="bg-background border-border text-foreground max-w-[400px] rounded-2xl border p-6 shadow-xl">
           <AlertDialogHeader className="space-y-1.5">
             <AlertDialogTitle className="text-lg font-semibold tracking-tight">
@@ -279,7 +296,9 @@ export default function ProjectsPage() {
               Are you sure you want to delete{" "}
               <span className="text-foreground font-medium">
                 "{projectToDelete?.title}"
-              </span>? This will permanently remove all associated screens and cannot be undone.
+              </span>
+              ? This will permanently remove all associated screens and cannot
+              be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-5 flex flex-row items-center gap-2">
@@ -288,7 +307,7 @@ export default function ProjectsPage() {
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-red-600 text-white hover:bg-red-700 h-9 flex-1 rounded-lg border-none text-xs font-medium transition-colors shadow-none"
+              className="h-9 flex-1 rounded-lg border-none bg-red-600 text-xs font-medium text-white shadow-none transition-colors hover:bg-red-700"
             >
               Delete Project
             </AlertDialogAction>

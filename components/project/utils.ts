@@ -23,7 +23,7 @@ export const getInjectedHTML = (html: string, themeVariables?: any) => {
   if (themeVariables) {
     const colors = themeVariables.colors || {};
     const typography = themeVariables.typography || {};
-    
+
     let bg = colors.background || "#ffffff";
     bg = bg.replace(/^#/, "");
     if (bg.length > 6) bg = bg.substring(0, 6);
@@ -36,7 +36,9 @@ export const getInjectedHTML = (html: string, themeVariables?: any) => {
       const yiq = (r * 299 + g * 587 + b * 114) / 1000;
       isDark = yiq < 128;
     }
-    const borderVal = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.08)";
+    const borderVal = isDark
+      ? "rgba(255, 255, 255, 0.08)"
+      : "rgba(0, 0, 0, 0.08)";
     const cardVal = isDark ? "#141414" : "#ffffff";
 
     themeStyle = `

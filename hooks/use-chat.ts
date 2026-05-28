@@ -46,7 +46,7 @@ export const useChat = (projectId: string) => {
 
       const imagePaths =
         params.files?.map((f: any) => f.path || f.url).filter(Boolean) || [];
-      
+
       const newUserMessage = {
         id: `u-${Date.now()}`,
         role: "user" as const,
@@ -147,7 +147,10 @@ export const useChat = (projectId: string) => {
                     );
                     updated[idx] = {
                       ...updated[idx],
-                      parts: [...filtered, { type: "text", text: assistantContent }],
+                      parts: [
+                        ...filtered,
+                        { type: "text", text: assistantContent },
+                      ],
                       status: "streaming" as any,
                     };
                   }
@@ -191,9 +194,14 @@ export const useChat = (projectId: string) => {
                   if (result.messageId) {
                     setMessages((prev) => {
                       const updated = [...prev];
-                      const idx = updated.findIndex((m) => m.id === assistantId);
+                      const idx = updated.findIndex(
+                        (m) => m.id === assistantId,
+                      );
                       if (idx !== -1) {
-                        updated[idx] = { ...updated[idx], id: result.messageId };
+                        updated[idx] = {
+                          ...updated[idx],
+                          id: result.messageId,
+                        };
                       }
                       return updated;
                     });
@@ -213,29 +221,37 @@ export const useChat = (projectId: string) => {
                   const { screenId, html } = data[0];
                   const state = useProjectStore.getState();
                   state.setArtifacts((prev) =>
-                    prev.map((a) => (a.id === screenId ? { ...a, html } : a))
+                    prev.map((a) => (a.id === screenId ? { ...a, html } : a)),
                   );
                   state.setThrottledArtifacts((prev) =>
-                    prev.map((a) => (a.id === screenId ? { ...a, html } : a))
+                    prev.map((a) => (a.id === screenId ? { ...a, html } : a)),
                   );
                 } else if (data?.[0]?.type === "theme-created") {
-                  const theme = { ...data[0].theme, isActive: true, isComplete: true };
+                  const theme = {
+                    ...data[0].theme,
+                    isActive: true,
+                    isComplete: true,
+                  };
                   const state = useProjectStore.getState();
                   state.setArtifacts((prev) => {
                     const filtered = prev.map((a) =>
-                      a.type === "theme" ? { ...a, isActive: false } : a
+                      a.type === "theme" ? { ...a, isActive: false } : a,
                     );
                     if (filtered.some((a) => a.id === theme.id)) {
-                      return filtered.map((a) => a.id === theme.id ? theme : a);
+                      return filtered.map((a) =>
+                        a.id === theme.id ? theme : a,
+                      );
                     }
                     return [...filtered, theme];
                   });
                   state.setThrottledArtifacts((prev) => {
                     const filtered = prev.map((a) =>
-                      a.type === "theme" ? { ...a, isActive: false } : a
+                      a.type === "theme" ? { ...a, isActive: false } : a,
                     );
                     if (filtered.some((a) => a.id === theme.id)) {
-                      return filtered.map((a) => a.id === theme.id ? theme : a);
+                      return filtered.map((a) =>
+                        a.id === theme.id ? theme : a,
+                      );
                     }
                     return [...filtered, theme];
                   });
@@ -245,24 +261,36 @@ export const useChat = (projectId: string) => {
                   state.setArtifacts((prev) =>
                     prev.map((a) => {
                       if (a.id === themeId) {
-                        return { ...a, title, variables, isActive: true, isComplete: true };
+                        return {
+                          ...a,
+                          title,
+                          variables,
+                          isActive: true,
+                          isComplete: true,
+                        };
                       }
                       if (a.type === "theme") {
                         return { ...a, isActive: false };
                       }
                       return a;
-                    })
+                    }),
                   );
                   state.setThrottledArtifacts((prev) =>
                     prev.map((a) => {
                       if (a.id === themeId) {
-                        return { ...a, title, variables, isActive: true, isComplete: true };
+                        return {
+                          ...a,
+                          title,
+                          variables,
+                          isActive: true,
+                          isComplete: true,
+                        };
                       }
                       if (a.type === "theme") {
                         return { ...a, isActive: false };
                       }
                       return a;
-                    })
+                    }),
                   );
                 }
               } catch (e) {
@@ -273,9 +301,9 @@ export const useChat = (projectId: string) => {
                 // Parse it just to consume the payload, but we won't show raw errors to the user
                 JSON.parse(line.slice(2));
                 toast.error("AI Engine Failed", {
-                  description: "Internal server error. Please try again."
+                  description: "Internal server error. Please try again.",
                 });
-                
+
                 // Immediately set message status to error and stop generation
                 setIsGenerating(false);
                 setMessages((prev) => {
@@ -324,9 +352,11 @@ export const useChat = (projectId: string) => {
             }
           }
         } catch (fetchErr) {
-          console.error("Failed to sync project artifacts synchronously:", fetchErr);
+          console.error(
+            "Failed to sync project artifacts synchronously:",
+            fetchErr,
+          );
         }
-
       } catch (err) {
         console.error("Chat error:", err);
         setIsGenerating(false);
@@ -343,7 +373,7 @@ export const useChat = (projectId: string) => {
       setIsAgentLogOpen,
       setSelectedTurnId,
       setIsTurnDetailVisible,
-    ]
+    ],
   );
 
   return {
