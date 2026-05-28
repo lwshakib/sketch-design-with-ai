@@ -437,7 +437,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
 
     const artifactWidth =
       artifact.width || (artifact.type === "app" ? 380 : 1024);
-    const artifactHeight = artifact.height || 800;
+    const artifactHeight = artifact.height || (artifact.type === "theme" ? 672 : 800);
 
     const targetX =
       -(framePos.x + (artifact.x || 0) + artifactWidth / 2) * effectiveScale;

@@ -52,38 +52,38 @@ export const generateScreen = inngest.createFunction(
       // --- STEP 2: INITIAL PERSISTENCE ---
       // Position the screen and create placeholder in DB
       const dbScreen = await step.run("init-screen-placeholder", async () => {
-        const lastScreen = await prisma.screen.findFirst({
-          where: { projectId },
-          orderBy: { x: "desc" },
-        });
-        const lastTheme = await prisma.theme.findFirst({
-          where: { projectId },
-          orderBy: { x: "desc" },
-        });
+        // Fetch all existing screens and themes in the project
+        const [screens, themes] = await Promise.all([
+          prisma.screen.findMany({ where: { projectId } }),
+          prisma.theme.findMany({ where: { projectId } }),
+        ]);
 
-        let lastX = null;
-        let lastWidth = 1280;
+        // Find active theme or last theme to determine row Y
+        const activeTheme = themes.find(t => t.isActive) || themes[themes.length - 1];
+        const targetY = activeTheme ? activeTheme.y : -((type === "web" ? 700 : 800) / 2);
 
-        if (lastScreen && lastTheme) {
-          if (lastScreen.x > lastTheme.x) {
-            lastX = lastScreen.x;
-            lastWidth = lastScreen.width || (lastScreen.type === "web" ? 1280 : 380);
-          } else {
-            lastX = lastTheme.x;
-            lastWidth = lastTheme.width || 1280;
-          }
-        } else if (lastScreen) {
-          lastX = lastScreen.x;
-          lastWidth = lastScreen.width || (lastScreen.type === "web" ? 1280 : 380);
-        } else if (lastTheme) {
-          lastX = lastTheme.x;
-          lastWidth = lastTheme.width || 1280;
-        }
+        const allArtifacts = [
+          ...screens.map(s => ({ x: s.x, y: s.y, width: s.width, type: s.type })),
+          ...themes.map(t => ({ x: t.x, y: t.y, width: t.width || 1200, type: "theme" })),
+        ];
 
-        // Use standard screen type and width
+        // Find elements on the same row (within 500px of targetY)
+        const rowElements = allArtifacts.filter((a) => a.y !== null && Math.abs(a.y - targetY) < 500);
+
+        let currentX;
         const width = type === "web" ? 1280 : 380;
-        const currentX = lastX !== null ? lastX + lastWidth + 120 : -width / 2;
-        const currentY = -((type === "web" ? 700 : 800) / 2);
+        if (rowElements.length === 0) {
+          currentX = -width / 2;
+        } else {
+          let maxX = -99999;
+          rowElements.forEach((el) => {
+            const getWidth = (t: string) => (t === "app" ? 380 : t === "web" ? 1280 : 1200);
+            const w = el.width || getWidth(el.type);
+            const right = (el.x || 0) + w;
+            if (right > maxX) maxX = right;
+          });
+          currentX = maxX + 120;
+        }
 
         return await prisma.screen.create({
           data: {
@@ -93,7 +93,7 @@ export const generateScreen = inngest.createFunction(
             type: type as any,
             status: "generating",
             x: currentX,
-            y: currentY,
+            y: targetY,
             width,
             height: null,
           },
@@ -109,13 +109,20 @@ export const generateScreen = inngest.createFunction(
         currentScreen: title,
         screenId: dbScreen.id,
         type: type, // Pass the type here
+        x: dbScreen.x,
+        y: dbScreen.y,
       });
 
       // --- STEP 3: GENERATE SCREEN CODE ---
       const htmlCode = await step.run("generate-screen-code", async () => {
+        const platformInstruction = type === "app"
+          ? "CRITICAL PLATFORM DIRECTIVE: You are generating a MOBILE APP UI (Viewport: 380px width, 800px height). You MUST design it strictly as a native mobile app screen, NOT a desktop website. Use compact elements: a mobile status bar (time, signal, battery icons), a clean header with a back button and title, vertical lists, swipable or tabbed selectors, a sticky bottom tab navigation bar (Home, Search, Cart, Profile), and high-contrast call-to-actions. Avoid wide desktop grid columns, large cards with p-12 padding, and horizontal top navigation links."
+          : "CRITICAL PLATFORM DIRECTIVE: You are generating a WEB PAGE/WEB APP UI (Desktop/Responsive layout). Use a full-bleed grid layout, responsive bento structure, horizontal top navigation header with branding and menu options, desktop search bars, and full-scale dashboard/landing page sections.";
+
         const systemPrompt =
           ScreenGenerationPrompt +
-          "\n\nCRITICAL: You are generating a single, high-fidelity screen. Do not use placeholders. Ensure all content is realistic.";
+          "\n\nCRITICAL: You are generating a single, high-fidelity screen. Do not use placeholders. Ensure all content is realistic." +
+          `\n\n${platformInstruction}`;
 
         // Fetch the project's active theme
         let themeContext = "";
@@ -324,36 +331,23 @@ export const generateThemeFlow = inngest.createFunction(
            data: { isActive: false }
         });
 
-        const lastScreen = await prisma.screen.findFirst({
+        const themes = await prisma.theme.findMany({
           where: { projectId },
-          orderBy: { x: "desc" },
-        });
-        const lastTheme = await prisma.theme.findFirst({
-          where: { projectId },
-          orderBy: { x: "desc" },
         });
 
-        let lastX = null;
-        let lastWidth = 1280;
-
-        if (lastScreen && lastTheme) {
-          if (lastScreen.x > lastTheme.x) {
-            lastX = lastScreen.x;
-            lastWidth = lastScreen.width || (lastScreen.type === "web" ? 1280 : 380);
-          } else {
-            lastX = lastTheme.x;
-            lastWidth = lastTheme.width || 1280;
+        const getRowY = (n: number) => -400 + (n - 1) * 1000;
+        let chosenRow = 1;
+        while (true) {
+          const yCenter = getRowY(chosenRow);
+          const isOccupied = themes.some(t => Math.abs(t.y - yCenter) < 500);
+          if (!isOccupied) {
+            break;
           }
-        } else if (lastScreen) {
-          lastX = lastScreen.x;
-          lastWidth = lastScreen.width || (lastScreen.type === "web" ? 1280 : 380);
-        } else if (lastTheme) {
-          lastX = lastTheme.x;
-          lastWidth = lastTheme.width || 1280;
+          chosenRow++;
         }
 
-        const currentX = lastX !== null ? lastX + lastWidth + 120 : -1280 / 2;
-        const currentY = -700 / 2;
+        const currentY = getRowY(chosenRow);
+        const currentX = -1200 / 2; // Theme width is 1200
       
         return await prisma.theme.create({
           data: {
@@ -376,6 +370,8 @@ export const generateThemeFlow = inngest.createFunction(
         currentScreen: "Theme",
         screenId: dbTheme.id,
         type: "theme",
+        x: dbTheme.x,
+        y: dbTheme.y,
       });
 
       // Generate JSON Variables
@@ -422,7 +418,8 @@ export const generateThemeFlow = inngest.createFunction(
            variables: finalTheme.variables,
            x: finalTheme.x,
            y: finalTheme.y,
-           isComplete: true
+           isComplete: true,
+           isActive: true
         } as any, 
       });
 

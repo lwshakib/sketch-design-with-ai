@@ -40,17 +40,23 @@ export async function processMessages(messages: any[]): Promise<GeminiContent[]>
         };
       }
 
-      // Handle part-based or array content
-      if (Array.isArray(msg.content)) {
+      const rawParts = Array.isArray(msg.content)
+        ? msg.content
+        : Array.isArray(msg.parts)
+          ? msg.parts
+          : null;
+
+      if (rawParts) {
         let imageCount = 0;
         const parts = await Promise.all(
-          msg.content.map(async (part: any) => {
-            if (part.type === "text") {
-              return { text: part.text };
+          rawParts.map(async (part: any) => {
+            if (part.type === "text" || part.text) {
+              return { text: part.text || part.content };
             }
 
-            if (part.type === "image_url") {
-              const url = part.image_url.url;
+            const isImage = part.type === "image" || part.type === "image_url";
+            if (isImage) {
+              const url = part.path || part.image_url?.url || part.url;
               if (!url) return null;
 
               if (url.startsWith("data:")) {
@@ -101,22 +107,6 @@ export async function processMessages(messages: any[]): Promise<GeminiContent[]>
         return {
           role,
           parts: parts.filter(Boolean) as GeminiPart[],
-        };
-      }
-
-      // If parts exist directly in the message structure
-      if (Array.isArray(msg.parts)) {
-        const parts = msg.parts.map((part: any) => {
-          if (part.type === "text" || part.text) {
-            return { text: part.text || part.content };
-          }
-          // Handle other direct parts if any
-          return null;
-        }).filter(Boolean) as GeminiPart[];
-
-        return {
-          role,
-          parts,
         };
       }
 

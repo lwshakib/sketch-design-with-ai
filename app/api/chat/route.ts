@@ -6,6 +6,7 @@ import { UX_AGENT_SYSTEM_PROMPT } from "@/lib/prompts";
 import { processMessages } from "@/llm/utils";
 import { streamText } from "@/llm/streamText";
 import { getAndResetCredits } from "@/lib/credits";
+import { generateText } from "@/llm/generateText";
 
 export async function POST(req: Request) {
   try {
@@ -36,7 +37,45 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
+    const messagesCount = await prisma.message.count({
+      where: { projectId }
+    });
+
     const lastUserMessage = messages?.[messages.length - 1];
+
+    // Automatically generate creative title via Gemini on first message
+    if (messagesCount === 0 && lastUserMessage && lastUserMessage.role === "user") {
+      try {
+        const promptText = typeof lastUserMessage.content === "string"
+          ? lastUserMessage.content
+          : lastUserMessage.content?.[0]?.text || "";
+
+        if (promptText) {
+          const { text: aiTitle } = await generateText([
+            {
+              role: "system",
+              content: "You are a professional project naming assistant. Generate a creative, professional title for the project based on the user's design prompt. The title must be exactly 3 to 5 words long. Return ONLY the title, with no quotes, punctuation, or conversational filler."
+            },
+            {
+              role: "user",
+              content: promptText
+            }
+          ]);
+          
+          const cleanTitle = aiTitle.trim().replace(/^["']|["']$/g, "").trim();
+          if (cleanTitle) {
+            await prisma.project.update({
+              where: { id: projectId },
+              data: { title: cleanTitle }
+            });
+            project.title = cleanTitle;
+          }
+        }
+      } catch (titleError) {
+        console.error("Failed to generate AI project title:", titleError);
+      }
+    }
+
     if (lastUserMessage && lastUserMessage.role === "user") {
       await prisma.message.create({
         data: {

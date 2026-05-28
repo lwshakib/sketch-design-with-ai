@@ -67,6 +67,13 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useWorkspaceStore } from "@/hooks/use-workspace-store";
 import NumberFlow from "@number-flow/react";
 
@@ -328,6 +335,64 @@ export function CanvasArea({
     setIsCreateThemeOpen(false);
   };
 
+  // State for custom theme creator
+  const [isCustomThemeOpen, setIsCustomThemeOpen] = React.useState(false);
+  const [customThemeName, setCustomThemeName] = React.useState("");
+  const [customPrimary, setCustomPrimary] = React.useState("#6366f1");
+  const [customSecondary, setCustomSecondary] = React.useState("#ec4899");
+  const [customBackground, setCustomBackground] = React.useState("#080808");
+  const [customForeground, setCustomForeground] = React.useState("#ffffff");
+  const [customFont, setCustomFont] = React.useState("Inter");
+
+  const handleCreateCustomThemeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customThemeName.trim()) return;
+
+    try {
+      const res = await fetch(`/api/projects/${project?.id}/themes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: customThemeName.trim(),
+          colors: {
+            primary: customPrimary,
+            secondary: customSecondary,
+            tertiary: "#14b8a6",
+            neutral: "#94a3b8",
+            background: customBackground,
+            foreground: customForeground,
+          },
+          typography: {
+            headline: customFont,
+            body: customFont,
+            label: customFont,
+          },
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to create custom theme");
+
+      const newTheme = await res.json();
+
+      const updateFn = (prev: any[]) => {
+        const updated = prev.map((a) =>
+          a.type === "theme" ? { ...a, isActive: false } : a
+        );
+        return [...updated, newTheme];
+      };
+
+      setArtifacts(updateFn);
+      setThrottledArtifacts(updateFn);
+
+      setIsCustomThemeOpen(false);
+      setCustomThemeName("");
+      toast.success("Custom theme created and applied successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to create custom theme");
+    }
+  };
+
   const isEditMode = secondarySidebarMode === "properties";
   const _status = isGenerating ? "streaming" : "ready"; // Simplification for UI checks
 
@@ -396,11 +461,38 @@ export function CanvasArea({
   return (
     <main
       ref={previewRef}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
+      onMouseDown={(e) => {
+        const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+        if (isModalOpen) return;
+        const target = e.target as HTMLElement;
+        if (
+          target.closest('[role="dialog"]') ||
+          target.closest('[role="menu"]') ||
+          target.closest('[data-radix-portal]') ||
+          target.closest('.pointer-events-auto')
+        ) {
+          return;
+        }
+        handleMouseDown(e);
+      }}
+      onMouseMove={(e) => {
+        const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+        if (isModalOpen) return;
+        handleMouseMove(e);
+      }}
+      onMouseUp={() => {
+        const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+        if (isModalOpen) return;
+        handleMouseUp();
+      }}
+      onMouseLeave={() => {
+        const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+        if (isModalOpen) return;
+        handleMouseUp();
+      }}
       onClick={(e) => {
+        const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+        if (isModalOpen) return;
         if (e.target === e.currentTarget) {
            setSelectedArtifactIds(new Set());
            setSelectedElementInfo(null);
@@ -827,6 +919,8 @@ export function CanvasArea({
                         // Manual resize takes absolute priority
                         if (artifact.height) return `${artifact.height}px`;
 
+                        if (artifact.type === "theme") return "672px";
+
                         const dynamicHeight =
                           dynamicFrameHeights[artifact.title];
                         // Prefer dynamic height if detected and no manual height is set
@@ -1124,6 +1218,25 @@ export function CanvasArea({
 
                 <div className="flex items-center justify-between gap-3 px-1">
                   <div className="flex items-center gap-1.5">
+                    {/* File Upload Button */}
+                    <Button
+                      onClick={() => fileInputRef.current?.click()}
+                      variant="outline"
+                      size="icon"
+                      className="bg-muted/40 border-border/50 text-muted-foreground hover:text-foreground hover:bg-muted h-7 w-7 rounded-full border"
+                      type="button"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                    </Button>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      className="hidden"
+                      ref={fileInputRef}
+                      onChange={handleFileUpload}
+                    />
+
                     {/* Multi-theme Dropdown Select */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -1141,55 +1254,50 @@ export function CanvasArea({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="start"
-                        className="bg-card border-border text-foreground z-[100] w-56 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
+                        className="bg-card border-border text-foreground z-[100] w-52 rounded-2xl p-1.5 shadow-2xl backdrop-blur-3xl"
                       >
-                        <div className="px-2.5 py-1 text-[9px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border/30 mb-1">
-                          Select Project Theme
-                        </div>
-                        {projectThemes.length === 0 ? (
-                          <div className="px-3 py-1.5 text-xs text-muted-foreground italic">
-                            No themes found
-                          </div>
-                        ) : (
-                          projectThemes.map((theme) => (
-                            <DropdownMenuItem
-                              key={theme.id}
-                              onClick={() => handleSwitchTheme(theme.id!)}
-                              className={cn(
-                                "hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-2.5 py-1.5 text-[11.5px] font-medium",
-                                theme.isActive && "text-primary font-semibold"
-                              )}
-                            >
-                              <div className="flex items-center gap-2 truncate max-w-[150px]">
-                                <div
-                                  className="size-3 rounded-full border shrink-0"
-                                  style={{ backgroundColor: theme.variables?.colors?.primary || "#6366f1" }}
-                                />
-                                <span className="truncate">{theme.title}</span>
-                              </div>
-                              {theme.isActive && (
-                                <Check className="h-3 w-3 text-primary shrink-0" />
-                              )}
-                            </DropdownMenuItem>
-                          ))
+                        {projectThemes.length > 0 && (
+                          <>
+                            {projectThemes.map((theme) => (
+                              <DropdownMenuItem
+                                key={theme.id}
+                                onClick={() => handleSwitchTheme(theme.id!)}
+                                className={cn(
+                                  "hover:bg-muted flex cursor-pointer items-center justify-between rounded-xl px-2.5 py-1.5 text-[11.5px] font-medium",
+                                  theme.isActive && "text-primary font-semibold"
+                                )}
+                              >
+                                <div className="flex items-center gap-2 truncate max-w-[130px]">
+                                  <div
+                                    className="size-3 rounded-full border shrink-0"
+                                    style={{ backgroundColor: theme.variables?.colors?.primary || "#6366f1" }}
+                                  />
+                                  <span className="truncate">{theme.title}</span>
+                                </div>
+                                {theme.isActive && (
+                                  <Check className="h-3 w-3 text-primary shrink-0" />
+                                )}
+                              </DropdownMenuItem>
+                            ))}
+                            <DropdownMenuSeparator className="bg-border/30 my-1" />
+                          </>
                         )}
+                        <DropdownMenuItem
+                          onClick={() => setIsCustomThemeOpen(true)}
+                          className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 text-[11.5px] font-semibold text-foreground/80 hover:text-primary transition-colors"
+                        >
+                          <Plus className="h-3.5 w-3.5 text-primary opacity-80" />
+                          <span>Custom Theme</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setIsCreateThemeOpen(true)}
+                          className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-1.5 text-[11.5px] font-semibold text-foreground/80 hover:text-primary transition-colors"
+                        >
+                          <Sparkles className="h-3.5 w-3.5 text-primary opacity-80" />
+                          <span>AI Theme</span>
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-
-                    {/* Add Theme Button */}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          onClick={() => setIsCreateThemeOpen(true)}
-                          variant="ghost"
-                          size="icon"
-                          className="bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground border border-border/50 h-7 w-7 rounded-full p-0 flex items-center justify-center"
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Create a new theme</TooltipContent>
-                    </Tooltip>
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -1357,7 +1465,7 @@ export function CanvasArea({
           </DialogHeader>
           <form onSubmit={handleCreateThemeSubmit} className="space-y-4 pt-3">
             <div className="space-y-1">
-              <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest px-1">
+              <label className="text-xs font-semibold text-muted-foreground px-1">
                  Creative Prompt
               </label>
               <textarea
@@ -1381,6 +1489,101 @@ export function CanvasArea({
               <Button
                 type="submit"
                 disabled={!themePrompt.trim()}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold transition-all shadow-md"
+              >
+                Create Theme
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Custom Theme Dialog */}
+      <Dialog open={isCustomThemeOpen} onOpenChange={setIsCustomThemeOpen}>
+        <DialogContent className="bg-background border-border text-foreground rounded-3xl p-6 shadow-2xl sm:max-w-md">
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="text-xl font-bold tracking-tight">
+               Create Custom Theme
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground text-xs leading-relaxed">
+               Manually configure colors and typography tokens to establish your project's custom design system.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreateCustomThemeSubmit} className="space-y-4 pt-3">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-muted-foreground px-1">
+                 Theme/Brand Name
+              </label>
+              <input
+                type="text"
+                value={customThemeName}
+                onChange={(e) => setCustomThemeName(e.target.value)}
+                placeholder="e.g. Horizon Ethos, Cyberpunk Neon..."
+                className="bg-secondary/40 border-border text-foreground placeholder:text-muted-foreground/40 focus:ring-primary/50 w-full rounded-xl border px-4 py-2.5 text-xs transition-all focus:ring-1 focus:outline-none"
+                required
+                autoFocus
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-muted-foreground px-1">Primary Color</label>
+                <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-1.5">
+                  <input type="color" value={customPrimary} onChange={(e) => setCustomPrimary(e.target.value)} className="w-6 h-6 rounded-full border-none cursor-pointer p-0 bg-transparent shrink-0" />
+                  <span className="text-[11px] font-mono uppercase text-foreground">{customPrimary}</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-muted-foreground px-1">Secondary Color</label>
+                <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-1.5">
+                  <input type="color" value={customSecondary} onChange={(e) => setCustomSecondary(e.target.value)} className="w-6 h-6 rounded-full border-none cursor-pointer p-0 bg-transparent shrink-0" />
+                  <span className="text-[11px] font-mono uppercase text-foreground">{customSecondary}</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-muted-foreground px-1">Background Color</label>
+                <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-1.5">
+                  <input type="color" value={customBackground} onChange={(e) => setCustomBackground(e.target.value)} className="w-6 h-6 rounded-full border-none cursor-pointer p-0 bg-transparent shrink-0" />
+                  <span className="text-[11px] font-mono uppercase text-foreground">{customBackground}</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-muted-foreground px-1">Foreground (Text)</label>
+                <div className="flex items-center gap-2 bg-secondary/40 border border-border rounded-xl px-3 py-1.5">
+                  <input type="color" value={customForeground} onChange={(e) => setCustomForeground(e.target.value)} className="w-6 h-6 rounded-full border-none cursor-pointer p-0 bg-transparent shrink-0" />
+                  <span className="text-[11px] font-mono uppercase text-foreground">{customForeground}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-muted-foreground px-1">Typography Font</label>
+              <Select value={customFont} onValueChange={(val) => setCustomFont(val)}>
+                <SelectTrigger className="w-full bg-secondary/40 border-border text-foreground rounded-xl h-9 text-xs">
+                  <SelectValue placeholder="Select a font" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border-border text-foreground z-[150]">
+                  <SelectItem value="Inter">Inter (Modern & Clean)</SelectItem>
+                  <SelectItem value="Poppins">Poppins (Friendly & Rounded)</SelectItem>
+                  <SelectItem value="Playfair Display">Playfair Display (Elegant Serif)</SelectItem>
+                  <SelectItem value="Fira Code">Fira Code (Futuristic Monospace)</SelectItem>
+                  <SelectItem value="Outfit">Outfit (Geometric & Bold)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <DialogFooter className="flex flex-row items-center gap-3 pt-2">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsCustomThemeOpen(false)}
+                className="text-muted-foreground hover:bg-secondary hover:text-foreground h-9 flex-1 rounded-xl text-xs font-semibold"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={!customThemeName.trim()}
                 className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 flex-1 rounded-xl text-xs font-bold transition-all shadow-md"
               >
                 Create Theme

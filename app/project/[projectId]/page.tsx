@@ -259,15 +259,51 @@ export default function ProjectPage() {
               (p) => p.title === title,
             );
             const type = event.data.type || planItem?.type || "web";
-            const getNewX = (existing: any[], scrType: string) => {
-              const last = existing[existing.length - 1];
-              const getWidth = (t: string) =>
-                t === "app" ? 380 : (t === "web" || t === "theme") ? 1280 : 1024;
-              const currentWidth = getWidth(scrType);
-              return last
-                ? (last.x || 0) + (last.width || getWidth(last.type)) + 120
-                : -currentWidth / 2;
+
+            const getThemePosition = (existing: Artifact[]) => {
+              const themes = existing.filter(a => a.type === "theme");
+              const getRowY = (n: number) => -400 + (n - 1) * 1000;
+              let chosenRow = 1;
+              while (true) {
+                const yCenter = getRowY(chosenRow);
+                const isOccupied = themes.some(t => t.y !== undefined && Math.abs(t.y - yCenter) < 500);
+                if (!isOccupied) {
+                  break;
+                }
+                chosenRow++;
+              }
+              return { x: -1200 / 2, y: getRowY(chosenRow) };
             };
+
+            const getScreenPosition = (existing: Artifact[], scrType: string) => {
+              const activeTheme = existing.find(a => a.type === "theme" && (a as any).isActive);
+              const themes = existing.filter(a => a.type === "theme");
+              const lastTheme = themes[themes.length - 1];
+              const targetY = activeTheme?.y ?? lastTheme?.y ?? -((scrType === "web" ? 700 : 800) / 2);
+
+              const rowElements = existing.filter(a => a.y !== undefined && Math.abs(a.y - targetY) < 500);
+              const width = scrType === "web" ? 1280 : 380;
+              
+              let currentX;
+              if (rowElements.length === 0) {
+                currentX = -width / 2;
+              } else {
+                let maxX = -99999;
+                rowElements.forEach((el) => {
+                  const getWidth = (t: string) => (t === "app" ? 380 : t === "web" ? 1280 : 1200);
+                  const w = el.width || getWidth(el.type);
+                  const right = (el.x || 0) + w;
+                  if (right > maxX) maxX = right;
+                });
+                currentX = maxX + 120;
+              }
+              return { x: currentX, y: targetY };
+            };
+
+            const pos = type === "theme"
+              ? getThemePosition(prev)
+              : getScreenPosition(prev, type);
+
             return [
               ...prev,
               {
@@ -276,8 +312,8 @@ export default function ProjectPage() {
                 html: "",
                 type: type as any,
                 isComplete: false,
-                x: getNewX(prev, type),
-                y: -((type === "web" || type === "theme" ? 700 : 800) / 2),
+                x: event.data.x !== undefined ? event.data.x : pos.x,
+                y: event.data.y !== undefined ? event.data.y : pos.y,
               },
             ];
           };
@@ -358,21 +394,56 @@ export default function ProjectPage() {
                      isComplete: true,
                    };
                  } else {
-                   const getNewX = (existing: any[], scrType: string) => {
-                     const last = existing[existing.length - 1];
-                     const getWidth = (t: string) =>
-                       t === "app" ? 380 : (t === "web" || t === "theme") ? 1280 : 1024;
-                     const currentWidth = getWidth(scrType);
-                     return last
-                       ? (last.x || 0) + (last.width || getWidth(last.type)) + 120
-                       : -currentWidth / 2;
-                   };
-                   updated.push({
-                     ...finishedScreen,
-                     isComplete: true,
-                     x: finishedScreen.x !== undefined ? finishedScreen.x : getNewX(updated, finishedScreen.type),
-                     y: finishedScreen.y !== undefined ? finishedScreen.y : -((finishedScreen.type === "web" || finishedScreen.type === "theme" ? 700 : 800) / 2),
-                   });
+                    const getThemePosition = (existing: Artifact[]) => {
+                      const themes = existing.filter(a => a.type === "theme");
+                      const getRowY = (n: number) => -400 + (n - 1) * 1000;
+                      let chosenRow = 1;
+                      while (true) {
+                        const yCenter = getRowY(chosenRow);
+                        const isOccupied = themes.some(t => t.y !== undefined && Math.abs(t.y - yCenter) < 500);
+                        if (!isOccupied) {
+                          break;
+                        }
+                        chosenRow++;
+                      }
+                      return { x: -1200 / 2, y: getRowY(chosenRow) };
+                    };
+
+                    const getScreenPosition = (existing: Artifact[], scrType: string) => {
+                      const activeTheme = existing.find(a => a.type === "theme" && (a as any).isActive);
+                      const themes = existing.filter(a => a.type === "theme");
+                      const lastTheme = themes[themes.length - 1];
+                      const targetY = activeTheme?.y ?? lastTheme?.y ?? -((scrType === "web" ? 700 : 800) / 2);
+
+                      const rowElements = existing.filter(a => a.y !== undefined && Math.abs(a.y - targetY) < 500);
+                      const width = scrType === "web" ? 1280 : 380;
+                      
+                      let currentX;
+                      if (rowElements.length === 0) {
+                        currentX = -width / 2;
+                      } else {
+                        let maxX = -99999;
+                        rowElements.forEach((el) => {
+                          const getWidth = (t: string) => (t === "app" ? 380 : t === "web" ? 1280 : 1200);
+                          const w = el.width || getWidth(el.type);
+                          const right = (el.x || 0) + w;
+                          if (right > maxX) maxX = right;
+                        });
+                        currentX = maxX + 120;
+                      }
+                      return { x: currentX, y: targetY };
+                    };
+
+                    const pos = finishedScreen.type === "theme"
+                      ? getThemePosition(updated)
+                      : getScreenPosition(updated, finishedScreen.type);
+
+                    updated.push({
+                      ...finishedScreen,
+                      isComplete: true,
+                      x: finishedScreen.x !== undefined ? finishedScreen.x : pos.x,
+                      y: finishedScreen.y !== undefined ? finishedScreen.y : pos.y,
+                    });
                  }
                }
                return updated;
@@ -422,21 +493,56 @@ export default function ProjectPage() {
                   isComplete: true,
                 };
               } else {
-                 const getNewX = (existing: any[], scrType: string) => {
-                   const last = existing[existing.length - 1];
-                   const getWidth = (t: string) =>
-                     t === "app" ? 380 : (t === "web" || t === "theme") ? 1280 : 1024;
-                   const currentWidth = getWidth(scrType);
-                   return last
-                     ? (last.x || 0) + (last.width || getWidth(last.type)) + 120
-                     : -currentWidth / 2;
-                 };
-                updated.push({
-                  ...newScreen,
-                  isComplete: true,
-                  x: newScreen.x !== undefined ? newScreen.x : getNewX(updated, newScreen.type),
-                  y: newScreen.y !== undefined ? newScreen.y : -((newScreen.type === "web" || newScreen.type === "theme" ? 700 : 800) / 2),
-                });
+                  const getThemePosition = (existing: Artifact[]) => {
+                    const themes = existing.filter(a => a.type === "theme");
+                    const getRowY = (n: number) => -400 + (n - 1) * 1000;
+                    let chosenRow = 1;
+                    while (true) {
+                      const yCenter = getRowY(chosenRow);
+                      const isOccupied = themes.some(t => t.y !== undefined && Math.abs(t.y - yCenter) < 500);
+                      if (!isOccupied) {
+                        break;
+                      }
+                      chosenRow++;
+                    }
+                    return { x: -1200 / 2, y: getRowY(chosenRow) };
+                  };
+
+                  const getScreenPosition = (existing: Artifact[], scrType: string) => {
+                    const activeTheme = existing.find(a => a.type === "theme" && (a as any).isActive);
+                    const themes = existing.filter(a => a.type === "theme");
+                    const lastTheme = themes[themes.length - 1];
+                    const targetY = activeTheme?.y ?? lastTheme?.y ?? -((scrType === "web" ? 700 : 800) / 2);
+
+                    const rowElements = existing.filter(a => a.y !== undefined && Math.abs(a.y - targetY) < 500);
+                    const width = scrType === "web" ? 1280 : 380;
+                    
+                    let currentX;
+                    if (rowElements.length === 0) {
+                      currentX = -width / 2;
+                    } else {
+                      let maxX = -99999;
+                      rowElements.forEach((el) => {
+                        const getWidth = (t: string) => (t === "app" ? 380 : t === "web" ? 1280 : 1200);
+                        const w = el.width || getWidth(el.type);
+                        const right = (el.x || 0) + w;
+                        if (right > maxX) maxX = right;
+                      });
+                      currentX = maxX + 120;
+                    }
+                    return { x: currentX, y: targetY };
+                  };
+
+                  const pos = newScreen.type === "theme"
+                    ? getThemePosition(updated)
+                    : getScreenPosition(updated, newScreen.type);
+
+                  updated.push({
+                    ...newScreen,
+                    isComplete: true,
+                    x: newScreen.x !== undefined ? newScreen.x : pos.x,
+                    y: newScreen.y !== undefined ? newScreen.y : pos.y,
+                  });
               }
             }
             return updated;

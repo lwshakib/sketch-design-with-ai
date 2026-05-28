@@ -260,7 +260,7 @@ export function useCanvas({
           const height =
             art.height ||
             dynamicFrameHeights[art.title] ||
-            (art.type === "app" ? 800 : 700);
+            (art.type === "theme" ? 672 : (art.type === "app" ? 800 : 700));
 
           // Artifact world to screen coordinates
           // The actual scale applied is zoom * 0.5
@@ -357,7 +357,7 @@ export function useCanvas({
               : art.type === "app"
                 ? 380
                 : 1024;
-      const defaultHeight = dynamicFrameHeights[art.title] || 800;
+      const defaultHeight = dynamicFrameHeights[art.title] || (art.type === "theme" ? 672 : (art.type === "app" ? 800 : 700));
 
       resizingStartSize.current = {
         width: art.width || defaultWidth,
@@ -479,6 +479,9 @@ export function useCanvas({
     if (!element || loading) return;
 
     const handleWheelNative = (e: WheelEvent) => {
+      const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+      if (isModalOpen) return;
+
       // Prevent canvas interaction if scrolling over a scrollable UI element
       let target = e.target as HTMLElement | null;
       while (target && target !== element) {
@@ -518,6 +521,9 @@ export function useCanvas({
         document.activeElement?.tagName || "",
       );
       if (isInput) return;
+
+      const isModalOpen = typeof document !== "undefined" && (!!document.querySelector('[role="dialog"]') || !!document.querySelector('[data-slot="dialog-content"]'));
+      if (isModalOpen) return;
 
       // Tool Switching (Press & Hold)
       if (e.key === " " && activeTool !== "hand" && !e.repeat) {

@@ -13,6 +13,8 @@ export async function publishStatus({
   screenId,
   screen,
   type,
+  x,
+  y,
 }: {
   publish: any;
   projectId: string;
@@ -23,6 +25,8 @@ export async function publishStatus({
   screenId?: string;
   screen?: any;
   type?: string;
+  x?: number;
+  y?: number;
 }) {
   await publish({
     channel: `project:${projectId}`,
@@ -35,6 +39,8 @@ export async function publishStatus({
       ...(screenId && { screenId }),
       ...(screen && { screen }),
       ...(type && { type }),
+      ...(x !== undefined && { x }),
+      ...(y !== undefined && { y }),
     },
   });
 }
