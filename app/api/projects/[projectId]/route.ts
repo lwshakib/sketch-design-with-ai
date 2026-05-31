@@ -99,10 +99,19 @@ export async function PATCH(
     const body = await req.json();
     const { canvasData, title } = body;
 
+    const projectCheck = await prisma.project.findUnique({
+      where: {
+        id: projectId,
+      },
+    });
+
+    if (!projectCheck || projectCheck.userId !== session.user.id) {
+      return new NextResponse("Unauthorized or Not Found", { status: 404 });
+    }
+
     const project = await prisma.project.update({
       where: {
         id: projectId,
-        userId: session.user.id,
       },
       data: {
         canvasData,
