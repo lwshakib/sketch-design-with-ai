@@ -361,7 +361,9 @@ export default function ProjectPage() {
 
         if (!res.ok) throw new Error("Failed to save changes");
         toast.success("Changes saved");
-        setHasUnsavedChanges(true);
+        if (!res.ok) throw new Error("Failed to save changes");
+        toast.success("Changes saved");
+        setHasUnsavedChanges(false);
       } catch (error) {
         console.error("Commit error:", error);
         toast.error("Failed to persist edits");
