@@ -18,12 +18,22 @@ export async function DELETE(
 
     const { themeId } = await params;
 
+    const themeCheck = await prisma.theme.findUnique({
+      where: {
+        id: themeId,
+      },
+      include: {
+        project: true,
+      },
+    });
+
+    if (!themeCheck || themeCheck.project.userId !== session.user.id) {
+      return new NextResponse("Unauthorized or Not Found", { status: 404 });
+    }
+
     const theme = await prisma.theme.delete({
       where: {
         id: themeId,
-        project: {
-          userId: session.user.id,
-        },
       },
     });
 
