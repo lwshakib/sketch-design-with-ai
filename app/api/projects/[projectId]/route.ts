@@ -146,10 +146,19 @@ export async function DELETE(
 
     const { projectId } = await params;
 
+    const existingProject = await prisma.project.findUnique({
+      where: {
+        id: projectId,
+      },
+    });
+
+    if (!existingProject || existingProject.userId !== session.user.id) {
+      return new NextResponse("Unauthorized or Not Found", { status: 404 });
+    }
+
     const project = await prisma.project.delete({
       where: {
         id: projectId,
-        userId: session.user.id,
       },
     });
 
