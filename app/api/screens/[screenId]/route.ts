@@ -20,12 +20,22 @@ export async function PATCH(
     const body = await req.json();
     const { x, y, width, height, html } = body;
 
-    const screen = await prisma.screen.update({
+    const existingScreen = await prisma.screen.findFirst({
       where: {
         id: screenId,
         project: {
           userId: session.user.id,
         },
+      },
+    });
+
+    if (!existingScreen) {
+      return new NextResponse("Unauthorized or Not Found", { status: 404 });
+    }
+
+    const screen = await prisma.screen.update({
+      where: {
+        id: screenId,
       },
       data: {
         x: x !== undefined ? x : undefined,
