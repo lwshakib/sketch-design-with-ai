@@ -1,9 +1,22 @@
+import { auth } from "@/lib/auth";
 import { getPresignedUploadUrl } from "@/lib/s3";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req: Request) {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
     const { contentType, folder = "attachments", fileName } = await req.json();
 
     if (!contentType) {
